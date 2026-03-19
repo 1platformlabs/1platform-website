@@ -5,8 +5,8 @@ import Hero from '@components/Hero.astro';
 import SolutionCard from '@components/SolutionCard.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 
-const title = 'E-Commerce, Delivery & AI Solutions | 1Platform';
-const description = 'Explore 13+ solutions unified under one REST API. Regional e-commerce, delivery management, payments, electronic invoicing (FEL), AI content generation, and more.';
+const title = 'SEO Automation Solutions — Unified API | 1Platform';
+const description = 'Replace 13+ separate tools with one platform. AI content, keywords, publishing, indexing, link building, payments, and invoicing — unified. Try free.';
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
@@ -115,93 +115,43 @@ const distributionSolutions = [
   },
 ];
 
-/* ── E-Commerce Pillar ── */
-const ecommerceSolutions = [
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
-    title: 'Online Store Builder',
-    description: 'Create regional e-commerce websites with integrated product catalogs, checkout flows, and multi-currency support for Latin American markets.',
-    replaces: 'Standalone e-commerce platforms',
-    href: '/docs/ecommerce/',
-  },
+/* ── Payments & Invoicing Pillar ── */
+const paymentsSolutions = [
   {
     icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
-    title: 'Payment Processing',
-    description: 'Accept credit cards, debit cards, and local payment methods across Latin America. Hosted checkout, webhook notifications, and automatic receipts.',
-    replaces: 'Standalone payment gateways',
+    title: 'Online Payment Processing',
+    description: 'Accept credit and debit card payments via API. Checkout URLs, webhook notifications, and automatic balance crediting.',
+    replaces: 'Separate payment gateway integration + POS terminal rental',
     href: '/docs/payments/',
   },
   {
     icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>',
     title: 'NFC Tap-to-Pay',
-    description: 'Accept card-present payments with NFC-enabled mobile devices. Turn any smartphone into a point-of-sale terminal — no hardware needed.',
+    description: 'Accept card-present payments via mobile app — accept payments in person with any NFC-enabled phone. No hardware needed.',
     replaces: 'Dedicated POS hardware',
     href: '/docs/nfc/',
   },
-];
-
-/* ── Delivery Pillar ── */
-const deliverySolutions = [
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
-    title: 'Delivery Coordination',
-    description: 'Manage the full delivery lifecycle: order assignment, route optimization, driver tracking, and delivery confirmation — all via API.',
-    replaces: 'Third-party delivery platforms',
-    href: '/docs/delivery/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
-    title: 'Real-Time Tracking',
-    description: 'Give customers live order tracking from store to doorstep. GPS-based driver location, ETA updates, and delivery status notifications.',
-    replaces: 'Manual delivery coordination',
-    href: '/docs/delivery/',
-  },
-];
-
-/* ── Invoicing Pillar ── */
-const invoicingSolutions = [
   {
     icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
     title: 'Electronic Invoicing (FEL)',
-    description: 'Generate certified electronic invoices automatically after each sale. Tax-compliant FEL billing for Guatemala and Central America.',
-    replaces: 'Invoicing software, tax compliance tools',
-    href: '/docs/invoicing/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-    title: 'Tax Compliance',
-    description: 'Automatic SAT compliance for Guatemala. Every invoice certified and submitted in real time — zero manual tax filing required.',
-    replaces: 'Manual tax reporting',
+    description: 'Generate FEL-compliant electronic invoices automatically from transactions. Certified tax compliance for Guatemala.',
+    replaces: 'Separate invoicing software + manual tax compliance',
     href: '/docs/invoicing/',
   },
 ];
 
 const pillarSections = [
   {
-    id: 'ecommerce',
-    title: 'E-Commerce & Payments',
-    description: 'Launch your online store with integrated checkout, multi-currency support, and NFC tap-to-pay for Latin American markets.',
-    icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
-    solutions: ecommerceSolutions,
-  },
-  {
-    id: 'delivery',
-    title: 'Delivery Management',
-    description: 'Coordinate deliveries from order to doorstep with real-time tracking, route optimization, and driver management.',
-    icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
-    solutions: deliverySolutions,
-  },
-  {
-    id: 'invoicing',
-    title: 'Invoicing & Tax Compliance',
-    description: 'Generate certified electronic invoices (FEL) automatically from every transaction. Tax compliance built for Central America.',
-    icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
-    solutions: invoicingSolutions,
+    id: 'intelligence',
+    title: 'Intelligence & Research',
+    description: 'Extract keywords, connect Google Search Console, and manage multiple websites — the foundation of every content strategy.',
+    icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
+    solutions: intelligenceSolutions,
   },
   {
     id: 'content',
-    title: 'AI Content Assistant',
-    description: 'Generate product descriptions, articles, images, and more with AI — boost your store\'s visibility and attract more customers.',
+    title: 'Content Creation & Publishing',
+    description: 'Generate articles, images, comments, profiles, and legal pages with AI — then publish directly to your CMS.',
     icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
     solutions: contentSolutions,
   },
@@ -211,6 +161,13 @@ const pillarSections = [
     description: 'Publish to CMS, get indexed by search engines, and build backlinks — the complete distribution pipeline, automated.',
     icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>',
     solutions: distributionSolutions,
+  },
+  {
+    id: 'payments',
+    title: 'Payments & Invoicing',
+    description: 'Accept payments online and in person, then generate certified electronic invoices automatically — monetize your content ecosystem.',
+    icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    solutions: paymentsSolutions,
   },
 ];
 ---
@@ -225,11 +182,11 @@ const pillarSections = [
 
   <!-- Hero -->
   <Hero
-    headline="E-Commerce, Delivery & AI — One Platform."
-    subheadline="Build online stores, manage deliveries, accept payments, generate invoices, and create content with AI — all from a single, unified API."
+    headline="Every Solution. One Platform."
+    subheadline="1Platform replaces 13+ fragmented tools with a unified platform that covers the entire lifecycle — from keyword intelligence to published, indexed, monetized content with automated invoicing."
     badge="13+ Solutions, 1 API"
     primaryCta={{ label: 'Get Started Free', href: 'https://app.1platform.pro' }}
-    secondaryCta={{ label: 'View API Docs', href: '/docs/' }}
+    secondaryCta={{ label: 'View API Docs', href: 'https://developer.1platform.pro/' }}
   />
 
   <!-- Pillar Sections -->
