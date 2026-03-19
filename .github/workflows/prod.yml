@@ -915,7 +915,7 @@ jobs:
             http://localhost:8080/features/
             http://localhost:8080/pricing/
           budgetPath: ""
-          uploadArtifacts: true
+          uploadArtifacts: false
           temporaryPublicStorage: true
 
       - name: Upload Lighthouse report
