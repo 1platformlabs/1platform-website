@@ -1,0 +1,76 @@
+---
+interface Props {
+  icon: string;
+  title: string;
+  description: string;
+  href?: string;
+  replaces?: string;
+}
+
+const { icon, title, description, href = '#', replaces } = Astro.props;
+---
+
+<article class="solution-card card reveal">
+  <div class="solution-card__icon" aria-hidden="true" set:html={icon} />
+  <h3>{title}</h3>
+  <p>{description}</p>
+  {replaces && <p class="solution-card__replaces"><strong>Replaces:</strong> {replaces}</p>}
+  <a href={href} class="solution-card__link">
+    Learn more <span class="sr-only">about {title}</span>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+</article>
+
+<style>
+  .solution-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .solution-card__icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    background: var(--color-accent-glow);
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .solution-card h3 {
+    font-size: var(--text-lg);
+    color: var(--color-text);
+  }
+
+  .solution-card p {
+    font-size: var(--text-sm);
+    flex-grow: 1;
+  }
+
+  .solution-card__replaces {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .solution-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+    margin-top: auto;
+  }
+
+  .solution-card__link:hover {
+    color: var(--color-accent-hover);
+  }
+</style>

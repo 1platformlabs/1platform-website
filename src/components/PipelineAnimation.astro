@@ -1,0 +1,145 @@
+---
+const steps = [
+  { label: 'Create Store', icon: '&#128722;' },
+  { label: 'Receive Order', icon: '&#128230;' },
+  { label: 'Accept Payment', icon: '&#128179;' },
+  { label: 'Assign Delivery', icon: '&#128666;' },
+  { label: 'Generate Invoice', icon: '&#128196;' },
+  { label: 'AI Content', icon: '&#9997;' },
+  { label: 'Publish & Index', icon: '&#128640;' },
+  { label: 'Grow Sales', icon: '&#128200;' },
+];
+---
+
+<div class="pipeline">
+  <div class="pipeline__track">
+    {steps.map((step, i) => (
+      <div class="pipeline__step" data-index={String(i)}>
+        <div class="pipeline__node">
+          <span class="pipeline__icon" aria-hidden="true" set:html={step.icon} />
+          <span class="pipeline__number">{i + 1}</span>
+        </div>
+        <span class="pipeline__label">{step.label}</span>
+        {i < steps.length - 1 && <div class="pipeline__connector" aria-hidden="true" />}
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  import '@scripts/pipeline';
+</script>
+
+<style>
+  .pipeline {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-8) 0;
+  }
+
+  .pipeline__track {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    min-width: max-content;
+    padding-inline: var(--space-4);
+  }
+
+  .pipeline__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    position: relative;
+    flex-shrink: 0;
+    width: 130px;
+    opacity: 0.3;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pipeline__step {
+      transition: opacity var(--duration-slow) var(--ease-out-expo);
+    }
+  }
+
+  .pipeline__step.is-active {
+    opacity: 1;
+  }
+
+  .pipeline__node {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-bg-alt);
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .pipeline__step.is-active .pipeline__node {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 20px var(--color-accent-glow);
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  .pipeline__icon {
+    font-size: var(--text-xl);
+  }
+
+  .pipeline__number {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pipeline__label {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .pipeline__connector {
+    position: absolute;
+    top: 28px;
+    left: calc(50% + 28px);
+    width: calc(130px - 56px);
+    height: 2px;
+    background: var(--color-border);
+  }
+
+  .pipeline__step.is-active .pipeline__connector {
+    background: var(--color-accent);
+  }
+
+  @media (max-width: 768px) {
+    .pipeline__track {
+      flex-direction: column;
+      min-width: auto;
+      align-items: flex-start;
+      gap: var(--space-4);
+    }
+
+    .pipeline__step {
+      flex-direction: row;
+      width: auto;
+      gap: var(--space-4);
+    }
+
+    .pipeline__connector {
+      display: none;
+    }
+  }
+</style>

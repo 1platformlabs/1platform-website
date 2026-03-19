@@ -1,0 +1,71 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import BlogPostCard from '@components/BlogPostCard.astro';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<BaseLayout
+  title="Blog | 1Platform"
+  description="Insights on SEO automation, AI content generation, API tutorials, and product updates from the 1Platform team."
+>
+  <section class="blog-listing section">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Blog' },
+      ]} />
+
+      <header class="blog-listing__header">
+        <h1>1Platform Blog</h1>
+        <p>Insights, tutorials, and updates from the 1Platform team.</p>
+      </header>
+
+      <div class="blog-listing__grid">
+        {posts.map((post) => (
+          <BlogPostCard
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            category={post.data.category}
+            slug={post.slug}
+            author={post.data.author}
+            readingTime={post.data.readingTime}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-listing__header {
+    margin-bottom: var(--space-10);
+  }
+
+  .blog-listing__header h1 {
+    margin-bottom: var(--space-3);
+  }
+
+  .blog-listing__header p {
+    color: var(--color-text-secondary);
+    font-size: var(--text-lg);
+    max-width: 40ch;
+  }
+
+  .blog-listing__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-8);
+  }
+
+  @media (max-width: 480px) {
+    .blog-listing__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

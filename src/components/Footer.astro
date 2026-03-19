@@ -1,0 +1,183 @@
+---
+import Logo from '@components/Logo.astro';
+
+const columns = [
+  {
+    title: 'Solutions',
+    links: [
+      { label: 'E-Commerce', href: '/solutions/#ecommerce' },
+      { label: 'Delivery', href: '/solutions/#delivery' },
+      { label: 'Payments', href: '/solutions/#payments' },
+      { label: 'Invoicing (FEL)', href: '/solutions/#invoicing' },
+      { label: 'AI Content', href: '/solutions/#content' },
+      { label: 'CMS Publishing', href: '/solutions/#content' },
+      { label: 'Indexing', href: '/solutions/#content' },
+      { label: 'NFC Tap-to-Pay', href: '/solutions/#payments' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { label: 'Documentation', href: '/docs/' },
+      { label: 'API Reference', href: '/docs/api-reference/' },
+      { label: 'Code Examples', href: '/docs/code-examples/' },
+      { label: 'Blog', href: '/blog/' },
+      { label: 'Changelog', href: '/changelog/' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About', href: '/about/' },
+      { label: 'Why 1Platform', href: '/why-1platform/' },
+      { label: 'Pricing', href: '/pricing/' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Terms of Service', href: '/terms/' },
+      { label: 'Privacy Policy', href: '/privacy/' },
+      { label: 'Cookie Policy', href: '/cookies/' },
+    ],
+  },
+];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <!-- CTA Banner -->
+    <div class="footer-cta">
+      <h2>E-Commerce, Delivery & Invoicing — All in One</h2>
+      <p>Launch your online store and start selling across Latin America today.</p>
+      <div class="footer-cta__actions">
+        <a href="https://app.1platform.pro" class="btn btn--primary">Get Started Free</a>
+        <a href="/docs/" class="btn btn--ghost">View Documentation</a>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Links -->
+    <div class="footer-links">
+      <div class="footer-brand">
+        <Logo class="footer-logo" />
+        <p>One platform. Every solution.</p>
+      </div>
+
+      {columns.map((col) => (
+        <div class="footer-col">
+          <h3>{col.title}</h3>
+          <ul>
+            {col.links.map((link) => (
+              <li><a href={link.href}>{link.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Bottom -->
+    <div class="footer-bottom">
+      <p>&copy; {year} 1Platform Labs. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-8);
+  }
+
+  .footer-cta {
+    text-align: center;
+    padding-bottom: var(--space-16);
+  }
+
+  .footer-cta h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-3);
+  }
+
+  .footer-cta p {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-8);
+  }
+
+  .footer-cta__actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-links {
+    display: grid;
+    grid-template-columns: 1.5fr repeat(4, 1fr);
+    gap: var(--space-8);
+    padding-block: var(--space-12);
+  }
+
+  .footer-brand {
+    padding-right: var(--space-8);
+  }
+
+  .footer-logo {
+    margin-bottom: var(--space-3);
+  }
+
+  .footer-brand p {
+    font-size: var(--text-sm);
+  }
+
+  .footer-col h3 {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+  }
+
+  .footer-col ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .footer-col a {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .footer-col a:hover {
+    color: var(--color-text);
+  }
+
+  .footer-bottom {
+    padding-top: var(--space-8);
+    text-align: center;
+  }
+
+  .footer-bottom p {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  @media (max-width: 768px) {
+    .footer-links {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-brand {
+      grid-column: 1 / -1;
+      padding-right: 0;
+    }
+  }
+</style>

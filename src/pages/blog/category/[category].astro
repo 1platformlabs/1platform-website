@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import BlogPostCard from '@components/BlogPostCard.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  const categories = [...new Set(posts.map((post) => post.data.category))];
+
+  return categories.map((category) => ({
+    params: { category },
+    props: {
+      posts: posts
+        .filter((post) => post.data.category === category)
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+      category,
+    },
+  }));
+}
+
+const { posts, category } = Astro.props;
+
+const categoryLabel = category.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+---
+
+<BaseLayout
+  title={`${categoryLabel} | 1Platform Blog`}
+  description={`Browse ${categoryLabel} articles on the 1Platform blog.`}
+>
+  <section class="category-listing section">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Blog', href: '/blog/' },
+        { label: categoryLabel },
+      ]} />
+
+      <header class="category-listing__header">
+        <span class="badge">{categoryLabel}</span>
+        <h1>{categoryLabel}</h1>
+        <p>{posts.length} {posts.length === 1 ? 'article' : 'articles'}</p>
+      </header>
+
+      <div class="category-listing__grid">
+        {posts.map((post) => (
+          <BlogPostCard
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            category={post.data.category}
+            slug={post.slug}
+            author={post.data.author}
+            readingTime={post.data.readingTime}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .category-listing__header {
+    margin-bottom: var(--space-10);
+  }
+
+  .category-listing__header h1 {
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+
+  .category-listing__header p {
+    color: var(--color-text-tertiary);
+    font-size: var(--text-sm);
+  }
+
+  .category-listing__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-8);
+  }
+
+  @media (max-width: 480px) {
+    .category-listing__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,36 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+const { title, description, icon } = Astro.props;
+---
+
+<div class="usecase card reveal">
+  <div class="usecase__icon" aria-hidden="true" set:html={icon} />
+  <h3>{title}</h3>
+  <p>{description}</p>
+</div>
+
+<style>
+  .usecase {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .usecase__icon {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-1);
+  }
+
+  .usecase h3 {
+    color: var(--color-text);
+  }
+
+  .usecase p {
+    font-size: var(--text-sm);
+  }
+</style>

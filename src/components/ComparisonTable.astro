@@ -1,0 +1,99 @@
+---
+interface Props {
+  rows?: { without: string; with_: string }[];
+}
+
+const { rows = [
+  { without: 'Separate e-commerce platform + payment gateway', with_: 'Store, payments, and delivery in one platform' },
+  { without: 'Third-party delivery service integration', with_: 'Built-in delivery management with tracking' },
+  { without: 'Manual tax-compliant invoice generation', with_: 'Automatic FEL electronic invoices per sale' },
+  { without: 'Hire writers for product descriptions & content', with_: 'AI generates content in Spanish and English' },
+  { without: '5+ separate tools and billing accounts', with_: '1 account, 1 API, 13+ services' },
+  { without: 'Weeks of integration work', with_: 'Hours to go live' },
+] } = Astro.props;
+---
+
+<div class="comparison reveal">
+  <div class="comparison__header">
+    <div class="comparison__col comparison__col--without">Without 1Platform</div>
+    <div class="comparison__col comparison__col--with">With 1Platform</div>
+  </div>
+  {rows.map((row) => (
+    <div class="comparison__row">
+      <div class="comparison__cell comparison__cell--without">
+        <span class="comparison__icon" aria-hidden="true">&#x2717;</span>
+        {row.without}
+      </div>
+      <div class="comparison__cell comparison__cell--with">
+        <span class="comparison__icon" aria-hidden="true">&#x2713;</span>
+        {row.with_}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .comparison {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+
+  .comparison__header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .comparison__col {
+    padding: var(--space-4) var(--space-6);
+  }
+
+  .comparison__col--without {
+    background: rgba(239, 68, 68, 0.05);
+    color: var(--color-red);
+  }
+
+  .comparison__col--with {
+    background: rgba(16, 185, 129, 0.05);
+    color: var(--color-green);
+  }
+
+  .comparison__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .comparison__cell {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text-secondary);
+  }
+
+  .comparison__cell--without .comparison__icon {
+    color: var(--color-red);
+  }
+
+  .comparison__cell--with .comparison__icon {
+    color: var(--color-green);
+  }
+
+  @media (max-width: 768px) {
+    .comparison__header,
+    .comparison__row {
+      grid-template-columns: 1fr;
+    }
+
+    .comparison__col--with,
+    .comparison__cell--with {
+      border-top: 1px solid var(--color-border);
+    }
+  }
+</style>

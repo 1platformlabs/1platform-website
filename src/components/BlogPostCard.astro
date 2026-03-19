@@ -1,0 +1,76 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  category: string;
+  slug: string;
+  author: string;
+  readingTime?: string;
+}
+
+const { title, description, pubDate, category, slug, author, readingTime } = Astro.props;
+---
+
+<article class="blog-card card reveal">
+  <div class="blog-card__meta">
+    <span class="badge">{category.replace(/-/g, ' ')}</span>
+    <time datetime={pubDate.toISOString()}>
+      {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+    </time>
+  </div>
+  <h3>
+    <a href={`/blog/${slug}/`}>{title}</a>
+  </h3>
+  <p>{description}</p>
+  <div class="blog-card__footer">
+    <span>{author}</span>
+    {readingTime && <span>{readingTime}</span>}
+  </div>
+</article>
+
+<style>
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .blog-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .blog-card h3 {
+    font-size: var(--text-lg);
+  }
+
+  .blog-card h3 a {
+    color: var(--color-text);
+  }
+
+  .blog-card h3 a:hover {
+    color: var(--color-accent);
+  }
+
+  .blog-card p {
+    font-size: var(--text-sm);
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-card__footer {
+    display: flex;
+    gap: var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+</style>

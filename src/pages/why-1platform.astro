@@ -1,0 +1,251 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import MetricCounter from '@components/MetricCounter.astro';
+
+const title = 'Why 1Platform — E-Commerce, Delivery & AI in One Platform';
+const description = 'Discover why 1Platform replaces fragmented e-commerce tools, delivery services, invoicing software, and content platforms with a single ecosystem for Latin America.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: title,
+  description,
+  url: 'https://1platform.pro/why-1platform/',
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://1platform.pro/' },
+      { '@type': 'ListItem', position: 2, name: 'Why 1Platform' },
+    ],
+  },
+};
+
+const pillars = [
+  {
+    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
+    title: 'Regional E-Commerce',
+    description: 'Build online stores designed for Latin American markets. Integrated checkout, local payment methods, multi-currency support, and NFC tap-to-pay — everything you need to sell online and in person.',
+    bullets: [
+      'Online stores with integrated checkout flows',
+      'Credit/debit cards and local payment methods',
+      'NFC tap-to-pay — turn any phone into a POS terminal',
+      'Multi-currency support (GTQ, USD, and more)',
+    ],
+  },
+  {
+    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+    title: 'Delivery Management',
+    description: 'Coordinate deliveries from order to doorstep. Route optimization, real-time GPS tracking, driver assignment, and delivery confirmation — all built into your e-commerce workflow.',
+    bullets: [
+      'Order-to-doorstep delivery coordination',
+      'Real-time GPS tracking for customers and drivers',
+      'Automatic driver assignment and route optimization',
+      'Delivery confirmation with proof-of-delivery',
+    ],
+  },
+  {
+    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
+    title: 'Invoicing & Tax Compliance',
+    description: 'Generate FEL-compliant electronic invoices automatically from every sale. Certified tax compliance for Guatemala and Central America — zero manual filing.',
+    bullets: [
+      'Certified electronic invoicing (FEL) per transaction',
+      'Automatic SAT compliance for Guatemala',
+      'Invoice generation triggered by payments',
+      'Full audit trail and tax reporting',
+    ],
+  },
+  {
+    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+    title: 'AI Content Assistant',
+    description: 'Generate product descriptions, blog posts, and marketing content with AI. Boost your store\'s SEO and attract more customers with content in Spanish and English.',
+    bullets: [
+      'AI-generated product descriptions and blog posts',
+      'Keyword research to optimize store pages',
+      'Automated image generation for products',
+      'CMS publishing, indexing, and link building',
+    ],
+  },
+  {
+    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><circle cx="5" cy="19" r="2"/><line x1="12" y1="9" x2="12" y2="3"/><line x1="14.5" y1="10" x2="17.5" y2="6.5"/><line x1="9.5" y1="10" x2="6.5" y2="6.5"/><line x1="14.5" y1="14" x2="17.5" y2="17.5"/><line x1="9.5" y1="14" x2="6.5" y2="17.5"/></svg>`,
+    title: 'Interconnected Ecosystem',
+    description: 'Every service feeds into the next. Customers order online, pay at checkout, receive delivery tracking, get an FEL invoice, and your AI content drives more traffic to the store.',
+    bullets: [
+      'Orders trigger payment processing automatically',
+      'Payments trigger delivery assignment and invoicing',
+      'AI content drives organic traffic to your store',
+      'All data flows between services seamlessly',
+      'One API, one dashboard, one billing account',
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <Breadcrumb items={[
+    { label: 'Home', href: '/' },
+    { label: 'Why 1Platform' },
+  ]} />
+
+  <Hero
+    headline="Why 1Platform?"
+    subheadline="Replace fragmented e-commerce tools, delivery services, invoicing software, and content platforms with one ecosystem built for Latin America."
+    badge="The Unified Advantage"
+    primaryCta={{ label: 'Get Started Free', href: 'https://app.1platform.pro' }}
+    secondaryCta={{ label: 'View Solutions', href: '/solutions/' }}
+  />
+
+  <!-- Pillars -->
+  {pillars.map((pillar, index) => (
+    <section class:list={['section', { 'section--alt': index % 2 === 1 }]}>
+      <div class="container">
+        <div class="pillar reveal">
+          <div class="pillar__icon" set:html={pillar.icon} />
+          <div class="pillar__content">
+            <h2>{pillar.title}</h2>
+            <p class="pillar__desc">{pillar.description}</p>
+            <ul class="pillar__list">
+              {pillar.bullets.map((bullet) => (
+                <li>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <!-- Metrics -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="metrics__header reveal">
+        <h2>1Platform by the Numbers</h2>
+        <p>One platform replacing an entire stack of disconnected tools.</p>
+      </div>
+      <div class="grid-4 metrics__grid">
+        <MetricCounter value={5000} suffix="+" label="Daily Orders" />
+        <MetricCounter value={13} suffix="+" label="Integrated Services" />
+        <MetricCounter value={1} label="Unified API" />
+        <MetricCounter value={2} label="Supported Languages" />
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container cta-section reveal">
+      <h2>Ready to Launch Your E-Commerce?</h2>
+      <p>Build your store, manage deliveries, generate invoices, and create content with AI — all from one platform. Get started in minutes.</p>
+      <div class="cta-section__actions">
+        <a href="https://app.1platform.pro" class="btn btn--primary">Get Started Free</a>
+        <a href="/docs/" class="btn btn--ghost">View API Docs</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pillar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-8);
+    align-items: start;
+    max-width: var(--max-width-narrow);
+    margin-inline: auto;
+  }
+
+  .pillar__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: var(--border-radius-lg);
+    background: var(--color-accent-glow);
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .pillar__content h2 {
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+  }
+
+  .pillar__desc {
+    margin-bottom: var(--space-6);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .pillar__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .pillar__list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text-secondary);
+  }
+
+  .pillar__list li svg {
+    flex-shrink: 0;
+  }
+
+  .metrics__header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+
+  .metrics__header h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  .metrics__grid {
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  .cta-section {
+    text-align: center;
+    max-width: var(--max-width-narrow);
+    margin-inline: auto;
+  }
+
+  .cta-section h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  .cta-section > p {
+    margin-bottom: var(--space-8);
+    color: var(--color-text-secondary);
+  }
+
+  .cta-section__actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .pillar {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .pillar__icon {
+      margin-inline: auto;
+    }
+
+    .pillar__list {
+      text-align: left;
+    }
+  }
+</style>

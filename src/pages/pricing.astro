@@ -1,0 +1,707 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+
+const title = 'Pricing — Flexible Plans | 1Platform';
+const description = 'Flexible pricing tailored to your business. Activate any solution, scale without limits, and get a plan designed around your needs.';
+
+const faqs = [
+  {
+    question: 'How does pricing work?',
+    answer: 'We offer flexible, usage-based plans tailored to your business needs. You can activate any combination of our 13+ solutions and pay based on actual consumption. Contact our team to get a custom quote.',
+  },
+  {
+    question: 'Is there a free tier?',
+    answer: 'Yes. Create a free account — no credit card required. You get a generous daily allowance to test every solution. Once you need more capacity, our team will work with you on the right plan.',
+  },
+  {
+    question: 'Can I set spending limits?',
+    answer: 'Yes. You can configure spending alerts and hard caps from your dashboard. If you hit your limit, operations pause automatically — you never get a surprise bill.',
+  },
+  {
+    question: 'Do you offer volume discounts?',
+    answer: 'Absolutely. Plans are customized based on your expected volume. The more you use, the better rates you unlock. Contact sales to discuss your needs.',
+  },
+  {
+    question: 'What payment methods do you accept?',
+    answer: 'We accept all major credit and debit cards. For enterprise accounts, we also support bank transfers and custom invoicing arrangements.',
+  },
+  {
+    question: 'How do I get a custom quote?',
+    answer: 'Reach out to our sales team via the contact form or at hello@1platform.pro. We will assess your needs and provide a tailored pricing proposal within 24 hours.',
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.answer,
+    },
+  })),
+};
+
+const pageJsonLd = [
+  faqJsonLd,
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Pricing',
+    description,
+    url: 'https://1platform.pro/pricing/',
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://1platform.pro/' },
+        { '@type': 'ListItem', position: 2, name: 'Pricing' },
+      ],
+    },
+  },
+];
+
+/* ── SVG Icons ── */
+const checkIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+const arrowIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+
+/* ── Solution data (no prices — defined commercially per contract) ── */
+const solutions = [
+  {
+    name: 'AI Content',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+    benefit: 'Generate SEO-optimized articles that rank and convert visitors into customers.',
+    unit: 'per article',
+    includes: ['Full SEO optimization', 'Multi-language (ES/EN)', 'Auto internal linking', 'Custom tone & style'],
+    color: '#3b82f6',
+  },
+  {
+    name: 'Keyword Research',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    benefit: 'Discover high-intent keywords your competitors miss to drive organic traffic.',
+    unit: 'per extraction',
+    includes: ['Search volume & difficulty', 'Competitor gap analysis', 'Long-tail suggestions', 'SERP feature data'],
+    color: '#8b5cf6',
+  },
+  {
+    name: 'Image Generation',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
+    benefit: 'Create unique visuals for your content without stock photo licenses.',
+    unit: 'per image',
+    includes: ['AI-generated originals', 'Stock library access', 'Auto-optimized formats', 'Commercial license included'],
+    color: '#06b6d4',
+  },
+  {
+    name: 'Indexing',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+    benefit: 'Get your pages indexed by Google faster — hours instead of weeks.',
+    unit: 'per submission',
+    includes: ['Google Search Console API', 'Bulk submissions', 'Status tracking', 'Priority queue'],
+    color: '#10b981',
+  },
+  {
+    name: 'E-commerce',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    benefit: 'Manage stores, process orders and deliveries from a single API.',
+    unit: 'per order',
+    includes: ['Unlimited stores', 'Order management', 'Delivery tracking', 'Inventory sync'],
+    color: '#f59e0b',
+  },
+  {
+    name: 'Invoicing (FEL)',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>',
+    benefit: 'Issue certified electronic invoices (FEL) instantly via API.',
+    unit: 'per invoice',
+    includes: ['SAT-certified (Guatemala)', 'PDF + XML generation', 'Auto tax calculation', 'Batch invoicing'],
+    color: '#ef4444',
+  },
+  {
+    name: 'NFC Payments',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    benefit: 'Accept contactless payments anywhere with tap-to-pay technology.',
+    unit: 'per transaction',
+    includes: ['Tap-to-pay NFC', 'Real-time processing', 'Multi-currency', 'Transaction analytics'],
+    color: '#ec4899',
+  },
+  {
+    name: 'Link Building',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+    benefit: 'Build high-quality backlinks to boost your domain authority and rankings.',
+    unit: 'per backlink',
+    includes: ['Quality publisher network', 'DA/DR filtering', 'Niche targeting', 'Placement reporting'],
+    color: '#14b8a6',
+  },
+];
+
+const highlights = [
+  { value: '13+', label: 'solutions', description: 'All interconnected' },
+  { value: '∞', label: 'scale', description: 'No usage caps' },
+  { value: '24h', label: 'custom quotes', description: 'Fast turnaround' },
+  { value: '100%', label: 'flexible', description: 'Pay per use' },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={pageJsonLd}>
+  <Hero
+    headline="Pricing That Scales With You."
+    subheadline="Flexible, usage-based plans tailored to your business. Activate any solution and pay per operation — we'll build the right plan for your needs."
+    primaryCta={{ label: 'Start Free', href: 'https://app.1platform.pro' }}
+    secondaryCta={{ label: 'Contact Sales', href: 'mailto:hello@1platform.pro' }}
+    badge="Flexible Pricing"
+  />
+
+  <div class="section">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Pricing' },
+      ]} />
+    </div>
+  </div>
+
+  <!-- Value Highlights -->
+  <section class="section" id="highlights">
+    <div class="container">
+      <div class="highlights-grid">
+        {highlights.map((item) => (
+          <div class="highlight-card reveal">
+            <span class="highlight-card__value">{item.value}</span>
+            <span class="highlight-card__label">{item.label}</span>
+            <span class="highlight-card__desc">{item.description}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Solutions Overview -->
+  <section class="section section--alt" id="solutions">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>What You Get</h2>
+        <p class="section-description">
+          Every solution is billed per operation. Use one or combine all 13+ — pricing is customized based on your volume and needs.
+        </p>
+      </div>
+
+      <div class="solutions-grid">
+        {solutions.map((sol) => (
+          <div class="solution-card card reveal">
+            <div class="solution-card__header">
+              <span class="solution-card__icon" style={`color: ${sol.color};`} aria-hidden="true" set:html={sol.icon} />
+              <h3 class="solution-card__name">{sol.name}</h3>
+            </div>
+            <p class="solution-card__benefit">{sol.benefit}</p>
+            <div class="solution-card__pricing">
+              <span class="solution-card__unit">{sol.unit}</span>
+            </div>
+            <ul class="solution-card__includes">
+              {sol.includes.map((item) => (
+                <li>
+                  <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div class="solutions-more reveal">
+        <p>Plus 5 more solutions: CMS Publishing, Comments, Profiles, Legal Pages & more.</p>
+        <a href="/solutions/" class="btn btn--ghost">
+          View All Solutions
+          <span aria-hidden="true" set:html={arrowIcon} />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Free Tier Banner -->
+  <section class="section" id="free-tier">
+    <div class="container">
+      <div class="free-banner reveal">
+        <div class="free-banner__content">
+          <span class="badge">Free to Start</span>
+          <h2>Test Every Solution at Zero Cost</h2>
+          <p>Create your account and get a free daily allowance across all solutions. No credit card required — start building and only pay when you scale.</p>
+        </div>
+        <div class="free-banner__cta">
+          <a href="https://app.1platform.pro" class="btn btn--primary btn--lg">Start Free</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Sales CTA (replaces calculator) -->
+  <section class="section section--alt" id="quote">
+    <div class="container">
+      <div class="quote-block reveal">
+        <div class="quote-block__content">
+          <h2>Get a Custom Quote</h2>
+          <p>Tell us about your expected usage and we'll build a pricing plan that fits your business. Volume discounts, custom SLAs, and dedicated support available.</p>
+          <ul class="quote-block__benefits">
+            <li>
+              <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
+              Custom per-operation rates based on your volume
+            </li>
+            <li>
+              <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
+              Volume discounts that grow with your usage
+            </li>
+            <li>
+              <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
+              Flexible billing: monthly, quarterly, or annual
+            </li>
+            <li>
+              <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
+              Dedicated account manager for enterprise plans
+            </li>
+          </ul>
+        </div>
+        <div class="quote-block__cta">
+          <a href="mailto:hello@1platform.pro" class="btn btn--primary btn--lg">Contact Sales</a>
+          <span class="quote-block__hint">Response within 24 hours</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Frequently Asked Questions</h2>
+        <p class="section-description">
+          Everything you need to know about 1Platform pricing and billing.
+        </p>
+      </div>
+
+      <div class="faq-list">
+        {faqs.map((faq) => (
+          <details class="faq-item reveal">
+            <summary class="faq-item__question">
+              <span>{faq.question}</span>
+              <svg class="faq-item__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </summary>
+            <div class="faq-item__answer">
+              <p>{faq.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section--alt">
+    <div class="container cta-section">
+      <h2 class="reveal">Start Building Today</h2>
+      <p class="reveal cta-description">
+        Try every solution for free, then let us build the perfect plan for your business.
+      </p>
+      <div class="cta-actions reveal">
+        <a href="https://app.1platform.pro" class="btn btn--primary">Start Free</a>
+        <a href="mailto:hello@1platform.pro" class="btn btn--ghost">Contact Sales</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ── Highlights Grid ── */
+  .highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  .highlight-card {
+    text-align: center;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .highlight-card__value {
+    display: block;
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin-bottom: var(--space-1);
+  }
+
+  .highlight-card__label {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-1);
+  }
+
+  .highlight-card__desc {
+    display: block;
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--color-text-tertiary);
+  }
+
+  @media (max-width: 640px) {
+    .highlights-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* ── Solutions Grid ── */
+  .solutions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+    margin-bottom: var(--space-10);
+  }
+
+  @media (max-width: 1024px) {
+    .solutions-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .solutions-grid {
+      grid-template-columns: 1fr;
+      max-width: 400px;
+      margin-inline: auto;
+      margin-bottom: var(--space-10);
+    }
+  }
+
+  /* ── Solution Card ── */
+  .solution-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-6);
+  }
+
+  .solution-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .solution-card__icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .solution-card__name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .solution-card__benefit {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-5);
+    flex-grow: 1;
+  }
+
+  .solution-card__pricing {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .solution-card__unit {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    font-style: italic;
+  }
+
+  .solution-card__includes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .solution-card__includes li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--color-text-tertiary);
+  }
+
+  .solution-card__check {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    color: var(--color-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Solutions More ── */
+  .solutions-more {
+    text-align: center;
+  }
+
+  .solutions-more p {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+  }
+
+  .solutions-more .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  /* ── Free Banner ── */
+  .free-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-10) var(--space-10);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .free-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .free-banner__content {
+    position: relative;
+    max-width: 640px;
+  }
+
+  .free-banner__content h2 {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-3);
+  }
+
+  .free-banner__content p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .free-banner__cta {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .btn--lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-base);
+  }
+
+  @media (max-width: 768px) {
+    .free-banner {
+      flex-direction: column;
+      text-align: center;
+      padding: var(--space-8) var(--space-6);
+    }
+  }
+
+  /* ── Quote Block ── */
+  .quote-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-10);
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  .quote-block__content {
+    flex: 1;
+  }
+
+  .quote-block__content h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  .quote-block__content > p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-6);
+  }
+
+  .quote-block__benefits {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .quote-block__benefits li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .quote-block__cta {
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .quote-block__hint {
+    display: block;
+    margin-top: var(--space-2);
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--color-text-tertiary);
+  }
+
+  @media (max-width: 768px) {
+    .quote-block {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .quote-block__benefits {
+      align-items: center;
+    }
+  }
+
+  /* ── Section Header ── */
+  .section-header {
+    text-align: center;
+    max-width: 700px;
+    margin-inline: auto;
+    margin-bottom: var(--space-12);
+  }
+
+  .section-header h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  .section-description {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+  }
+
+  /* ── FAQ ── */
+  .faq-list {
+    max-width: 700px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .faq-item {
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+
+  .faq-item__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-6);
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: var(--text-base);
+    list-style: none;
+  }
+
+  .faq-item__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item__question::marker {
+    display: none;
+    content: '';
+  }
+
+  .faq-item__chevron {
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .faq-item__chevron {
+      transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+  }
+
+  .faq-item[open] .faq-item__chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq-item__answer {
+    padding: 0 var(--space-6) var(--space-5);
+  }
+
+  .faq-item__answer p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .faq-item__question:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    border-radius: var(--border-radius-lg);
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    text-align: center;
+    max-width: 600px;
+    margin-inline: auto;
+  }
+
+  .cta-section h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  .cta-description {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>

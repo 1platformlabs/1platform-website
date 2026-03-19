@@ -1,0 +1,36 @@
+---
+/**
+ * Shared Logo component — single source of truth for 1Platform branding.
+ * Used in Header, Footer, and anywhere the brand logo appears.
+ */
+interface Props {
+  /** Accessible label for the logo link. */
+  label?: string;
+  /** Additional CSS class for the link. */
+  class?: string;
+}
+
+const { label = '1Platform Home', class: className } = Astro.props;
+---
+
+<a href="/" class:list={['logo', className]} aria-label={label}>
+  <span class="logo-1">1</span><span class="logo-text">Platform</span>
+</a>
+
+<style>
+  .logo {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  .logo-1 {
+    color: var(--color-accent);
+    font-weight: 800;
+  }
+
+  .logo-text {
+    color: var(--color-text);
+  }
+</style>

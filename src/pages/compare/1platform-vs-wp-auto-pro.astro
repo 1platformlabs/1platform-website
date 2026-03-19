@@ -1,0 +1,464 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+
+const title = ' 1Platform vs. WP Auto Pro: API Platform vs Plugin | 1Platform';
+const description =
+  'Compare 1Platform with WP Auto Pro. See why an API-first platform with full pipeline automation, payments, invoicing, and link building beats a WordPress-only plugin.';
+
+const faqItems = [
+  {
+    question: 'Can I migrate from WP Auto Pro to 1Platform?',
+    answer:
+      'Yes. 1Platform is API-first, so you can integrate it into any existing WordPress site or any other framework. Simply replace your plugin calls with 1Platform API endpoints and gain access to the full automation pipeline, including payments, invoicing, and link building.',
+  },
+  {
+    question: 'Does 1Platform work only with WordPress?',
+    answer:
+      '1Platform is completely framework agnostic. It works with WordPress, Next.js, Astro, Nuxt, custom backends, mobile apps, and any platform that can make HTTP requests. Your stack, your choice.',
+  },
+  {
+    question: 'How does 1Platform handle multi-site content?',
+    answer:
+      'With 1Platform, a single API account manages content across unlimited sites. Each site can have its own configuration, publishing schedule, and analytics. No need for separate plugin installations or licenses per site.',
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+};
+
+const apiExample = `curl -X POST https://api.1platform.pro/api/v1/content/generate \\
+  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
+  -H "x-user-token: USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "keyword": "best project management tools",
+    "language": "en",
+    "tone": "professional",
+    "length": "long"
+  }'`;
+---
+
+<BaseLayout title={title} description={description} jsonLd={faqJsonLd}>
+  <section class="section hero-section">
+    <div class="container">
+      <Breadcrumb
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Compare', href: '/compare/' },
+          { label: '1Platform vs. WP Auto Pro' },
+        ]}
+      />
+
+      <h1>1Platform vs. WP Auto Pro</h1>
+      <p class="subtitle">API-first platform vs. WordPress plugin</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Feature Comparison</h2>
+      <div class="table-wrapper">
+        <table class="comparison-table" role="table">
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              <th scope="col">1Platform</th>
+              <th scope="col">WP Auto Pro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>API Access</td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+            </tr>
+            <tr>
+              <td>Full Automation Pipeline</td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+              <td><span class="cross" aria-label="No">&#10005;</span></td>
+            </tr>
+            <tr>
+              <td>Multi-site Support</td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+            </tr>
+            <tr>
+              <td>Payment Processing</td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+              <td><span class="cross" aria-label="No">&#10005;</span></td>
+            </tr>
+            <tr>
+              <td>Invoicing</td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+              <td><span class="cross" aria-label="No">&#10005;</span></td>
+            </tr>
+            <tr>
+              <td>Link Building</td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+              <td><span class="cross" aria-label="No">&#10005;</span></td>
+            </tr>
+            <tr>
+              <td>Framework Agnostic</td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+              <td><span class="cross" aria-label="No">&#10005;</span></td>
+            </tr>
+            <tr>
+              <td>Async Processing</td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+              <td><span class="check" aria-label="Yes">&#10003;</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <h2>Key Differentiators</h2>
+      <div class="differentiators">
+        <div class="differentiator">
+          <h3>Beyond content generation</h3>
+          <p>
+            WP Auto Pro focuses on automating WordPress content creation. 1Platform goes further
+            with a complete pipeline: keyword research, AI content generation, image sourcing,
+            CMS publishing, search engine indexing, link building, payment processing, and
+            electronic invoicing. Every step is connected and automated through a single API.
+          </p>
+        </div>
+        <div class="differentiator">
+          <h3>No vendor lock-in</h3>
+          <p>
+            A WordPress plugin locks you into the WordPress ecosystem. 1Platform is a REST API
+            that works with any technology stack. Build with React, Vue, Astro, mobile apps, or
+            custom backends. Switch frameworks without rewriting your automation logic.
+          </p>
+        </div>
+        <div class="differentiator">
+          <h3>Built-in monetization</h3>
+          <p>
+            1Platform includes native payment processing and electronic invoicing. Monetize your
+            content pipeline from day one without integrating third-party payment gateways or
+            billing systems. One platform handles everything from content creation to revenue
+            collection.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Get Started in Minutes</h2>
+      <p class="section-desc">
+        A single API call generates optimized content, ready for publishing across any platform.
+      </p>
+      <CodeBlock
+        language="bash"
+        title="Generate content with 1Platform API"
+        code={apiExample}
+      />
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-list">
+        {faqItems.map((item) => (
+          <details class="faq-item">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta-section">
+    <div class="container cta-container">
+      <h2>Ready to Go Beyond a Plugin?</h2>
+      <p>
+        Replace your WordPress plugin with a full automation platform. Start building with 1Platform today.
+      </p>
+      <div class="cta-buttons">
+        <a href="https://developer.1platform.pro/" class="btn btn--primary">View API Docs</a>
+        <a href="/pricing/" class="btn btn--ghost">See Pricing</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-section {
+    padding-top: calc(var(--header-height) + var(--space-16));
+    padding-bottom: var(--space-12);
+  }
+
+  h1 {
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-4);
+  }
+
+  .subtitle {
+    font-size: var(--text-xl);
+    color: var(--color-text-secondary);
+    max-width: 600px;
+  }
+
+  .section {
+    padding: var(--space-20) 0;
+  }
+
+  .section--alt {
+    background-color: var(--color-bg-alt);
+  }
+
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+  }
+
+  h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-8);
+  }
+
+  .section-desc {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+    max-width: 600px;
+  }
+
+  /* Comparison Table */
+  .table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-base);
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: var(--space-4) var(--space-6);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .comparison-table thead th {
+    background-color: var(--color-bg-elevated);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+  }
+
+  .comparison-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .comparison-table tbody td:first-child {
+    font-weight: 500;
+  }
+
+  .check {
+    color: var(--color-green);
+    font-size: var(--text-xl);
+    font-weight: 700;
+  }
+
+  .cross {
+    color: var(--color-red);
+    font-size: var(--text-xl);
+    font-weight: 700;
+  }
+
+  /* Differentiators */
+  .differentiators {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .differentiator h3 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-3);
+    color: var(--color-accent);
+  }
+
+  .differentiator p {
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* FAQ */
+  .faq-list {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--max-width-narrow);
+  }
+
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  .faq-item summary {
+    padding: var(--space-4) var(--space-6);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary::after {
+    content: '+';
+    font-size: var(--text-xl);
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .faq-item[open] summary::after {
+    content: '\2212';
+  }
+
+  .faq-item summary:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .faq-item p {
+    padding: 0 var(--space-6) var(--space-6);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .faq-item summary {
+      transition: background-color var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .faq-item summary:hover {
+      background-color: var(--color-bg-elevated);
+    }
+  }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+  }
+
+  .cta-container {
+    max-width: var(--max-width-narrow);
+  }
+
+  .cta-container h2 {
+    font-size: var(--text-4xl);
+  }
+
+  .cta-container > p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+    font-size: var(--text-lg);
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-size: var(--text-base);
+    min-height: 48px;
+    min-width: 48px;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+  }
+
+  .btn--primary {
+    background-color: var(--color-accent);
+    color: #fff;
+  }
+
+  .btn--ghost {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn--primary:hover {
+      filter: brightness(1.1);
+      transform: scale(1.02);
+    }
+
+    .btn--ghost:hover {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 12px var(--color-accent-glow);
+    }
+
+    .btn {
+      transition: transform var(--duration-fast) var(--ease-out-expo),
+        filter var(--duration-fast) var(--ease-out-expo),
+        border-color var(--duration-fast) var(--ease-out-expo),
+        box-shadow var(--duration-fast) var(--ease-out-expo);
+    }
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: var(--text-3xl);
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-sm);
+    }
+  }
+</style>

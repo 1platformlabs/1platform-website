@@ -1,0 +1,255 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+
+const title = 'About 1Platform Labs — Unified SEO Automation';
+const description = 'Learn about 1Platform Labs and our mission to democratize SEO through automation and AI. One platform replacing 13+ disconnected tools.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: title,
+  description,
+  url: 'https://1platform.pro/about/',
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://1platform.pro/' },
+      { '@type': 'ListItem', position: 2, name: 'About' },
+    ],
+  },
+};
+
+const capabilities = [
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`, label: 'AI Content Generation' },
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`, label: 'Keyword Research' },
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`, label: 'Image Sourcing & Generation' },
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`, label: 'Comment Automation' },
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>`, label: 'CMS Publishing' },
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`, label: 'Google Indexing' },
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`, label: 'Link Building' },
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`, label: 'Payment Processing' },
+  { icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`, label: 'Electronic Invoicing' },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <Breadcrumb items={[
+    { label: 'Home', href: '/' },
+    { label: 'About' },
+  ]} />
+
+  <Hero
+    headline="About 1Platform Labs"
+    subheadline="Democratizing SEO through automation and AI. We believe every business deserves enterprise-grade tools without enterprise-grade complexity."
+    primaryCta={{ label: 'Get Started Free', href: 'https://app.1platform.pro' }}
+    secondaryCta={{ label: 'View Solutions', href: '/solutions/' }}
+  />
+
+  <!-- Mission -->
+  <section class="section">
+    <div class="container content-section reveal">
+      <span class="badge">Our Mission</span>
+      <h2>One Platform. Every Solution.</h2>
+      <p>1Platform Labs was founded on a simple observation: businesses spend more time managing their tools than using them. The average SEO workflow requires switching between a dozen disconnected services, each with its own login, billing, data format, and learning curve.</p>
+      <p>We set out to build something different. A single, unified platform that integrates every tool in the SEO and content pipeline into one interconnected ecosystem. From keyword research to content creation, from publishing to indexing, from link building to payment processing, every service works together seamlessly through a single API.</p>
+    </div>
+  </section>
+
+  <!-- The Problem -->
+  <section class="section section--alt">
+    <div class="container content-section reveal">
+      <span class="badge">The Problem</span>
+      <h2>The Fragmentation Tax</h2>
+      <p>Every disconnected tool in your stack costs you time, money, and cognitive overhead. Data gets lost between services. Workflows break at integration points. Teams waste hours on manual data transfer instead of strategy and creativity.</p>
+      <div class="problem-grid">
+        <div class="problem-card card">
+          <h3>Without 1Platform</h3>
+          <ul>
+            <li>13+ separate subscriptions and logins</li>
+            <li>Manual data export/import between tools</li>
+            <li>Inconsistent APIs and documentation</li>
+            <li>Scattered billing and cost tracking</li>
+            <li>No unified view of your pipeline</li>
+          </ul>
+        </div>
+        <div class="problem-card problem-card--solution card">
+          <h3>With 1Platform</h3>
+          <ul>
+            <li>1 platform, 1 API key, 1 dashboard</li>
+            <li>Data flows automatically between services</li>
+            <li>Consistent RESTful API with full docs</li>
+            <li>Single invoice for all services</li>
+            <li>End-to-end visibility across your workflow</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technology Ecosystem -->
+  <section class="section">
+    <div class="container">
+      <div class="content-section reveal">
+        <span class="badge">Technology</span>
+        <h2>Our Capabilities</h2>
+        <p>1Platform integrates 13+ business solutions into a single interconnected ecosystem. Every capability is accessible through our unified API and works seamlessly with every other service.</p>
+      </div>
+      <div class="capabilities-grid">
+        {capabilities.map((cap, i) => (
+          <div class="capability-card card reveal" style={`--delay: ${i * 100}ms`}>
+            <div class="capability-card__icon" set:html={cap.icon} />
+            <span class="capability-card__label">{cap.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="section section--alt">
+    <div class="container content-section reveal">
+      <span class="badge">Our Team</span>
+      <h2>Built by Engineers, for Engineers</h2>
+      <p>1Platform Labs is a team of engineers, designers, and SEO practitioners who got tired of the fragmentation problem. We build the platform we always wished existed: developer-first, API-native, and relentlessly focused on eliminating complexity.</p>
+      <p>Based in Guatemala and serving clients worldwide, we are committed to building tools that are accessible, affordable, and powerful enough for any scale of operation.</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container cta-section reveal">
+      <h2>Join the Unified Platform</h2>
+      <p>Ready to replace your fragmented toolchain? Start building with 1Platform today.</p>
+      <div class="cta-section__actions">
+        <a href="https://app.1platform.pro" class="btn btn--primary">Get Started Free</a>
+        <a href="/docs/" class="btn btn--ghost">View API Docs</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .content-section {
+    max-width: var(--max-width-narrow);
+    margin-inline: auto;
+  }
+
+  .content-section .badge {
+    margin-bottom: var(--space-4);
+  }
+
+  .content-section h2 {
+    margin-bottom: var(--space-6);
+  }
+
+  .content-section p {
+    margin-bottom: var(--space-4);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+  }
+
+  .problem-card h3 {
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+  }
+
+  .problem-card ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .problem-card li {
+    color: var(--color-text-secondary);
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .problem-card li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-red);
+    font-weight: 600;
+  }
+
+  .problem-card--solution li::before {
+    content: '\2713';
+    color: var(--color-green);
+  }
+
+  .capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    margin-top: var(--space-10);
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  .capability-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+    padding: var(--space-6);
+  }
+
+  .capability-card__icon {
+    color: var(--color-accent);
+  }
+
+  .capability-card__label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .cta-section {
+    text-align: center;
+    max-width: var(--max-width-narrow);
+    margin-inline: auto;
+  }
+
+  .cta-section h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  .cta-section > p {
+    margin-bottom: var(--space-8);
+    color: var(--color-text-secondary);
+  }
+
+  .cta-section__actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .problem-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .capabilities-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .capabilities-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

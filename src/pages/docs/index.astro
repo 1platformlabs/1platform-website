@@ -1,0 +1,149 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+
+const sections = [
+  {
+    title: 'Getting Started',
+    description: 'Set up your account, install the SDK, and make your first API call in under 5 minutes.',
+    href: '/docs/getting-started/',
+    icon: 'rocket',
+  },
+  {
+    title: 'Authentication',
+    description: 'Learn about the two-token system: App tokens (Bearer) and User tokens (x-user-token header).',
+    href: '/docs/authentication/',
+    icon: 'key',
+  },
+  {
+    title: 'API Reference',
+    description: 'Complete endpoint documentation for all 13+ services with request and response schemas.',
+    href: '/docs/api-reference/',
+    icon: 'book',
+  },
+  {
+    title: 'Code Examples',
+    description: 'Copy-paste examples in JavaScript, Python, cURL, and more for common workflows.',
+    href: '/docs/code-examples/',
+    icon: 'code',
+  },
+  {
+    title: 'Webhooks',
+    description: 'Receive real-time notifications for content generation, payments, and indexing events.',
+    href: '/docs/webhooks/',
+    icon: 'webhook',
+  },
+  {
+    title: 'Error Handling',
+    description: 'HTTP status codes, error response formats, rate limits, and retry strategies.',
+    href: '/docs/errors/',
+    icon: 'alert',
+  },
+];
+---
+
+<BaseLayout
+  title="Documentation | 1Platform"
+  description="Everything you need to integrate the 1Platform API. Guides, references, code examples, and more."
+>
+  <section class="docs-landing section">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Documentation' },
+      ]} />
+
+      <header class="docs-landing__header">
+        <h1>Documentation</h1>
+        <p>Everything you need to integrate 1Platform into your stack. From your first API call to production-ready webhooks, we have you covered.</p>
+      </header>
+
+      <div class="docs-landing__grid">
+        {sections.map((section) => (
+          <a href={section.href} class="docs-landing__card card reveal">
+            <h2>{section.title}</h2>
+            <p>{section.description}</p>
+          </a>
+        ))}
+      </div>
+
+      <div class="docs-landing__api-link reveal">
+        <h2>Interactive API Docs</h2>
+        <p>Explore the full OpenAPI 3.1.0 specification with live request testing.</p>
+        <a href="https://developer.1platform.pro" target="_blank" rel="noopener noreferrer" class="btn btn--primary">
+          View API Docs
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .docs-landing__header {
+    margin-bottom: var(--space-12);
+    max-width: 60ch;
+  }
+
+  .docs-landing__header h1 {
+    margin-bottom: var(--space-4);
+  }
+
+  .docs-landing__header p {
+    color: var(--color-text-secondary);
+    font-size: var(--text-lg);
+  }
+
+  .docs-landing__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-16);
+  }
+
+  .docs-landing__card {
+    display: block;
+    text-decoration: none;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .docs-landing__card h2 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+    color: var(--color-text);
+  }
+
+  .docs-landing__card p {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .docs-landing__card:hover {
+      transform: translateY(-4px);
+    }
+  }
+
+  .docs-landing__api-link {
+    text-align: center;
+    padding: var(--space-12);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background: var(--color-bg-alt);
+  }
+
+  .docs-landing__api-link h2 {
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-3);
+  }
+
+  .docs-landing__api-link p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  @media (max-width: 480px) {
+    .docs-landing__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

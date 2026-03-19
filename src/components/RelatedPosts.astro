@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import BlogPostCard from './BlogPostCard.astro';
+
+interface Props {
+  currentSlug: string;
+  currentCategory: string;
+}
+
+const { currentSlug, currentCategory } = Astro.props;
+
+const allPosts = await getCollection('blog');
+const related = allPosts
+  .filter((p) => p.slug !== currentSlug)
+  .sort((a, b) => {
+    const aMatch = a.data.category === currentCategory ? 1 : 0;
+    const bMatch = b.data.category === currentCategory ? 1 : 0;
+    return bMatch - aMatch || b.data.pubDate.getTime() - a.data.pubDate.getTime();
+  })
+  .slice(0, 3);
+---
+
+{related.length > 0 && (
+  <section class="related section section--alt">
+    <div class="container">
+      <h2>Related Articles</h2>
+      <div class="grid-3" style="margin-top: var(--space-8);">
+        {related.map((post) => (
+          <BlogPostCard
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            category={post.data.category}
+            slug={post.slug}
+            author={post.data.author}
+            readingTime={post.data.readingTime}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+)}

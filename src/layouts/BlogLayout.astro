@@ -1,0 +1,156 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import TOC from '@components/TOC.astro';
+import ShareButtons from '@components/ShareButtons.astro';
+import RelatedPosts from '@components/RelatedPosts.astro';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate?: Date;
+    author: string;
+    category: string;
+    image?: string;
+    ogImage?: string;
+    readingTime?: string;
+    tags?: string[];
+  };
+  headings?: { depth: number; slug: string; text: string }[];
+  slug: string;
+}
+
+const { frontmatter, headings = [], slug } = Astro.props;
+
+const ogImage = frontmatter.ogImage || frontmatter.image || '/og/default.png';
+const ogImageURL = new URL(ogImage, 'https://1platform.pro').href;
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: frontmatter.title,
+  description: frontmatter.description,
+  image: ogImageURL,
+  author: {
+    '@type': 'Person',
+    name: frontmatter.author,
+  },
+  datePublished: frontmatter.pubDate.toISOString(),
+  dateModified: (frontmatter.updatedDate || frontmatter.pubDate).toISOString(),
+  publisher: {
+    '@type': 'Organization',
+    name: '1Platform',
+    url: 'https://1platform.pro',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://1platform.pro/favicon.svg',
+    },
+  },
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': `https://1platform.pro/blog/${slug}/`,
+  },
+};
+---
+
+<BaseLayout
+  title={`${frontmatter.title} | 1Platform Blog`}
+  description={frontmatter.description}
+  ogImage={frontmatter.ogImage}
+  jsonLd={articleJsonLd}
+>
+  <article class="blog-post section">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Blog', href: '/blog/' },
+        { label: frontmatter.title },
+      ]} />
+
+      <header class="blog-post__header">
+        <span class="badge">{frontmatter.category.replace(/-/g, ' ')}</span>
+        <h1>{frontmatter.title}</h1>
+        <div class="blog-post__meta">
+          <span>By {frontmatter.author}</span>
+          <time datetime={frontmatter.pubDate.toISOString()}>
+            {frontmatter.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </time>
+          {frontmatter.readingTime && <span>{frontmatter.readingTime}</span>}
+        </div>
+      </header>
+
+      <div class="blog-post__layout">
+        <aside class="blog-post__sidebar">
+          <TOC headings={headings} />
+        </aside>
+        <div class="blog-post__content prose">
+          <slot />
+        </div>
+      </div>
+
+      <footer class="blog-post__footer">
+        <ShareButtons title={frontmatter.title} url={`https://1platform.pro/blog/${slug}/`} />
+      </footer>
+    </div>
+  </article>
+
+  <RelatedPosts currentSlug={slug} currentCategory={frontmatter.category} />
+</BaseLayout>
+
+<style>
+  .blog-post__header {
+    margin-bottom: var(--space-10);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .blog-post__header h1 {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-4xl);
+  }
+
+  .blog-post__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    color: var(--color-text-tertiary);
+    font-size: var(--text-sm);
+  }
+
+  .blog-post__meta span:not(:last-child)::after {
+    content: '\00b7';
+    margin-left: var(--space-4);
+  }
+
+  .blog-post__layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .blog-post__sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .blog-post__footer {
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  @media (max-width: 768px) {
+    .blog-post__layout {
+      grid-template-columns: 1fr;
+    }
+
+    .blog-post__sidebar {
+      position: static;
+      order: -1;
+    }
+  }
+</style>

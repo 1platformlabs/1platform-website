@@ -1,0 +1,43 @@
+---
+interface Props {
+  value: number;
+  label: string;
+  suffix?: string;
+  prefix?: string;
+}
+
+const { value, label, suffix = '', prefix = '' } = Astro.props;
+---
+
+<div class="metric reveal">
+  <span
+    class="metric__value"
+    data-count-to={String(value)}
+    data-count-suffix={suffix}
+    data-count-prefix={prefix}
+    style="font-variant-numeric: tabular-nums;"
+  >
+    {prefix}0{suffix}
+  </span>
+  <span class="metric__label">{label}</span>
+</div>
+
+<style>
+  .metric {
+    text-align: center;
+  }
+
+  .metric__value {
+    display: block;
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.1;
+    margin-bottom: var(--space-2);
+  }
+
+  .metric__label {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+</style>

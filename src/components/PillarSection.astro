@@ -1,0 +1,47 @@
+---
+interface Props {
+  icon: string;
+  title: string;
+  description: string;
+  index: number;
+}
+
+const { icon, title, description, index } = Astro.props;
+---
+
+<div class="pillar card reveal" data-delay={String(index * 150)}>
+  <div class="pillar__icon" aria-hidden="true" set:html={icon} />
+  <h3>{title}</h3>
+  <p>{description}</p>
+</div>
+
+<style>
+  .pillar {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .pillar__icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-xl);
+    background: linear-gradient(135deg, var(--color-accent-glow), rgba(6, 182, 212, 0.1));
+    color: var(--color-accent);
+    font-size: var(--text-2xl);
+  }
+
+  .pillar h3 {
+    color: var(--color-text);
+    font-size: var(--text-xl);
+  }
+
+  .pillar p {
+    font-size: var(--text-sm);
+  }
+</style>
