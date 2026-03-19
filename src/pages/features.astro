@@ -5,8 +5,8 @@ import Hero from '@components/Hero.astro';
 import FeatureCard from '@components/FeatureCard.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 
-const title = 'Features — E-Commerce, Delivery, Invoicing & AI | 1Platform';
-const description = 'Explore 1Platform features: regional e-commerce, delivery management, payments, electronic invoicing (FEL), AI content generation — all via REST API.';
+const title = 'Features — AI Content, Keywords, Indexing & More | 1Platform';
+const description = 'Explore 1Platform features: AI content generation, keyword extraction, CMS publishing, Google indexing, link building, payments, and invoicing — all via REST API.';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -37,70 +37,70 @@ const icons = {
   payments: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
   nfc: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h6l3-9 3 18 3-9h5"/></svg>',
   invoicing: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
-  ecommerce: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
-  delivery: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
-  tracking: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  searchConsole: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+  websites: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
 };
 
 /* ── Code Examples ── */
-const codeKeywords = `curl -X POST https://api.1platform.pro/api/v1/keywords/extract \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
-  -H "Content-Type: application/json" \\
-  -d '{ "url": "https://example.com/blog-post", "language": "en" }'`;
-
-const codeContent = `curl -X POST https://api.1platform.pro/api/v1/content/generate \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
+const codeKeywords = `curl -X POST https://api.1platform.pro/api/v1/posts/keywords/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "keyword": "astro static site generator",
-    "language": "en",
-    "tone": "professional",
-    "length": "long"
+    "domain": "example.com",
+    "country": "us",
+    "lang": "en"
   }'`;
 
-const codeCms = `curl -X POST https://api.1platform.pro/api/v1/cms/publish \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
+const codeContent = `curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "website_id": "site_abc123",
-    "title": "Your SEO Title",
-    "content": "<p>Your HTML content...</p>",
-    "status": "publish"
+    "keyword": "sustainable gardening tips",
+    "lang": "en",
+    "country": "us"
   }'`;
 
-const codePayments = `curl -X POST https://api.1platform.pro/api/v1/payments/create \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
+const codeIndexing = `curl -X POST https://api.1platform.pro/api/v1/posts/indexing/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "amount": 49.99,
-    "currency": "GTQ",
-    "description": "Pro Plan - Monthly",
-    "callback_url": "https://yoursite.com/callback"
+    "url": "https://myblog.com/sustainable-gardening-tips"
   }'`;
 
-const codeDelivery = `curl -X POST https://api.1platform.pro/api/v1/delivery/assign \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
+const codePayments = `curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "order_id": "ord_abc123",
-    "pickup": "Zone 10, Guatemala City",
-    "dropoff": "Zone 14, Guatemala City",
-    "priority": "express"
+    "amount": 25.00,
+    "description": "Account top-up - March 2026"
+  }'`;
+
+const codeInvoice = `curl -X POST https://api.1platform.pro/api/v1/businesses/$BUSINESS_ID/invoices \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "items": [{"description": "Consulting service", "unit_price": 1000.00, "quantity": 1}],
+    "receptorInfo": {
+      "name": "Client S.A.",
+      "documentType": "NIT",
+      "documentNumber": "98765432",
+      "email": "client@example.com"
+    }
   }'`;
 ---
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd}>
   <Hero
     headline="Built for Developers Who Ship"
-    subheadline="Every feature designed for programmatic access. E-commerce, delivery, payments, invoicing, and AI content — all through a unified REST API."
+    subheadline="Every feature designed for programmatic access. Keywords, content, publishing, indexing, link building, payments, and invoicing — all through a unified REST API."
     primaryCta={{ label: 'Get Started Free', href: 'https://app.1platform.pro' }}
     secondaryCta={{ label: 'View API Docs', href: 'https://developer.1platform.pro/' }}
-    badge="E-Commerce, Delivery & AI"
+    badge="AI Content, SEO & Payments"
   />
 
   <div class="section">
@@ -111,82 +111,6 @@ const codeDelivery = `curl -X POST https://api.1platform.pro/api/v1/delivery/ass
       ]} />
     </div>
   </div>
-
-  <!-- E-Commerce & Payments -->
-  <section class="section" id="ecommerce">
-    <div class="container">
-      <div class="section-header reveal">
-        <h2 class="gradient-text">E-Commerce & Payments</h2>
-        <p class="section-description">
-          Build regional online stores with integrated checkout, accept cards and local payment methods, and process NFC transactions in person.
-        </p>
-      </div>
-
-      <div class="grid-3 features-grid">
-        <FeatureCard
-          icon={icons.ecommerce}
-          title="Online Store"
-          description="Create e-commerce websites with product catalogs, checkout flows, and multi-currency support for Latin American markets."
-        />
-        <FeatureCard
-          icon={icons.payments}
-          title="Payment Processing"
-          description="Accept credit cards, debit cards, and local payment methods. Hosted checkout or embedded payments via API."
-        />
-        <FeatureCard
-          icon={icons.nfc}
-          title="NFC Tap-to-Pay"
-          description="Turn any NFC-enabled smartphone into a point-of-sale terminal. Accept card-present payments without dedicated hardware."
-        />
-      </div>
-
-      <div class="code-example reveal">
-        <CodeBlock
-          language="bash"
-          title="Create a payment"
-          code={codePayments}
-        />
-      </div>
-    </div>
-  </section>
-
-  <!-- Delivery & Invoicing -->
-  <section class="section section--alt" id="delivery">
-    <div class="container">
-      <div class="section-header reveal">
-        <h2 class="gradient-text">Delivery & Invoicing</h2>
-        <p class="section-description">
-          Coordinate deliveries from order to doorstep and generate certified electronic invoices (FEL) automatically for every sale.
-        </p>
-      </div>
-
-      <div class="grid-3 features-grid">
-        <FeatureCard
-          icon={icons.delivery}
-          title="Delivery Coordination"
-          description="Manage the full delivery lifecycle: order assignment, route optimization, driver tracking, and delivery confirmation."
-        />
-        <FeatureCard
-          icon={icons.tracking}
-          title="Real-Time Tracking"
-          description="Give customers live order tracking. GPS-based driver location, ETA updates, and delivery status notifications."
-        />
-        <FeatureCard
-          icon={icons.invoicing}
-          title="Electronic Invoicing (FEL)"
-          description="Generate certified electronic invoices automatically after each sale. Tax-compliant FEL billing for Guatemala and Central America."
-        />
-      </div>
-
-      <div class="code-example reveal">
-        <CodeBlock
-          language="bash"
-          title="Assign a delivery"
-          code={codeDelivery}
-        />
-      </div>
-    </div>
-  </section>
 
   <!-- AI & Content -->
   <section class="section" id="ai-content">
@@ -280,8 +204,54 @@ const codeDelivery = `curl -X POST https://api.1platform.pro/api/v1/delivery/ass
       <div class="code-example reveal">
         <CodeBlock
           language="bash"
-          title="Publish to your CMS"
-          code={codeCms}
+          title="Submit a URL for indexing"
+          code={codeIndexing}
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Payments & Invoicing -->
+  <section class="section section--alt" id="payments">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2 class="gradient-text">Payments & Invoicing</h2>
+        <p class="section-description">
+          Accept online and in-person payments, then generate certified electronic invoices (FEL) automatically — monetize your content ecosystem.
+        </p>
+      </div>
+
+      <div class="grid-3 features-grid">
+        <FeatureCard
+          icon={icons.payments}
+          title="Payment Processing"
+          description="Accept credit and debit card payments via API. Get checkout URLs, receive webhook notifications, and track transaction history."
+        />
+        <FeatureCard
+          icon={icons.nfc}
+          title="NFC Tap-to-Pay"
+          description="Turn any NFC-enabled smartphone into a point-of-sale terminal. Accept card-present payments without dedicated hardware."
+        />
+        <FeatureCard
+          icon={icons.invoicing}
+          title="Electronic Invoicing (FEL)"
+          description="Generate certified electronic invoices automatically from transactions. Tax-compliant FEL billing for Guatemala."
+        />
+      </div>
+
+      <div class="code-example reveal">
+        <CodeBlock
+          language="bash"
+          title="Create a payment transaction"
+          code={codePayments}
+        />
+      </div>
+
+      <div class="code-example reveal">
+        <CodeBlock
+          language="bash"
+          title="Generate an electronic invoice"
+          code={codeInvoice}
         />
       </div>
     </div>

@@ -4,8 +4,8 @@ import Breadcrumb from '@components/Breadcrumb.astro';
 import Hero from '@components/Hero.astro';
 import MetricCounter from '@components/MetricCounter.astro';
 
-const title = 'Why 1Platform — E-Commerce, Delivery & AI in One Platform';
-const description = 'Discover why 1Platform replaces fragmented e-commerce tools, delivery services, invoicing software, and content platforms with a single ecosystem for Latin America.';
+const title = 'Why 1Platform — Replace 13+ Tools With One Platform';
+const description = 'Discover why 1Platform replaces fragmented SEO tools, content generators, publishing plugins, and separate payment integrations with a single unified platform.';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -24,59 +24,59 @@ const jsonLd = {
 
 const pillars = [
   {
-    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
-    title: 'Regional E-Commerce',
-    description: 'Build online stores designed for Latin American markets. Integrated checkout, local payment methods, multi-currency support, and NFC tap-to-pay — everything you need to sell online and in person.',
+    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
+    title: 'Unified Integration',
+    description: 'Replace 13+ separate tools with one platform. Single account, single API key, single auth system, single billing — consistent response format across all solutions.',
     bullets: [
-      'Online stores with integrated checkout flows',
-      'Credit/debit cards and local payment methods',
-      'NFC tap-to-pay — turn any phone into a POS terminal',
-      'Multi-currency support (GTQ, USD, and more)',
-    ],
-  },
-  {
-    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
-    title: 'Delivery Management',
-    description: 'Coordinate deliveries from order to doorstep. Route optimization, real-time GPS tracking, driver assignment, and delivery confirmation — all built into your e-commerce workflow.',
-    bullets: [
-      'Order-to-doorstep delivery coordination',
-      'Real-time GPS tracking for customers and drivers',
-      'Automatic driver assignment and route optimization',
-      'Delivery confirmation with proof-of-delivery',
-    ],
-  },
-  {
-    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
-    title: 'Invoicing & Tax Compliance',
-    description: 'Generate FEL-compliant electronic invoices automatically from every sale. Certified tax compliance for Guatemala and Central America — zero manual filing.',
-    bullets: [
-      'Certified electronic invoicing (FEL) per transaction',
-      'Automatic SAT compliance for Guatemala',
-      'Invoice generation triggered by payments',
-      'Full audit trail and tax reporting',
+      'One API key replaces 13+ separate integrations',
+      'Consistent JSON envelope responses across all endpoints',
+      'Single billing account with credits-based usage',
+      'All services interconnect: content feeds publishing, which triggers indexing',
     ],
   },
   {
     icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
-    title: 'AI Content Assistant',
-    description: 'Generate product descriptions, blog posts, and marketing content with AI. Boost your store\'s SEO and attract more customers with content in Spanish and English.',
+    title: 'AI-Native Pipeline',
+    description: 'Every step powered by AI — not just content generation. AI keyword analysis, AI content writing, AI image generation, AI website descriptions. Async job-based architecture designed for production scale.',
     bullets: [
-      'AI-generated product descriptions and blog posts',
-      'Keyword research to optimize store pages',
-      'Automated image generation for products',
-      'CMS publishing, indexing, and link building',
+      'AI keyword extraction with volume and intent analysis',
+      'AI content generation with async job pipeline',
+      'AI image generation and stock sourcing',
+      'Multiple providers abstracted behind one unified API',
+    ],
+  },
+  {
+    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+    title: 'Developer Experience',
+    description: 'Clean REST API with consistent patterns. Comprehensive documentation with code examples in Python, JavaScript, and cURL. Dual-token auth system for security.',
+    bullets: [
+      'Standard JSON envelope: { success, data, msg }',
+      'Dual-token auth: App token + User token',
+      'Rate limiting per category (health, auth, read, write, keywords, content)',
+      'Interactive API docs at developer.1platform.pro',
+    ],
+  },
+  {
+    icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+    title: 'Production-Ready',
+    description: 'Async job processing for long-running operations. Credits-based billing so you pay for what you use. Multi-website management from one account.',
+    bullets: [
+      'Async content generation with job polling',
+      'Credits-based billing — pay only for what you use',
+      'Multi-website management from one account',
+      'Webhook notifications for payment status updates',
     ],
   },
   {
     icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><circle cx="5" cy="19" r="2"/><line x1="12" y1="9" x2="12" y2="3"/><line x1="14.5" y1="10" x2="17.5" y2="6.5"/><line x1="9.5" y1="10" x2="6.5" y2="6.5"/><line x1="14.5" y1="14" x2="17.5" y2="17.5"/><line x1="9.5" y1="14" x2="6.5" y2="17.5"/></svg>`,
     title: 'Interconnected Ecosystem',
-    description: 'Every service feeds into the next. Customers order online, pay at checkout, receive delivery tracking, get an FEL invoice, and your AI content drives more traffic to the store.',
+    description: 'All services work together. Extract keywords, generate an article, publish to CMS, submit for indexing, build backlinks, accept payments, generate invoice — all from one API.',
     bullets: [
-      'Orders trigger payment processing automatically',
-      'Payments trigger delivery assignment and invoicing',
-      'AI content drives organic traffic to your store',
-      'All data flows between services seamlessly',
-      'One API, one dashboard, one billing account',
+      'Keywords feed content generation automatically',
+      'Generated content publishes directly to your CMS',
+      'Published content triggers indexing submission',
+      'Payments generate certified electronic invoices',
+      'One API, one account, one billing relationship',
     ],
   },
 ];
@@ -90,7 +90,7 @@ const pillars = [
 
   <Hero
     headline="Why 1Platform?"
-    subheadline="Replace fragmented e-commerce tools, delivery services, invoicing software, and content platforms with one ecosystem built for Latin America."
+    subheadline="Replace fragmented SEO tools, content generators, publishing plugins, and separate payment integrations with one unified platform."
     badge="The Unified Advantage"
     primaryCta={{ label: 'Get Started Free', href: 'https://app.1platform.pro' }}
     secondaryCta={{ label: 'View Solutions', href: '/solutions/' }}
@@ -127,7 +127,7 @@ const pillars = [
         <p>One platform replacing an entire stack of disconnected tools.</p>
       </div>
       <div class="grid-4 metrics__grid">
-        <MetricCounter value={5000} suffix="+" label="Daily Orders" />
+        <MetricCounter value={10000} suffix="+" label="Articles Generated" />
         <MetricCounter value={13} suffix="+" label="Integrated Services" />
         <MetricCounter value={1} label="Unified API" />
         <MetricCounter value={2} label="Supported Languages" />
@@ -138,8 +138,8 @@ const pillars = [
   <!-- CTA -->
   <section class="section">
     <div class="container cta-section reveal">
-      <h2>Ready to Launch Your E-Commerce?</h2>
-      <p>Build your store, manage deliveries, generate invoices, and create content with AI — all from one platform. Get started in minutes.</p>
+      <h2>Ready to Simplify Your Stack?</h2>
+      <p>Automate your entire SEO pipeline — from keyword research to published, indexed, monetized content. Get started in minutes.</p>
       <div class="cta-section__actions">
         <a href="https://app.1platform.pro" class="btn btn--primary">Get Started Free</a>
         <a href="/docs/" class="btn btn--ghost">View API Docs</a>

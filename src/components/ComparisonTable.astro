@@ -4,11 +4,12 @@ interface Props {
 }
 
 const { rows = [
-  { without: 'Separate e-commerce platform + payment gateway', with_: 'Store, payments, and delivery in one platform' },
-  { without: 'Third-party delivery service integration', with_: 'Built-in delivery management with tracking' },
-  { without: 'Manual tax-compliant invoice generation', with_: 'Automatic FEL electronic invoices per sale' },
-  { without: 'Hire writers for product descriptions & content', with_: 'AI generates content in Spanish and English' },
-  { without: '5+ separate tools and billing accounts', with_: '1 account, 1 API, 13+ services' },
+  { without: '13+ separate service integrations', with_: '1 unified platform' },
+  { without: '13+ API keys and accounts to manage', with_: '1 account, 1 API key' },
+  { without: '13+ different auth systems', with_: '1 JWT token pair (app + user)' },
+  { without: '13+ billing relationships', with_: '1 credits-based account' },
+  { without: 'Manual data piping between tools', with_: 'All services interconnect automatically' },
+  { without: 'Content, payments, and invoicing are disconnected', with_: 'Content to monetization to invoicing in one flow' },
   { without: 'Weeks of integration work', with_: 'Hours to go live' },
 ] } = Astro.props;
 ---
