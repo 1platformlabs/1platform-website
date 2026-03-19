@@ -909,6 +909,8 @@ jobs:
 
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@cabfab8e290c3bf643832352dea6b566554674ee # v9
+        env:
+          LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
         with:
           urls: |
             http://localhost:8080/
