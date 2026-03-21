@@ -22,16 +22,28 @@ Exchange your API key for a JWT access token:
 ```bash
 curl -X POST https://api.1platform.pro/api/v1/auth/token \
   -H "Content-Type: application/json" \
-  -d '{"api_key": "YOUR_API_KEY"}'
+  -d '{"apiKey": "ak-your-app-api-key"}'
 ```
 
-### 3. Make Your First Request
+### 3. Get a User Token
 
-Test your connection with a simple profile request:
+Authenticate a user within your app:
+
+```bash
+curl -X POST https://api.1platform.pro/api/v1/users/token \
+  -H "Authorization: Bearer $APP_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"apiKey": "sk-user-abc123"}'
+```
+
+### 4. Make Your First Request
+
+Test your connection with a simple profile request (both tokens required):
 
 ```bash
 curl https://api.1platform.pro/api/v1/users/profile \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "Authorization: Bearer $APP_TOKEN" \
+  -H "x-user-token: $USER_TOKEN"
 ```
 
 ## Base URL
