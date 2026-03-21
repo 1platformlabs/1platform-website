@@ -19,7 +19,7 @@ Exchange your App API key for a JWT token:
 ```bash
 curl -X POST https://api.1platform.pro/api/v1/auth/token \
   -H "Content-Type: application/json" \
-  -d '{"api_key": "YOUR_APP_API_KEY"}'
+  -d '{"apiKey": "ak-your-app-api-key"}'
 ```
 
 Response:
@@ -28,21 +28,42 @@ Response:
 {
   "success": true,
   "data": {
-    "token": "eyJhbGciOiJIUzI1NiIs..."
-  }
+    "access_token": "eyJhbGciOiJIUzI1NiIs...",
+    "token_type": "bearer",
+    "expires_in": 1800
+  },
+  "msg": "App token generated successfully"
 }
 ```
 
+Save `data.access_token` as your `$APP_TOKEN`. It expires in 30 minutes (1800 seconds).
+
 ## Getting a User Token
 
-With your App Token, create or authenticate a user:
+With your App Token, authenticate a user:
 
 ```bash
 curl -X POST https://api.1platform.pro/api/v1/users/token \
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \
+  -H "Authorization: Bearer $APP_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"api_key": "USER_API_KEY"}'
+  -d '{"apiKey": "sk-user-abc123"}'
 ```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIs...",
+    "token_type": "bearer",
+    "expires_in": 1800
+  },
+  "msg": "User token generated successfully"
+}
+```
+
+Save `data.access_token` as your `$USER_TOKEN`.
 
 ## Using Both Tokens
 
@@ -50,13 +71,13 @@ Most endpoints require both tokens:
 
 ```bash
 curl https://api.1platform.pro/api/v1/users/profile \
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \
-  -H "x-user-token: YOUR_USER_TOKEN"
+  -H "Authorization: Bearer $APP_TOKEN" \
+  -H "x-user-token: $USER_TOKEN"
 ```
 
 ## Token Expiration
 
-Tokens have a limited lifetime. When a token expires, exchange your API key for a new one. The response will include expiration information.
+Both tokens expire after 30 minutes (1800 seconds). When a token expires, exchange your API key for a new one. Plan for automatic renewal before expiration.
 
 ## Security Best Practices
 

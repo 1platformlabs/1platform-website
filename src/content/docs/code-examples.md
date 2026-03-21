@@ -12,14 +12,26 @@ section: "code-examples"
 ```python
 import httpx
 
-API_KEY = "your_api_key"
+APP_API_KEY = "ak-your-app-api-key"
+USER_API_KEY = "sk-user-abc123"
 BASE_URL = "https://api.1platform.pro/api/v1"
 
 # Get app token
-response = httpx.post(f"{BASE_URL}/auth/token", json={"api_key": API_KEY})
-app_token = response.json()["data"]["token"]
+response = httpx.post(f"{BASE_URL}/auth/token", json={"apiKey": APP_API_KEY})
+app_token = response.json()["data"]["access_token"]
 
-headers = {"Authorization": f"Bearer {app_token}"}
+# Get user token
+response = httpx.post(
+    f"{BASE_URL}/users/token",
+    headers={"Authorization": f"Bearer {app_token}"},
+    json={"apiKey": USER_API_KEY},
+)
+user_token = response.json()["data"]["access_token"]
+
+headers = {
+    "Authorization": f"Bearer {app_token}",
+    "x-user-token": user_token,
+}
 ```
 
 ### Generate Content
@@ -31,7 +43,8 @@ response = httpx.post(
     headers=headers,
     json={
         "keyword": "best seo automation tools",
-        "website_id": "your_website_id",
+        "lang": "en",
+        "country": "us",
     },
 )
 job_id = response.json()["data"]["job_id"]
@@ -56,14 +69,30 @@ while True:
 ```javascript
 const BASE_URL = 'https://api.1platform.pro/api/v1';
 
-const tokenRes = await fetch(`${BASE_URL}/auth/token`, {
+// Get app token
+const appRes = await fetch(`${BASE_URL}/auth/token`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ api_key: 'your_api_key' }),
+  body: JSON.stringify({ apiKey: 'ak-your-app-api-key' }),
 });
+const appToken = (await appRes.json()).data.access_token;
 
-const { data } = await tokenRes.json();
-const headers = { Authorization: `Bearer ${data.token}` };
+// Get user token
+const userRes = await fetch(`${BASE_URL}/users/token`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${appToken}`,
+  },
+  body: JSON.stringify({ apiKey: 'sk-user-abc123' }),
+});
+const userToken = (await userRes.json()).data.access_token;
+
+const headers = {
+  Authorization: `Bearer ${appToken}`,
+  'x-user-token': userToken,
+  'Content-Type': 'application/json',
+};
 ```
 
 ### Extract Keywords
@@ -71,11 +100,11 @@ const headers = { Authorization: `Bearer ${data.token}` };
 ```javascript
 const keywordsRes = await fetch(`${BASE_URL}/posts/keywords/`, {
   method: 'POST',
-  headers: { ...headers, 'Content-Type': 'application/json' },
+  headers,
   body: JSON.stringify({
     domain: 'example.com',
     country: 'us',
-    language: 'en',
+    lang: 'en',
   }),
 });
 
@@ -88,20 +117,28 @@ console.log(keywords.data);
 ### Full Pipeline Example
 
 ```bash
-# 1. Get token
-TOKEN=$(curl -s -X POST https://api.1platform.pro/api/v1/auth/token \
+# 1. Get app token
+APP_TOKEN=$(curl -s -X POST https://api.1platform.pro/api/v1/auth/token \
   -H "Content-Type: application/json" \
-  -d '{"api_key": "YOUR_KEY"}' | jq -r '.data.token')
+  -d '{"apiKey": "ak-your-app-api-key"}' | jq -r '.data.access_token')
 
-# 2. Extract keywords
+# 2. Get user token
+USER_TOKEN=$(curl -s -X POST https://api.1platform.pro/api/v1/users/token \
+  -H "Authorization: Bearer $APP_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"apiKey": "sk-user-abc123"}' | jq -r '.data.access_token')
+
+# 3. Extract keywords
 curl -X POST https://api.1platform.pro/api/v1/posts/keywords/ \
-  -H "Authorization: Bearer $TOKEN" \
+  -H "Authorization: Bearer $APP_TOKEN" \
+  -H "x-user-token: $USER_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"domain": "example.com", "country": "us"}'
+  -d '{"domain": "example.com", "country": "us", "lang": "en"}'
 
-# 3. Generate content
+# 4. Generate content
 curl -X POST https://api.1platform.pro/api/v1/posts/content/ \
-  -H "Authorization: Bearer $TOKEN" \
+  -H "Authorization: Bearer $APP_TOKEN" \
+  -H "x-user-token: $USER_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"keyword": "target keyword", "website_id": "SITE_ID"}'
+  -d '{"keyword": "target keyword", "lang": "en", "country": "us"}'
 ```
