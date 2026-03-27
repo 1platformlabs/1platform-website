@@ -12,7 +12,8 @@ Marketing website + documentation site for **1Platform** — a unified platform 
 - **[Astro](https://astro.build/) 5** — static site generator, outputs 100% static HTML, zero JS by default
 - **Islands architecture** — JS only ships for interactive components (`client:visible`, `client:load`)
 - **Content Collections** — type-safe Markdown/MDX for blog, docs, changelog (Zod-validated schemas)
-- CSS uses modern features: variables, grid, flexbox, `@layer`, `@container`, nesting. Scoped `<style>` per component + global CSS
+- **Lenis** smooth scroll (npm package, initialized in `src/scripts/lenis-init.ts`)
+- CSS uses modern features: variables, grid, flexbox, nesting. Scoped `<style>` per component + global CSS
 - **Integrations:** `@astrojs/sitemap`, `@astrojs/rss`, Astro View Transitions
 - **Output:** `dist/` folder with pure static HTML/CSS/JS — deployable to any static host
 
@@ -34,13 +35,22 @@ src/
     DocsLayout.astro                # Docs (extends Base, sidebar nav)
     LegalLayout.astro               # Legal pages (extends Base, minimal)
   components/
-    Header.astro, Footer.astro      # Site chrome
-    Hero.astro, SolutionCard.astro   # Reusable UI components
-    PricingCalculator.astro          # Island (client:visible)
-    PipelineAnimation.astro          # Island (client:visible)
-    MetricCounter.astro              # Island (client:visible)
-    MobileMenu.astro                 # Island (client:load)
-    SEOHead.astro, Breadcrumb.astro  # Meta/SEO components
+    Header.astro, Footer.astro      # Site chrome (Header includes mobile menu with focus trap)
+    Hero.astro                      # Aurora mesh gradient bg + staggered text reveal
+    SolutionCard.astro              # Solution cards with icons + "Replaces" text
+    FeatureCard.astro               # Feature showcase cards
+    ComparisonTable.astro           # Without/With comparison (red/green)
+    PillarSection.astro             # 4 core pillars display
+    PipelineAnimation.astro         # Island (client:visible) — 8-step scroll-linked
+    MetricCounter.astro             # Island (client:visible) — animated counters
+    LogoCarousel.astro              # Infinite CSS scroll of capabilities
+    UseCaseCard.astro               # Use case cards with icons
+    CodeBlock.astro                 # Code samples with copy button
+    Breadcrumb.astro                # Breadcrumb nav + JSON-LD
+    TOC.astro                       # Table of contents (blog/docs)
+    RelatedPosts.astro              # Related blog posts sidebar
+    ShareButtons.astro              # Social share buttons
+    Logo.astro                      # 1Platform brand logo
   pages/
     index.astro                     # Homepage → /
     solutions.astro                 # Solutions → /solutions/
@@ -55,15 +65,17 @@ src/
     changelog/index.astro           # Changelog → /changelog/
     rss.xml.ts                      # RSS feed endpoint
   content/
-    config.ts                       # Zod schemas for collections
-    blog/*.md                       # Blog posts (Markdown)
-    docs/*.md                       # Docs pages (Markdown)
-    changelog/*.md                  # Changelog entries (Markdown)
+    config.ts                       # Zod schemas for 3 collections
+    blog/*.md                       # 5 blog posts (categories: seo-automation, ai-content, api-tutorials, product-updates)
+    docs/*.md                       # 6 docs pages (sections: getting-started, authentication, api-reference, code-examples, webhooks, errors)
+    changelog/*.md                  # 2 changelog entries (categories: new-feature, improvement, bug-fix, api-change)
   styles/
     global.css                      # Reset, variables, typography, layout
     components.css                  # Shared component styles
   scripts/
-    animations.ts, lenis-init.ts, pipeline.ts, calculator.ts
+    animations.ts                  # Reveal, stagger, counter animations
+    lenis-init.ts                   # Smooth scroll + anchor linking
+    pipeline.ts                     # Pipeline scroll-linked animation
 public/
   robots.txt, favicon.svg, fonts/, og/
 ```
@@ -160,6 +172,10 @@ npm run preview          # Visual review all pages
 # Test keyboard nav: Tab, Enter, Escape on all pages
 # Test prefers-reduced-motion: all animations have static fallbacks
 ```
+
+## Version
+
+Current version: **0.0.5** (in package.json)
 
 ## Path Aliases (tsconfig.json)
 
