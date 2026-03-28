@@ -11,6 +11,7 @@ You sync the **1Platform marketing website** (`1platform-website/`) with the cur
 - Empty → detect and process ALL pages and content
 - Page name (e.g., `solutions`, `features`, `pricing`) → process only that page
 - `audit` → only run Phase 1 (inventory) + Phase 7 (self-audit) on existing pages, no generation
+- `diff` → run Phase 0 (fetch) + Phase 1 (inventory) and **report only** (read-only mode, NO modifications to any file). Shows what would change without applying changes.
 - `content` → only sync blog posts, docs, and changelog content
 - `components` → only sync components (cards, sections, data arrays)
 
@@ -18,7 +19,7 @@ You sync the **1Platform marketing website** (`1platform-website/`) with the cur
 
 Before processing `$ARGUMENTS`, validate it:
 
-- Must be empty OR match one of: a known page name (`index`, `solutions`, `features`, `pricing`, `why-1platform`, `about`, `compare/*`), `audit`, `content`, `components`
+- Must be empty OR match one of: a known page name (`index`, `solutions`, `features`, `pricing`, `why-1platform`, `about`, `compare/*`), `audit`, `diff`, `content`, `components`
 - Reject any input containing shell metacharacters (`;`, `|`, `&`, `$`, `` ` ``, `>`, `<`, `\n`, `$(`, `${`)
 - Reject path traversal patterns (`..`, `/`, `~`)
 - If the input doesn't match any valid option, print an error and stop: `"Invalid argument: [input]. Valid options: [list]. Aborting."`
@@ -32,8 +33,11 @@ Based on the validated `$ARGUMENTS`, skip irrelevant phases:
 | (empty) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Page name | ✅ | ✅ | ✅ (scoped) | ✅ (only that page) | ✅ (only related) | ❌ skip | ✅ | ✅ | ✅ (scoped) |
 | `audit` | ✅ | ❌ skip | ✅ | ❌ skip | ❌ skip | ❌ skip | ❌ skip | ❌ skip | ✅ |
+| `diff` | ✅ | ❌ skip | ✅ | ❌ skip | ❌ skip | ❌ skip | ❌ skip | ❌ skip | ❌ skip |
 | `content` | ✅ | ✅ | ✅ (scoped) | ❌ skip | ❌ skip | ✅ | ✅ | ✅ | ✅ (scoped) |
 | `components` | ✅ | ✅ | ✅ (scoped) | ❌ skip | ✅ | ❌ skip | ✅ | ✅ | ✅ (scoped) |
+
+> In `diff` mode, **STOP after Phase 1.8** (sync report). Do not create a safety branch, do not modify any files. Report what would change and exit.
 
 When a phase is **scoped**, only read/audit/update files relevant to the argument. When a phase is **skipped**, print `"Phase N — Skipped (argument: {arg})"` and continue.
 
@@ -329,8 +333,10 @@ For each detected capability, compare against existing website content:
   - The description doesn't match current spec capabilities (new fields, new options, changed behavior)
   - Code examples use deprecated endpoints or schemas
   - Feature descriptions are incomplete or inaccurate vs the spec
-  - Pricing/billing information has changed
+  - Pricing/billing information has changed — cross-reference `GET /users/billing`, `GET /users/subscriptions` schemas against pricing page data (tiers, amounts, operation costs)
   - New sub-features have been added that aren't mentioned
+  - Pipeline animation steps don't match current API capability flow
+  - Solution/feature counts on one page contradict another page
 - **MISALIGNED:** The website presents something that doesn't match the API:
   - Features listed that don't exist in the spec
   - Incorrect endpoint paths or methods in code examples
@@ -368,10 +374,13 @@ No changes applied. Exiting.
 
 ### 1.8 Print the sync report (informational only — do NOT stop here)
 
-If there ARE changes needed, print a summary table, then **immediately continue to Phase 2**:
+If there ARE changes needed, print a summary table, then **immediately continue to Phase 2** (or stop if in `diff` mode):
 
 ```
 ## Website Sync Report
+
+### Sync Score: XX/100
+Scoring: Provider leak=-20, Credential leak=-20, Broken endpoint=-10, Missing capability=-5, Outdated content=-5, Cross-page inconsistency=-3, SEO issue=-2, Design violation=-2. Base=100.
 
 ### Pages
 | Page | Status | Action |
@@ -396,6 +405,18 @@ If there ARE changes needed, print a summary table, then **immediately continue 
 | Blog: [missing topic] | 🆕 Missing | Create post about payments feature |
 | Docs: authentication.md | ✅ Up to date | Skip |
 | ... | ... | ... |
+
+### Pipeline Animation vs API
+| Pipeline Step | API Capability | Status |
+|---|---|---|
+| Add Website | Website Management | Up to date |
+| Extract Keywords | AI Content & SEO | Up to date |
+| ... | ... | ... |
+
+### Pricing vs API Billing
+| Website pricing data | API spec data | Status |
+|---|---|---|
+| {tier/amount on website} | {from GET /users/subscriptions schema} | Match / Mismatch |
 
 ### Critical Issues
 - ⛔ Provider name "OpenAI" found in features.astro line 142
@@ -685,6 +706,16 @@ category: "{new-feature|improvement|bug-fix|api-change}"
 
 ## Phase 5 — Build Verification
 
+### 5.0 Pre-build sitemap snapshot
+
+Before building, capture the current sitemap (if it exists from a previous build) for later comparison:
+
+```bash
+cd 1platform-website && [ -f dist/sitemap-index.xml ] && grep '<loc>' dist/sitemap*.xml | sort > /tmp/sitemap-before.txt || echo "No previous sitemap"
+```
+
+### 5.1 Build
+
 ```bash
 cd 1platform-website && npm run build 2>&1 | head -100
 ```
@@ -705,6 +736,37 @@ If the build fails:
 
 **Maximum build-fix iterations:** 3. If the build still fails after 3 fix attempts, **revert ALL changes** (`git checkout -- .`), report the error details, and stop. Do NOT continue to Phase 6 with a broken build.
 
+### 5.2 Post-build checks
+
+After a successful build, run these automated checks:
+
+**Bundle size check:**
+```bash
+# Total JS size (target: < 10KB)
+JS_SIZE=$(find dist/ -name "*.js" -exec cat {} + 2>/dev/null | wc -c)
+echo "Total JS: $JS_SIZE bytes"
+if [ "$JS_SIZE" -gt 10240 ]; then
+  echo "WARNING: JS bundle exceeds 10KB target ($JS_SIZE bytes)"
+fi
+
+# Total build size
+du -sh dist/
+```
+If JS exceeds 10KB, flag as warning in the report. Check if any new `client:visible` or `client:load` islands were added unnecessarily.
+
+**Sitemap diff:**
+```bash
+# Compare sitemap before vs after
+[ -f dist/sitemap-index.xml ] && grep '<loc>' dist/sitemap*.xml | sort > /tmp/sitemap-after.txt
+if [ -f /tmp/sitemap-before.txt ] && [ -f /tmp/sitemap-after.txt ]; then
+  REMOVED=$(comm -23 /tmp/sitemap-before.txt /tmp/sitemap-after.txt)
+  ADDED=$(comm -13 /tmp/sitemap-before.txt /tmp/sitemap-after.txt)
+  [ -n "$REMOVED" ] && echo "WARNING: Pages REMOVED from sitemap:" && echo "$REMOVED"
+  [ -n "$ADDED" ] && echo "Pages added to sitemap:" && echo "$ADDED"
+fi
+```
+If pages were removed from the sitemap, flag as warning — this could mean a page was accidentally deleted or a dynamic route lost its `getStaticPaths` entries.
+
 ---
 
 ## Phase 6 — Summary
@@ -713,6 +775,8 @@ Print an interim report, then **immediately continue to Phase 7**:
 
 ```
 ## Website Sync Complete
+
+### Sync Score: XX/100
 
 ### Pages Updated
 - src/pages/index.astro (added NFC Payments to solutions grid, updated pipeline)
@@ -738,7 +802,11 @@ Print an interim report, then **immediately continue to Phase 7**:
 - src/pages/about.astro
 - (list)
 
-### Build: ✅ Passed
+### Build Metrics
+- Build: Passed
+- Total JS bundle: X bytes (target: < 10,240)
+- Total build size: X MB
+- Sitemap pages: X (added: X, removed: X)
 
 ### All modified files (for git staging)
 src/pages/index.astro
@@ -817,6 +885,8 @@ Compare the website's solution/feature lists against the capability map from Pha
 - [ ] Solution descriptions accurately reflect what the API does
 - [ ] "Replaces" callouts use generic category names, not brand names
 - [ ] No duplicate entries in solution/feature arrays (idempotency check)
+- [ ] **Pipeline animation steps match current API capabilities** — each step in PipelineAnimation corresponds to a real API capability. No steps for capabilities that were removed, and new capabilities are reflected in the pipeline if they fit the flow.
+- [ ] **Pricing data matches API billing spec** — if the pricing page shows specific tiers, amounts, or operation costs, cross-reference against `GET /users/subscriptions` and `GET /users/billing` schemas in the spec. Flag mismatches.
 
 ### 7.4 Cross-page consistency audit
 
@@ -834,6 +904,8 @@ Using the cross-page consistency map from Phase 1.4:
 - [ ] Navigation links in header/footer are consistent across all pages
 - [ ] No broken internal links (all `href` point to existing pages)
 - [ ] Heading hierarchy is correct (H1 → H2 → H3, no skips)
+- [ ] **Content collection internal links are valid** — scan all `.md` files in `src/content/blog/`, `src/content/docs/`, `src/content/changelog/` for markdown links (`[text](/path/)`) and verify each target path corresponds to an existing page or content file. Flag broken cross-references.
+- [ ] **Dynamic route coverage** — for each `[...slug].astro` and `[category].astro`, verify that `getStaticPaths()` generates pages for ALL content items. Check that new blog categories have corresponding category pages.
 
 ### 7.6 Design system compliance audit
 
@@ -845,17 +917,41 @@ Using the cross-page consistency map from Phase 1.4:
 - [ ] Islands only on interactive components (no `client:*` on presentational components)
 - [ ] Images use `<Image />` from `astro:assets` (not `<img>` with `public/` paths)
 - [ ] No changes to files listed in "What NOT to touch" section (unless explicitly justified)
+- [ ] **Bundle size under target** — total JS in `dist/` is under 10KB. If exceeded, identify which `client:*` islands contribute the most and flag unnecessary ones.
+- [ ] **View Transitions compatibility** — new components with `client:visible` or `client:load` do not conflict with `<ViewTransitions />`. Check that islands include `transition:persist` if they maintain state across navigations, and that no island uses `document.addEventListener('DOMContentLoaded', ...)` (incompatible with View Transitions — use `astro:page-load` instead).
+- [ ] **No new CSS specificity conflicts** — if new scoped styles were added, verify they don't use `!important` to override existing styles (indicates a specificity problem). Check that new `z-index` values don't conflict with existing layering (header: 1000, mobile menu: 999, modals: 1100).
+- [ ] **Tap targets >= 48px** — any new buttons or links in mobile layout have at least 48x48px touch area (check `min-height`, `padding`, or `min-width` in mobile styles).
 
 ### 7.7 SEO audit
 
 - [ ] Every page has unique `<title>` (50-60 chars) and meta description (150-160 chars)
-- [ ] JSON-LD structured data present on applicable pages (validate structure: `@context`, `@type`, required properties)
+- [ ] JSON-LD structured data present on applicable pages (validate structure — see below)
 - [ ] Breadcrumbs on all pages except homepage
 - [ ] Canonical URLs use `https://1platform.pro/[page]/` format
 - [ ] One H1 per page
 - [ ] No orphaned pages (every page reachable from navigation)
 - [ ] **Sitemap verification:** After build, check `dist/sitemap-index.xml` exists and contains entries for all pages (including any new pages added). Run: `grep -c '<loc>' dist/sitemap*.xml` to count entries.
+- [ ] **Sitemap diff:** Compare pre-build vs post-build sitemaps (from Phase 5.0/5.2). If any pages were removed, flag as warning — could indicate accidental page deletion or broken `getStaticPaths`.
 - [ ] **RSS verification:** If new blog posts were created, verify they appear in the built RSS feed: `grep '{new-post-slug}' dist/rss.xml`
+- [ ] **Open Graph images:** Every page's `og:image` meta tag points to an image that exists in the build output (`dist/`). Images should be >= 1200x630px. Check that `og:image:width`, `og:image:height`, `og:image:type` meta tags are present.
+- [ ] **Twitter card meta:** `twitter:card`, `twitter:title`, `twitter:description`, `twitter:image` present on all pages.
+
+**JSON-LD validation checklist:**
+
+For each page with JSON-LD (`<script type="application/ld+json">`):
+
+1. Parse as JSON — must be valid JSON (no trailing commas, no single quotes)
+2. `@context` must be `"https://schema.org"` (not http)
+3. `@type` must be a recognized schema.org type
+4. Cross-reference against the schema map in WEBSITE_PROMPT.md — verify the correct `@type` is used for each page
+5. Required properties per type:
+   - `WebSite`: `name`, `url`
+   - `SoftwareApplication`: `name`, `operatingSystem`, `applicationCategory`
+   - `Organization`: `name`, `url`
+   - `BlogPosting`: `headline`, `datePublished`, `author`
+   - `BreadcrumbList`: `itemListElement` with valid `ListItem` entries
+   - `FAQPage`: `mainEntity` with `Question`/`acceptedAnswer` pairs
+6. No provider names in any JSON-LD field value
 
 ### 7.8 Cross-reference with developer docs
 
@@ -891,10 +987,13 @@ If ANY issue is found in 7.1–7.9:
 ```
 ## Self-Audit Results
 
+### Sync Score: XX/100 (previous: XX/100, delta: +/-X)
+Scoring: Provider leak=-20, Credential leak=-20, Broken endpoint=-10, Missing capability=-5, Outdated content=-5, Cross-page inconsistency=-3, SEO issue=-2, Design violation=-2.
+
 ### Security
-- ✅ OpenAPI spec validated (structure, size, origin)
-- ✅ Zero credential leaks detected
-- ✅ No set:html or dangerouslySetInnerHTML with spec content
+- OpenAPI spec validated (structure, size, origin)
+- Zero credential leaks detected
+- No set:html or dangerouslySetInnerHTML with spec content
 - ✅ No inline event handlers in generated HTML
 - ✅ All external URLs validated (https://, known domains only)
 - ✅ No prompt injection patterns detected in spec content
@@ -925,16 +1024,31 @@ If ANY issue is found in 7.1–7.9:
 - ✅ No broken internal links
 
 ### Design system
-- ✅ Dark mode only
-- ✅ All animations respect prefers-reduced-motion
-- ✅ No accessibility violations detected
-- ✅ No unauthorized changes to protected files
+- Dark mode only
+- All animations respect prefers-reduced-motion
+- No accessibility violations detected
+- No unauthorized changes to protected files
+- JS bundle: X bytes (target: < 10,240) — OK / WARNING
+- View Transitions compatible
+- No CSS specificity conflicts
+- Tap targets >= 48px
 
 ### SEO
-- ✅ All pages have unique titles and descriptions
-- ✅ JSON-LD present on applicable pages
+- All pages have unique titles and descriptions
+- JSON-LD valid on all applicable pages (types match schema map)
+- OG images present and correct dimensions
+- Sitemap: X pages (delta: +X/-X from pre-build)
+- RSS: X entries (includes new posts: yes/no)
 
-### Build: ✅ Passed (post-audit)
+### Pipeline vs API
+- Pipeline steps: X (all match current capabilities: yes/no)
+- Removed capabilities in pipeline: (list or none)
+
+### Pricing vs API
+- Pricing data matches spec: yes / no / N/A (placeholder)
+- Mismatches: (list or none)
+
+### Build: Passed (post-audit)
 
 ### Audit iterations: N
 
