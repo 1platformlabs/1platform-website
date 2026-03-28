@@ -6,7 +6,7 @@ import SolutionCard from '@components/SolutionCard.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 
 const title = 'SEO Automation Solutions — Unified API | 1Platform';
-const description = 'Replace 13+ separate tools with one platform. AI content, keywords, publishing, indexing, link building, payments, and invoicing — unified. Try free.';
+const description = 'Replace 15+ separate tools with one platform. AI content, keywords, publishing, indexing, link building, payments, and invoicing — unified. Try free.';
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
@@ -41,6 +41,13 @@ const intelligenceSolutions = [
     description: 'Connect Google Search Console programmatically. Pull ranking data, clicks, impressions, and CTR for any property — then feed insights directly into content generation.',
     replaces: 'Manual Search Console workflows',
     href: '/docs/search-console/',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+    title: 'Google Analytics Integration',
+    description: 'Connect Google Analytics 4 via OAuth, provision properties automatically, and retrieve traffic metrics — sessions, pageviews, realtime data, and per-page performance — all through one API.',
+    replaces: 'Manual GA4 setup, separate analytics dashboards',
+    href: '/docs/analytics/',
   },
 ];
 
@@ -140,11 +147,22 @@ const paymentsSolutions = [
   },
 ];
 
+/* ── Automation & AI Agents Pillar ── */
+const automationSolutions = [
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="3"/><path d="M12 8v3"/><path d="M8 16h0"/><path d="M16 16h0"/></svg>',
+    title: 'AI Agents',
+    description: 'Create autonomous AI agents from a catalog of templates or via a guided wizard. Schedule runs, monitor execution, and handle human-in-the-loop approvals — all through the API.',
+    replaces: 'Custom automation scripts, separate AI orchestration tools',
+    href: '/docs/agents/',
+  },
+];
+
 const pillarSections = [
   {
     id: 'intelligence',
     title: 'Intelligence & Research',
-    description: 'Extract keywords, connect Google Search Console, and manage multiple websites — the foundation of every content strategy.',
+    description: 'Extract keywords, connect Google Search Console, integrate analytics, and manage multiple websites — the foundation of every content strategy.',
     icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
     solutions: intelligenceSolutions,
   },
@@ -169,6 +187,13 @@ const pillarSections = [
     icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
     solutions: paymentsSolutions,
   },
+  {
+    id: 'automation',
+    title: 'Automation & AI Agents',
+    description: 'Deploy autonomous AI agents that execute tasks on a schedule, respond to events, and request human approval when needed.',
+    icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="3"/><path d="M12 8v3"/></svg>',
+    solutions: automationSolutions,
+  },
 ];
 ---
 
@@ -183,8 +208,8 @@ const pillarSections = [
   <!-- Hero -->
   <Hero
     headline="Every Solution. One Platform."
-    subheadline="1Platform replaces 13+ fragmented tools with a unified platform that covers the entire lifecycle — from keyword intelligence to published, indexed, monetized content with automated invoicing."
-    badge="13+ Solutions, 1 API"
+    subheadline="1Platform replaces 15+ fragmented tools with a unified platform that covers the entire lifecycle — from keyword intelligence to published, indexed, monetized content with automated invoicing."
+    badge="15+ Solutions, 1 API"
     primaryCta={{ label: 'Get Started Free', href: 'https://app.1platform.pro' }}
     secondaryCta={{ label: 'View API Docs', href: 'https://developer.1platform.pro/' }}
   />
@@ -229,7 +254,7 @@ const pillarSections = [
     <div class="container">
       <div class="cta-banner__content reveal">
         <h2>Ready to Simplify Your Stack?</h2>
-        <p>Start building with 1Platform today. One integration, 13+ capabilities, zero complexity.</p>
+        <p>Start building with 1Platform today. One integration, 15+ capabilities, zero complexity.</p>
         <div class="cta-banner__actions">
           <a href="https://app.1platform.pro" class="btn btn--primary">Get Started Free</a>
           <a href="/pricing/" class="btn btn--ghost">View Pricing</a>
