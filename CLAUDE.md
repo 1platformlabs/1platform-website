@@ -1,6 +1,8 @@
-# CLAUDE.md — 1Platform Marketing Website
+# CLAUDE.md
 
-This file provides project-specific guidance for the **marketing website** (`1platform.pro`).
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+Project-specific guidance for the **1Platform marketing website** (`1platform.pro`).
 See the root `../CLAUDE.md` for shared brand/API context.
 
 ## Project Overview
@@ -50,6 +52,7 @@ src/
     TOC.astro                       # Table of contents (blog/docs)
     RelatedPosts.astro              # Related blog posts sidebar
     ShareButtons.astro              # Social share buttons
+    BlogPostCard.astro              # Blog post preview card (used in blog index/category pages)
     Logo.astro                      # 1Platform brand logo
   pages/
     index.astro                     # Homepage → /
@@ -59,7 +62,9 @@ src/
     why-1platform.astro             # Differentiators → /why-1platform/
     about.astro, terms.astro, privacy.astro, cookies.astro, 404.astro
     compare/*.astro                 # Comparison pages → /compare/[slug]/
+    docs/index.astro                # Docs index → /docs/
     docs/[...slug].astro            # Docs from content collection → /docs/[slug]/
+    blog/index.astro                # Blog index → /blog/
     blog/[...slug].astro            # Blog from content collection → /blog/[slug]/
     blog/category/[category].astro  # Category pages
     changelog/index.astro           # Changelog → /changelog/
@@ -175,7 +180,7 @@ npm run preview          # Visual review all pages
 
 ## Version
 
-Current version: **0.0.5** (in package.json)
+Current version: **0.2.2** (in package.json)
 
 ## Path Aliases (tsconfig.json)
 
