@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **OAuth logo**: Add 120x120 logo asset for OAuth consent screen
+- **OAuth logo**: Added 120x120 OAuth logo asset for Google integration flows
 
 ### Changed
 
-- **CLAUDE.md**: Sync project instructions with current codebase — document BlogPostCard, blog/index, and docs/index pages; update version reference to 0.2.1
+- **CLAUDE.md**: Updated project documentation to reflect current codebase (new components, pages, version)
 
 ## [0.1.0] — 2026-03-28
 
