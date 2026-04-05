@@ -5,6 +5,29 @@ All notable changes to the 1Platform Website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-04-05
+
+### Added
+
+- **Ad Revenue Management solution**: New solution across all pages — connect ad accounts via OAuth, monitor earnings by page, track RPM/CTR, review policy issues, and generate revenue reports (17 API endpoints)
+- **Activity Logs solution**: Full API observability — server-side logs, client-side event ingestion, trace ID correlation, and retention management (4 API endpoints)
+- **5 new capability cards on About page**: Search Console, Analytics, Ad Revenue, AI Agents, Activity Logs — now matches the full solution set
+- **Ad Revenue pricing card**: Added to pricing grid with includes list
+- **Footer links**: Ad Revenue and Activity Logs added to Solutions column
+- **Changelog entry**: `2026-04-05-v1.2.0.md` content collection entry
+
+### Fixed
+
+- **Provider name leak**: Removed `claude-sonnet-4-6` model name from AI Agents code example in features page, replaced with generic `1platform-agent-default`
+
+### Changed
+
+- **Solution count**: Updated from 15+ to 18+ across all pages (homepage, solutions, features, pricing, why-1platform, about, comparison pages, docs index, blog) to reflect current API capabilities
+- **Pricing footnote**: Updated "Plus 5 more solutions" to "Plus 9 more solutions" with expanded list
+- **Intelligence pillar description**: Updated to mention ad revenue management
+- **Automation pillar description**: Updated to mention activity logs
+- **Analytics section title**: Renamed to "Analytics, Monetization & AI Agents" on features page
+
 ## [0.2.2] — 2026-04-01
 
 ### Added
