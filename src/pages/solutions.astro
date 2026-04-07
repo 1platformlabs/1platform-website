@@ -50,10 +50,10 @@ const intelligenceSolutions = [
     href: '/docs/analytics/',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-    title: 'Ad Revenue Management',
-    description: 'Connect your ad account via OAuth, monitor earnings by page, track RPM and CTR, review policy issues, and generate custom revenue reports — all via API.',
-    replaces: 'Separate ad platform dashboards, manual revenue tracking',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><line x1="6" y1="11" x2="10" y2="11"/><line x1="14" y1="11" x2="18" y2="11"/></svg>',
+    title: 'Ad Revenue Tracking',
+    description: 'Connect your ad accounts via OAuth, monitor earnings by site and page, track policy issues, and generate custom revenue reports — all from a single API integration.',
+    replaces: 'Ad platform dashboards, manual revenue tracking',
     href: '/docs/adsense/',
   },
 ];
@@ -127,6 +127,13 @@ const distributionSolutions = [
     replaces: 'Separate hosting dashboards, site managers',
     href: '/docs/websites/',
   },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+    title: 'Domain Registration',
+    description: 'Register, transfer, and manage domains directly through the API. Configure DNS records, set nameservers, manage registrar lock, and automate renewals — no registrar dashboard needed.',
+    replaces: 'Domain registrars + DNS managers',
+    href: '/docs/domains/',
+  },
 ];
 
 /* ── Payments & Invoicing Pillar ── */
@@ -166,8 +173,8 @@ const automationSolutions = [
   {
     icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>',
     title: 'Activity Logs',
-    description: 'Track every API call with server-side logs, ingest client-side events, correlate with trace IDs, and manage retention — full observability for your integration.',
-    replaces: 'Custom logging infrastructure, separate observability tools',
+    description: 'Track every API call with detailed structured logs. Filter by endpoint, status code, or time range. Register client-side events for full end-to-end observability across your integration.',
+    replaces: 'Logging services, separate monitoring tools',
     href: '/docs/logs/',
   },
 ];
@@ -176,7 +183,7 @@ const pillarSections = [
   {
     id: 'intelligence',
     title: 'Intelligence & Research',
-    description: 'Extract keywords, connect Search Console, integrate analytics, manage ad revenue, and manage multiple websites — the foundation of every content strategy.',
+    description: 'Extract keywords, connect Google Search Console, integrate analytics, and manage multiple websites — the foundation of every content strategy.',
     icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
     solutions: intelligenceSolutions,
   },
@@ -204,7 +211,7 @@ const pillarSections = [
   {
     id: 'automation',
     title: 'Automation & AI Agents',
-    description: 'Deploy autonomous AI agents that execute tasks on a schedule, respond to events, and request human approval. Track every API call with full observability logs.',
+    description: 'Deploy autonomous AI agents that execute tasks on a schedule, respond to events, and request human approval when needed.',
     icon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="3"/><path d="M12 8v3"/></svg>',
     solutions: automationSolutions,
   },

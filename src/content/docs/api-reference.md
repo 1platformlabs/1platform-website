@@ -54,8 +54,44 @@ section: "api-reference"
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/users/websites/{id}/publisuites` | Link building marketplace |
+| POST | `/users/websites/{id}/link-building` | Link building marketplace |
 | POST | `/users/websites/{id}/searchconsole` | Google Search Console integration |
+
+## Domain Registration
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/domains/check` | Check domain availability |
+| POST | `/domains` | Register a new domain |
+| POST | `/domains/transfer` | Initiate a domain transfer |
+| GET | `/domains` | List registered domains |
+| GET | `/domains/{domain}` | Get domain details |
+| PATCH | `/domains/{domain}` | Update domain settings (registrar lock, auto-renew) |
+| GET | `/domains/{domain}/dns` | List DNS records |
+| POST | `/domains/{domain}/dns` | Create DNS record |
+| PUT | `/domains/{domain}/dns/{id}` | Update DNS record |
+| DELETE | `/domains/{domain}/dns/{id}` | Delete DNS record |
+| PUT | `/domains/{domain}/nameservers` | Set custom nameservers |
+
+## Ad Revenue
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/users/adsense/connect` | Connect ad account via OAuth |
+| GET | `/users/adsense/accounts` | List connected ad accounts |
+| GET | `/users/adsense/earnings` | Get earnings overview (total, by site) |
+| GET | `/users/adsense/earnings/pages` | Get page-level earnings breakdown |
+| GET | `/users/adsense/reports` | Generate custom revenue report |
+| GET | `/users/adsense/policy` | Retrieve active policy issues |
+
+## Activity Logs
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/users/logs` | List API activity logs (filterable by endpoint, status, date) |
+| GET | `/users/logs/{id}` | Get log entry details |
+| POST | `/users/logs/events` | Register a client-side event |
+| DELETE | `/users/logs` | Clear activity log history |
 
 ## Payments & Invoicing
 

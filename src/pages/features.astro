@@ -41,8 +41,9 @@ const icons = {
   websites: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
   analytics: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
   agents: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="3"/><path d="M12 8v3"/><path d="M8 16h0"/><path d="M16 16h0"/></svg>',
-  adsense: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-  activityLogs: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>',
+  domains: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+  adsense: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><line x1="6" y1="11" x2="10" y2="11"/><line x1="14" y1="11" x2="18" y2="11"/></svg>',
+  logs: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>',
 };
 
 /* ── Code Examples ── */
@@ -109,7 +110,7 @@ const codeAgents = `curl -X POST https://api.1platform.pro/api/v1/agents \\
     "name": "SEO Content Writer",
     "description": "Generates weekly blog posts from trending keywords",
     "system_prompt": "You are an SEO content writer...",
-    "model": "1platform-agent-default",
+    "model": "claude-sonnet-4-6",
     "schedule": "0 9 * * 1",
     "max_iterations": 10
   }'`;
@@ -220,6 +221,11 @@ const codeAgents = `curl -X POST https://api.1platform.pro/api/v1/agents \\
           title="Link Building"
           description="Access a marketplace of high-authority sites for guest posts and backlinks. Automate outreach and placement via API."
         />
+        <FeatureCard
+          icon={icons.domains}
+          title="Domain Registration & DNS"
+          description="Check domain availability, register and transfer domains, manage DNS records and nameservers, set registrar lock, and automate renewals — all through the API without touching a registrar dashboard."
+        />
       </div>
 
       <div class="code-example reveal">
@@ -282,11 +288,11 @@ const codeAgents = `curl -X POST https://api.1platform.pro/api/v1/agents \\
   <section class="section" id="analytics-agents">
     <div class="container">
       <div class="section-header reveal">
-        <h2>Analytics, Monetization & AI Agents</h2>
-        <p>Connect analytics and ad monetization to measure performance and revenue. Deploy autonomous AI agents to automate recurring tasks. Track every API call with activity logs.</p>
+        <h2>Analytics & AI Agents</h2>
+        <p>Connect analytics to measure content performance. Deploy autonomous AI agents to automate recurring tasks.</p>
       </div>
 
-      <div class="feature-grid reveal">
+      <div class="grid-3 features-grid">
         <FeatureCard
           icon={icons.analytics}
           title="Google Analytics Integration"
@@ -294,8 +300,8 @@ const codeAgents = `curl -X POST https://api.1platform.pro/api/v1/agents \\
         />
         <FeatureCard
           icon={icons.adsense}
-          title="Ad Revenue Management"
-          description="Connect your ad account via OAuth, monitor earnings by page, track RPM and CTR, review policy issues, and generate custom revenue reports — all via API."
+          title="Ad Revenue Tracking"
+          description="Connect ad accounts via OAuth, monitor earnings at the site and page level, track policy issues, configure alerts, and pull custom revenue reports — no third-party dashboard required."
         />
         <FeatureCard
           icon={icons.agents}
@@ -303,9 +309,9 @@ const codeAgents = `curl -X POST https://api.1platform.pro/api/v1/agents \\
           description="Create autonomous agents from templates or via a guided wizard. Schedule runs, monitor execution, and handle human-in-the-loop approvals."
         />
         <FeatureCard
-          icon={icons.activityLogs}
+          icon={icons.logs}
           title="Activity Logs"
-          description="Track every API call with server-side logs, ingest client-side events, correlate with trace IDs, and manage retention — full observability for your integration."
+          description="Every API call is logged with method, endpoint, status, latency, and payload. Filter by endpoint, status code, or date range. Register client-side events to build a complete observability picture."
         />
       </div>
 
