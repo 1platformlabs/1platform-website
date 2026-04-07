@@ -5,6 +5,19 @@ All notable changes to the 1Platform Website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-04-06
+
+### Added
+
+- **Domain Management solution**: New solution across homepage, solutions, features, and footer — register domains, manage DNS records, configure nameservers, set WHOIS privacy, and handle transfers via API (15 endpoints).
+- Domain Management code example on features page.
+
+### Changed
+
+- Updated solution counts from 18+ to 19+ across all pages (index, solutions, features, pricing, about, why-1platform).
+- Updated metric counter on homepage from 18 to 19.
+- Updated footer with Domain Management link.
+
 ## [0.3.0] — 2026-04-05
 
 ### Added
