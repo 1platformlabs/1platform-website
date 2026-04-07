@@ -180,7 +180,7 @@ npm run preview          # Visual review all pages
 
 ## Version
 
-Current version: **0.2.3** (in package.json)
+Current version: **0.9.0** (in package.json)
 
 ## Path Aliases (tsconfig.json)
 

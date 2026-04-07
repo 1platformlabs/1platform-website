@@ -29,8 +29,8 @@ To replicate what 1Platform offers, you would need to individually integrate:
 
 ### Hidden Costs
 
-- **18+ separate API accounts** and billing relationships
-- **18+ sets of documentation** to learn and maintain
+- **19+ separate API accounts** and billing relationships
+- **19+ sets of documentation** to learn and maintain
 - **Different auth systems** for each service
 - **Data transformation** between incompatible formats
 - **Error handling** for each integration
