@@ -5,6 +5,15 @@ All notable changes to the 1Platform Website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] — 2026-04-07
+
+### Added
+- **Domain Management solution**: Added Domain Management to homepage solutions grid, features page (Publishing & Distribution section), solutions page (Distribution & Growth pillar), and footer navigation
+- **Changelog entry**: `src/content/changelog/2026-04-07-v1.3.0.md` for the Domain Management addition
+
+### Changed
+- **Solution count**: Updated from 18+ to 19+ across all pages (homepage, solutions, features, pricing, why-1platform, about, comparison pages, docs index, blog content, and comparison table) to reflect Domain Management as the 19th solution
+
 ## [0.7.0] — 2026-04-06
 
 ### Added
