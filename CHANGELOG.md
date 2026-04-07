@@ -5,6 +5,21 @@ All notable changes to the 1Platform Website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] — 2026-04-06
+
+### Added
+- **Domain Registration solution**: New solution card on homepage, solutions, and features pages covering domain availability, registration, DNS, nameservers, transfers, and registrar lock
+- **Ad Revenue Tracking solution**: New solution card for AdSense-style ad account management, earnings monitoring, and custom reports
+- **Activity Logs solution**: New solution card for API call tracking, filtering, client-side events, and observability
+- **API reference sections**: Added Domain Registration (11 endpoints), Ad Revenue (6 endpoints), and Activity Logs (4 endpoints) to docs API reference
+
+### Changed
+- **Solution count**: Updated "15+ Solutions" to "18+ Solutions" across all pages (homepage, solutions, features)
+- **CTA copy**: Updated "Stop Managing 10 Different Tools" to "Stop Managing 15+ Different Tools"
+
+### Fixed
+- **Provider name leak**: Removed "publisuites" from api-reference.md endpoint path — replaced with "link-building"
+
 ## [0.5.0] — 2026-04-06
 
 ### Added
