@@ -1,0 +1,8 @@
+# Build & cache
+node_modules/
+.astro/
+dist/
+.vercel/
+
+# Package lock
+package-lock.json
