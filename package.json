@@ -2,6 +2,12 @@
   "name": "1platform-website",
   "type": "module",
   "version": "0.10.3",
+  "license": "MIT",
+  "homepage": "https://1platform.pro",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1platformlabs/1platform-website.git"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
