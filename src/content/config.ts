@@ -16,23 +16,6 @@ const blog = defineCollection({
   }),
 });
 
-const docs = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    order: z.number(),
-    section: z.enum([
-      'getting-started',
-      'authentication',
-      'api-reference',
-      'code-examples',
-      'webhooks',
-      'errors',
-    ]),
-  }),
-});
-
 const changelog = defineCollection({
   type: 'content',
   schema: z.object({
@@ -43,4 +26,4 @@ const changelog = defineCollection({
   }),
 });
 
-export const collections = { blog, docs, changelog };
+export const collections = { blog, changelog };

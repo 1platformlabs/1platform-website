@@ -11,7 +11,7 @@ const {
   headline,
   subheadline,
   primaryCta = { label: 'Get Started Free', href: 'https://app.1platform.pro' },
-  secondaryCta = { label: 'View Documentation', href: '/docs/' },
+  secondaryCta = { label: 'View Documentation', href: 'https://developer.1platform.pro/' },
   badge,
 } = Astro.props;
 
@@ -68,9 +68,9 @@ const words = headline.split(' ');
   .hero__blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.3;
-    mix-blend-mode: screen;
+    filter: blur(100px);
+    opacity: 0.12;
+    mix-blend-mode: multiply;
   }
 
   .hero__blob--1 {
@@ -95,6 +95,7 @@ const words = headline.split(' ');
     background: var(--color-cyan);
     bottom: -5%;
     left: 40%;
+    opacity: 0.08;
   }
 
   @media (prefers-reduced-motion: no-preference) {

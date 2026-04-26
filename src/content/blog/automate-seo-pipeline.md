@@ -50,4 +50,4 @@ By unifying these steps, you reduce integration time from weeks to hours. A sing
 
 ## Getting Started
 
-Sign up for a free account at 1Platform and follow our [getting started guide](/docs/getting-started/) to build your first automated pipeline in under 5 minutes.
+Sign up for a free account at 1Platform and follow our [getting started guide](https://developer.1platform.pro/) to build your first automated pipeline in under 5 minutes.

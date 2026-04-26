@@ -5,7 +5,7 @@ const navItems = [
   { label: 'Solutions', href: '/solutions/' },
   { label: 'Features', href: '/features/' },
   { label: 'Pricing', href: '/pricing/' },
-  { label: 'Docs', href: '/docs/' },
+  { label: 'Docs', href: 'https://developer.1platform.pro/' },
   { label: 'Blog', href: '/blog/' },
 ];
 
@@ -142,9 +142,9 @@ const currentPath = Astro.url.pathname;
     right: 0;
     z-index: 100;
     height: var(--header-height);
-    background: rgba(10, 10, 10, 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
     border-bottom: 1px solid var(--color-border);
   }
 
