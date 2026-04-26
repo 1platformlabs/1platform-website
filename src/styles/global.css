@@ -45,28 +45,58 @@ ul, ol {
   list-style: none;
 }
 
-/* ===== CSS Variables ===== */
+/* ===== CSS Variables — 1Platform Design System (LIGHT) ===== */
 :root {
-  /* Colors */
-  --color-bg: #0a0a0a;
-  --color-bg-alt: #111111;
-  --color-bg-elevated: #191919;
-  --color-surface: #1a1a1a;
-  --color-border: rgba(255, 255, 255, 0.06);
-  --color-border-hover: rgba(255, 255, 255, 0.12);
+  /* Surfaces */
+  --color-bg:          #fafafa;
+  --color-bg-alt:      #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-surface:     #ffffff;
+  --color-bg-muted:    #f4f4f5;
 
-  --color-text: #ededed;
-  --color-text-secondary: #a1a1a1;
-  --color-text-tertiary: #666666;
+  /* Borders — neutral hairlines */
+  --color-border:        rgba(0, 0, 0, 0.08);
+  --color-border-hover:  rgba(0, 0, 0, 0.16);
+  --color-border-strong: rgba(0, 0, 0, 0.12);
 
-  --color-accent: #3b82f6;
-  --color-accent-hover: #60a5fa;
-  --color-accent-glow: rgba(59, 130, 246, 0.15);
-  --color-purple: #8b5cf6;
-  --color-cyan: #06b6d4;
-  --color-green: #10b981;
-  --color-red: #ef4444;
-  --color-amber: #f59e0b;
+  /* Foreground */
+  --color-text:           #0a0a0a;
+  --color-text-secondary: #52525b;
+  --color-text-tertiary:  #a1a1a1;
+  --color-text-inverse:   #ffffff;
+
+  /* Brand / Accent */
+  --color-accent:       #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-glow:  rgba(37, 99, 235, 0.08);
+  --color-accent-ring:  rgba(37, 99, 235, 0.24);
+  --color-accent-soft:  #eff6ff;
+
+  /* Supporting hues */
+  --color-purple: #7c3aed;
+  --color-cyan:   #0891b2;
+  --color-green:  #059669;
+  --color-red:    #dc2626;
+  --color-amber:  #d97706;
+
+  /* Semantic */
+  --color-success:    var(--color-green);
+  --color-success-bg: #ecfdf5;
+  --color-danger:     var(--color-red);
+  --color-danger-bg:  #fef2f2;
+  --color-warning:    var(--color-amber);
+  --color-warning-bg: #fffbeb;
+
+  /* Gradients — quieter on light */
+  --gradient-text: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+  --gradient-cta:  linear-gradient(180deg, #ffffff, #f4f4f5);
+
+  /* Shadows — subtle, neutral */
+  --shadow-sm:          0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:          0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-lg:          0 12px 32px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover:  0 8px 24px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-glow-ring:   0 0 0 3px var(--color-accent-ring);
 
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -104,17 +134,18 @@ ul, ol {
   --border-radius: 8px;
   --border-radius-lg: 12px;
   --border-radius-xl: 16px;
+  --border-radius-pill: 9999px;
 
   /* Animation */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --duration-fast: 200ms;
-  --duration-normal: 300ms;
-  --duration-slow: 800ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 600ms;
 }
 
 /* ===== Base Styles ===== */
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -124,17 +155,24 @@ body {
   background-color: var(--color-bg);
 }
 
-/* ===== Typography ===== */
-h1, h2, h3, h4, h5, h6 {
-  line-height: 1.2;
-  font-weight: 600;
-  text-wrap: balance;
+::selection {
+  background: var(--color-accent-ring);
+  color: var(--color-text);
 }
 
-h1 { font-size: var(--text-5xl); }
+/* ===== Typography ===== */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--color-text);
+}
+
+h1 { font-size: var(--text-5xl); font-weight: 700; letter-spacing: -0.03em; }
 h2 { font-size: var(--text-3xl); }
-h3 { font-size: var(--text-xl); }
-h4 { font-size: var(--text-lg); }
+h3 { font-size: var(--text-xl); letter-spacing: -0.01em; }
+h4 { font-size: var(--text-lg); letter-spacing: -0.01em; }
 
 p {
   text-wrap: pretty;
@@ -163,11 +201,13 @@ code, pre {
 
 .section--alt {
   background-color: var(--color-bg-alt);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* ===== Dot Grid Background ===== */
 .dot-grid {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -179,7 +219,7 @@ code, pre {
   z-index: 9999;
   padding: var(--space-3) var(--space-6);
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-text-inverse);
   border-radius: var(--border-radius);
   font-weight: 600;
   font-size: var(--text-sm);

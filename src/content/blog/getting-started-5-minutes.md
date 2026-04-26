@@ -55,4 +55,4 @@ curl https://api.1platform.pro/api/v1/posts/content/jobs/JOB_ID \
 
 Once the job completes, the content is ready. If you have CMS publishing configured, it can be published automatically.
 
-That's it! From account creation to published content in 5 steps. Check our [full documentation](/docs/) for advanced features.
+That's it! From account creation to published content in 5 steps. Check our [full documentation](https://developer.1platform.pro/) for advanced features.

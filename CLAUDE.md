@@ -13,7 +13,7 @@ Marketing website + documentation site for **1Platform** — a unified platform 
 
 - **[Astro](https://astro.build/) 5** — static site generator, outputs 100% static HTML, zero JS by default
 - **Islands architecture** — JS only ships for interactive components (`client:visible`, `client:load`)
-- **Content Collections** — type-safe Markdown/MDX for blog, docs, changelog (Zod-validated schemas)
+- **Content Collections** — type-safe Markdown/MDX for blog and changelog (Zod-validated schemas)
 - **Lenis** smooth scroll (npm package, initialized in `src/scripts/lenis-init.ts`)
 - CSS uses modern features: variables, grid, flexbox, nesting. Scoped `<style>` per component + global CSS
 - **Integrations:** `@astrojs/sitemap`, `@astrojs/rss`, Astro View Transitions
@@ -34,7 +34,6 @@ src/
   layouts/
     BaseLayout.astro                # HTML shell: <head>, nav, footer, Lenis, ViewTransitions
     BlogLayout.astro                # Blog post (extends Base, article schema, TOC)
-    DocsLayout.astro                # Docs (extends Base, sidebar nav)
     LegalLayout.astro               # Legal pages (extends Base, minimal)
   components/
     Header.astro, Footer.astro      # Site chrome (Header includes mobile menu with focus trap)
@@ -49,7 +48,7 @@ src/
     UseCaseCard.astro               # Use case cards with icons
     CodeBlock.astro                 # Code samples with copy button
     Breadcrumb.astro                # Breadcrumb nav + JSON-LD
-    TOC.astro                       # Table of contents (blog/docs)
+    TOC.astro                       # Table of contents (blog)
     RelatedPosts.astro              # Related blog posts sidebar
     ShareButtons.astro              # Social share buttons
     BlogPostCard.astro              # Blog post preview card (used in blog index/category pages)
@@ -62,17 +61,14 @@ src/
     why-1platform.astro             # Differentiators → /why-1platform/
     about.astro, terms.astro, privacy.astro, cookies.astro, 404.astro
     compare/*.astro                 # Comparison pages → /compare/[slug]/
-    docs/index.astro                # Docs index → /docs/
-    docs/[...slug].astro            # Docs from content collection → /docs/[slug]/
     blog/index.astro                # Blog index → /blog/
     blog/[...slug].astro            # Blog from content collection → /blog/[slug]/
     blog/category/[category].astro  # Category pages
     changelog/index.astro           # Changelog → /changelog/
     rss.xml.ts                      # RSS feed endpoint
   content/
-    config.ts                       # Zod schemas for 3 collections
+    config.ts                       # Zod schemas for 2 collections
     blog/*.md                       # 5 blog posts (categories: seo-automation, ai-content, api-tutorials, product-updates)
-    docs/*.md                       # 6 docs pages (sections: getting-started, authentication, api-reference, code-examples, webhooks, errors)
     changelog/*.md                  # 2 changelog entries (categories: new-feature, improvement, bug-fix, api-change)
   styles/
     global.css                      # Reset, variables, typography, layout
@@ -120,6 +116,20 @@ public/
 - **RSS:** Blog + changelog feeds via `@astrojs/rss` — endpoints in `src/pages/rss.xml.ts`
 - **View Transitions:** `<ViewTransitions />` in `BaseLayout.astro` for smooth page transitions
 - LCP < 2s, INP < 200ms, CLS < 0.1
+
+## Navbar & Footer Harmony Rule (MUST)
+
+The website **navbar AND footer** must stay in sync with the developer docs counterparts — users should perceive `1platform.pro` and `developer.1platform.pro` as one product.
+
+**Source of truth on each side:**
+- Website — `src/components/Header.astro` (navbar), `src/components/Footer.astro` (footer)
+- Developer docs — `../1platform-api-developer/docusaurus.config.ts` (navbar), `../1platform-api-developer/src/theme/Footer/index.tsx` + `styles.module.css` (footer swizzle)
+
+**Navbar contract:** Solutions, Features, Pricing, Docs, Blog + Get Started Free CTA. On the developer site, Solutions/Features/Pricing/Blog are absolute URLs back to this site; "Docs" points to `https://developer.1platform.pro/`.
+
+**Footer contract:** CTA banner ("Stop Managing 19+ Different Tools") + brand column + Solutions / Resources / Company / Legal columns + copyright bottom row. Same labels, same link targets, same ordering.
+
+**If you add/remove/rename a navbar item or footer column/link on this site, update the developer docs in the same change.**
 
 ## Accessibility Requirements
 

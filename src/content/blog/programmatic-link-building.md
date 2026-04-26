@@ -36,4 +36,4 @@ All four steps can be automated through a single platform.
 
 ## Getting Started
 
-Explore the link building API in our [documentation](/docs/api-reference/) to start building authority programmatically.
+Explore the link building API in our [documentation](https://developer.1platform.pro/api-docs) to start building authority programmatically.
