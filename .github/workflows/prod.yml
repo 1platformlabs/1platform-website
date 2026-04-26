@@ -2,6 +2,17 @@ name: 1Platform Website — PROD
 
 on:
   workflow_dispatch:
+    inputs:
+      bump_override:
+        description: "Force a specific version bump (skips Claude analysis and the major-block guard). Use 'auto' to keep automatic detection."
+        type: choice
+        required: false
+        default: auto
+        options:
+          - auto
+          - patch
+          - minor
+          - major
   push:
     branches: [main]
     paths-ignore:
@@ -233,11 +244,15 @@ jobs:
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           CLAUDE_MODEL_NAME: ${{ env.CLAUDE_MODEL }}
           IS_TRIVIAL: ${{ steps.get_diff.outputs.trivial }}
+          BUMP_OVERRIDE: ${{ inputs.bump_override || 'auto' }}
         shell: bash
         run: |
           set -euo pipefail
 
-          if [ "$IS_TRIVIAL" = "true" ]; then
+          if [ -n "${BUMP_OVERRIDE:-}" ] && [ "$BUMP_OVERRIDE" != "auto" ]; then
+            BUMP_TYPE="$BUMP_OVERRIDE"
+            echo "::notice::Using manual bump override: ${BUMP_TYPE} (skipping Claude analysis)"
+          elif [ "$IS_TRIVIAL" = "true" ]; then
             BUMP_TYPE="patch"
           else
             if [ -z "${CLAUDE_API_KEY}" ]; then
@@ -319,10 +334,10 @@ jobs:
           ")
           fi
 
-          # Safety: block automatic major bumps
-          if [ "$BUMP_TYPE" = "major" ]; then
+          # Safety: block automatic major bumps unless explicitly authorized via workflow_dispatch input
+          if [ "$BUMP_TYPE" = "major" ] && [ "${BUMP_OVERRIDE:-auto}" != "major" ]; then
             echo "::warning::Claude suggested MAJOR bump — requires manual approval"
-            echo "::error::Major bumps require manual workflow_dispatch with override"
+            echo "::error::Major bumps require re-running via workflow_dispatch with bump_override=major"
             exit 1
           fi
 
@@ -338,7 +353,9 @@ jobs:
           parts   = current.split(".")
           major, minor, patch_v = [int(x) for x in parts]
 
-          if bump == "minor":
+          if bump == "major":
+              new_version = f"{major + 1}.0.0"
+          elif bump == "minor":
               new_version = f"{major}.{minor + 1}.0"
           else:
               new_version = f"{major}.{minor}.{patch_v + 1}"
