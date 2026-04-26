@@ -703,6 +703,8 @@ jobs:
         run: |
           cat > /tmp/rsync-excludes.txt << 'EOF'
           developer.1platform.pro/
+          app.1platform.pro/
+          app-qa.1platform.pro/
           .well-known/
           .htaccess
           .cpanel/
@@ -738,6 +740,8 @@ jobs:
 
             rsync -a \
               --exclude='developer.1platform.pro/' \
+              --exclude='app.1platform.pro/' \
+              --exclude='app-qa.1platform.pro/' \
               --exclude='.well-known/' \
               --exclude='.htaccess' \
               --exclude='.cpanel/' \
@@ -768,7 +772,7 @@ jobs:
             dist/ \
             "${HETZNER_USER}@${HETZNER_HOST}:${DEPLOY_PATH}/" 2>&1)
 
-          PROTECTED_PATTERNS="developer.1platform.pro .well-known .htaccess .cpanel .htpasswds"
+          PROTECTED_PATTERNS="developer.1platform.pro app.1platform.pro app-qa.1platform.pro .well-known .htaccess .cpanel .htpasswds"
           for pattern in $PROTECTED_PATTERNS; do
             if echo "$DRY_OUTPUT" | grep -i "deleting.*${pattern}"; then
               echo "::error::ABORT — rsync dry-run would delete protected path: ${pattern}"
@@ -844,6 +848,8 @@ jobs:
 
             rsync -av --delete \
               --exclude='developer.1platform.pro/' \
+              --exclude='app.1platform.pro/' \
+              --exclude='app-qa.1platform.pro/' \
               --exclude='.well-known/' \
               --exclude='.htaccess' \
               --exclude='.cpanel/' \
