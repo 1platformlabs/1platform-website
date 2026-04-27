@@ -38,15 +38,14 @@ const faqJsonLd = {
   })),
 };
 
-const apiExample = `curl -X POST https://api.1platform.pro/api/v1/content/generate \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
+const apiExample = `curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
     "keyword": "best project management tools",
-    "language": "en",
-    "tone": "professional",
-    "length": "long"
+    "lang": "en",
+    "country": "us"
   }'`;
 ---
 
