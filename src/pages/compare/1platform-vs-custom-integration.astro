@@ -39,25 +39,24 @@ const faqJsonLd = {
 };
 
 const apiExample = `# With 1Platform: 1 API, 1 auth, 1 bill
-curl -X POST https://api.1platform.pro/api/v1/content/generate \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
+curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
     "keyword": "saas landing page best practices",
-    "language": "en",
-    "tone": "professional",
-    "includeImages": true
+    "lang": "en",
+    "country": "us"
   }'
 
 # Same auth, same base URL for every service:
-# /api/v1/keywords/research
-# /api/v1/images/search
-# /api/v1/cms/publish
-# /api/v1/indexing/submit
-# /api/v1/links/build
-# /api/v1/payments/create
-# /api/v1/invoicing/generate`;
+# /api/v1/posts/keywords/             — Keyword extraction
+# /api/v1/users/generations/images    — AI image generation
+# /api/v1/posts/content/              — Article generation + CMS publish
+# /api/v1/posts/indexing/             — Submit URLs for indexing
+# /api/v1/users/websites/{id}/...     — Link building + Search Console
+# /api/v1/users/transactions          — Online payment processing
+# /api/v1/businesses/{id}/invoices    — Electronic invoicing (FEL)`;
 ---
 
 <BaseLayout title={title} description={description} jsonLd={faqJsonLd}>

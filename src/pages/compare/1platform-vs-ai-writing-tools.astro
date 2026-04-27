@@ -39,17 +39,17 @@ const faqJsonLd = {
 };
 
 const apiExample = `# Full pipeline: keywords -> content -> publish -> index
-# Step 1: Research keywords
-curl -X POST https://api.1platform.pro/api/v1/keywords/research \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
-  -d '{ "seed": "project management", "language": "en" }'
+# Step 1: Extract keywords from a domain
+curl -X POST https://api.1platform.pro/api/v1/posts/keywords/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -d '{ "domain": "example.com", "country": "us", "lang": "en" }'
 
-# Step 2: Generate content using top keyword
-curl -X POST https://api.1platform.pro/api/v1/content/generate \\
-  -H "Authorization: Bearer YOUR_APP_TOKEN" \\
-  -H "x-user-token: USER_TOKEN" \\
-  -d '{ "keyword": "best project management tools 2026", "tone": "professional" }'`;
+# Step 2: Generate content from the top keyword (async job)
+curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -d '{ "keyword": "best project management tools 2026", "lang": "en", "country": "us" }'`;
 ---
 
 <BaseLayout title={title} description={description} jsonLd={faqJsonLd}>

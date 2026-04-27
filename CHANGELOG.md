@@ -5,6 +5,27 @@ All notable changes to the 1Platform Website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — 2026-04-27
+
+### Added
+- **Five new solutions** to the Solutions page and homepage solutions grid:
+  - **Whitelabel Dashboard** — Bootstrap a fully branded dashboard from one API call (branding, theme, layout, i18n, home KPIs)
+  - **Webhooks** — Subscribe to real-time payment lifecycle events with HMAC-signed payloads, allowed-domain registration, and secret rotation
+  - **In-App Notifications** — Push notifications to a single user or broadcast to all; list, mark as read, and read the unread count
+  - **Support Center** — Embed an in-app help center with tickets, threaded replies, and a public FAQ catalog
+  - **Referrals** — Resolve referral codes to referrer username and pre-filled signup URLs for personalized landing pages
+- **Matching feature cards** on the Features page across the Publishing & Distribution (Referrals), Payments & Invoicing (Webhooks), and Analytics, AI Agents & Operations (Whitelabel Dashboard, In-App Notifications, Support Center) sections
+- **Changelog content collection entry**: `src/content/changelog/2026-04-27-v1.4.0.md` documenting the eight new developer-docs flows, the new `GET /plans` endpoint, the five new website solutions, and the comparison-page fixes
+
+### Changed
+- **Automation pillar** renamed from "Automation & AI Agents" to "Automation & Operations" to reflect the broader scope (now includes whitelabel dashboards, notifications, support, and webhooks alongside AI agents and activity logs)
+- **Analytics & AI Agents** section on Features page renamed to "Analytics, AI Agents & Operations" to align with the expanded pillar
+- **Homepage CTA banner** copy from "Stop Managing 15+ Different Tools" to "Stop Managing 19+ Different Tools" — consistent with footer and metric counter
+
+### Fixed
+- **Phantom endpoint references** in the comparison pages (`/keywords/research`, `/content/generate`, `/cms/publish`, `/indexing/submit`, `/links/build`, `/payments/create`, `/invoicing/generate`, `/images/search`) replaced with real OpenAPI spec endpoints (`/posts/keywords/`, `/posts/content/`, `/posts/indexing/`, `/users/transactions`, `/businesses/{id}/invoices`, `/users/generations/images`)
+- **Activity Logs feature card** rendering: `icons.logs` (undefined) → `icons.activityLogs` (correctly defined in the icons map)
+
 ## [0.9.0] — 2026-04-07
 
 ### Added
