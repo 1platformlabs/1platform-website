@@ -5,6 +5,11 @@ All notable changes to the 1Platform Website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **"Get Started Free" CTA** now points to `https://app.1platform.pro/app/` (the dashboard app) instead of the bare apex, which served an "Index of /" directory listing. Applied across Header, Footer, Hero, and every page-level CTA (Home, About, Solutions, Features, Pricing, Why-1Platform). Closes #11
+
 ## [2.1.0] — 2026-04-27
 
 ### Added
