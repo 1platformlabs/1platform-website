@@ -1,14 +1,23 @@
 ---
-const steps = [
-  { label: 'Add Website', icon: '&#127760;' },
-  { label: 'Extract Keywords', icon: '&#128269;' },
-  { label: 'Generate Content', icon: '&#9997;' },
-  { label: 'Publish to CMS', icon: '&#128196;' },
-  { label: 'Submit for Indexing', icon: '&#128640;' },
-  { label: 'Build Backlinks', icon: '&#128279;' },
-  { label: 'Accept Payments', icon: '&#128179;' },
-  { label: 'Generate Invoice', icon: '&#129534;' },
+interface Step {
+  label: string;
+  icon: string;
+}
+
+interface Props {
+  steps?: Step[];
+}
+
+const defaultSteps: Step[] = [
+  { label: 'Create your account', icon: '&#128100;' },
+  { label: 'Pick: store or website', icon: '&#127968;' },
+  { label: 'Connect your domain', icon: '&#127760;' },
+  { label: 'Generate content with AI', icon: '&#9997;' },
+  { label: 'Enable payments + invoicing', icon: '&#128179;' },
+  { label: 'Go live', icon: '&#128640;' },
 ];
+
+const { steps = defaultSteps } = Astro.props;
 ---
 
 <div class="pipeline">

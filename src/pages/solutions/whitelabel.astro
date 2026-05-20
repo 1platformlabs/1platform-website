@@ -1,0 +1,183 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import FeatureCard from '@components/FeatureCard.astro';
+import SolutionCard from '@components/SolutionCard.astro';
+import PipelineAnimation from '@components/PipelineAnimation.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+
+const title = 'Whitelabel Dashboard — Branded SaaS in One API Call | 1Platform';
+const description = 'Bootstrap a fully branded dashboard from one API call — branding, theme, layout, i18n, and home KPIs. Power your own product under your brand.';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: 'Whitelabel Dashboard',
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: 'https://1platform.pro/solutions/whitelabel/',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://1platform.pro/' },
+      { '@type': 'ListItem', position: 2, name: 'Solutions', item: 'https://1platform.pro/solutions/' },
+      { '@type': 'ListItem', position: 3, name: 'Whitelabel' },
+    ],
+  },
+];
+
+const features = [
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>',
+    title: 'Branded from one call',
+    description: 'Branding, theme palette, layout, modules, feature flags, and KPIs — all returned in a single bootstrap response.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    title: 'i18n out of the box',
+    description: 'Localized bundles served per tenant — hot-reload language packs without redeploying the dashboard.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    title: 'Home KPIs included',
+    description: 'Balance, unread counts, in-flight counters, and feature gates resolved in the bootstrap call — no extra round trips.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+    title: 'Production-ready today',
+    description: 'Used in production by multiple tenants. Shipped, tested, and ready to power your own product under your brand.',
+  },
+];
+
+const whitelabelSteps = [
+  { label: 'Configure your tenant', icon: '&#9881;' },
+  { label: 'Set branding & theme', icon: '&#127912;' },
+  { label: 'Bootstrap the dashboard', icon: '&#128640;' },
+  { label: 'Launch under your brand', icon: '&#127991;' },
+];
+
+const related = [
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', title: 'For Developers', description: 'Power your own SaaS on top of the platform — REST API, async jobs, predictable envelopes.', href: '/for-developers/' },
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>', title: 'For Agencies', description: 'Run dozens of client stores and websites from one dashboard.', href: '/for-agencies/' },
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>', title: 'Payments & Invoicing', description: 'Built-in payments and electronic invoicing across every tenant.', href: '/payments-invoicing/' },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <section class="section section--breadcrumb">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Solutions', href: '/solutions/' },
+        { label: 'Whitelabel' },
+      ]} />
+    </div>
+  </section>
+
+  <Hero
+    headline="Your Own Brand, Your Own Dashboard"
+    subheadline="Bootstrap a fully branded dashboard from one API call. Branding, theme, layout, i18n, and home KPIs — everything your users see, under your name."
+    badge="Whitelabel Dashboard"
+    primaryCta={{ label: 'Talk to Sales', href: 'mailto:sales@1platform.pro?subject=Whitelabel%20Inquiry' }}
+    secondaryCta={{ label: 'Read API Docs', href: 'https://developer.1platform.pro/' }}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>What You Get</h2>
+        <p>Everything your dashboard needs to look and feel like your product.</p>
+      </div>
+      <div class="grid-2 stagger-grid">
+        {features.map((f) => (
+          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>How It Works</h2>
+        <p>Four steps from tenant configuration to a branded dashboard live in production.</p>
+      </div>
+      <PipelineAnimation steps={whitelabelSteps} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>One Bootstrap Call</h2>
+        <p>Everything your dashboard needs — in a single response.</p>
+      </div>
+      <CodeBlock
+        language="bash"
+        title="Bootstrap a branded dashboard"
+        code={`curl -X GET https://api.1platform.pro/api/v1/dashboard/bootstrap \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN"`}
+      />
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Related Solutions</h2>
+        <p>Whitelabel pairs naturally with the rest of the platform.</p>
+      </div>
+      <div class="grid-3 stagger-grid">
+        {related.map((r) => (
+          <SolutionCard icon={r.icon} title={r.title} description={r.description} href={r.href} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta-banner">
+    <div class="container">
+      <div class="cta-banner__content reveal">
+        <h2>Ready to Whitelabel?</h2>
+        <p>Talk to sales about pricing and onboarding — already in production with multiple tenants.</p>
+        <div class="cta-banner__actions">
+          <a href="mailto:sales@1platform.pro?subject=Whitelabel%20Inquiry" class="btn btn--primary">Talk to Sales</a>
+          <a href="https://developer.1platform.pro/" class="btn btn--ghost">Read API Docs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section { padding-block: var(--space-20); }
+  .section--breadcrumb { padding-block: var(--space-4) 0; padding-top: calc(var(--header-height) + var(--space-4)); }
+  .section--alt {
+    background-color: var(--color-bg-alt, #ffffff);
+    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  }
+  .container { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-6); }
+  .section__header { text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: var(--space-12); }
+  .section__header h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .section__header p { font-size: var(--text-lg); color: var(--color-text-secondary); }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+  @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .section { padding-block: var(--space-12); }
+  }
+  .cta-banner {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
+    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  }
+  .cta-banner__content { text-align: center; max-width: 700px; margin-inline: auto; }
+  .cta-banner__content h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .cta-banner__content p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
+  .cta-banner__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+</style>

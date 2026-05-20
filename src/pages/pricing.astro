@@ -3,17 +3,17 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import Hero from '@components/Hero.astro';
 
-const title = 'Pricing — Flexible Plans | 1Platform';
-const description = 'Flexible pricing tailored to your business. Activate any solution, scale without limits, and get a plan designed around your needs.';
+const title = 'Pricing — Transparent, Pay-as-You-Use | 1Platform';
+const description = 'Transparent pricing — pay only for what you use. No subscriptions, no hidden fees. Online store, payments, invoicing, content, and whitelabel dashboard.';
 
 const faqs = [
   {
     question: 'How does pricing work?',
-    answer: 'We offer flexible, usage-based plans tailored to your business needs. You can activate any combination of our 19+ solutions and pay based on actual consumption. Contact our team to get a custom quote.',
+    answer: 'Pricing is transparent and pay-as-you-use. You activate any combination of our solutions and pay only for the operations you consume — no subscriptions, no hidden fees. Volume rates available via custom plans.',
   },
   {
     question: 'Is there a free tier?',
-    answer: 'Yes. Create a free account — no credit card required. You get a generous daily allowance to test every solution. Once you need more capacity, our team will work with you on the right plan.',
+    answer: 'Yes. Create a free account — no credit card required. You get a generous daily allowance to test every solution. Once you need more capacity, you can switch to pay-as-you-use or talk to sales for a custom plan.',
   },
   {
     question: 'Can I set spending limits?',
@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     question: 'Do you offer volume discounts?',
-    answer: 'Absolutely. Plans are customized based on your expected volume. The more you use, the better rates you unlock. Contact sales to discuss your needs.',
+    answer: 'Yes. Custom plans include volume rates that scale with your usage. Contact sales to discuss your expected operations and we will tailor a plan that fits your business.',
   },
   {
     question: 'What payment methods do you accept?',
@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     question: 'How do I get a custom quote?',
-    answer: 'Reach out to our sales team via the contact form or at hello@1platform.pro. We will assess your needs and provide a tailored pricing proposal within 24 hours.',
+    answer: 'Reach out via sales@1platform.pro or use the contact form below. We will assess your needs and provide a tailored pricing proposal within 24 hours.',
   },
 ];
 
@@ -64,94 +64,101 @@ const pageJsonLd = [
   },
 ];
 
-/* ── SVG Icons ── */
 const checkIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-
 const arrowIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
 
-/* ── Solution data (no prices — defined commercially per contract) ── */
+/* Solution → pricing model. No prices — credits-based pay-as-you-use,
+   tailored to volume per customer. */
 const solutions = [
   {
-    name: 'AI Content',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
-    benefit: 'Generate SEO-optimized articles that rank and convert visitors into customers.',
-    unit: 'per article',
-    includes: ['Full SEO optimization', 'Multi-language (ES/EN)', 'Auto internal linking', 'Custom tone & style'],
+    name: 'Online Store',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    benefit: 'Launch a full storefront with checkout, catalog, and customer accounts — no plugins.',
+    unit: 'per store',
+    includes: ['Unlimited products', 'Hosted checkout', 'Customer accounts', 'Branded under your domain'],
     color: '#2563eb',
   },
   {
-    name: 'Keyword Research',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
-    benefit: 'Discover high-intent keywords your competitors miss to drive organic traffic.',
-    unit: 'per extraction',
-    includes: ['Search volume & difficulty', 'Competitor gap analysis', 'Long-tail suggestions', 'SERP feature data'],
-    color: '#7c3aed',
-  },
-  {
-    name: 'Image Generation',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
-    benefit: 'Create unique visuals for your content without stock photo licenses.',
-    unit: 'per image',
-    includes: ['AI-generated originals', 'Stock library access', 'Auto-optimized formats', 'Commercial license included'],
+    name: 'Payments',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    benefit: 'Accept card payments with built-in fraud checks and real-time webhooks.',
+    unit: 'per transaction',
+    includes: ['Hosted checkout URLs', 'HMAC-signed webhooks', 'Automatic crediting', 'Refunds & cancellations'],
     color: '#0891b2',
   },
   {
-    name: 'Indexing',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
-    benefit: 'Get your pages indexed by Google faster — hours instead of weeks.',
-    unit: 'per submission',
-    includes: ['Google Search Console API', 'Bulk submissions', 'Status tracking', 'Priority queue'],
-    color: '#059669',
-  },
-  {
-    name: 'Website Management',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
-    benefit: 'Register and manage multiple websites, categories, and legal pages from one account.',
-    unit: 'per website',
-    includes: ['Unlimited websites', 'AI descriptions', 'Legal page generation', 'Category management'],
-    color: '#f59e0b',
-  },
-  {
-    name: 'Invoicing (FEL)',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>',
-    benefit: 'Issue certified electronic invoices (FEL) instantly via API.',
+    name: 'Electronic Invoicing',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+    benefit: 'Compliant electronic invoices issued instantly. PDF + XML, multi-item lines.',
     unit: 'per invoice',
-    includes: ['SAT-certified (Guatemala)', 'PDF + XML generation', 'Auto tax calculation', 'Batch invoicing'],
+    includes: ['Compliant tax codes', 'PDF + XML', 'Automatic calculation', 'Credit notes & cancellations'],
     color: '#ef4444',
   },
   {
-    name: 'Link Building',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
-    benefit: 'Build high-quality backlinks to boost your domain authority and rankings.',
-    unit: 'per backlink',
-    includes: ['Quality publisher network', 'DA/DR filtering', 'Niche targeting', 'Placement reporting'],
+    name: 'Domains',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    benefit: 'Register, transfer, and renew domains. DNS and nameservers managed for you.',
+    unit: 'per domain',
+    includes: ['Registration', 'DNS records', 'Transfers', 'Auto-renewal'],
+    color: '#059669',
+  },
+  {
+    name: 'AI Content',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+    benefit: 'Generate SEO-optimized articles that rank — multi-language, async pipeline.',
+    unit: 'per article',
+    includes: ['Full SEO optimization', 'Multi-language', 'Internal linking', 'Custom tone & style'],
+    color: '#7c3aed',
+  },
+  {
+    name: 'AI Images',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
+    benefit: 'Create unique visuals for your content — no stock photo licenses needed.',
+    unit: 'per image',
+    includes: ['AI originals', 'Stock library access', 'Web-optimized formats', 'Commercial license'],
+    color: '#0891b2',
+  },
+  {
+    name: 'API Access',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+    benefit: 'Power your own product with the full REST API — included on every plan.',
+    unit: 'included',
+    includes: ['Dual-token auth', 'Async jobs', 'Predictable envelopes', 'Interactive API docs'],
     color: '#14b8a6',
   },
   {
-    name: 'Ad Revenue',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-    benefit: 'Monitor ad earnings by page, track RPM and CTR, and generate revenue reports.',
-    unit: 'per report',
-    includes: ['OAuth integration', 'Earnings overview', 'Page-level breakdown', 'Policy alerts'],
+    name: 'Whitelabel Dashboard',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>',
+    benefit: 'Brand the dashboard under your name — one API call, full control.',
+    unit: 'per seat',
+    includes: ['Branding + theme', 'i18n bundles', 'Home KPIs', 'Feature flags'],
     color: '#f59e0b',
+  },
+  {
+    name: 'Support',
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    benefit: 'Embedded help center with tickets and FAQ — community to dedicated.',
+    unit: 'tiered',
+    includes: ['Community on free tier', 'Email on pay-as-you-use', 'Dedicated on custom plans', 'In-app tickets'],
+    color: '#7c3aed',
   },
 ];
 
 const highlights = [
-  { value: '19+', label: 'solutions', description: 'All interconnected' },
+  { value: '$0', label: 'subscriptions', description: 'No monthly fees' },
   { value: '∞', label: 'scale', description: 'No usage caps' },
   { value: '24h', label: 'custom quotes', description: 'Fast turnaround' },
-  { value: '100%', label: 'flexible', description: 'Pay per use' },
+  { value: '100%', label: 'transparent', description: 'Pay per use' },
 ];
 ---
 
 <BaseLayout title={title} description={description} jsonLd={pageJsonLd}>
   <Hero
     headline="Pricing That Scales With You."
-    subheadline="Flexible, usage-based plans tailored to your business. Activate any solution and pay per operation — we'll build the right plan for your needs."
+    subheadline="Transparent pricing — pay only for what you use. No subscriptions, no hidden fees. Activate any solution and pay per operation."
     primaryCta={{ label: 'Start Free', href: 'https://app.1platform.pro/app/' }}
-    secondaryCta={{ label: 'Contact Sales', href: 'mailto:hello@1platform.pro' }}
-    badge="Flexible Pricing"
+    secondaryCta={{ label: 'Contact Sales', href: 'mailto:sales@1platform.pro' }}
+    badge="Pay-as-You-Use"
   />
 
   <div class="section">
@@ -163,7 +170,6 @@ const highlights = [
     </div>
   </div>
 
-  <!-- Value Highlights -->
   <section class="section" id="highlights">
     <div class="container">
       <div class="highlights-grid">
@@ -178,13 +184,12 @@ const highlights = [
     </div>
   </section>
 
-  <!-- Solutions Overview -->
   <section class="section section--alt" id="solutions">
     <div class="container">
       <div class="section-header reveal">
-        <h2>What You Get</h2>
+        <h2>Pricing by Solution</h2>
         <p class="section-description">
-          Every solution is billed per operation. Use one or combine all 19+ — pricing is customized based on your volume and needs.
+          Every solution is billed per operation. Combine any number of them — pricing is tailored to your volume.
         </p>
       </div>
 
@@ -212,7 +217,7 @@ const highlights = [
       </div>
 
       <div class="solutions-more reveal">
-        <p>Plus 9 more solutions: CMS Publishing, Comments, Profiles, Legal Pages, Search Console, Analytics, AI Agents, Activity Logs & more.</p>
+        <p>Plus more solutions: indexing, link building, search console, analytics, AI agents, webhooks, activity logs, notifications, and referrals.</p>
         <a href="/solutions/" class="btn btn--ghost">
           View All Solutions
           <span aria-hidden="true" set:html={arrowIcon} />
@@ -221,7 +226,6 @@ const highlights = [
     </div>
   </section>
 
-  <!-- Free Tier Banner -->
   <section class="section" id="free-tier">
     <div class="container">
       <div class="free-banner reveal">
@@ -237,13 +241,12 @@ const highlights = [
     </div>
   </section>
 
-  <!-- Contact Sales CTA (replaces calculator) -->
   <section class="section section--alt" id="quote">
     <div class="container">
       <div class="quote-block reveal">
         <div class="quote-block__content">
           <h2>Get a Custom Quote</h2>
-          <p>Tell us about your expected usage and we'll build a pricing plan that fits your business. Volume discounts, custom SLAs, and dedicated support available.</p>
+          <p>Tell us about your expected usage and we'll build a pricing plan that fits your business. Volume rates, custom SLAs, and dedicated support available.</p>
           <ul class="quote-block__benefits">
             <li>
               <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
@@ -251,7 +254,7 @@ const highlights = [
             </li>
             <li>
               <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
-              Volume discounts that grow with your usage
+              Volume rates that scale with your usage
             </li>
             <li>
               <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
@@ -264,14 +267,13 @@ const highlights = [
           </ul>
         </div>
         <div class="quote-block__cta">
-          <a href="mailto:hello@1platform.pro" class="btn btn--primary btn--lg">Contact Sales</a>
+          <a href="mailto:sales@1platform.pro" class="btn btn--primary btn--lg">Contact Sales</a>
           <span class="quote-block__hint">Response within 24 hours</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ -->
   <section class="section" id="faq">
     <div class="container">
       <div class="section-header reveal">
@@ -299,23 +301,21 @@ const highlights = [
     </div>
   </section>
 
-  <!-- CTA -->
   <section class="section section--alt">
     <div class="container cta-section">
       <h2 class="reveal">Start Building Today</h2>
       <p class="reveal cta-description">
-        Try every solution for free, then let us build the perfect plan for your business.
+        Try every solution for free, then pay only for what you use.
       </p>
       <div class="cta-actions reveal">
         <a href="https://app.1platform.pro/app/" class="btn btn--primary">Start Free</a>
-        <a href="mailto:hello@1platform.pro" class="btn btn--ghost">Contact Sales</a>
+        <a href="mailto:sales@1platform.pro" class="btn btn--ghost">Contact Sales</a>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* ── Highlights Grid ── */
   .highlights-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -360,7 +360,6 @@ const highlights = [
     }
   }
 
-  /* ── Solutions Grid ── */
   .solutions-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -383,7 +382,6 @@ const highlights = [
     }
   }
 
-  /* ── Solution Card ── */
   .solution-card {
     display: flex;
     flex-direction: column;
@@ -460,7 +458,6 @@ const highlights = [
     justify-content: center;
   }
 
-  /* ── Solutions More ── */
   .solutions-more {
     text-align: center;
   }
@@ -477,7 +474,6 @@ const highlights = [
     gap: var(--space-2);
   }
 
-  /* ── Free Banner ── */
   .free-banner {
     display: flex;
     align-items: center;
@@ -533,7 +529,6 @@ const highlights = [
     }
   }
 
-  /* ── Quote Block ── */
   .quote-block {
     display: flex;
     align-items: center;
@@ -595,7 +590,6 @@ const highlights = [
     }
   }
 
-  /* ── Section Header ── */
   .section-header {
     text-align: center;
     max-width: 700px;
@@ -612,7 +606,6 @@ const highlights = [
     color: var(--color-text-secondary);
   }
 
-  /* ── FAQ ── */
   .faq-list {
     max-width: 700px;
     margin-inline: auto;
@@ -681,7 +674,6 @@ const highlights = [
     border-radius: var(--border-radius-lg);
   }
 
-  /* ── CTA ── */
   .cta-section {
     text-align: center;
     max-width: 600px;

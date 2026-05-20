@@ -6,5 +6,7 @@ export default defineConfig({
   site: 'https://1platform.pro',
   trailingSlash: 'always',
   integrations: [sitemap()],
-
+  redirects: {
+    '/why-1platform/': '/for-developers/',
+  },
 });
