@@ -1,6 +1,6 @@
 ---
-title: "Electronic Invoicing for Online Businesses: Why It Is Not Optional Anymore"
-description: "How to accept online payments and issue compliant electronic invoices from a single platform — including the regulatory rules, the workflow, and the integration model."
+title: "Electronic Invoicing for Online Businesses"
+description: "How to accept online payments and issue compliant electronic invoices from one platform — the regulatory rules, the workflow, and the integration model."
 pubDate: 2026-05-20
 author: "1Platform Team"
 category: "payments-invoicing"

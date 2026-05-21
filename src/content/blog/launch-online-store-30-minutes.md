@@ -1,5 +1,5 @@
 ---
-title: "How to Launch an Online Store in 30 Minutes (Without Stitching Six Tools Together)"
+title: "How to Launch an Online Store in 30 Minutes"
 description: "A practical guide to launching an online store with checkout, payments, electronic invoicing, and your own domain — all from one platform, in under 30 minutes."
 pubDate: 2026-05-20
 author: "1Platform Team"
