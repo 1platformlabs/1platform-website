@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Production deploy health check** in `.github/workflows/prod.yml` no longer trips a SIGPIPE under `set -euo pipefail`. The check now uses a here-string (`grep -q "1Platform" <<< "$BODY"`) instead of `echo "$BODY" | grep -q`, which closed the pipe early and caused 10/10 retries to falsely report failure on already-deployed builds (run 26198698104 — Phase 2B's navbar dropdown rolled back even though the rsync had succeeded).
 - **"Get Started Free" CTA** now points to `https://app.1platform.pro/app/` (the dashboard app) instead of the bare apex, which served an "Index of /" directory listing. Applied across Header, Footer, Hero, and every page-level CTA (Home, About, Solutions, Features, Pricing, Why-1Platform). Closes #11
 - **compare/1platform-vs-ai-writing-tools `<title>` and meta description** trimmed (title 73 → 57 chars; description 177 → 155 chars) so both stop truncating in SERP. This was the one compare page that polish PR #27 missed. Closes #28.
+- **"Contact Sales" / "Talk to Sales" buttons did nothing on click** for users with the Cloudflare email-decode script blocked (uBlock Origin, Brave shields, NoScript). The 8 affected buttons (Pricing × 3, For Agencies × 3, Whitelabel × 2) were `mailto:sales@1platform.pro` links, which Cloudflare auto-rewrote to `/cdn-cgi/l/email-protection#...` — and stayed in that rewritten state when the decoder was blocked. Replaced with links to a new `/contact/` landing page that constructs the `mailto:` href in client-side JS at click time (Cloudflare can't pattern-match an email that isn't in the HTML), shows the address visibly, offers a "Copy Email" fallback, and preserves the previous subject prefills via a `?topic=agency|whitelabel` query parameter. Closes #14.
+
+### Added
+- **`/contact/` landing page** (`src/pages/contact.astro`) — minimal sales contact page with response-time SLA, in-app chat handoff for existing accounts, and a runtime-constructed `mailto:` that survives email-obfuscation proxies. JSON-LD `ContactPage` schema + breadcrumb.
 
 ## [2.1.0] — 2026-04-27
 

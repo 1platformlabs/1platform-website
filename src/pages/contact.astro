@@ -1,0 +1,294 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+
+const title = 'Contact Sales — Custom Quotes & Onboarding | 1Platform';
+const description = 'Talk to the 1Platform sales team. Custom quotes, demos, onboarding help, and partnership inquiries. Response within 24 hours, business days.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: title,
+  description,
+  url: 'https://1platform.pro/contact/',
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://1platform.pro/' },
+      { '@type': 'ListItem', position: 2, name: 'Contact' },
+    ],
+  },
+};
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <section class="section">
+    <div class="container">
+      <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Contact' }]} />
+
+      <header class="contact-hero reveal">
+        <span class="badge">Talk to Sales</span>
+        <h1>Let's talk about <span class="contact-hero__accent">your scale</span>.</h1>
+        <p class="contact-hero__sub">
+          Need a custom quote, a live demo, or onboarding help for your team? Our sales engineers
+          reply within <strong>24 hours</strong> on business days.
+        </p>
+        <p class="contact-hero__topic" data-contact-topic hidden>
+          Asking about <strong data-contact-topic-label></strong>
+        </p>
+      </header>
+
+      <div class="contact-card reveal">
+        <h2>Email Sales</h2>
+        <p
+          class="contact-card__email"
+          aria-label="sales at 1platform dot pro"
+          data-contact-email
+          data-user="sales"
+          data-domain="1platform.pro"
+        >
+          <noscript>Enable JavaScript to see the email address, or use the Open Email button below.</noscript>
+        </p>
+        <div class="contact-card__actions">
+          <button type="button" class="btn btn--primary btn--lg" data-contact-open>
+            Open Email
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button type="button" class="btn btn--ghost" data-contact-copy aria-live="polite">
+            Copy Email
+          </button>
+        </div>
+        <p class="contact-card__hint">
+          Already on 1Platform? Sign in at
+          <a href="https://app.1platform.pro/app/">app.1platform.pro</a>
+          and use the in-app chat for faster support.
+        </p>
+      </div>
+
+      <ul class="contact-expectations reveal">
+        <li>
+          <strong>Response time</strong>
+          <span>Within 24 hours on business days (GMT-6).</span>
+        </li>
+        <li>
+          <strong>What to include</strong>
+          <span>Use case, expected volume, team size, and any deadline.</span>
+        </li>
+        <li>
+          <strong>Technical questions</strong>
+          <span>Check the <a href="https://developer.1platform.pro/">developer documentation</a> first — it covers most integrations.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const TOPIC_LABELS: Record<string, string> = {
+    agency: 'Agency Inquiry',
+    whitelabel: 'Whitelabel Inquiry',
+    enterprise: 'Enterprise Inquiry',
+    custom: 'Custom Pricing',
+  };
+
+  function resolveTopic(): { subject: string; label: string | null } {
+    const raw = new URLSearchParams(globalThis.location.search).get('topic');
+    if (!raw) return { subject: 'Sales Inquiry', label: null };
+    const key = raw.toLowerCase().replace(/[^a-z]/g, '');
+    const label = TOPIC_LABELS[key];
+    if (label) return { subject: label, label };
+    return { subject: 'Sales Inquiry', label: null };
+  }
+
+  function wireContactPage() {
+    const target = document.querySelector('[data-contact-email]') as HTMLElement | null;
+    const openBtn = document.querySelector('[data-contact-open]') as HTMLButtonElement | null;
+    const copyBtn = document.querySelector('[data-contact-copy]') as HTMLButtonElement | null;
+    const topicEl = document.querySelector('[data-contact-topic]') as HTMLElement | null;
+    const topicLabelEl = document.querySelector('[data-contact-topic-label]') as HTMLElement | null;
+    if (!target) return;
+
+    const user = target.dataset.user ?? '';
+    const dom = target.dataset.domain ?? '';
+    if (!user || !dom) return;
+
+    const email = user + '@' + dom;
+    target.textContent = email;
+
+    const { subject, label } = resolveTopic();
+    if (label && topicEl && topicLabelEl) {
+      topicLabelEl.textContent = label;
+      topicEl.hidden = false;
+    }
+
+    openBtn?.addEventListener('click', () => {
+      globalThis.location.href = 'mailto:' + email + '?subject=' + encodeURIComponent(subject);
+    });
+
+    copyBtn?.addEventListener('click', async () => {
+      const original = copyBtn.textContent ?? 'Copy Email';
+      try {
+        await navigator.clipboard.writeText(email);
+        copyBtn.textContent = 'Copied!';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        const sel = globalThis.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        copyBtn.textContent = 'Email selected — press Cmd/Ctrl+C';
+      }
+      globalThis.setTimeout(() => {
+        copyBtn.textContent = original;
+      }, 1800);
+    });
+  }
+
+  document.addEventListener('astro:page-load', wireContactPage);
+</script>
+
+<style>
+  .contact-hero {
+    text-align: center;
+    margin: var(--space-8) 0 var(--space-12);
+  }
+
+  .contact-hero .badge {
+    margin-bottom: var(--space-4);
+  }
+
+  .contact-hero h1 {
+    font-size: clamp(var(--text-4xl), 5vw, var(--text-6xl));
+    text-wrap: balance;
+    margin: 0 auto var(--space-4);
+    max-width: 18ch;
+  }
+
+  .contact-hero__accent {
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .contact-hero__sub {
+    color: var(--color-text-secondary);
+    max-width: 56ch;
+    margin: 0 auto;
+    font-size: var(--text-lg);
+  }
+
+  .contact-hero__topic {
+    display: inline-block;
+    margin: var(--space-4) auto 0;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    background: var(--color-accent-glow);
+    border-radius: var(--border-radius);
+  }
+
+  .contact-hero__topic strong {
+    color: var(--color-text);
+    margin-left: var(--space-1);
+  }
+
+  .contact-card {
+    max-width: 640px;
+    margin: 0 auto var(--space-12);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background: var(--color-bg-elevated);
+    box-shadow: var(--shadow-md, 0 1px 3px rgba(0, 0, 0, 0.04));
+    text-align: center;
+  }
+
+  .contact-card h2 {
+    font-size: var(--text-xl);
+    margin: 0 0 var(--space-2);
+  }
+
+  .contact-card__email {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: var(--text-lg);
+    color: var(--color-text);
+    margin: 0 0 var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg-muted);
+    border-radius: var(--border-radius);
+    user-select: all;
+    word-break: break-all;
+  }
+
+  .contact-card__email noscript {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .contact-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: center;
+    margin-bottom: var(--space-5);
+  }
+
+  .btn--lg {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-base);
+  }
+
+  .contact-card__hint {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .contact-card__hint a {
+    color: var(--color-accent);
+  }
+
+  .contact-expectations {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 720px) {
+    .contact-expectations {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .contact-expectations li {
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background: var(--color-bg-alt);
+  }
+
+  .contact-expectations strong {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .contact-expectations span {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .contact-expectations a {
+    color: var(--color-accent);
+  }
+</style>
