@@ -814,7 +814,12 @@ jobs:
             HTTP_CODE=$(echo "$RESPONSE" | tail -1)
             BODY=$(echo "$RESPONSE" | sed '$d')
 
-            if [ "$HTTP_CODE" = "200" ] && echo "$BODY" | grep -q "1Platform"; then
+            # Use a here-string instead of `echo | grep -q` — `grep -q`
+            # exits on first match and closes the pipe before echo finishes
+            # writing, producing SIGPIPE that `set -euo pipefail` propagates
+            # as a non-zero exit. Symptom: every retry reports HTTP 200 but
+            # the if-clause never evaluates true. Seen in run 26198698104.
+            if [ "$HTTP_CODE" = "200" ] && grep -q "1Platform" <<< "$BODY"; then
               echo "Health check passed (attempt ${i}): HTTP 200, content verified"
               exit 0
             fi

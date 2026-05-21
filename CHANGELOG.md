@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`blog/1platform-vs-custom-toolchain.md`** intro framing refreshed: the "19+ separate API accounts" claim replaced with wording that matches the post's own list of services.
 
 ### Fixed
+- **Default Open Graph / Twitter image** fallback in `BaseLayout.astro` and `BlogLayout.astro` switched from `/og/default.png` (which 404'd in production and blanked every social-share preview) to `/logo-oauth-120x120.png`, an asset that actually ships in `public/`. Per-page overrides still win; this only changes the default. A proper 1200×630 OG asset can replace it later without touching the layouts.
+- **Production deploy health check** in `.github/workflows/prod.yml` no longer trips a SIGPIPE under `set -euo pipefail`. The check now uses a here-string (`grep -q "1Platform" <<< "$BODY"`) instead of `echo "$BODY" | grep -q`, which closed the pipe early and caused 10/10 retries to falsely report failure on already-deployed builds (run 26198698104 — Phase 2B's navbar dropdown rolled back even though the rsync had succeeded).
 - **"Get Started Free" CTA** now points to `https://app.1platform.pro/app/` (the dashboard app) instead of the bare apex, which served an "Index of /" directory listing. Applied across Header, Footer, Hero, and every page-level CTA (Home, About, Solutions, Features, Pricing, Why-1Platform). Closes #11
 
 ## [2.1.0] — 2026-04-27
