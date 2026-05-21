@@ -5,6 +5,7 @@ pubDate: 2026-05-20
 author: "1Platform Team"
 category: "ecommerce"
 readingTime: "9 min read"
+ogImage: "/og/blog-launch-online-store-30-minutes.png"
 tags: ["ecommerce", "online store", "payments", "invoicing", "launch"]
 ---
 
