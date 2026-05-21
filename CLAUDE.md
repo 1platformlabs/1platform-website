@@ -127,6 +127,18 @@ The website **navbar AND footer** must stay in sync with the developer docs coun
 
 **Navbar contract:** Solutions, Features, Pricing, Docs, Blog + Get Started Free CTA. On the developer site, Solutions/Features/Pricing/Blog are absolute URLs back to this site; "Docs" points to `https://developer.1platform.pro/`.
 
+**Solutions dropdown (source of truth — keep in sync with `docusaurus.config.ts` on the developer docs):** the "Solutions" item is a hybrid label-link + chevron-button. The label navigates to `/solutions/`; the chevron toggles a panel with these items in this exact order:
+
+1. **Online Store** → `/solutions/online-store/`
+2. **Website Builder** → `/solutions/website/`
+3. **AI Content** → `/solutions/content/`
+4. **Whitelabel Dashboard** → `/solutions/whitelabel/`
+5. **Payments & Invoicing** → `/payments-invoicing/`
+6. _(divider)_
+7. **View all solutions** → `/solutions/`
+
+Adding/removing/reordering any item in this list requires the same change in `../1platform-api-developer/docusaurus.config.ts` (the `type: 'dropdown'` items array under "Solutions") in the same commit. Keyboard a11y on the website side: `Enter`/`Space` toggle the panel from the chevron; `Escape` closes; `ArrowDown`/`ArrowUp` cycle items; `Tab` exits. Mobile: the panel renders as an indented inline sub-list inside the existing mobile menu — no overlay.
+
 **Footer contract:** CTA banner ("Stop Managing 19+ Different Tools") + brand column + Solutions / Resources / Company / Legal columns + copyright bottom row. Same labels, same link targets, same ordering.
 
 **If you add/remove/rename a navbar item or footer column/link on this site, update the developer docs in the same change.**

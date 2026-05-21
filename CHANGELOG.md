@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Solutions navbar dropdown** in `src/components/Header.astro`. The Solutions label remains a link to `/solutions/`; an adjacent chevron `<button>` toggles a panel with Online Store, Website Builder, AI Content, Whitelabel Dashboard, Payments & Invoicing, a divider, and View all solutions. Full keyboard a11y (Enter/Space toggle from chevron, Escape closes + restores focus, ArrowUp/ArrowDown cycle items, Tab exits the panel), `aria-expanded` / `aria-controls` / `role="menu"` / `role="menuitem"`, and click-outside / hover-to-open behavior. On mobile (≤768px) the chevron and floating panel are hidden and the items render as an indented inline sub-list inside the existing mobile menu. Vanilla JS, no React island.
 - **Blog categories** `ecommerce` and `payments-invoicing` added to `src/content/config.ts` so posts can be organized around the refocused outcome narrative.
 - **Three new blog posts** under the refocused categories:
   - `launch-online-store-30-minutes` (ecommerce) — a 30-minute online-store launch checklist
