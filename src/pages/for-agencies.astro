@@ -1,0 +1,164 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import FeatureCard from '@components/FeatureCard.astro';
+import SolutionCard from '@components/SolutionCard.astro';
+
+const title = 'Manage Client Websites & Stores from One Dashboard | 1Platform';
+const description = 'Run dozens of client stores and websites from one dashboard. Whitelabel optional, billing per client, content engine included — perfect for agencies and consultants.';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: title,
+    description,
+    url: 'https://1platform.pro/for-agencies/',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://1platform.pro/' },
+      { '@type': 'ListItem', position: 2, name: 'For Agencies' },
+    ],
+  },
+];
+
+const features = [
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg>',
+    title: 'Multi-site management',
+    description: 'Register, configure, and operate multiple client sites from one account. Switch context in a click.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+    title: 'Content engine included',
+    description: 'AI articles, images, comments, and legal pages across every client site — generated and published at scale.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>',
+    title: 'Whitelabel optional',
+    description: 'Surface every dashboard under your agency brand — or use 1Platform directly. Your call, per client.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    title: 'Payments & invoicing',
+    description: 'Accept payments and issue compliant invoices for every client — without juggling six different services.',
+  },
+];
+
+const related = [
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>', title: 'Whitelabel Dashboard', description: 'Brand every client dashboard under your agency name.', href: '/solutions/whitelabel/' },
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>', title: 'AI Content Generation', description: 'Scale content production across every client site.', href: '/solutions/content/' },
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', title: 'For Developers', description: 'Integrate 1Platform into your agency stack via REST API.', href: '/for-developers/' },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <section class="section section--breadcrumb">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'For Agencies' },
+      ]} />
+    </div>
+  </section>
+
+  <Hero
+    headline="Manage Client Sites at Scale"
+    subheadline="Run dozens of client stores and websites from one dashboard. Whitelabel optional, billing per client, content engine included — built for agencies and consultants."
+    badge="For Agencies"
+    primaryCta={{ label: 'Contact Sales', href: 'mailto:sales@1platform.pro?subject=Agency%20Inquiry' }}
+    secondaryCta={{ label: 'Read API Docs', href: 'https://developer.1platform.pro/' }}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>What You Get</h2>
+        <p>A unified control plane for every client site you operate.</p>
+      </div>
+      <div class="grid-2 stagger-grid">
+        {features.map((f) => (
+          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="contact-callout reveal">
+        <h2>Talk to Our Team</h2>
+        <p>Tell us about your agency setup — expected sites, billing model, whitelabel needs — and we'll build the right onboarding plan with you.</p>
+        <div class="contact-callout__actions">
+          <a href="mailto:sales@1platform.pro?subject=Agency%20Inquiry" class="btn btn--primary">Contact Sales</a>
+          <a href="https://developer.1platform.pro/" class="btn btn--ghost">Read API Docs</a>
+        </div>
+        <span class="contact-callout__hint">Response within 24 hours</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Related Solutions</h2>
+        <p>Build your agency stack on top of 1Platform.</p>
+      </div>
+      <div class="grid-3 stagger-grid">
+        {related.map((r) => (
+          <SolutionCard icon={r.icon} title={r.title} description={r.description} href={r.href} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta-banner">
+    <div class="container">
+      <div class="cta-banner__content reveal">
+        <h2>Run Every Client from One Place</h2>
+        <p>Stop juggling per-client tool stacks. One platform, every client, one bill.</p>
+        <div class="cta-banner__actions">
+          <a href="mailto:sales@1platform.pro?subject=Agency%20Inquiry" class="btn btn--primary">Contact Sales</a>
+          <a href="/solutions/whitelabel/" class="btn btn--ghost">See Whitelabel</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section { padding-block: var(--space-20); }
+  .section--breadcrumb { padding-block: var(--space-4) 0; padding-top: calc(var(--header-height) + var(--space-4)); }
+  .section--alt {
+    background-color: var(--color-bg-alt, #ffffff);
+    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  }
+  .container { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-6); }
+  .section__header { text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: var(--space-12); }
+  .section__header h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .section__header p { font-size: var(--text-lg); color: var(--color-text-secondary); }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+  @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .section { padding-block: var(--space-12); }
+  }
+  .contact-callout { text-align: center; max-width: 700px; margin-inline: auto; }
+  .contact-callout h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .contact-callout p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
+  .contact-callout__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-4); }
+  .contact-callout__hint { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+  .cta-banner {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
+    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  }
+  .cta-banner__content { text-align: center; max-width: 700px; margin-inline: auto; }
+  .cta-banner__content h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .cta-banner__content p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
+  .cta-banner__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+</style>

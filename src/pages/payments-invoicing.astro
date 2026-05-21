@@ -1,0 +1,245 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import FeatureCard from '@components/FeatureCard.astro';
+import SolutionCard from '@components/SolutionCard.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+
+const title = 'Accept Payments & Issue Electronic Invoices | 1Platform';
+const description = 'Accept online card payments and issue compliant electronic invoices automatically — all from one platform. Webhook-driven, audit-ready, ready for production.';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: 'Payments & Electronic Invoicing',
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: 'https://1platform.pro/payments-invoicing/',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://1platform.pro/' },
+      { '@type': 'ListItem', position: 2, name: 'Payments & Invoicing' },
+    ],
+  },
+];
+
+const faqs = [
+  {
+    question: 'Which countries are supported for electronic invoicing?',
+    answer: 'Electronic invoicing currently issues compliant invoices for Guatemala (FEL). Additional jurisdictions are on the roadmap — contact sales for timelines.',
+  },
+  {
+    question: 'What currencies and payment methods do you accept?',
+    answer: 'We accept all major credit and debit cards. Settlement currency is configured per merchant — contact sales to enable additional currencies.',
+  },
+  {
+    question: 'What types of invoices can I issue?',
+    answer: 'Standard invoices, credit notes, and cancellations — all PDF + XML output. Multi-item line support and automatic tax calculation.',
+  },
+  {
+    question: 'How does reconciliation work?',
+    answer: 'Every transaction emits HMAC-signed webhooks for approved, denied, cancelled, expired, and dismissed states. Pair with activity logs for full audit trails.',
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+
+const features = [
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    title: 'Accept payments',
+    description: 'Card payments via API. Hosted checkout URLs, real-time webhooks, and automatic balance crediting.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
+    title: 'Issue invoices',
+    description: 'Compliant electronic invoices generated automatically. PDF + XML output, multi-item lines, automatic tax calculation.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    title: 'Track everything',
+    description: 'HMAC-signed webhooks for every lifecycle event. Activity logs with method, endpoint, status, and latency.',
+  },
+];
+
+const related = [
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>', title: 'Online Store', description: 'Add a full storefront with checkout and customer accounts.', href: '/solutions/online-store/' },
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', title: 'For Developers', description: 'Integrate payments and invoicing into your own SaaS via REST.', href: '/for-developers/' },
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>', title: 'Whitelabel Dashboard', description: 'Surface payments and invoicing under your own brand.', href: '/solutions/whitelabel/' },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={[...jsonLd, faqJsonLd]}>
+  <section class="section section--breadcrumb">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Payments & Invoicing' },
+      ]} />
+    </div>
+  </section>
+
+  <Hero
+    headline="Payments & Compliant Invoicing"
+    subheadline="Accept payments and issue compliant electronic invoices automatically — from one platform. Webhook-driven, audit-ready, production-tested."
+    badge="Payments · Invoicing"
+    primaryCta={{ label: 'Start Accepting Payments', href: 'https://app.1platform.pro/app/?intent=payments' }}
+    secondaryCta={{ label: 'For Developers — View API', href: 'https://developer.1platform.pro/' }}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>What You Get</h2>
+        <p>End-to-end flow from checkout to compliant invoice — one platform, one bill.</p>
+      </div>
+      <div class="grid-3 stagger-grid">
+        {features.map((f) => (
+          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>One API, Two Outcomes</h2>
+        <p>Create a transaction, get an invoice — automatically.</p>
+      </div>
+      <CodeBlock
+        language="bash"
+        title="Create a payment transaction"
+        code={`curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "amount": 25.00,
+    "description": "Order #1042"
+  }'`}
+      />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about payments and electronic invoicing.</p>
+      </div>
+      <div class="faq-list">
+        {faqs.map((faq) => (
+          <details class="faq-item reveal">
+            <summary class="faq-item__question">
+              <span>{faq.question}</span>
+              <svg class="faq-item__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </summary>
+            <div class="faq-item__answer">
+              <p>{faq.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Related Solutions</h2>
+        <p>Payments and invoicing connect with the rest of the platform.</p>
+      </div>
+      <div class="grid-3 stagger-grid">
+        {related.map((r) => (
+          <SolutionCard icon={r.icon} title={r.title} description={r.description} href={r.href} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta-banner">
+    <div class="container">
+      <div class="cta-banner__content reveal">
+        <h2>Ready to Get Paid?</h2>
+        <p>Stop running two separate systems. Accept payments and issue invoices from one platform.</p>
+        <div class="cta-banner__actions">
+          <a href="https://app.1platform.pro/app/?intent=payments" class="btn btn--primary">Start Accepting Payments</a>
+          <a href="https://developer.1platform.pro/" class="btn btn--ghost">View API Docs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section { padding-block: var(--space-20); }
+  .section--breadcrumb { padding-block: var(--space-4) 0; padding-top: calc(var(--header-height) + var(--space-4)); }
+  .section--alt {
+    background-color: var(--color-bg-alt, #ffffff);
+    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  }
+  .container { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-6); }
+  .section__header { text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: var(--space-12); }
+  .section__header h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .section__header p { font-size: var(--text-lg); color: var(--color-text-secondary); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+  @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    .section { padding-block: var(--space-12); }
+  }
+  .faq-list {
+    max-width: 700px; margin-inline: auto;
+    display: flex; flex-direction: column; gap: var(--space-3);
+  }
+  .faq-item {
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+  .faq-item__question {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--space-4); padding: var(--space-5) var(--space-6);
+    cursor: pointer; font-weight: 600; color: var(--color-text);
+    font-size: var(--text-base); list-style: none;
+  }
+  .faq-item__question::-webkit-details-marker { display: none; }
+  .faq-item__question::marker { display: none; content: ''; }
+  .faq-item__chevron { flex-shrink: 0; color: var(--color-text-tertiary); }
+  @media (prefers-reduced-motion: no-preference) {
+    .faq-item__chevron { transition: transform var(--duration-normal) var(--ease-out-expo); }
+  }
+  .faq-item[open] .faq-item__chevron { transform: rotate(180deg); }
+  .faq-item__answer { padding: 0 var(--space-6) var(--space-5); }
+  .faq-item__answer p { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.7; }
+  .faq-item__question:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    border-radius: var(--border-radius-lg);
+  }
+  .cta-banner {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
+    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  }
+  .cta-banner__content { text-align: center; max-width: 700px; margin-inline: auto; }
+  .cta-banner__content h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .cta-banner__content p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
+  .cta-banner__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+</style>
