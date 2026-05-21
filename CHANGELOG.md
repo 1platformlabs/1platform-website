@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Blog categories** `ecommerce` and `payments-invoicing` added to `src/content/config.ts` so posts can be organized around the refocused outcome narrative.
+- **Three new blog posts** under the refocused categories:
+  - `launch-online-store-30-minutes` (ecommerce) — a 30-minute online-store launch checklist
+  - `electronic-invoicing-online-business` (payments-invoicing) — compliance + workflow walkthrough
+  - `integrating-payments-into-your-saas` (payments-invoicing) — developer-focused payments API guide
+- **Changelog content collection entry**: `src/content/changelog/2026-05-20-refocus-positioning.md` summarizing the homepage refocus (website PR #23) and developer-docs footer sync (developer-docs PR #18).
+
+### Changed
+- **`about.astro`** refreshed to drop the "19+ separate subscriptions" framing and the SEO-centric mission language. Reframed around the six unified services (store, website, AI content, whitelabel dashboard, payments & invoicing, developer API) and the outcome narrative (sell / build / grow / build-on-API). Structure and capabilities grid preserved.
+- **`compare/1platform-vs-custom-integration.astro`** hero meta description, FAQ answer, cost-grid prose, and closing CTA reframed away from "19+ services" toward category wording. Comparison table rows (the SEO content) left intact.
+- **`blog/1platform-vs-custom-toolchain.md`** intro framing refreshed: the "19+ separate API accounts" claim replaced with wording that matches the post's own list of services.
+
 ### Fixed
 - **"Get Started Free" CTA** now points to `https://app.1platform.pro/app/` (the dashboard app) instead of the bare apex, which served an "Index of /" directory listing. Applied across Header, Footer, Hero, and every page-level CTA (Home, About, Solutions, Features, Pricing, Why-1Platform). Closes #11
 

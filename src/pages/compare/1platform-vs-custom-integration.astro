@@ -5,13 +5,13 @@ import CodeBlock from '@components/CodeBlock.astro';
 
 const title = ' 1Platform vs. Custom Integration: Weeks vs Hours | 1Platform';
 const description =
-  'Compare 1Platform with building your own custom integration. Ship in hours instead of weeks. One API replaces 19+ services, auth systems, and billing accounts.';
+  'Compare 1Platform with building your own custom integration. Ship in hours instead of weeks. One API replaces a stack of separate services, auth systems, and billing accounts.';
 
 const faqItems = [
   {
     question: 'How much time does 1Platform save compared to custom integration?',
     answer:
-      'Building a custom integration across 19+ services typically takes 6 to 12 weeks of development time. With 1Platform, you integrate once and access every service immediately. Most developers ship their first integration in under a day.',
+      'Building a custom integration across the services 1Platform replaces — store, payments, invoicing, AI content, website, and developer APIs — typically takes six to twelve weeks of development time. With 1Platform, you integrate once and access every service immediately. Most developers ship their first integration in under a day.',
   },
   {
     question: 'What happens if one of the underlying services changes?',
@@ -131,9 +131,10 @@ curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
         <div class="cost-card">
           <h3>Development time</h3>
           <p>
-            Integrating 19+ APIs means learning 19+ sets of documentation, handling 19+ different
-            authentication methods, and writing 19+ sets of error handling logic. At an average
-            engineering rate, that is tens of thousands of dollars before you ship a single feature.
+            Wiring up a store, payments, invoicing, content, and a developer API yourself means
+            learning a different vendor for each one — every set of documentation, every
+            authentication method, every error model. At an average engineering rate, that is tens
+            of thousands of dollars before you ship a single feature.
           </p>
         </div>
         <div class="cost-card">
@@ -190,10 +191,11 @@ curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
     <div class="container cta-container">
       <h2>Ship Today, Not Next Quarter</h2>
       <p>
-        Stop building infrastructure. Start building your product. One API, every solution.
+        Stop wiring up a stack of separate services. Launch your store, charge your customers,
+        issue invoices, generate content, and expose a developer API from one platform.
       </p>
       <div class="cta-buttons">
-        <a href="https://developer.1platform.pro/" class="btn btn--primary">Get Started Free</a>
+        <a href="https://app.1platform.pro/app/" class="btn btn--primary">Get Started Free</a>
         <a href="/pricing/" class="btn btn--ghost">See Pricing</a>
       </div>
     </div>
