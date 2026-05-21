@@ -5,6 +5,7 @@ pubDate: 2026-05-20
 author: "1Platform Team"
 category: "payments-invoicing"
 readingTime: "11 min read"
+ogImage: "/og/blog-integrating-payments-into-your-saas.png"
 tags: ["payments api", "saas", "developer", "webhooks", "billing"]
 ---
 

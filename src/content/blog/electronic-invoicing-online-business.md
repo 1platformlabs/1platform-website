@@ -5,6 +5,7 @@ pubDate: 2026-05-20
 author: "1Platform Team"
 category: "payments-invoicing"
 readingTime: "10 min read"
+ogImage: "/og/blog-electronic-invoicing-online-business.png"
 tags: ["electronic invoicing", "payments", "compliance", "ecommerce", "fel"]
 ---
 
