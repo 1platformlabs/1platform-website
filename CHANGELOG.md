@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **`/contact/` landing page** (`src/pages/contact.astro`) — minimal sales contact page with response-time SLA, in-app chat handoff for existing accounts, and a runtime-constructed `mailto:` that survives email-obfuscation proxies. JSON-LD `ContactPage` schema + breadcrumb.
+- **Real 1200×630 Open Graph default image** at `public/og/default.png` (108 KB) — brand-coherent wordmark, tagline, dot grid + subtle aurora, generated via `scripts/generate-og-default.py` (Pillow). `BaseLayout.astro` and `BlogLayout.astro` defaults flipped from `/logo-oauth-120x120.png` back to `/og/default.png`. A designer-made replacement can drop into the same path with zero code change. Closes #33.
 
 ### Changed
 - **CI Lighthouse coverage expanded** in `.github/workflows/prod.yml` from 3 URLs (`/`, `/features/`, `/pricing/`) to all 13 refocus URLs from issue #31: homepage, all 5 solutions sub-pages, `/payments-invoicing/`, `/pricing/`, `/for-developers/`, `/for-agencies/`, and the 3 new blog posts. Reports are published to the lighthouse-ci temporary public storage on every deploy — recurring coverage instead of one-shot manual audits. Score thresholds remain informational for now (`budgetPath: ""`); promote to enforced budgets via `lighthouserc.json` once per-page baselines are known. Closes #31.

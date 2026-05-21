@@ -24,10 +24,7 @@ interface Props {
 
 const { frontmatter, headings = [], slug } = Astro.props;
 
-// Same /og/default.png 404 caveat as BaseLayout — fall back to the OAuth
-// logo so blog social shares show *something* until a proper 1200×630
-// OG asset is supplied. Per-post `ogImage`/`image` overrides still win.
-const ogImage = frontmatter.ogImage || frontmatter.image || '/logo-oauth-120x120.png';
+const ogImage = frontmatter.ogImage || frontmatter.image || '/og/default.png';
 const ogImageURL = new URL(ogImage, 'https://1platform.pro').href;
 
 const articleJsonLd = {
