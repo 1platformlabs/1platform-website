@@ -37,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **`/contact/` landing page** (`src/pages/contact.astro`) — minimal sales contact page with response-time SLA, in-app chat handoff for existing accounts, and a runtime-constructed `mailto:` that survives email-obfuscation proxies. JSON-LD `ContactPage` schema + breadcrumb.
 
+### Changed
+- **CI Lighthouse coverage expanded** in `.github/workflows/prod.yml` from 3 URLs (`/`, `/features/`, `/pricing/`) to all 13 refocus URLs from issue #31: homepage, all 5 solutions sub-pages, `/payments-invoicing/`, `/pricing/`, `/for-developers/`, `/for-agencies/`, and the 3 new blog posts. Reports are published to the lighthouse-ci temporary public storage on every deploy — recurring coverage instead of one-shot manual audits. Score thresholds remain informational for now (`budgetPath: ""`); promote to enforced budgets via `lighthouserc.json` once per-page baselines are known. Closes #31.
+
 ## [2.1.0] — 2026-04-27
 
 ### Added

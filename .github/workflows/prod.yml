@@ -940,10 +940,24 @@ jobs:
         env:
           LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
         with:
+          # 13 refocus URLs from issue #31 — ongoing CI coverage replaces one-shot manual audits.
+          # Each URL produces a public temporary-storage report URL in the workflow logs.
+          # Thresholds are currently informational (budgetPath: ""); enforce via lighthouserc.json
+          # once baseline scores per page are known and any regressions are addressed.
           urls: |
             http://localhost:8080/
-            http://localhost:8080/features/
+            http://localhost:8080/solutions/
+            http://localhost:8080/solutions/online-store/
+            http://localhost:8080/solutions/website/
+            http://localhost:8080/solutions/content/
+            http://localhost:8080/solutions/whitelabel/
+            http://localhost:8080/payments-invoicing/
             http://localhost:8080/pricing/
+            http://localhost:8080/for-developers/
+            http://localhost:8080/for-agencies/
+            http://localhost:8080/blog/launch-online-store-30-minutes/
+            http://localhost:8080/blog/electronic-invoicing-online-business/
+            http://localhost:8080/blog/integrating-payments-into-your-saas/
           budgetPath: ""
           uploadArtifacts: false
           temporaryPublicStorage: true
