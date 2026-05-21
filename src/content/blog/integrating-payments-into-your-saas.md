@@ -1,5 +1,5 @@
 ---
-title: "Integrating Payments Into Your SaaS: A Practical Guide to the Payments API"
+title: "Integrating Payments Into Your SaaS API"
 description: "A developer-focused walkthrough of adding a payments API to your SaaS — checkout URLs, webhooks, balances, refunds, and the architectural decisions that matter."
 pubDate: 2026-05-20
 author: "1Platform Team"

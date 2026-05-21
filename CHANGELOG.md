@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`about.astro`** refreshed to drop the "19+ separate subscriptions" framing and the SEO-centric mission language. Reframed around the six unified services (store, website, AI content, whitelabel dashboard, payments & invoicing, developer API) and the outcome narrative (sell / build / grow / build-on-API). Structure and capabilities grid preserved.
 - **`compare/1platform-vs-custom-integration.astro`** hero meta description, FAQ answer, cost-grid prose, and closing CTA reframed away from "19+ services" toward category wording. Comparison table rows (the SEO content) left intact.
 - **`blog/1platform-vs-custom-toolchain.md`** intro framing refreshed: the "19+ separate API accounts" claim replaced with wording that matches the post's own list of services.
+- **Three new blog-post titles shortened** for SERP (`launch-online-store-30-minutes` 82→43 chars; `electronic-invoicing-online-business` 74→42; `integrating-payments-into-your-saas` 74→39). Slugs unchanged, H1 follows the new title. Subtitles/hooks live in the post body now.
+- **Four meta descriptions trimmed to ≤155 chars** so they stop truncating in SERP: `compare/1platform-vs-custom-integration.astro`, `for-agencies.astro`, `for-developers.astro`, and `blog/electronic-invoicing-online-business.md`.
+
+### Fixed
+- **Leading space in `<title>` of all three compare pages** (`" 1Platform vs. ..."`) removed. Pre-existing typo from before the refocus.
 
 ### Fixed
 - **Default Open Graph / Twitter image** fallback in `BaseLayout.astro` and `BlogLayout.astro` switched from `/og/default.png` (which 404'd in production and blanked every social-share preview) to `/logo-oauth-120x120.png`, an asset that actually ships in `public/`. Per-page overrides still win; this only changes the default. A proper 1200×630 OG asset can replace it later without touching the layouts.
