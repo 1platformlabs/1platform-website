@@ -16,7 +16,11 @@ interface Props {
 const {
   title,
   description,
-  ogImage = '/og/default.png',
+  // Fallback to an asset that actually ships in public/ — /og/default.png
+  // is referenced everywhere but the file does not exist (404 on prod),
+  // which blanks the preview on every social-share surface. Swap to the
+  // OAuth logo until a proper 1200×630 OG asset lands.
+  ogImage = '/logo-oauth-120x120.png',
   noIndex = false,
   jsonLd,
 } = Astro.props;
