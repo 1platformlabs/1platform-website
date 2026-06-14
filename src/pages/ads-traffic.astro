@@ -1,0 +1,265 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import FeatureCard from '@components/FeatureCard.astro';
+import SolutionCard from '@components/SolutionCard.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+
+const title = 'Ads & Traffic — Drive Visitors and Buy Visibility | 1Platform';
+const description = 'Grow with 1Platform Ads. Send internal traffic to your own products and buy visibility across the network — one wallet, one dashboard, campaign analytics built in.';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: '1Platform Ads & Traffic',
+    serviceType: 'Advertising and Traffic Engine',
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: 'https://1platform.pro/ads-traffic/',
+    areaServed: 'Worldwide',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://1platform.pro/' },
+      { '@type': 'ListItem', position: 2, name: 'Ads & Traffic' },
+    ],
+  },
+];
+
+// Pillar 1 — internal traffic engine
+const internalFeatures = [
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>',
+    title: 'Send visitors to your own products',
+    description: 'Spin up internal campaigns that route engaged visitors straight to your stores, articles, and landing pages — no third parties involved.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    title: 'Target by country',
+    description: 'Include or exclude countries per campaign so every visit lands where it converts best. Schedule start and end dates with a single setting.',
+  },
+];
+
+// Pillar 2 — ads for third parties
+const advertiserFeatures = [
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
+    title: 'Buy visibility across the network',
+    description: 'Launch advertiser campaigns and reach real audiences. Choose cost-per-click or cost-per-impression and set the bid that fits your goals.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    title: 'One wallet, full control',
+    description: 'Top up your balance, set daily and total budgets, and pause or resume any campaign in real time. You never spend more than you fund.',
+  },
+];
+
+const steps = [
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    title: 'Set up your campaign',
+    description: 'Pick a goal — drive internal traffic or advertise to third parties — then add a destination, countries, and a schedule.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+    title: 'Fund your wallet',
+    description: 'Advertiser campaigns draw from your balance. Add funds, set daily and total budgets, and stay fully in control of spend.',
+  },
+  {
+    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    title: 'Track performance',
+    description: 'Watch impressions, clicks, click-through rate, and spend in real time — with a daily series you can act on.',
+  },
+];
+
+const related = [
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>', title: 'Online Store', description: 'Send your campaign traffic straight to products that are ready to sell.', href: '/solutions/online-store/' },
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>', title: 'AI Content', description: 'Create landing pages and articles worth driving traffic to.', href: '/solutions/content/' },
+  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>', title: 'Payments & Invoicing', description: 'Fund your wallet and collect from customers, all in one place.', href: '/payments-invoicing/' },
+];
+
+const comparisonRows = [
+  { without: 'Separate ad network account — yet another login', with_: 'Built into your 1Platform dashboard' },
+  { without: 'No way to promote your own products internally', with_: 'Internal traffic engine for your own pages' },
+  { without: 'Prepaid balances scattered across tools', with_: 'One wallet for every campaign' },
+  { without: 'Reporting locked behind a third-party console', with_: 'Impressions, clicks, CTR, and spend in real time' },
+  { without: 'Rigid budgets and slow changes', with_: 'Pause, resume, and re-budget any time' },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <section class="section section--breadcrumb">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Ads & Traffic' },
+      ]} />
+    </div>
+  </section>
+
+  <Hero
+    headline="Drive Traffic. Buy Visibility."
+    subheadline="One advertising engine, two ways to grow. Route visitors to your own products and buy visibility across the network — one wallet, one dashboard, analytics built in."
+    badge="Ads & Traffic"
+    primaryCta={{ label: 'Get Started Free', href: 'https://app.1platform.pro/app/?intent=ads' }}
+    secondaryCta={{ label: 'Talk to Sales', href: '/contact/?topic=ads-traffic' }}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Two Ways to Grow</h2>
+        <p>Send traffic to what you already own, or pay to reach new audiences — from the same dashboard.</p>
+      </div>
+      <div class="grid-2 pillars">
+        <article class="pillar-card card reveal">
+          <span class="pillar-card__tag">Internal Traffic Engine</span>
+          <h3>Drive visitors to your products</h3>
+          <p>Promote your own stores, articles, and landing pages with internal campaigns. Target the right countries, set a schedule, and keep every visit inside your ecosystem.</p>
+        </article>
+        <article class="pillar-card card reveal">
+          <span class="pillar-card__tag pillar-card__tag--accent">Ads for Third Parties</span>
+          <h3>Buy visibility on the internet</h3>
+          <p>Run advertiser campaigns to reach real audiences beyond your own pages. Choose cost-per-click or cost-per-impression, set your bid, and fund it from your wallet.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Internal Traffic Engine</h2>
+        <p>Turn the audience you already have into visits to the pages that matter.</p>
+      </div>
+      <div class="grid-2 stagger-grid">
+        {internalFeatures.map((f) => (
+          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Ads for Third Parties</h2>
+        <p>Reach audiences across the network and pay only for the results you choose.</p>
+      </div>
+      <div class="grid-2 stagger-grid">
+        {advertiserFeatures.map((f) => (
+          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>How It Works</h2>
+        <p>Three steps from a fresh campaign to live performance you can act on.</p>
+      </div>
+      <div class="grid-3 stagger-grid">
+        {steps.map((s) => (
+          <FeatureCard icon={s.icon} title={s.title} description={s.description} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Without vs. With 1Platform</h2>
+        <p>Stop bolting on a separate ad network. Run traffic and ads where you already work.</p>
+      </div>
+      <ComparisonTable rows={comparisonRows} />
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header reveal">
+        <h2>Works With the Rest of 1Platform</h2>
+        <p>Ads &amp; Traffic pairs naturally with the products that turn visits into revenue.</p>
+      </div>
+      <div class="grid-3 stagger-grid">
+        {related.map((r) => (
+          <SolutionCard icon={r.icon} title={r.title} description={r.description} href={r.href} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section cta-banner">
+    <div class="container">
+      <div class="cta-banner__content reveal">
+        <h2>Ready to Grow Your Traffic?</h2>
+        <p>Launch your first campaign in minutes — drive visitors to your own products or buy visibility across the network.</p>
+        <div class="cta-banner__actions">
+          <a href="https://app.1platform.pro/app/?intent=ads" class="btn btn--primary">Get Started Free</a>
+          <a href="/contact/?topic=ads-traffic" class="btn btn--ghost">Talk to Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section { padding-block: var(--space-20); }
+  .section--breadcrumb { padding-block: var(--space-4) 0; padding-top: calc(var(--header-height) + var(--space-4)); }
+  .section--alt {
+    background-color: var(--color-bg-alt, #ffffff);
+    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  }
+  .container { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-6); }
+  .section__header { text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: var(--space-12); }
+  .section__header h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .section__header p { font-size: var(--text-lg); color: var(--color-text-secondary); }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+  @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .section { padding-block: var(--space-12); }
+  }
+
+  .pillars { align-items: stretch; }
+  .pillar-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .pillar-card__tag {
+    align-self: flex-start;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-tertiary);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+  }
+  .pillar-card__tag--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background: var(--color-accent-glow);
+  }
+  .pillar-card h3 { font-size: var(--text-xl); color: var(--color-text); }
+  .pillar-card p { font-size: var(--text-base); color: var(--color-text-secondary); }
+
+  .cta-banner {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
+    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  }
+  .cta-banner__content { text-align: center; max-width: 700px; margin-inline: auto; }
+  .cta-banner__content h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
+  .cta-banner__content p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
+  .cta-banner__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+</style>
