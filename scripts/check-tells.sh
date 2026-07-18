@@ -152,13 +152,17 @@ report "fonts are self-hosted and preloaded" \
 
 # 10. Provider names are client-facing only in the privacy policy.
 # The exclusion follows the privacy policy's CONTENT, not one path. Under the
-# shell pattern src/pages/privacy.astro is four lines and the prose that names
-# processors lives in src/page-content/Privacy.astro and its message module —
-# and there is now a Spanish shell at src/pages/es/privacy.astro too. Pinning
-# the old path would have exempted a file with nothing in it while policing the
-# three files that actually carry the text.
+# shell pattern src/pages/privacy.astro is four lines; the prose that names
+# processors lives in the per-locale partials, plus a frame component, a message
+# module and a Spanish shell. Pinning the old path would have exempted a file
+# with nothing in it while policing the five that actually carry the text.
+#
+# The `.en`/`.es` branch is not optional and is the reason this list is written
+# out: an earlier version of this rule matched only `privacy.astro|privacy.ts`,
+# which silently excluded nothing that mattered and turned the legally-required
+# processor disclosure into a permanent red.
 m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b' $SRC \
-  | grep -viE '(^|/)privacy\.(astro|ts):' | strip_comments)
+  | grep -viE '(^|/)privacy(\.(en|es))?\.(astro|ts):' | strip_comments)
 report "no external provider names outside the privacy policy" \
        "capabilities are presented as native product features" "$m"
 
