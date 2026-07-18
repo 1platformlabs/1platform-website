@@ -1,4 +1,19 @@
 ---
+import Icon from '@components/Icon.astro';
+
+/**
+ * One post, in the three shapes the blog actually needs.
+ *
+ * `row`  — the default. A bordered index entry: date rail, title, standfirst.
+ *          An archive is a list, so it is drawn as a list rather than as a
+ *          grid of identical surfaces.
+ * `lead` — the most recent post, given the weight it earns.
+ * `card` — a surface, used only where posts sit beside each other in a grid
+ *          (related reading at the foot of an article).
+ *
+ * The whole item is the link in every variant, so the target is the size of
+ * the block rather than the size of the headline.
+ */
 interface Props {
   title: string;
   description: string;
@@ -7,70 +22,267 @@ interface Props {
   slug: string;
   author: string;
   readingTime?: string;
+  variant?: 'row' | 'lead' | 'card';
+  class?: string;
 }
 
-const { title, description, pubDate, category, slug, author, readingTime } = Astro.props;
+/**
+ * Categories carry initialisms, so they cannot be title-cased by rule —
+ * `seo-automation` came out as "Seo Automation". The set is closed by the
+ * content schema, so it is written out.
+ */
+const CATEGORY_LABELS: Record<string, string> = {
+  'seo-automation': 'SEO automation',
+  'ai-content': 'AI content',
+  'api-tutorials': 'API tutorials',
+  'product-updates': 'Product updates',
+  ecommerce: 'Ecommerce',
+  'payments-invoicing': 'Payments & invoicing',
+};
+
+const {
+  title,
+  description,
+  pubDate,
+  category,
+  slug,
+  author,
+  readingTime,
+  variant = 'row',
+  class: className,
+} = Astro.props;
+
+const categoryLabel = CATEGORY_LABELS[category] ?? category.replace(/-/g, ' ');
+const dateISO = pubDate.toISOString();
+const dateLabel = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
 ---
 
-<article class="blog-card card reveal">
-  <div class="blog-card__meta">
-    <span class="badge">{category.replace(/-/g, ' ')}</span>
-    <time datetime={pubDate.toISOString()}>
-      {pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-    </time>
-  </div>
-  <h3>
-    <a href={`/blog/${slug}/`}>{title}</a>
-  </h3>
-  <p>{description}</p>
-  <div class="blog-card__footer">
-    <span>{author}</span>
-    {readingTime && <span>{readingTime}</span>}
-  </div>
+<article class:list={['post', `post--${variant}`, variant === 'card' && 'card', className]}>
+  <a href={`/blog/${slug}/`} class="post__link">
+    <span class="post__date-rail eyebrow">
+      <time datetime={dateISO}>{dateLabel}</time>
+    </span>
+
+    <span class="post__body">
+      <h3 class="post__title">{title}</h3>
+      <span class="post__standfirst">{description}</span>
+
+      <span class="post__meta">
+        <span class="post__category">{categoryLabel}</span>
+        <span class="post__author">{author}</span>
+        {readingTime && <span class="post__reading">{readingTime}</span>}
+      </span>
+    </span>
+
+    {variant === 'lead' && (
+      <span class="post__cue" aria-hidden="true">
+        Read the article
+        <Icon name="arrow-right" size={15} />
+      </span>
+    )}
+  </a>
 </article>
 
 <style>
-  .blog-card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
+  .post__link {
+    display: block;
+    color: inherit;
   }
 
-  .blog-card__meta {
+  .post__title {
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .post__standfirst {
+    display: block;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    text-wrap: pretty;
+  }
+
+  /* Date, category, author and reading time are data about the post, so they
+     are set in the label voice rather than dressed as coloured pills. */
+  .post__meta {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3);
+    font-family: var(--font-mono);
     font-size: var(--text-xs);
+    letter-spacing: 0.04em;
     color: var(--color-text-tertiary);
   }
 
-  .blog-card h3 {
-    font-size: var(--text-lg);
+  .post__category {
+    color: var(--color-text-secondary);
   }
 
-  .blog-card h3 a {
-    color: var(--color-text);
+  .post__author::before,
+  .post__reading::before {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 0.85em;
+    margin-right: var(--space-3);
+    vertical-align: -1px;
+    background: var(--color-border-strong);
   }
 
-  .blog-card h3 a:hover {
+  /* ===== Row: the archive entry ===== */
+  .post--row {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post--row .post__link {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: var(--space-6);
+    padding-block: var(--space-6);
+  }
+
+  .post--row .post__date-rail {
+    padding-top: 3px;
+    white-space: nowrap;
+  }
+
+  .post--row .post__body {
+    display: grid;
+    gap: var(--space-3);
+    min-width: 0;
+  }
+
+  .post--row .post__title {
+    font-size: var(--text-xl);
+  }
+
+  .post--row .post__link:hover .post__title,
+  .post--row .post__link:focus-visible .post__title {
     color: var(--color-accent);
   }
 
-  .blog-card p {
-    font-size: var(--text-sm);
-    flex-grow: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  /* ===== Lead: the most recent post ===== */
+  .post--lead {
+    border-top: 1px solid var(--color-border-strong);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  .blog-card__footer {
+  .post--lead .post__link {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: var(--space-6);
+    padding-block: var(--space-8);
+  }
+
+  .post--lead .post__date-rail {
+    padding-top: 6px;
+    white-space: nowrap;
+  }
+
+  .post--lead .post__body {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 44rem;
+    min-width: 0;
+  }
+
+  .post--lead .post__title {
+    font-size: var(--text-4xl);
+  }
+
+  .post--lead .post__standfirst {
+    font-size: var(--text-lg);
+  }
+
+  .post--lead .post__link:hover .post__title,
+  .post--lead .post__link:focus-visible .post__title {
+    color: var(--color-accent);
+  }
+
+  .post--lead .post__cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    grid-column: 2;
+    margin-top: var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .post--lead .post__cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .post--lead .post__link:hover .post__cue :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Card: only where posts sit side by side ===== */
+  .post--card .post__link {
     display: flex;
+    flex-direction: column;
     gap: var(--space-3);
-    font-size: var(--text-xs);
-    color: var(--color-text-tertiary);
+    height: 100%;
+  }
+
+  .post--card .post__date-rail {
+    order: -1;
+  }
+
+  .post--card .post__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .post--card .post__title {
+    font-size: var(--text-lg);
+  }
+
+  .post--card .post__standfirst {
+    flex-grow: 1;
+  }
+
+  .post--card .post__meta {
     padding-top: var(--space-3);
     border-top: 1px solid var(--color-border);
+  }
+
+  .post--card .post__link:hover .post__title,
+  .post--card .post__link:focus-visible .post__title {
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .post__title {
+      transition: color var(--duration-fast) ease;
+    }
+  }
+
+  /* The date rail stacks above the title rather than squeezing the measure. */
+  @media (max-width: 640px) {
+    .post--row .post__link,
+    .post--lead .post__link {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-3);
+    }
+
+    .post--lead .post__cue {
+      grid-column: 1;
+    }
+
+    .post--lead .post__title {
+      font-size: var(--text-3xl);
+    }
   }
 </style>

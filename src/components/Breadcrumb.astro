@@ -40,8 +40,12 @@ const jsonLd = {
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
 <style>
+  /* Set in the mono label voice, like the eyebrow: a breadcrumb is a path,
+     which is data about where you are, not prose. The trail truncates rather
+     than wrapping to a second line — a deep page title should not push the
+     whole page down. */
   .breadcrumb {
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-6);
   }
 
   .breadcrumb ol {
@@ -49,13 +53,16 @@ const jsonLd = {
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2);
-    font-size: var(--text-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
   }
 
   .breadcrumb li {
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    min-width: 0;
   }
 
   .breadcrumb a {
@@ -67,10 +74,21 @@ const jsonLd = {
   }
 
   .breadcrumb__sep {
-    color: var(--color-text-tertiary);
+    color: var(--color-border-strong);
   }
 
   .breadcrumb [aria-current="page"] {
+    display: block;
+    max-width: 28rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--color-text-secondary);
+  }
+
+  @media (max-width: 640px) {
+    .breadcrumb [aria-current="page"] {
+      max-width: 14rem;
+    }
   }
 </style>

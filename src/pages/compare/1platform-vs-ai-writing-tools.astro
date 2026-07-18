@@ -1,11 +1,63 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import Hero from '@components/Hero.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import CodeBlock from '@components/CodeBlock.astro';
+import Card from '@components/Card.astro';
+import Check from '@components/Check.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
 
-const title = '1Platform vs. AI Writing Tools: Full Pipeline | 1Platform';
+const title = '1Platform vs. AI Writing Tools: The Whole Pipeline | 1Platform';
 const description =
   'Compare 1Platform with standalone AI writing tools. See why a full pipeline with keywords, publishing, indexing, and monetization beats content-only tools.';
+
+/**
+ * The comparison, grouped by the stage of work each capability belongs to.
+ * Writing tools cover one stage well; the argument of this page is what
+ * happens either side of it, so the table is organised by stage rather than
+ * as a flat feature list.
+ */
+const stages: {
+  stage: string;
+  rows: { capability: string; writingTools: boolean }[];
+}[] = [
+  {
+    stage: 'Research',
+    rows: [{ capability: 'Keyword research', writingTools: false }],
+  },
+  {
+    stage: 'Create',
+    rows: [
+      { capability: 'AI content generation', writingTools: true },
+      { capability: 'Image sourcing', writingTools: false },
+    ],
+  },
+  {
+    stage: 'Distribute',
+    rows: [
+      { capability: 'CMS publishing', writingTools: false },
+      { capability: 'Search engine indexing', writingTools: false },
+      { capability: 'Link building', writingTools: false },
+    ],
+  },
+  {
+    stage: 'Monetize',
+    rows: [
+      { capability: 'Payment processing', writingTools: false },
+      { capability: 'Electronic invoicing', writingTools: false },
+    ],
+  },
+];
+
+const pipelineSteps = [
+  { label: 'Research keywords' },
+  { label: 'Generate the article' },
+  { label: 'Source the images' },
+  { label: 'Publish to your CMS' },
+  { label: 'Submit for indexing' },
+  { label: 'Charge and invoice' },
+];
 
 const faqItems = [
   {
@@ -16,7 +68,7 @@ const faqItems = [
   {
     question: 'Can I use 1Platform just for content generation?',
     answer:
-      'Absolutely. You can use any 1Platform service independently. But the real power comes from connecting them. Generate content with researched keywords, attach sourced images, publish to your CMS, submit for indexing, and build backlinks \u2014 all through one integration.',
+      'Absolutely. You can use any 1Platform service independently. But the real power comes from connecting them. Generate content with researched keywords, attach sourced images, publish to your CMS, submit for indexing, and build backlinks — all through one integration.',
   },
   {
     question: 'Does 1Platform support multiple languages for content?',
@@ -38,14 +90,13 @@ const faqJsonLd = {
   })),
 };
 
-const apiExample = `# Full pipeline: keywords -> content -> publish -> index
-# Step 1: Extract keywords from a domain
+const apiExample = `# Step 1: extract keywords from a domain
 curl -X POST https://api.1platform.pro/api/v1/posts/keywords/ \\
   -H "Authorization: Bearer $APP_TOKEN" \\
   -H "x-user-token: $USER_TOKEN" \\
   -d '{ "domain": "example.com", "country": "us", "lang": "en" }'
 
-# Step 2: Generate content from the top keyword (async job)
+# Step 2: generate content from the top keyword (async job)
 curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
   -H "Authorization: Bearer $APP_TOKEN" \\
   -H "x-user-token: $USER_TOKEN" \\
@@ -53,7 +104,16 @@ curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
 ---
 
 <BaseLayout title={title} description={description} jsonLd={faqJsonLd}>
-  <section class="section hero-section">
+  <Hero
+    badge="Compare"
+    headline="1Platform vs. AI writing tools"
+    subheadline="A writing tool hands you a draft. Everything that turns a draft into a published, ranked, paid-for page is still yours to build — unless the pipeline is the product."
+    primaryCta={{ label: 'View API Docs', href: 'https://developer.1platform.pro/' }}
+    secondaryCta={{ label: 'Explore Solutions', href: '/solutions/' }}
+  />
+
+  <!-- Capability by capability, grouped by stage of work -->
+  <section class="section">
     <div class="container">
       <Breadcrumb
         items={[
@@ -63,391 +123,344 @@ curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
         ]}
       />
 
-      <h1>1Platform vs. AI Writing Tools</h1>
-      <p class="subtitle">Full automation pipeline vs. content generation only</p>
-    </div>
-  </section>
+      <div class="section__rule">
+        <p class="eyebrow">Capability by capability</p>
+      </div>
+      <h2 class="section__lead">Both write. Only one of them keeps going.</h2>
 
-  <section class="section">
-    <div class="container">
-      <h2>Feature Comparison</h2>
-      <div class="table-wrapper">
-        <table class="comparison-table" role="table">
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <caption class="sr-only">
+            Capabilities covered by 1Platform compared with standalone AI writing tools,
+            grouped by stage of work.
+          </caption>
           <thead>
             <tr>
               <th scope="col">Capability</th>
-              <th scope="col">1Platform</th>
-              <th scope="col">AI Writing Tools</th>
+              <th scope="col" class="matrix__mark-col matrix__mark-col--us">1Platform</th>
+              <th scope="col" class="matrix__mark-col">Writing tools</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Keyword Research</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>AI Content Generation</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-            </tr>
-            <tr>
-              <td>Image Sourcing</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>CMS Publishing</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Search Engine Indexing</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Link Building</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Payment Processing</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Invoicing</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-          </tbody>
+          {stages.map((group) => (
+            <tbody>
+              <tr class="matrix__group">
+                <th scope="colgroup" colspan="3">{group.stage}</th>
+              </tr>
+              {group.rows.map((row) => (
+                <tr>
+                  <th scope="row">{row.capability}</th>
+                  <td class="matrix__mark-col"><Check yes={true} /></td>
+                  <td class="matrix__mark-col"><Check yes={row.writingTools} /></td>
+                </tr>
+              ))}
+            </tbody>
+          ))}
         </table>
       </div>
     </div>
   </section>
 
+  <!-- The argument, then the pipeline drawn as a sequence -->
   <section class="section section--alt">
     <div class="container">
-      <h2>The Pipeline Advantage</h2>
-      <div class="pipeline-content">
+      <div class="section__rule">
+        <p class="eyebrow">The pipeline</p>
+      </div>
+
+      <p class="lede reveal">
+        AI writing tools solve one piece of the puzzle: generating text. But content that
+        performs needs more than words. It needs the right keyword behind it, optimized
+        images, a publishing path, visibility in search, and a way to get paid.
+      </p>
+
+      <div class="notes reveal">
         <p>
-          AI writing tools solve one piece of the puzzle: generating text. But content that
-          performs needs more than words. It needs the right keywords, optimized images, a
-          publishing workflow, search engine visibility, and a monetization strategy.
+          With separate tools you stitch that chain together yourself — each one with its own
+          API, authentication, billing and documentation. Every join is a place the chain can
+          break, and every vendor update can break it for you.
         </p>
         <p>
-          With standalone tools, you stitch together 5 to 8 different services, each with its
-          own API, authentication, billing, and documentation. Every integration point is a
-          potential failure. Every vendor update can break your workflow.
+          1Platform replaces the chain with a single, interconnected API. Keyword research
+          feeds content generation. Generated content flows into your CMS. Published URLs are
+          submitted for indexing. Link building targets the new content. Payments and
+          invoicing close the loop. One integration. One bill.
         </p>
-        <p>
-          1Platform replaces that fragile chain with a single, interconnected API. Your keyword
-          research feeds directly into content generation. Generated content flows into your CMS.
-          Published URLs are submitted for indexing automatically. Link building campaigns target
-          your new content. Payments and invoicing close the loop. One API key. One integration.
-          One bill.
-        </p>
+      </div>
+
+      <ProcessSpine steps={pipelineSteps} label="The content pipeline, stage by stage" />
+    </div>
+  </section>
+
+  <!-- Copy and code, side by side -->
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy">
+          <p class="eyebrow">Integrate</p>
+          <h2>From keyword to draft in two calls</h2>
+          <p>
+            Research keywords and generate optimized content through one integration — the
+            same base URL, the same token pair, the same response envelope for every stage
+            that follows.
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            Read the API docs
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title="Keywords, then content"
+            code={apiExample}
+          />
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      <h2>From Keywords to Content in 2 Calls</h2>
-      <p class="section-desc">
-        Research keywords and generate optimized content through a single API integration.
-      </p>
-      <CodeBlock
-        language="bash"
-        title="1Platform pipeline example"
-        code={apiExample}
-      />
-    </div>
-  </section>
-
+  <!-- Questions -->
   <section class="section section--alt">
     <div class="container">
-      <h2>Frequently Asked Questions</h2>
-      <div class="faq-list">
+      <div class="section__rule">
+        <p class="eyebrow">Questions</p>
+      </div>
+
+      <div class="qa">
         {faqItems.map((item) => (
-          <details class="faq-item">
-            <summary>{item.question}</summary>
-            <p>{item.answer}</p>
-          </details>
+          <div class="qa__item">
+            <h2 class="qa__q">{item.question}</h2>
+            <p class="qa__a">{item.answer}</p>
+          </div>
         ))}
       </div>
     </div>
   </section>
 
-  <section class="section cta-section">
-    <div class="container cta-container">
-      <h2>Stop Stitching. Start Shipping.</h2>
-      <p>
-        Replace your patchwork of AI writing tools with a complete automation pipeline.
-        One platform. Every solution.
-      </p>
-      <div class="cta-buttons">
-        <a href="https://developer.1platform.pro/" class="btn btn--primary">View API Docs</a>
-        <a href="/solutions/" class="btn btn--ghost">Explore Solutions</a>
+  <!-- Sideways links, rather than another closing CTA band (the footer carries it) -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">More comparisons</p>
+      </div>
+
+      <div class="more">
+        <Card
+          headingLevel={2}
+          title="1Platform vs. building your own integration"
+          description="What it takes to wire the same capabilities together yourself, and what stays your problem afterwards."
+          href="/compare/1platform-vs-custom-integration/"
+        />
+        <Card
+          headingLevel={2}
+          title="1Platform vs. WordPress content plugins"
+          description="Where an automated content plugin ends and a framework-agnostic platform begins."
+          href="/compare/1platform-vs-wp-auto-pro/"
+        />
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .hero-section {
-    padding-top: calc(var(--header-height) + var(--space-16));
-    padding-bottom: var(--space-12);
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
   }
 
-  h1 {
-    font-size: var(--text-5xl);
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: var(--space-4);
-  }
-
-  .subtitle {
-    font-size: var(--text-xl);
-    color: var(--color-text-secondary);
-    max-width: 600px;
-  }
-
-  .section {
-    padding: var(--space-20) 0;
-  }
-
-  .section--alt {
-    background-color: var(--color-bg-alt);
-  }
-
-  .container {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 var(--space-6);
-  }
-
-  h2 {
-    font-size: var(--text-3xl);
-    margin-bottom: var(--space-8);
-  }
-
-  .section-desc {
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-8);
-    max-width: 600px;
-  }
-
-  /* Comparison Table */
-  .table-wrapper {
+  /* ===== Capability matrix =====
+     A real table: the row and column headers are what make the marks readable
+     to a screen reader, so they stay semantic rather than becoming divs. */
+  .matrix-wrap {
     overflow-x: auto;
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-lg);
+    background: var(--color-bg-alt);
   }
 
-  .comparison-table {
+  .matrix {
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--text-base);
+    text-align: left;
   }
 
-  .comparison-table th,
-  .comparison-table td {
+  .matrix th,
+  .matrix td {
     padding: var(--space-4) var(--space-6);
     text-align: left;
-    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
   }
 
-  .comparison-table thead th {
-    background-color: var(--color-bg-elevated);
-    font-weight: 600;
-    font-size: var(--text-sm);
+  .matrix thead th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-secondary);
-  }
-
-  .comparison-table tbody tr:last-child td {
-    border-bottom: none;
-  }
-
-  .comparison-table tbody td:first-child {
-    font-weight: 500;
-  }
-
-  .check {
-    color: var(--color-green);
-    font-size: var(--text-xl);
-    font-weight: 700;
-  }
-
-  .cross {
-    color: var(--color-red);
-    font-size: var(--text-xl);
-    font-weight: 700;
-  }
-
-  /* Pipeline content */
-  .pipeline-content {
-    display: grid;
-    gap: var(--space-6);
-    max-width: var(--max-width-narrow);
-  }
-
-  .pipeline-content p {
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-  }
-
-  /* FAQ */
-  .faq-list {
-    display: grid;
-    gap: var(--space-4);
-    max-width: var(--max-width-narrow);
-  }
-
-  .faq-item {
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-  }
-
-  .faq-item summary {
-    padding: var(--space-4) var(--space-6);
-    font-weight: 600;
-    cursor: pointer;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-  }
-
-  .faq-item summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .faq-item summary::after {
-    content: '+';
-    font-size: var(--text-xl);
     color: var(--color-text-tertiary);
-    flex-shrink: 0;
+    white-space: nowrap;
   }
 
-  .faq-item[open] summary::after {
-    content: '\2212';
+  /* The claim column reads in the accent; the other stays ink. */
+  .matrix__mark-col--us {
+    color: var(--color-accent);
   }
 
-  .faq-item summary:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: -2px;
+  .matrix tbody th,
+  .matrix tbody td {
+    border-top: 1px solid var(--color-border);
   }
 
-  .faq-item p {
-    padding: 0 var(--space-6) var(--space-6);
-    color: var(--color-text-secondary);
-    line-height: 1.7;
+  /* Stage label: the same mono device the eyebrows use, set into the table. */
+  .matrix__group th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-muted);
+    padding-block: var(--space-2);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .faq-item summary {
-      transition: background-color var(--duration-fast) var(--ease-out-expo);
-    }
-
-    .faq-item summary:hover {
-      background-color: var(--color-bg-elevated);
-    }
-  }
-
-  /* CTA */
-  .cta-section {
-    text-align: center;
-  }
-
-  .cta-container {
-    max-width: var(--max-width-narrow);
-  }
-
-  .cta-container h2 {
-    font-size: var(--text-4xl);
-  }
-
-  .cta-container > p {
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-8);
-    font-size: var(--text-lg);
-  }
-
-  .cta-buttons {
-    display: flex;
-    gap: var(--space-4);
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-3) var(--space-6);
-    border-radius: var(--border-radius);
-    font-weight: 600;
-    font-size: var(--text-base);
-    min-height: 48px;
-    min-width: 48px;
-    cursor: pointer;
-    text-decoration: none;
-    border: none;
-  }
-
-  .btn--primary {
-    background-color: var(--color-accent);
-    color: #fff;
-  }
-
-  .btn--ghost {
-    background: transparent;
-    border: 1px solid var(--color-border);
+  .matrix tbody th[scope='row'] {
+    font-weight: 500;
+    font-size: var(--text-sm);
     color: var(--color-text);
   }
 
-  .btn:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+  .matrix__mark-col {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  /* ===== Editorial notes ===== */
+  .lede {
+    max-width: 40rem;
+    font-size: var(--text-xl);
+    line-height: 1.5;
+    color: var(--color-text);
+    margin-bottom: var(--space-8);
+  }
+
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+    max-width: 56rem;
+    padding-bottom: var(--space-12);
+    margin-bottom: var(--space-12);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .notes p {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+  }
+
+  /* ===== Split: copy + code ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Long code lines would otherwise widen the whole grid past the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .btn--primary:hover {
-      filter: brightness(1.1);
-      transform: scale(1.02);
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
     }
 
-    .btn--ghost:hover {
-      border-color: var(--color-accent);
-      box-shadow: 0 0 12px var(--color-accent-glow);
-    }
-
-    .btn {
-      transition: transform var(--duration-fast) var(--ease-out-expo),
-        filter var(--duration-fast) var(--ease-out-expo),
-        border-color var(--duration-fast) var(--ease-out-expo),
-        box-shadow var(--duration-fast) var(--ease-out-expo);
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
     }
   }
 
-  @media (max-width: 768px) {
-    h1 {
-      font-size: var(--text-3xl);
+  /* ===== Questions =====
+     Three answers, all worth reading: shown open as an editorial list rather
+     than hidden behind disclosure toggles. */
+  .qa {
+    display: grid;
+    max-width: 46rem;
+  }
+
+  .qa__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .qa__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .qa__q {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    margin-bottom: var(--space-3);
+  }
+
+  .qa__a {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ===== More comparisons ===== */
+  .more {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
     }
 
-    .comparison-table th,
-    .comparison-table td {
+    /* Two columns of body copy get too narrow to read below this. */
+    .notes {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .more {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+
+    .lede {
+      font-size: var(--text-lg);
+    }
+
+    .matrix th,
+    .matrix td {
       padding: var(--space-3) var(--space-4);
-      font-size: var(--text-sm);
     }
   }
 </style>

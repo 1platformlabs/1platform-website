@@ -2,9 +2,10 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import Hero from '@components/Hero.astro';
-import FeatureCard from '@components/FeatureCard.astro';
-import SolutionCard from '@components/SolutionCard.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
 import CodeBlock from '@components/CodeBlock.astro';
+import type { IconName } from '@components/icons';
 
 const title = 'Accept Payments & Issue Electronic Invoices | 1Platform';
 const description = 'Accept online card payments and issue compliant electronic invoices automatically — all from one platform. Webhook-driven, audit-ready, ready for production.';
@@ -57,73 +58,115 @@ const faqJsonLd = {
   })),
 };
 
-const features = [
+const capabilities: { icon: IconName; title: string; description: string }[] = [
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    icon: 'card',
     title: 'Accept payments',
-    description: 'Card payments via API. Hosted checkout URLs, real-time webhooks, and automatic balance crediting.',
+    description: 'Card payments via API. Hosted checkout URLs, real-time webhooks and automatic balance crediting.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
+    icon: 'invoice',
     title: 'Issue invoices',
     description: 'Compliant electronic invoices generated automatically. PDF + XML output, multi-item lines, automatic tax calculation.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    icon: 'logs',
     title: 'Track everything',
-    description: 'HMAC-signed webhooks for every lifecycle event. Activity logs with method, endpoint, status, and latency.',
+    description: 'HMAC-signed webhooks for every lifecycle event. Activity logs with method, endpoint, status and latency.',
   },
 ];
 
-const related = [
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>', title: 'Online Store', description: 'Add a full storefront with checkout and customer accounts.', href: '/solutions/online-store/' },
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', title: 'For Developers', description: 'Integrate payments and invoicing into your own SaaS via REST.', href: '/for-developers/' },
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>', title: 'Whitelabel Dashboard', description: 'Surface payments and invoicing under your own brand.', href: '/solutions/whitelabel/' },
+/** The states a transaction can report back, as the webhook emits them. */
+const lifecycle = ['approved', 'denied', 'cancelled', 'expired', 'dismissed'];
+
+const related: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'cart',
+    title: 'Online Store',
+    description: 'Add a full storefront with checkout and customer accounts.',
+    href: '/solutions/online-store/',
+  },
+  {
+    icon: 'code',
+    title: 'For Developers',
+    description: 'Integrate payments and invoicing into your own SaaS via REST.',
+    href: '/for-developers/',
+  },
+  {
+    icon: 'dashboard',
+    title: 'Whitelabel Dashboard',
+    description: 'Surface payments and invoicing under your own brand.',
+    href: '/solutions/whitelabel/',
+  },
 ];
 ---
 
 <BaseLayout title={title} description={description} ogImage="/og/solution-payments-invoicing.png" jsonLd={[...jsonLd, faqJsonLd]}>
-  <section class="section section--breadcrumb">
-    <div class="container">
-      <Breadcrumb items={[
-        { label: 'Home', href: '/' },
-        { label: 'Payments & Invoicing' },
-      ]} />
-    </div>
-  </section>
+  <div class="container crumbs">
+    <Breadcrumb items={[
+      { label: 'Home', href: '/' },
+      { label: 'Payments & Invoicing' },
+    ]} />
+  </div>
 
   <Hero
-    headline="Payments & Compliant Invoicing"
+    headline="Payments and compliant invoicing"
     subheadline="Accept payments and issue compliant electronic invoices automatically — from one platform. Webhook-driven, audit-ready, production-tested."
     badge="Payments · Invoicing"
     primaryCta={{ label: 'Start Accepting Payments', href: 'https://app.1platform.pro/app/?intent=payments' }}
     secondaryCta={{ label: 'For Developers — View API', href: 'https://developer.1platform.pro/' }}
   />
 
+  <!-- What you get -->
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>What You Get</h2>
-        <p>End-to-end flow from checkout to compliant invoice — one platform, one bill.</p>
+      <div class="section__rule">
+        <p class="eyebrow">What you get</p>
       </div>
-      <div class="grid-3 stagger-grid">
-        {features.map((f) => (
-          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+      <h2 class="section__lead">From checkout to compliant invoice, on one platform</h2>
+
+      <div class="capabilities">
+        {capabilities.map((capability) => (
+          <Card
+            variant="bare"
+            icon={capability.icon}
+            title={capability.title}
+            description={capability.description}
+            class="reveal"
+          />
         ))}
       </div>
     </div>
   </section>
 
+  <!-- One call, two outcomes -->
   <section class="section section--alt">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>One API, Two Outcomes</h2>
-        <p>Create a transaction, get an invoice — automatically.</p>
-      </div>
-      <CodeBlock
-        language="bash"
-        title="Create a payment transaction"
-        code={`curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">One API, two outcomes</p>
+          <h2>Create a transaction, get an invoice</h2>
+          <p>
+            One call opens the checkout. When the payment settles, the invoice is issued from
+            the same transaction — no second system to reconcile it against, no export in
+            between.
+          </p>
+
+          <div class="lifecycle">
+            <p class="lifecycle__label">Webhook states</p>
+            <ul class="lifecycle__list">
+              {lifecycle.map((state) => (
+                <li class="lifecycle__state">{state}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title="Create a payment transaction"
+            code={`curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
   -H "Authorization: Bearer $APP_TOKEN" \\
   -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
@@ -131,26 +174,28 @@ const related = [
     "amount": 25.00,
     "description": "Order #1042"
   }'`}
-      />
+          />
+        </div>
+      </div>
     </div>
   </section>
 
+  <!-- FAQ -->
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>Frequently Asked Questions</h2>
-        <p>Everything you need to know about payments and electronic invoicing.</p>
+      <div class="section__rule">
+        <p class="eyebrow">Questions</p>
       </div>
-      <div class="faq-list">
+      <h2 class="section__lead">What people ask before they switch</h2>
+
+      <div class="faq">
         {faqs.map((faq) => (
-          <details class="faq-item reveal">
-            <summary class="faq-item__question">
+          <details class="faq__item">
+            <summary class="faq__question">
               <span>{faq.question}</span>
-              <svg class="faq-item__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
+              <Icon name="chevron-down" size={20} class="faq__chevron" />
             </summary>
-            <div class="faq-item__answer">
+            <div class="faq__answer">
               <p>{faq.answer}</p>
             </div>
           </details>
@@ -159,87 +204,250 @@ const related = [
     </div>
   </section>
 
+  <!-- Related -->
   <section class="section section--alt">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>Related Solutions</h2>
-        <p>Payments and invoicing connect with the rest of the platform.</p>
+      <div class="section__rule">
+        <p class="eyebrow">Related</p>
       </div>
-      <div class="grid-3 stagger-grid">
-        {related.map((r) => (
-          <SolutionCard icon={r.icon} title={r.title} description={r.description} href={r.href} />
-        ))}
-      </div>
-    </div>
-  </section>
+      <h2 class="section__lead">Payments and invoicing connect with the rest of the platform</h2>
 
-  <section class="section cta-banner">
-    <div class="container">
-      <div class="cta-banner__content reveal">
-        <h2>Ready to Get Paid?</h2>
-        <p>Stop running two separate systems. Accept payments and issue invoices from one platform.</p>
-        <div class="cta-banner__actions">
-          <a href="https://app.1platform.pro/app/?intent=payments" class="btn btn--primary">Start Accepting Payments</a>
-          <a href="https://developer.1platform.pro/" class="btn btn--ghost">View API Docs</a>
-        </div>
-      </div>
+      <ul class="related">
+        {related.map((item) => (
+          <li>
+            <a href={item.href} class="related__link">
+              <span class="related__icon"><Icon name={item.icon} size={20} /></span>
+              <span class="related__text">
+                <span class="related__title">{item.title}</span>
+                <span class="related__desc">{item.description}</span>
+              </span>
+              <Icon name="arrow-right" size={16} class="related__arrow" />
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
 </BaseLayout>
 
 <style>
-  .section { padding-block: var(--space-20); }
-  .section--breadcrumb { padding-block: var(--space-4) 0; padding-top: calc(var(--header-height) + var(--space-4)); }
-  .section--alt {
-    background-color: var(--color-bg-alt, #ffffff);
-    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  /* Breadcrumbs clear the fixed header; the hero then drops its own top
+     offset so the two don't stack into a canyon of whitespace. */
+  .crumbs {
+    padding-top: calc(var(--header-height) + var(--space-8));
   }
-  .container { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-6); }
-  .section__header { text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: var(--space-12); }
-  .section__header h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
-  .section__header p { font-size: var(--text-lg); color: var(--color-text-secondary); }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
-  @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 640px) {
-    .grid-3 { grid-template-columns: 1fr; }
-    .section { padding-block: var(--space-12); }
+
+  .crumbs + :global(.hero) {
+    padding-top: var(--space-6);
   }
-  .faq-list {
-    max-width: 700px; margin-inline: auto;
-    display: flex; flex-direction: column; gap: var(--space-3);
+
+  .section__lead {
+    max-width: 36rem;
+    margin-bottom: var(--space-10);
   }
-  .faq-item {
-    background: var(--color-bg-alt);
+
+  /* ===== Capabilities ===== */
+  .capabilities {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-10);
+  }
+
+  /* ===== Split: copy + the call itself ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-8);
+  }
+
+  /* Grid children default to min-width:auto, which lets a long code line push
+     the whole page wider than the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  /* ===== Lifecycle states ===== */
+  .lifecycle {
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .lifecycle__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-3);
+  }
+
+  .lifecycle__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .lifecycle__state {
+    padding: var(--space-1) var(--space-3);
     border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
+    border-radius: var(--border-radius);
+    background: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
   }
-  .faq-item__question {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: var(--space-4); padding: var(--space-5) var(--space-6);
-    cursor: pointer; font-weight: 600; color: var(--color-text);
-    font-size: var(--text-base); list-style: none;
+
+  /* ===== FAQ: hairline rows, not a stack of rounded cards ===== */
+  .faq {
+    max-width: 46rem;
+    border-top: 1px solid var(--color-border);
   }
-  .faq-item__question::-webkit-details-marker { display: none; }
-  .faq-item__question::marker { display: none; content: ''; }
-  .faq-item__chevron { flex-shrink: 0; color: var(--color-text-tertiary); }
+
+  .faq__item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    min-height: 44px;
+    padding-block: var(--space-4);
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-text);
+    list-style: none;
+  }
+
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__question::marker {
+    content: '';
+  }
+
+  .faq__question:hover {
+    color: var(--color-accent);
+  }
+
+  .faq__question :global(.faq__chevron) {
+    color: var(--color-text-tertiary);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    .faq-item__chevron { transition: transform var(--duration-normal) var(--ease-out-expo); }
+    .faq__question :global(.faq__chevron) {
+      transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
   }
-  .faq-item[open] .faq-item__chevron { transform: rotate(180deg); }
-  .faq-item__answer { padding: 0 var(--space-6) var(--space-5); }
-  .faq-item__answer p { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.7; }
-  .faq-item__question:focus-visible {
+
+  .faq__item[open] .faq__question :global(.faq__chevron) {
+    transform: rotate(180deg);
+  }
+
+  .faq__question:focus-visible {
     outline: 2px solid var(--color-accent);
-    outline-offset: -2px;
-    border-radius: var(--border-radius-lg);
+    outline-offset: 2px;
   }
-  .cta-banner {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
-    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+
+  .faq__answer {
+    padding-bottom: var(--space-5);
+    max-width: 40rem;
   }
-  .cta-banner__content { text-align: center; max-width: 700px; margin-inline: auto; }
-  .cta-banner__content h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
-  .cta-banner__content p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
-  .cta-banner__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+
+  .faq__answer p {
+    font-size: var(--text-sm);
+    line-height: 1.75;
+    margin: 0;
+  }
+
+  /* ===== Related ===== */
+  .related {
+    display: grid;
+    max-width: 52rem;
+  }
+
+  .related li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related li:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .related__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding-block: var(--space-5);
+    color: var(--color-text);
+  }
+
+  .related__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .related__text {
+    display: grid;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .related__title {
+    font-weight: 600;
+  }
+
+  .related__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .related__link :global(.related__arrow) {
+    color: var(--color-text-tertiary);
+  }
+
+  .related__link:hover {
+    color: var(--color-accent);
+  }
+
+  .related__link:hover :global(.related__arrow) {
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .related__link :global(.related__arrow) {
+      transition: transform var(--duration-fast) var(--ease-out-expo),
+                  color var(--duration-fast) ease;
+    }
+
+    .related__link:hover :global(.related__arrow) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .capabilities {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
 </style>

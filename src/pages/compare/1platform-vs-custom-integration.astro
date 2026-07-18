@@ -1,27 +1,109 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import Hero from '@components/Hero.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import CodeBlock from '@components/CodeBlock.astro';
+import Card from '@components/Card.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
 
-const title = '1Platform vs. Custom Integration: Weeks vs Hours | 1Platform';
+const title = '1Platform vs. Building Your Own Integration | 1Platform';
 const description =
-  'Compare 1Platform with building your own custom integration. Ship in hours, not weeks. One API replaces a stack of separate services, auth, and billing.';
+  'Compare 1Platform with wiring up your own integration. One API, one auth model, one bill — instead of a separate service, SDK, and invoice for every capability.';
+
+/**
+ * The comparison, by what the work actually feels like on each side.
+ *
+ * The previous version of this page quoted API counts, delivery timescales and
+ * a dollar figure for engineering effort, none of which anything on the site
+ * could substantiate. What is true and checkable is the shape of the work, so
+ * that is what is compared.
+ */
+const integrationRows = [
+  {
+    without: 'A separate service to choose, integrate and monitor for each capability',
+    with_: 'One API surface covering every capability',
+  },
+  {
+    without: 'A different auth scheme and token model per vendor',
+    with_: 'One two-token model across every endpoint',
+  },
+  {
+    without: 'A separate account, plan and renewal per vendor',
+    with_: 'One account, one bill',
+  },
+  {
+    without: 'A different error format and documentation set to learn per vendor',
+    with_: 'One response envelope, one reference',
+  },
+  {
+    without: 'Every upstream API change becomes your migration',
+    with_: 'The contract you code against stays stable',
+  },
+  {
+    without: 'Integration work stands between you and your first feature',
+    with_: 'The first call ships the capability',
+  },
+];
+
+const costs: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'clock',
+    title: 'Development time',
+    description:
+      'Wiring up a store, payments, invoicing, content and a developer API yourself means learning a different vendor for each one — every documentation set, every authentication method, every error model — before any of it serves a customer.',
+  },
+  {
+    icon: 'settings',
+    title: 'Ongoing maintenance',
+    description:
+      'APIs change. Endpoints are deprecated, rate limits move, response formats are revised. With your own integrations, every upstream change becomes your problem. With 1Platform, the API contract stays stable while those changes are absorbed behind it.',
+  },
+  {
+    icon: 'launch',
+    title: 'Opportunity cost',
+    description:
+      'Every hour spent wiring services together is an hour not spent on your core product. 1Platform lets your team work on what differentiates the business while the platform holds the infrastructure layer.',
+  },
+];
+
+/** Every capability, on one base URL and one auth model. */
+const surface: { group: string; items: { path: string; label: string }[] }[] = [
+  {
+    group: 'Content & SEO',
+    items: [
+      { path: '/posts/keywords/', label: 'Keyword extraction' },
+      { path: '/posts/content/', label: 'Article generation + CMS publish' },
+      { path: '/users/generations/images', label: 'AI image generation' },
+      { path: '/posts/indexing/', label: 'Submit URLs for indexing' },
+      { path: '/users/websites/{id}/...', label: 'Link building + Search Console' },
+    ],
+  },
+  {
+    group: 'Money',
+    items: [
+      { path: '/users/transactions', label: 'Online payment processing' },
+      { path: '/businesses/{id}/invoices', label: 'Electronic invoicing' },
+    ],
+  },
+];
 
 const faqItems = [
   {
-    question: 'How much time does 1Platform save compared to custom integration?',
+    question: 'What does 1Platform save me compared with building the integration myself?',
     answer:
-      'Building a custom integration across the services 1Platform replaces — store, payments, invoicing, AI content, website, and developer APIs — typically takes six to twelve weeks of development time. With 1Platform, you integrate once and access every service immediately. Most developers ship their first integration in under a day.',
+      'The integration layer itself. Building across the services 1Platform replaces — store, payments, invoicing, AI content, website, and developer APIs — means a separate integration, auth model, error model and bill for each one, plus the maintenance that follows. With 1Platform you integrate once and every service is already reachable through the same contract.',
   },
   {
     question: 'What happens if one of the underlying services changes?',
     answer:
-      '1Platform handles all upstream service changes internally. Your integration stays stable because you only interact with the 1Platform API. When a provider updates their API, the 1Platform team adapts the integration so you never have to.',
+      '1Platform handles all upstream service changes internally. Your integration stays stable because you only interact with the 1Platform API. When an upstream API is updated, the 1Platform team adapts the integration so you never have to.',
   },
   {
     question: 'Can I start with one service and add more later?',
     answer:
-      'Yes. 1Platform is modular by design. Start with content generation today, add keyword research next week, enable publishing when you are ready. Same API key, same auth, same billing. No new integrations required.',
+      'Yes. 1Platform is modular by design. Start with content generation today, add keyword research next, enable publishing when you are ready. Same API key, same auth, same billing. No new integrations required.',
   },
 ];
 
@@ -38,8 +120,7 @@ const faqJsonLd = {
   })),
 };
 
-const apiExample = `# With 1Platform: 1 API, 1 auth, 1 bill
-curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+const apiExample = `curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
   -H "Authorization: Bearer $APP_TOKEN" \\
   -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
@@ -47,20 +128,20 @@ curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
     "keyword": "saas landing page best practices",
     "lang": "en",
     "country": "us"
-  }'
-
-# Same auth, same base URL for every service:
-# /api/v1/posts/keywords/             — Keyword extraction
-# /api/v1/users/generations/images    — AI image generation
-# /api/v1/posts/content/              — Article generation + CMS publish
-# /api/v1/posts/indexing/             — Submit URLs for indexing
-# /api/v1/users/websites/{id}/...     — Link building + Search Console
-# /api/v1/users/transactions          — Online payment processing
-# /api/v1/businesses/{id}/invoices    — Electronic invoicing (FEL)`;
+  }'`;
 ---
 
 <BaseLayout title={title} description={description} jsonLd={faqJsonLd}>
-  <section class="section hero-section">
+  <Hero
+    badge="Compare"
+    headline="1Platform vs. building your own"
+    subheadline="You can integrate a separate service for the store, the payments, the invoicing, the content and the publishing — and then maintain all of them. Or you can integrate once."
+    primaryCta={{ label: 'Get Started Free', href: 'https://app.1platform.pro/app/' }}
+    secondaryCta={{ label: 'See Pricing', href: '/pricing/' }}
+  />
+
+  <!-- The comparison, by shape of work rather than by invented counts -->
+  <section class="section">
     <div class="container">
       <Breadcrumb
         items={[
@@ -70,415 +151,305 @@ curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
         ]}
       />
 
-      <h1>1Platform vs. Building Your Own</h1>
-      <p class="subtitle">Ship in hours, not weeks</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <h2>Integration Comparison</h2>
-      <div class="table-wrapper">
-        <table class="comparison-table" role="table">
-          <thead>
-            <tr>
-              <th scope="col">Factor</th>
-              <th scope="col">1Platform</th>
-              <th scope="col">Custom Integration</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>APIs to Integrate</td>
-              <td><span class="highlight">1</span></td>
-              <td><span class="dim">19+</span></td>
-            </tr>
-            <tr>
-              <td>Auth Systems</td>
-              <td><span class="highlight">1</span> (two-token)</td>
-              <td><span class="dim">19+ different</span></td>
-            </tr>
-            <tr>
-              <td>Billing Accounts</td>
-              <td><span class="highlight">1</span></td>
-              <td><span class="dim">19+</span></td>
-            </tr>
-            <tr>
-              <td>Documentation Sets</td>
-              <td><span class="highlight">1</span></td>
-              <td><span class="dim">19+</span></td>
-            </tr>
-            <tr>
-              <td>Maintenance Burden</td>
-              <td><span class="highlight">None</span></td>
-              <td><span class="dim">Ongoing per service</span></td>
-            </tr>
-            <tr>
-              <td>Time to Ship</td>
-              <td><span class="highlight">Hours</span></td>
-              <td><span class="dim">6\u201312 weeks</span></td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="section__rule">
+        <p class="eyebrow">Two ways to get there</p>
       </div>
+      <h2 class="section__lead">The same capabilities. A different amount of your work.</h2>
+
+      <ComparisonTable rows={integrationRows} />
     </div>
   </section>
 
+  <!-- What "building it yourself" actually costs, stated honestly -->
   <section class="section section--alt">
     <div class="container">
-      <h2>The Real Cost of "Building It Yourself"</h2>
-      <div class="cost-grid">
-        <div class="cost-card">
-          <h3>Development time</h3>
-          <p>
-            Wiring up a store, payments, invoicing, content, and a developer API yourself means
-            learning a different vendor for each one — every set of documentation, every
-            authentication method, every error model. At an average engineering rate, that is tens
-            of thousands of dollars before you ship a single feature.
-          </p>
-        </div>
-        <div class="cost-card">
-          <h3>Ongoing maintenance</h3>
-          <p>
-            APIs change. Providers deprecate endpoints, update rate limits, and modify response
-            formats. With custom integrations, every upstream change becomes your problem. With
-            1Platform, the API contract stays stable while the team handles provider changes
-            behind the scenes.
-          </p>
-        </div>
-        <div class="cost-card">
-          <h3>Opportunity cost</h3>
-          <p>
-            Every hour spent wiring together third-party services is an hour not spent on your
-            core product. 1Platform lets your team focus on what differentiates your business
-            while the platform handles the infrastructure layer.
-          </p>
-        </div>
+      <div class="section__rule">
+        <p class="eyebrow">The real cost of building it yourself</p>
       </div>
-    </div>
-  </section>
 
-  <section class="section">
-    <div class="container">
-      <h2>One API for Everything</h2>
-      <p class="section-desc">
-        Same base URL, same authentication, same response format. Access every service through a
-        single integration.
-      </p>
-      <CodeBlock
-        language="bash"
-        title="1Platform unified API"
-        code={apiExample}
-      />
-    </div>
-  </section>
-
-  <section class="section section--alt">
-    <div class="container">
-      <h2>Frequently Asked Questions</h2>
-      <div class="faq-list">
-        {faqItems.map((item) => (
-          <details class="faq-item">
-            <summary>{item.question}</summary>
-            <p>{item.answer}</p>
-          </details>
+      <div class="costs">
+        {costs.map((cost) => (
+          <Card
+            variant="bare"
+            icon={cost.icon}
+            title={cost.title}
+            description={cost.description}
+            class="reveal"
+          />
         ))}
       </div>
     </div>
   </section>
 
-  <section class="section cta-section">
-    <div class="container cta-container">
-      <h2>Ship Today, Not Next Quarter</h2>
-      <p>
-        Stop wiring up a stack of separate services. Launch your store, charge your customers,
-        issue invoices, generate content, and expose a developer API from one platform.
-      </p>
-      <div class="cta-buttons">
-        <a href="https://app.1platform.pro/app/" class="btn btn--primary">Get Started Free</a>
-        <a href="/pricing/" class="btn btn--ghost">See Pricing</a>
+  <!-- One surface: the call, and the map of everything reachable from it -->
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy">
+          <p class="eyebrow">One surface</p>
+          <h2>Same base URL, same auth, same envelope</h2>
+          <p>
+            Every capability sits behind one integration. Swapping from generating content to
+            issuing an invoice is a different path — not a different vendor, SDK, token or
+            bill.
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            Read the API docs
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title="Generate an article"
+            code={apiExample}
+          />
+        </div>
+      </div>
+
+      <div class="surface">
+        <p class="surface__note">
+          The same token pair reaches every path below, all on
+          <code>https://api.1platform.pro/api/v1</code>.
+        </p>
+
+        <div class="surface__groups">
+          {surface.map((group) => (
+            <div>
+              <h3 class="surface__group">{group.group}</h3>
+              <ul class="surface__list">
+                {group.items.map((item) => (
+                  <li class="surface__row">
+                    <code class="surface__path">{item.path}</code>
+                    <span class="surface__label">{item.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Questions -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">Questions</p>
+      </div>
+
+      <div class="qa">
+        {faqItems.map((item) => (
+          <div class="qa__item">
+            <h2 class="qa__q">{item.question}</h2>
+            <p class="qa__a">{item.answer}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sideways links; the closing CTA lives in the footer on every page -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">More comparisons</p>
+      </div>
+
+      <div class="more">
+        <Card
+          headingLevel={2}
+          title="1Platform vs. AI writing tools"
+          description="Where a writing tool stops, and what the rest of the content pipeline has to cover."
+          href="/compare/1platform-vs-ai-writing-tools/"
+        />
+        <Card
+          headingLevel={2}
+          title="1Platform vs. WordPress content plugins"
+          description="Where an automated content plugin ends and a framework-agnostic platform begins."
+          href="/compare/1platform-vs-wp-auto-pro/"
+        />
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .hero-section {
-    padding-top: calc(var(--header-height) + var(--space-16));
-    padding-bottom: var(--space-12);
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
   }
 
-  h1 {
-    font-size: var(--text-5xl);
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: var(--space-4);
-  }
-
-  .subtitle {
-    font-size: var(--text-xl);
-    color: var(--color-text-secondary);
-    max-width: 600px;
-  }
-
-  .section {
-    padding: var(--space-20) 0;
-  }
-
-  .section--alt {
-    background-color: var(--color-bg-alt);
-  }
-
-  .container {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 var(--space-6);
-  }
-
-  h2 {
-    font-size: var(--text-3xl);
-    margin-bottom: var(--space-8);
-  }
-
-  .section-desc {
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-8);
-    max-width: 600px;
-  }
-
-  /* Comparison Table */
-  .table-wrapper {
-    overflow-x: auto;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-  }
-
-  .comparison-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: var(--text-base);
-  }
-
-  .comparison-table th,
-  .comparison-table td {
-    padding: var(--space-4) var(--space-6);
-    text-align: left;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .comparison-table thead th {
-    background-color: var(--color-bg-elevated);
-    font-weight: 600;
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-secondary);
-  }
-
-  .comparison-table tbody tr:last-child td {
-    border-bottom: none;
-  }
-
-  .comparison-table tbody td:first-child {
-    font-weight: 500;
-  }
-
-  .highlight {
-    color: var(--color-green);
-    font-weight: 700;
-    font-family: var(--font-mono);
-  }
-
-  .dim {
-    color: var(--color-text-tertiary);
-    font-family: var(--font-mono);
-  }
-
-  /* Cost grid */
-  .cost-grid {
+  /* ===== Cost of building it yourself ===== */
+  .costs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--space-6);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-10) var(--space-12);
   }
 
-  .cost-card {
-    padding: var(--space-6);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-bg);
+  /* ===== Split: copy + code ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
   }
 
-  .cost-card h3 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-3);
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Long code lines would otherwise widen the whole grid past the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
     color: var(--color-accent);
   }
 
-  .cost-card p {
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-  }
-
   @media (prefers-reduced-motion: no-preference) {
-    .cost-card {
-      transition: transform var(--duration-fast) var(--ease-out-expo),
-        box-shadow var(--duration-fast) var(--ease-out-expo);
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
     }
 
-    .cost-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-card-hover);
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
     }
   }
 
-  /* FAQ */
-  .faq-list {
-    display: grid;
-    gap: var(--space-4);
-    max-width: var(--max-width-narrow);
+  /* ===== The API surface, as an index rather than as code comments ===== */
+  .surface {
+    margin-top: var(--space-16);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
   }
 
-  .faq-item {
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-  }
-
-  .faq-item summary {
-    padding: var(--space-4) var(--space-6);
-    font-weight: 600;
-    cursor: pointer;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-  }
-
-  .faq-item summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .faq-item summary::after {
-    content: '+';
-    font-size: var(--text-xl);
-    color: var(--color-text-tertiary);
-    flex-shrink: 0;
-  }
-
-  .faq-item[open] summary::after {
-    content: '\2212';
-  }
-
-  .faq-item summary:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: -2px;
-  }
-
-  .faq-item p {
-    padding: 0 var(--space-6) var(--space-6);
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .faq-item summary {
-      transition: background-color var(--duration-fast) var(--ease-out-expo);
-    }
-
-    .faq-item summary:hover {
-      background-color: var(--color-bg-elevated);
-    }
-  }
-
-  /* CTA */
-  .cta-section {
-    text-align: center;
-  }
-
-  .cta-container {
-    max-width: var(--max-width-narrow);
-  }
-
-  .cta-container h2 {
-    font-size: var(--text-4xl);
-  }
-
-  .cta-container > p {
-    color: var(--color-text-secondary);
+  .surface__note {
+    font-size: var(--text-sm);
     margin-bottom: var(--space-8);
-    font-size: var(--text-lg);
   }
 
-  .cta-buttons {
-    display: flex;
-    gap: var(--space-4);
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-3) var(--space-6);
-    border-radius: var(--border-radius);
-    font-weight: 600;
-    font-size: var(--text-base);
-    min-height: 48px;
-    min-width: 48px;
-    cursor: pointer;
-    text-decoration: none;
-    border: none;
-  }
-
-  .btn--primary {
-    background-color: var(--color-accent);
-    color: #fff;
-  }
-
-  .btn--ghost {
-    background: transparent;
-    border: 1px solid var(--color-border);
+  .surface__note code {
+    font-size: var(--text-xs);
     color: var(--color-text);
+    background: var(--color-bg-muted);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
   }
 
-  .btn:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+  .surface__groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-10);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .btn--primary:hover {
-      filter: brightness(1.1);
-      transform: scale(1.02);
+  .surface__group {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+  }
+
+  .surface__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: baseline;
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .surface__list > .surface__row:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .surface__path {
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    overflow-wrap: anywhere;
+  }
+
+  .surface__label {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== Questions ===== */
+  .qa {
+    display: grid;
+    max-width: 46rem;
+  }
+
+  .qa__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .qa__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .qa__q {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    margin-bottom: var(--space-3);
+  }
+
+  .qa__a {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ===== More comparisons ===== */
+  .more {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
     }
 
-    .btn--ghost:hover {
-      border-color: var(--color-accent);
-      box-shadow: 0 0 12px var(--color-accent-glow);
+    .costs {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
     }
 
-    .btn {
-      transition: transform var(--duration-fast) var(--ease-out-expo),
-        filter var(--duration-fast) var(--ease-out-expo),
-        border-color var(--duration-fast) var(--ease-out-expo),
-        box-shadow var(--duration-fast) var(--ease-out-expo);
+    /* Path + label side by side inside two columns is too tight below this. */
+    .surface__groups {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
     }
   }
 
-  @media (max-width: 768px) {
-    h1 {
-      font-size: var(--text-3xl);
+  @media (max-width: 640px) {
+    .more {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
     }
 
-    .comparison-table th,
-    .comparison-table td {
-      padding: var(--space-3) var(--space-4);
-      font-size: var(--text-sm);
+    .surface__row {
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
     }
   }
 </style>

@@ -2,34 +2,47 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import Hero from '@components/Hero.astro';
+import Icon from '@components/Icon.astro';
+import Check from '@components/Check.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import type { IconName } from '@components/icons';
 
 const title = 'Pricing — Transparent, Pay-as-You-Use | 1Platform';
 const description = 'Transparent pricing — pay only for what you use. No subscriptions, no hidden fees. Online store, payments, invoicing, content, and whitelabel dashboard.';
 
+/* Answers describe the billing mechanism as it actually runs: a prepaid
+   balance, a hold taken before the work and captured only on success, and
+   per-account rates. Nothing here promises a feature the platform does not
+   have — the previous copy advertised hard spending caps that auto-pause,
+   which do not exist; the prepaid balance is what actually bounds spend. */
 const faqs = [
   {
     question: 'How does pricing work?',
-    answer: 'Pricing is transparent and pay-as-you-use. You activate any combination of our solutions and pay only for the operations you consume — no subscriptions, no hidden fees. Volume rates available via custom plans.',
+    answer: 'There is no subscription. Your account holds a prepaid balance in USD, and every billable operation draws from it at a per-unit rate. You activate whichever solutions you need and pay for the operations you actually run.',
   },
   {
-    question: 'Is there a free tier?',
-    answer: 'Yes. Create a free account — no credit card required. You get a generous daily allowance to test every solution. Once you need more capacity, you can switch to pay-as-you-use or talk to sales for a custom plan.',
+    question: 'Why are per-unit rates not listed on this page?',
+    answer: 'Rates are set per account rather than published as one list, because they move with volume and with the country you operate in. The unit each operation is billed by is fixed and listed above — the rate attached to each unit comes on your rate card.',
   },
   {
-    question: 'Can I set spending limits?',
-    answer: 'Yes. You can configure spending alerts and hard caps from your dashboard. If you hit your limit, operations pause automatically — you never get a surprise bill.',
+    question: 'Is there a free plan?',
+    answer: 'Yes. Create an account with no credit card and you get a daily allowance for content generation and keyword extraction, plus full REST API access. When you need more than the daily allowance, add balance — nothing about how you build changes.',
   },
   {
-    question: 'Do you offer volume discounts?',
-    answer: 'Yes. Custom plans include volume rates that scale with your usage. Contact sales to discuss your expected operations and we will tailor a plan that fits your business.',
+    question: 'What happens if an operation fails?',
+    answer: 'Nothing is charged. The cost is held against your balance before the work starts and captured only once the operation completes. If it fails, the hold is released and your balance is untouched. Retries carry an idempotency key, so a repeated call is never charged twice.',
+  },
+  {
+    question: 'Can I end up with a bill I did not expect?',
+    answer: 'No. Because the balance is prepaid, you cannot spend past it. You get a low-balance notification as it runs down, and once it is insufficient the affected operations stop rather than accruing a debt. Every charge is itemised in your consumption log with the operation, the endpoint, the cost, and your balance before and after.',
+  },
+  {
+    question: 'Do rates improve with volume?',
+    answer: 'Yes. Per-unit rates are configured per account, so sustained volume is reflected in your rate card. Tell us the operations you expect to run and we will quote against them.',
   },
   {
     question: 'What payment methods do you accept?',
-    answer: 'We accept all major credit and debit cards. For enterprise accounts, we also support bank transfers and custom invoicing arrangements.',
-  },
-  {
-    question: 'How do I get a custom quote?',
-    answer: 'Visit the Contact Sales page to start a conversation. We will assess your needs and provide a tailored pricing proposal within 24 hours on business days.',
+    answer: 'Credit and debit cards, charged through the same hosted checkout the platform gives you for your own customers. For larger accounts we can arrange billing terms and consolidated invoicing.',
   },
 ];
 
@@ -64,104 +77,158 @@ const pageJsonLd = [
   },
 ];
 
-const checkIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-const arrowIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
-
-/* Solution → pricing model. No prices — credits-based pay-as-you-use,
-   tailored to volume per customer. */
-const solutions = [
+/* How the model works, stated as four checkable facts about the ledger.
+   Replaces the four vanity tiles (zero-subscriptions / infinite-scale /
+   turnaround / percent-transparent), which asserted nothing a reader could
+   verify and one thing that was not true — usage is bounded by the balance,
+   not uncapped. */
+const model = [
   {
-    name: 'Online Store',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
-    benefit: 'Launch a full storefront with checkout, catalog, and customer accounts — no plugins.',
-    unit: 'per store',
-    includes: ['Unlimited products', 'Hosted checkout', 'Customer accounts', 'Branded under your domain'],
-    color: '#2563eb',
+    label: 'No subscription',
+    body: 'Your account holds a balance in USD. Every billable operation draws from it. There is no monthly fee, and nothing renews on its own.',
   },
   {
-    name: 'Payments',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
-    benefit: 'Accept card payments with built-in fraud checks and real-time webhooks.',
-    unit: 'per transaction',
-    includes: ['Hosted checkout URLs', 'HMAC-signed webhooks', 'Automatic crediting', 'Refunds & cancellations'],
-    color: '#0891b2',
+    label: 'Charged on success',
+    body: 'The cost is held against your balance before the work starts, and captured only when the operation completes. A failure releases the hold and leaves the balance untouched.',
   },
   {
-    name: 'Electronic Invoicing',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
-    benefit: 'Compliant electronic invoices issued instantly. PDF + XML, multi-item lines.',
-    unit: 'per invoice',
-    includes: ['Compliant tax codes', 'PDF + XML', 'Automatic calculation', 'Credit notes & cancellations'],
-    color: '#ef4444',
+    label: 'Itemised, line by line',
+    body: 'Each operation writes a line to your consumption log: what ran, which endpoint served it, what it cost, and your balance before and after.',
   },
   {
-    name: 'Domains',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
-    benefit: 'Register, transfer, and renew domains. DNS and nameservers managed for you.',
-    unit: 'per domain',
-    includes: ['Registration', 'DNS records', 'Transfers', 'Auto-renewal'],
-    color: '#059669',
-  },
-  {
-    name: 'AI Content',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
-    benefit: 'Generate SEO-optimized articles that rank — multi-language, async pipeline.',
-    unit: 'per article',
-    includes: ['Full SEO optimization', 'Multi-language', 'Internal linking', 'Custom tone & style'],
-    color: '#7c3aed',
-  },
-  {
-    name: 'AI Images',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
-    benefit: 'Create unique visuals for your content — no stock photo licenses needed.',
-    unit: 'per image',
-    includes: ['AI originals', 'Stock library access', 'Web-optimized formats', 'Commercial license'],
-    color: '#0891b2',
-  },
-  {
-    name: 'API Access',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
-    benefit: 'Power your own product with the full REST API — included on every plan.',
-    unit: 'included',
-    includes: ['Dual-token auth', 'Async jobs', 'Predictable envelopes', 'Interactive API docs'],
-    color: '#14b8a6',
-  },
-  {
-    name: 'Whitelabel Dashboard',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>',
-    benefit: 'Brand the dashboard under your name — one API call, full control.',
-    unit: 'per seat',
-    includes: ['Branding + theme', 'i18n bundles', 'Home KPIs', 'Feature flags'],
-    color: '#f59e0b',
-  },
-  {
-    name: 'Support',
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
-    benefit: 'Embedded help center with tickets and FAQ — community to dedicated.',
-    unit: 'tiered',
-    includes: ['Community on free tier', 'Email on pay-as-you-use', 'Dedicated on custom plans', 'In-app tickets'],
-    color: '#7c3aed',
+    label: 'Bounded by design',
+    body: 'A prepaid balance cannot be overspent. You are notified as it runs low, and operations stop rather than accruing a bill you never agreed to.',
   },
 ];
 
-const highlights = [
-  { value: '$0', label: 'subscriptions', description: 'No monthly fees' },
-  { value: '∞', label: 'scale', description: 'No usage caps' },
-  { value: '24h', label: 'custom quotes', description: 'Fast turnaround' },
-  { value: '100%', label: 'transparent', description: 'Pay per use' },
+const chargeSteps = [
+  { label: 'Add balance' },
+  { label: 'Call an operation' },
+  { label: 'Cost is held' },
+  { label: 'The work runs' },
+  { label: 'Hold is captured' },
+  { label: 'Or released on failure' },
+];
+
+/* The metered operations and the unit each is billed by. The unit is the part
+   that is fixed and publishable; the rate attached to it is per-account, which
+   is why no figures appear here rather than invented ones. */
+const metered: { icon: IconName; name: string; unit: string; note: string }[] = [
+  {
+    icon: 'content',
+    name: 'AI content generation',
+    unit: 'per article',
+    note: 'One charge per generated article, in any supported language, whatever its length.',
+  },
+  {
+    icon: 'image',
+    name: 'AI image generation',
+    unit: 'per image',
+    note: 'Three rates, by output: standard, HD, and HD wide.',
+  },
+  {
+    icon: 'image',
+    name: 'Stock image lookup',
+    unit: 'per image',
+    note: 'Billed separately from generated images, at a materially lower unit rate.',
+  },
+  {
+    icon: 'keyword',
+    name: 'Keyword extraction',
+    unit: 'per search',
+    note: 'Extraction and topic expansion share the same unit rate.',
+  },
+  {
+    icon: 'indexing',
+    name: 'Indexing submission',
+    unit: 'per URL',
+    note: 'One charge per URL submitted to search engines for indexing.',
+  },
+  {
+    icon: 'message',
+    name: 'Comment generation',
+    unit: 'per comment',
+    note: 'Generated review and discussion copy for your catalog or articles.',
+  },
+  {
+    icon: 'user',
+    name: 'Profile generation',
+    unit: 'per profile',
+    note: 'Author and customer profiles, generated with matching avatars.',
+  },
+  {
+    icon: 'logs',
+    name: 'Legal page generation',
+    unit: 'per page',
+    note: 'Privacy policy, terms of service, and cookie notice, per jurisdiction.',
+  },
+  {
+    icon: 'chart',
+    name: 'Search Console reports',
+    unit: 'per report',
+    note: 'Pulled performance reports for a connected property.',
+  },
+  {
+    icon: 'agent',
+    name: 'AI agent conversations',
+    unit: 'per step',
+    note: 'Charged by step: opening the session, each response, and confirmation.',
+  },
+];
+
+/* Capabilities with no per-operation charge attached. Grouped rather than
+   listed flat, so the page reads as a document instead of another card grid. */
+const included: { group: string; items: string[] }[] = [
+  {
+    group: 'Platform',
+    items: [
+      'Full REST API access',
+      'Dual-token authentication',
+      'Async jobs and webhook delivery',
+      'Activity logs and consumption history',
+    ],
+  },
+  {
+    group: 'Storefront',
+    items: [
+      'Catalog and hosted checkout',
+      'Customer accounts',
+      'Analytics',
+      'Referrals',
+    ],
+  },
+  {
+    group: 'Your brand',
+    items: [
+      'Whitelabel branding and theme',
+      'Localization bundles',
+      'Dashboard KPIs and feature flags',
+      'Low-balance and activity notifications',
+    ],
+  },
+];
+
+/* The only things that genuinely need a conversation: their cost is set
+   outside the platform, by a registry, a card network, or a tax authority. */
+const quoted = [
+  { name: 'Domain registration, transfer and renewal', reason: 'set by the extension and the registry' },
+  { name: 'Payment processing', reason: 'set by the card networks in your country' },
+  { name: 'Electronic invoicing', reason: 'set by your tax authority’s certification regime' },
+  { name: 'Link building placements', reason: 'set by the publisher you place with' },
+  { name: 'Volume rates for metered operations', reason: 'set against the volume you expect to run' },
 ];
 ---
 
 <BaseLayout title={title} description={description} jsonLd={pageJsonLd}>
   <Hero
-    headline="Pricing That Scales With You."
-    subheadline="Transparent pricing — pay only for what you use. No subscriptions, no hidden fees. Activate any solution and pay per operation."
+    headline="Pay for the operations you run."
+    subheadline="No subscription and no seat count. Your account holds a balance, each operation draws from it at a per-unit rate, and everything else that comes with the platform is not metered at all."
     primaryCta={{ label: 'Start Free', href: 'https://app.1platform.pro/app/' }}
     secondaryCta={{ label: 'Contact Sales', href: '/contact/' }}
-    badge="Pay-as-You-Use"
+    badge="Pricing"
   />
 
-  <div class="section">
+  <div class="crumbs">
     <div class="container">
       <Breadcrumb items={[
         { label: 'Home', href: '/' },
@@ -170,45 +237,88 @@ const highlights = [
     </div>
   </div>
 
-  <section class="section" id="highlights">
+  <!-- The model, as four checkable facts rather than four large numbers -->
+  <section class="section" id="model">
     <div class="container">
-      <div class="highlights-grid">
-        {highlights.map((item) => (
-          <div class="highlight-card reveal">
-            <span class="highlight-card__value">{item.value}</span>
-            <span class="highlight-card__label">{item.label}</span>
-            <span class="highlight-card__desc">{item.description}</span>
-          </div>
-        ))}
+      <div class="statement reveal">
+        <p class="eyebrow">The model</p>
+        <h2 class="statement__lead">There is no plan to choose. There is a balance.</h2>
       </div>
+
+      <ol class="model">
+        {model.map((item, i) => (
+          <li class="model__item reveal">
+            <p class="model__label">
+              <span class="model__num">{String(i + 1).padStart(2, '0')}</span>
+              {item.label}
+            </p>
+            <p class="model__body">{item.body}</p>
+          </li>
+        ))}
+      </ol>
     </div>
   </section>
 
-  <section class="section section--alt" id="solutions">
+  <!-- The mechanism, drawn on the spine -->
+  <section class="section section--alt" id="how-a-charge-works">
     <div class="container">
-      <div class="section-header reveal">
-        <h2>Pricing by Solution</h2>
-        <p class="section-description">
-          Every solution is billed per operation. Combine any number of them — pricing is tailored to your volume.
+      <div class="section__rule">
+        <p class="eyebrow">How a charge works</p>
+      </div>
+      <h2 class="section__lead">A hold first, a charge only if the work lands.</h2>
+      <ProcessSpine steps={chargeSteps} label="How a single charge moves through your balance" />
+    </div>
+  </section>
+
+  <!-- The rate card: what is metered, and by what unit -->
+  <section class="section" id="metered">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">Metered operations</p>
+      </div>
+
+      <div class="rates__intro">
+        <h2>What draws from your balance, and by what unit</h2>
+        <p>
+          The unit is fixed — it is what one charge covers. The rate attached to
+          each unit is set per account, because it moves with volume and with
+          where you operate, so it lives on your rate card rather than on a
+          public list.
         </p>
       </div>
 
-      <div class="solutions-grid">
-        {solutions.map((sol) => (
-          <div class="solution-card card reveal">
-            <div class="solution-card__header">
-              <span class="solution-card__icon" style={`color: ${sol.color};`} aria-hidden="true" set:html={sol.icon} />
-              <h3 class="solution-card__name">{sol.name}</h3>
+      <ul class="rates">
+        {metered.map((item) => (
+          <li class="rates__row reveal">
+            <span class="rates__icon"><Icon name={item.icon} size={20} /></span>
+            <div class="rates__main">
+              <h3 class="rates__name">{item.name}</h3>
+              <p class="rates__note">{item.note}</p>
             </div>
-            <p class="solution-card__benefit">{sol.benefit}</p>
-            <div class="solution-card__pricing">
-              <span class="solution-card__unit">{sol.unit}</span>
-            </div>
-            <ul class="solution-card__includes">
-              {sol.includes.map((item) => (
-                <li>
-                  <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
-                  {item}
+            <span class="rates__unit">{item.unit}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- The other half of the answer: what is not metered at all -->
+  <section class="section section--alt" id="included">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">Not metered</p>
+      </div>
+      <h2 class="section__lead">Included with the account, at no per-operation charge.</h2>
+
+      <div class="included">
+        {included.map((column) => (
+          <div class="included__group">
+            <h3 class="included__title">{column.group}</h3>
+            <ul class="included__list">
+              {column.items.map((item) => (
+                <li class="included__item">
+                  <Check yes={true} label="Included" />
+                  <span>{item}</span>
                 </li>
               ))}
             </ul>
@@ -216,83 +326,72 @@ const highlights = [
         ))}
       </div>
 
-      <div class="solutions-more reveal">
-        <p>Plus more solutions: indexing, link building, search console, analytics, AI agents, webhooks, activity logs, notifications, and referrals.</p>
-        <a href="/solutions/" class="btn btn--ghost">
-          View All Solutions
-          <span aria-hidden="true" set:html={arrowIcon} />
+      <p class="included__all">
+        <a href="/solutions/" class="link-cue">
+          See what each solution does
+          <Icon name="arrow-right" size={15} />
         </a>
-      </div>
+      </p>
     </div>
   </section>
 
-  <section class="section" id="free-tier">
+  <!-- Two honest routes in: open an account, or ask for a rate card -->
+  <section class="section" id="start">
     <div class="container">
-      <div class="free-banner reveal">
-        <div class="free-banner__content">
-          <span class="badge">Free to Start</span>
-          <h2>Test Every Solution at Zero Cost</h2>
-          <p>Create your account and get a free daily allowance across all solutions. No credit card required — start building and only pay when you scale.</p>
-        </div>
-        <div class="free-banner__cta">
-          <a href="https://app.1platform.pro/app/" class="btn btn--primary btn--lg">Start Free</a>
-        </div>
+      <div class="section__rule">
+        <p class="eyebrow">Two ways to start</p>
       </div>
-    </div>
-  </section>
 
-  <section class="section section--alt" id="quote">
-    <div class="container">
-      <div class="quote-block reveal">
-        <div class="quote-block__content">
-          <h2>Get a Custom Quote</h2>
-          <p>Tell us about your expected usage and we'll build a pricing plan that fits your business. Volume rates, custom SLAs, and dedicated support available.</p>
-          <ul class="quote-block__benefits">
-            <li>
-              <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
-              Custom per-operation rates based on your volume
-            </li>
-            <li>
-              <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
-              Volume rates that scale with your usage
-            </li>
-            <li>
-              <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
-              Flexible billing: monthly, quarterly, or annual
-            </li>
-            <li>
-              <span class="solution-card__check" aria-hidden="true" set:html={checkIcon} />
-              Dedicated account manager for enterprise plans
-            </li>
+      <div class="panels">
+        <div class="panel card reveal">
+          <p class="panel__kicker">Open an account</p>
+          <h3 class="panel__title">Start on the free plan</h3>
+          <p class="panel__body">
+            No credit card. You get a daily allowance for content generation and
+            keyword extraction, and the full REST API from the first request.
+            When the allowance stops being enough, add balance — the code you
+            wrote against it does not change.
+          </p>
+          <a href="https://app.1platform.pro/app/" class="btn btn--primary panel__cta">Start Free</a>
+        </div>
+
+        <div class="panel card reveal">
+          <p class="panel__kicker">Get a quote</p>
+          <h3 class="panel__title">Ask for your rate card</h3>
+          <p class="panel__body">
+            Some costs are not ours to publish — they are set outside the
+            platform and passed through. Those, plus volume rates, are what a
+            quote is actually for:
+          </p>
+          <ul class="panel__list">
+            {quoted.map((item) => (
+              <li>
+                <span class="panel__list-name">{item.name}</span>
+                <span class="panel__list-reason">{item.reason}</span>
+              </li>
+            ))}
           </ul>
-        </div>
-        <div class="quote-block__cta">
-          <a href="/contact/" class="btn btn--primary btn--lg">Contact Sales</a>
-          <span class="quote-block__hint">Response within 24 hours</span>
+          <a href="/contact/" class="btn btn--ghost panel__cta">Contact Sales</a>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="faq">
+  <section class="section section--alt" id="faq">
     <div class="container">
-      <div class="section-header reveal">
-        <h2>Frequently Asked Questions</h2>
-        <p class="section-description">
-          Everything you need to know about 1Platform pricing and billing.
-        </p>
+      <div class="section__rule">
+        <p class="eyebrow">Questions</p>
       </div>
+      <h2 class="section__lead">The rest of what people ask before they start.</h2>
 
-      <div class="faq-list">
+      <div class="faq">
         {faqs.map((faq) => (
-          <details class="faq-item reveal">
-            <summary class="faq-item__question">
+          <details class="faq__item reveal">
+            <summary class="faq__q">
               <span>{faq.question}</span>
-              <svg class="faq-item__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
+              <span class="faq__chevron"><Icon name="chevron-down" size={18} /></span>
             </summary>
-            <div class="faq-item__answer">
+            <div class="faq__a">
               <p>{faq.answer}</p>
             </div>
           </details>
@@ -300,400 +399,383 @@ const highlights = [
       </div>
     </div>
   </section>
-
-  <section class="section section--alt">
-    <div class="container cta-section">
-      <h2 class="reveal">Start Building Today</h2>
-      <p class="reveal cta-description">
-        Try every solution for free, then pay only for what you use.
-      </p>
-      <div class="cta-actions reveal">
-        <a href="https://app.1platform.pro/app/" class="btn btn--primary">Start Free</a>
-        <a href="/contact/" class="btn btn--ghost">Contact Sales</a>
-      </div>
-    </div>
-  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
 </BaseLayout>
 
 <style>
-  .highlights-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-6);
-    max-width: 900px;
-    margin-inline: auto;
+  /* Breadcrumbs sit tight under the hero rather than owning a full section
+     band of their own. */
+  .crumbs {
+    padding-block: var(--space-6);
   }
 
-  .highlight-card {
-    text-align: center;
-    padding: var(--space-6) var(--space-4);
-  }
-
-  .highlight-card__value {
-    display: block;
-    font-size: var(--text-4xl);
-    font-weight: 700;
-    color: var(--color-accent);
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    margin-bottom: var(--space-1);
-  }
-
-  .highlight-card__label {
-    display: block;
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: var(--space-1);
-  }
-
-  .highlight-card__desc {
-    display: block;
-    font-size: var(--text-xs, 0.75rem);
-    color: var(--color-text-tertiary);
-  }
-
-  @media (max-width: 640px) {
-    .highlights-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  .solutions-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-5);
-    margin-bottom: var(--space-10);
-  }
-
-  @media (max-width: 1024px) {
-    .solutions-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 640px) {
-    .solutions-grid {
-      grid-template-columns: 1fr;
-      max-width: 400px;
-      margin-inline: auto;
-      margin-bottom: var(--space-10);
-    }
-  }
-
-  .solution-card {
-    display: flex;
-    flex-direction: column;
-    padding: var(--space-6);
-  }
-
-  .solution-card__header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-3);
-  }
-
-  .solution-card__icon {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .solution-card__name {
-    font-size: var(--text-base);
-    font-weight: 600;
-    color: var(--color-text);
-    margin: 0;
-  }
-
-  .solution-card__benefit {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-    margin-bottom: var(--space-5);
-    flex-grow: 1;
-  }
-
-  .solution-card__pricing {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-2);
-    margin-bottom: var(--space-5);
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .solution-card__unit {
-    font-size: var(--text-sm);
-    color: var(--color-text-tertiary);
-    font-style: italic;
-  }
-
-  .solution-card__includes {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .solution-card__includes li {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-xs, 0.75rem);
-    color: var(--color-text-tertiary);
-  }
-
-  .solution-card__check {
-    flex-shrink: 0;
-    width: 14px;
-    height: 14px;
-    color: var(--color-green);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .solutions-more {
-    text-align: center;
-  }
-
-  .solutions-more p {
-    font-size: var(--text-sm);
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--space-4);
-  }
-
-  .solutions-more .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .free-banner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-8);
-    background: var(--color-bg-alt);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    padding: var(--space-10) var(--space-10);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .free-banner::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, transparent 50%);
-    pointer-events: none;
-  }
-
-  .free-banner__content {
-    position: relative;
-    max-width: 640px;
-  }
-
-  .free-banner__content h2 {
-    margin-top: var(--space-4);
-    margin-bottom: var(--space-3);
-  }
-
-  .free-banner__content p {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-  }
-
-  .free-banner__cta {
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .btn--lg {
-    padding: var(--space-4) var(--space-8);
-    font-size: var(--text-base);
-  }
-
-  @media (max-width: 768px) {
-    .free-banner {
-      flex-direction: column;
-      text-align: center;
-      padding: var(--space-8) var(--space-6);
-    }
-  }
-
-  .quote-block {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-10);
-    max-width: 900px;
-    margin-inline: auto;
-  }
-
-  .quote-block__content {
-    flex: 1;
-  }
-
-  .quote-block__content h2 {
-    margin-bottom: var(--space-4);
-  }
-
-  .quote-block__content > p {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-    margin-bottom: var(--space-6);
-  }
-
-  .quote-block__benefits {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .quote-block__benefits li {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-  }
-
-  .quote-block__cta {
-    flex-shrink: 0;
-    text-align: center;
-  }
-
-  .quote-block__hint {
-    display: block;
-    margin-top: var(--space-2);
-    font-size: var(--text-xs, 0.75rem);
-    color: var(--color-text-tertiary);
-  }
-
-  @media (max-width: 768px) {
-    .quote-block {
-      flex-direction: column;
-      text-align: center;
-    }
-
-    .quote-block__benefits {
-      align-items: center;
-    }
-  }
-
-  .section-header {
-    text-align: center;
-    max-width: 700px;
-    margin-inline: auto;
+  /* ===== Opening statement ===== */
+  .statement {
+    max-width: 40rem;
     margin-bottom: var(--space-12);
   }
 
-  .section-header h2 {
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== The model: four statements on rules, numbered in mono ===== */
+  .model {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 var(--space-12);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 58rem;
+  }
+
+  .model__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* The last row in each column closes the block. */
+  .model__item:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .model__label {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .model__num {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+  }
+
+  .model__body {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  /* ===== Rate card ===== */
+  .rates__intro {
+    max-width: 40rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .rates__intro h2 {
     margin-bottom: var(--space-4);
   }
 
-  .section-description {
-    font-size: var(--text-lg);
+  .rates {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .rates__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: var(--space-5);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .rates__row:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .rates__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    /* Baseline alignment would hang the glyph off the cap height. */
+    align-self: start;
+    padding-top: 2px;
+  }
+
+  .rates__main {
+    min-width: 0;
+  }
+
+  .rates__name {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+
+  .rates__note {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  /* The unit is the data on this page, so it is set in the data face. */
+  .rates__unit {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  /* ===== Not metered ===== */
+  .included {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  }
+
+  .included__title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-5);
+  }
+
+  .included__list {
+    display: grid;
+    gap: var(--space-3);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .included__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
     color: var(--color-text-secondary);
   }
 
-  .faq-list {
-    max-width: 700px;
-    margin-inline: auto;
+  .included__all {
+    margin-top: var(--space-10);
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== The two routes in ===== */
+  .panels {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .panel {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    padding: var(--space-8);
   }
 
-  .faq-item {
-    background: var(--color-bg-alt);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
+  .panel__kicker {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
   }
 
-  .faq-item__question {
+  .panel__title {
+    margin-bottom: var(--space-3);
+  }
+
+  .panel__body {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-6);
+  }
+
+  .panel__list {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .panel__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .panel__list li:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .panel__list-name {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .panel__list-reason {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .panel__cta {
+    align-self: flex-start;
+    margin-top: auto;
+  }
+
+  /* ===== FAQ ===== */
+  .faq {
+    display: grid;
+    gap: 0;
+    max-width: 46rem;
+  }
+
+  .faq__item {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .faq__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .faq__q {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    padding: var(--space-5) var(--space-6);
+    min-height: 44px;
+    padding-block: var(--space-5);
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--color-text);
     font-size: var(--text-base);
     list-style: none;
   }
 
-  .faq-item__question::-webkit-details-marker {
+  .faq__q::-webkit-details-marker {
     display: none;
   }
 
-  .faq-item__question::marker {
-    display: none;
+  .faq__q::marker {
     content: '';
   }
 
-  .faq-item__chevron {
+  .faq__chevron {
+    display: inline-flex;
     flex-shrink: 0;
     color: var(--color-text-tertiary);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .faq-item__chevron {
+    .faq__chevron {
       transition: transform var(--duration-normal) var(--ease-out-expo);
     }
   }
 
-  .faq-item[open] .faq-item__chevron {
+  .faq__item[open] .faq__chevron {
     transform: rotate(180deg);
   }
 
-  .faq-item__answer {
-    padding: 0 var(--space-6) var(--space-5);
+  .faq__item[open] .faq__q {
+    color: var(--color-accent);
   }
 
-  .faq-item__answer p {
+  .faq__a {
+    padding-bottom: var(--space-5);
+    max-width: 40rem;
+  }
+
+  .faq__a p {
     font-size: var(--text-sm);
-    color: var(--color-text-secondary);
     line-height: 1.7;
+    margin: 0;
   }
 
-  .faq-item__question:focus-visible {
+  .faq__q:focus-visible {
     outline: 2px solid var(--color-accent);
-    outline-offset: -2px;
-    border-radius: var(--border-radius-lg);
+    outline-offset: 2px;
+    border-radius: var(--border-radius);
   }
 
-  .cta-section {
-    text-align: center;
-    max-width: 600px;
-    margin-inline: auto;
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .included {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .panels {
+      grid-template-columns: 1fr;
+    }
   }
 
-  .cta-section h2 {
-    margin-bottom: var(--space-4);
-  }
+  @media (max-width: 640px) {
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
 
-  .cta-description {
-    font-size: var(--text-lg);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-8);
-  }
+    .model,
+    .included {
+      grid-template-columns: 1fr;
+    }
 
-  .cta-actions {
-    display: flex;
-    gap: var(--space-4);
-    justify-content: center;
-    flex-wrap: wrap;
+    /* Single column: only the true last item closes the block. */
+    .model__item:nth-last-child(-n + 2) {
+      border-bottom: none;
+    }
+
+    .model__item:last-child {
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* The unit drops under the name rather than squeezing the note. */
+    .rates__row {
+      grid-template-columns: auto minmax(0, 1fr);
+      row-gap: var(--space-2);
+    }
+
+    .rates__unit {
+      grid-column: 2;
+      text-align: left;
+    }
+
+    .panel {
+      padding: var(--space-6);
+    }
   }
 </style>

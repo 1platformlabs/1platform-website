@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
+import Icon from '@components/Icon.astro';
 
 const entries = (await getCollection('changelog')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
@@ -14,11 +15,18 @@ const renderedEntries = await Promise.all(
   })
 );
 
-const categoryColors: Record<string, string> = {
-  'new-feature': 'var(--color-accent, #2563eb)',
-  'improvement': '#0891b2',
-  'bug-fix': '#d97706',
-  'api-change': '#7c3aed',
+/**
+ * There was a colour per category here — cyan, amber, violet, blue — which
+ * gave four unrelated hues to a system that has one accent, and did it with
+ * raw hex plus a token-with-hex-fallback that quietly bypassed the system.
+ * The category is a label, so it is now written as one. Kinds of change are
+ * distinguished by what they say, not by a colour the reader has to decode.
+ */
+const CATEGORY_LABELS: Record<string, string> = {
+  'new-feature': 'New feature',
+  improvement: 'Improvement',
+  'bug-fix': 'Bug fix',
+  'api-change': 'API change',
 };
 ---
 
@@ -26,115 +34,184 @@ const categoryColors: Record<string, string> = {
   title="Changelog | 1Platform"
   description="Every update, new feature, and improvement to 1Platform — online store, payments, invoicing, AI content, whitelabel dashboard, and developer API services."
 >
-  <section class="changelog section">
+  <section class="section">
     <div class="container">
       <Breadcrumb items={[
         { label: 'Home', href: '/' },
         { label: 'Changelog' },
       ]} />
 
-      <header class="changelog__header">
+      <header class="masthead">
+        <p class="eyebrow">Product</p>
         <h1>Changelog</h1>
-        <p>
-          Track every update to 1Platform.
-          <a href="/changelog/feed.xml" class="changelog__rss-link">RSS Feed</a>
+        <p class="masthead__lede">
+          Every release, in the order it shipped — new capabilities, changes to
+          the API, and fixes.
         </p>
+        <a href="/changelog/feed.xml" class="masthead__feed">
+          <Icon name="rss" size={15} />
+          Subscribe via RSS
+        </a>
       </header>
 
-      <div class="changelog__timeline">
+      <!-- The releases hang off a spine, in the same language as the
+           interconnect motif and the "how it works" sequence. -->
+      <ol class="timeline">
         {renderedEntries.map(({ entry, Content }) => (
-          <article class="changelog__entry reveal">
-            <div class="changelog__entry-meta">
-              <time datetime={entry.data.date.toISOString()}>
+          <li class="entry reveal">
+            <div class="entry__rail">
+              <span class="entry__node" aria-hidden="true"></span>
+              <time class="entry__date" datetime={entry.data.date.toISOString()}>
                 {entry.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
               </time>
               {entry.data.version && (
-                <span class="changelog__version-badge">v{entry.data.version}</span>
+                <span class="entry__version">v{entry.data.version}</span>
               )}
-              <span
-                class="badge"
-                style={`--badge-color: ${categoryColors[entry.data.category] || 'var(--color-accent)'}`}
-              >
-                {entry.data.category.replace(/-/g, ' ')}
+              <span class="entry__kind">
+                {CATEGORY_LABELS[entry.data.category] ?? entry.data.category.replace(/-/g, ' ')}
               </span>
             </div>
-            <h2>{entry.data.title}</h2>
-            <div class="changelog__content prose">
-              <Content />
+
+            <div class="entry__body">
+              <h2 class="entry__title">{entry.data.title}</h2>
+              <div class="entry__content prose">
+                <Content />
+              </div>
             </div>
-          </article>
+          </li>
         ))}
-      </div>
+      </ol>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .changelog__header {
-    margin-bottom: var(--space-12);
+  .masthead {
+    max-width: 40rem;
+    margin-bottom: var(--space-16);
   }
 
-  .changelog__header h1 {
-    margin-bottom: var(--space-3);
+  .masthead h1 {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-5);
   }
 
-  .changelog__header p {
-    color: var(--color-text-secondary);
+  .masthead__lede {
     font-size: var(--text-lg);
+    line-height: 1.6;
   }
 
-  .changelog__rss-link {
-    color: var(--color-accent);
-    font-size: var(--text-sm);
-    margin-left: var(--space-2);
-  }
-
-  .changelog__rss-link:hover {
-    text-decoration: underline;
-  }
-
-  .changelog__timeline {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-12);
-  }
-
-  .changelog__entry {
-    padding-bottom: var(--space-12);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .changelog__entry:last-child {
-    border-bottom: none;
-  }
-
-  .changelog__entry-meta {
-    display: flex;
-    flex-wrap: wrap;
+  .masthead__feed {
+    display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-3);
+    gap: var(--space-2);
+    min-height: 44px;
+    margin-top: var(--space-2);
     font-size: var(--text-sm);
-    color: var(--color-text-tertiary);
+    font-weight: 500;
+    color: var(--color-accent);
   }
 
-  .changelog__version-badge {
-    font-family: var(--font-mono, monospace);
+  .timeline {
+    display: grid;
+    gap: var(--space-16);
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: var(--space-10);
+  }
+
+  /* The rail carries the release metadata and draws the spine. */
+  .entry__rail {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    gap: var(--space-3);
+    padding-right: var(--space-6);
+    border-right: 1px solid var(--color-border);
+  }
+
+  /* The same cobalt rounded square the schematic and the step spine use. */
+  .entry__node {
+    position: absolute;
+    top: 7px;
+    right: -4.5px;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    background: var(--cobalt);
+  }
+
+  .entry__date,
+  .entry__version,
+  .entry__kind {
+    font-family: var(--font-mono);
     font-size: var(--text-xs);
-    padding: var(--space-1) var(--space-2);
+    letter-spacing: 0.08em;
+  }
+
+  .entry__date {
+    color: var(--color-text);
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+
+  .entry__version {
+    padding: 3px var(--space-2);
+    border: 1px solid var(--color-border-strong);
     border-radius: var(--border-radius);
-    background: var(--color-bg-alt);
-    border: 1px solid var(--color-border);
     color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
   }
 
-  .changelog__entry h2 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-4);
+  .entry__kind {
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
   }
 
-  .changelog__content {
+  .entry__body {
+    min-width: 0;
+  }
+
+  .entry__title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-5);
+  }
+
+  .entry__content {
     font-size: var(--text-sm);
+  }
+
+  /* Below the split, the spine turns into a rule under the metadata and the
+     rail lies flat — a vertical line beside a full-width column reads as an
+     accident on a narrow screen. */
+  @media (max-width: 860px) {
+    .timeline {
+      gap: var(--space-12);
+    }
+
+    .entry {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+
+    .entry__rail {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+      padding-right: 0;
+      padding-bottom: var(--space-4);
+      border-right: none;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .entry__node {
+      position: static;
+      align-self: center;
+    }
   }
 </style>

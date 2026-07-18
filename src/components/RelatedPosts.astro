@@ -21,12 +21,16 @@ const related = allPosts
 ---
 
 {related.length > 0 && (
-  <section class="related section section--alt">
+  <section class="related section section--alt" aria-labelledby="related-heading">
     <div class="container">
-      <h2>Related Articles</h2>
-      <div class="grid-3" style="margin-top: var(--space-8);">
+      <div class="section__rule">
+        <p class="eyebrow" id="related-heading">Keep reading</p>
+      </div>
+
+      <div class="related__grid">
         {related.map((post) => (
           <BlogPostCard
+            variant="card"
             title={post.data.title}
             description={post.data.description}
             pubDate={post.data.pubDate}
@@ -34,9 +38,33 @@ const related = allPosts
             slug={post.slug}
             author={post.data.author}
             readingTime={post.data.readingTime}
+            class="reveal"
           />
         ))}
       </div>
     </div>
   </section>
 )}
+
+<style>
+  /* The inline `style="margin-top"` and the shared .grid-3 went: this is the
+     one place on the blog where posts genuinely sit side by side, so it owns
+     its own column rule and can drop to two columns before it drops to one. */
+  .related__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 1024px) {
+    .related__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .related__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

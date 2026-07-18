@@ -2,10 +2,11 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import Hero from '@components/Hero.astro';
-import FeatureCard from '@components/FeatureCard.astro';
-import SolutionCard from '@components/SolutionCard.astro';
-import PipelineAnimation from '@components/PipelineAnimation.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
 
 const title = 'AI Content Generation API — Articles, Images & SEO | 1Platform';
 const description = 'Generate SEO-optimized articles, images, comments, and landing pages with AI. Extract keywords, publish to CMS, and submit for indexing — all from one platform.';
@@ -30,52 +31,72 @@ const jsonLd = [
   },
 ];
 
-const features = [
+const features: { icon: IconName; title: string; description: string }[] = [
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+    icon: 'content',
     title: 'AI articles',
     description: 'SEO-optimized articles from a single keyword. Multi-language, async job pipeline, human-quality output.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+    icon: 'image',
     title: 'AI images',
     description: 'Generate unique visuals or source from premium libraries — commercial license included.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 8h6"/><path d="M11 5v6"/></svg>',
+    icon: 'keyword',
     title: 'Keyword intelligence',
     description: 'Extract keywords with volume, intent, and difficulty from any URL or topic.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    icon: 'indexing',
     title: 'Publish & index',
     description: 'Push content to your CMS, submit URLs for indexing, and build backlinks — all from one API.',
   },
 ];
 
+/* The sequence is the information here. Steps carry labels, not decoration. */
 const contentSteps = [
-  { label: 'Extract keywords', icon: '&#128269;' },
-  { label: 'Generate content', icon: '&#9997;' },
-  { label: 'Publish to your CMS', icon: '&#128196;' },
-  { label: 'Submit for indexing', icon: '&#128640;' },
+  { label: 'Extract keywords' },
+  { label: 'Generate content' },
+  { label: 'Publish to your CMS' },
+  { label: 'Submit for indexing' },
 ];
 
+/**
+ * Compared by what a fragmented content stack costs you in effort. The prices
+ * that used to sit in this table were invented and are gone.
+ */
 const comparisonRows = [
-  { without: 'AI writing tool — around $49/mo', with_: 'AI content built in' },
-  { without: 'Stock images — around $29/mo', with_: 'AI images included' },
-  { without: 'SEO tool — around $99/mo', with_: 'Keyword intelligence included' },
-  { without: 'Indexing plugin + manual submission', with_: 'Automatic indexing' },
+  { without: 'An AI writing tool on its own subscription', with_: 'AI content built in' },
+  { without: 'A stock image library billed separately', with_: 'AI images included' },
+  { without: 'A keyword research tool with its own login', with_: 'Keyword intelligence included' },
+  { without: 'An indexing plugin plus manual URL submission', with_: 'Automatic indexing' },
 ];
 
-const related = [
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg>', title: 'Website Builder', description: 'Launch a complete website with AI content and your own domain.', href: '/solutions/website/' },
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>', title: 'Online Store', description: 'Sell products with AI-generated descriptions and landing pages.', href: '/solutions/online-store/' },
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', title: 'For Developers', description: 'Power your own product with the content API.', href: '/for-developers/' },
+const related: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'monitor',
+    title: 'Website Builder',
+    description: 'Launch a complete website with AI content and your own domain.',
+    href: '/solutions/website/',
+  },
+  {
+    icon: 'cart',
+    title: 'Online Store',
+    description: 'Sell products with AI-generated descriptions and landing pages.',
+    href: '/solutions/online-store/',
+  },
+  {
+    icon: 'code',
+    title: 'For Developers',
+    description: 'Power your own product with the content API.',
+    href: '/for-developers/',
+  },
 ];
 ---
 
 <BaseLayout title={title} description={description} ogImage="/og/solution-content.png" jsonLd={jsonLd}>
-  <section class="section section--breadcrumb">
+  <div class="page-top">
     <div class="container">
       <Breadcrumb items={[
         { label: 'Home', href: '/' },
@@ -83,85 +104,101 @@ const related = [
         { label: 'Content' },
       ]} />
     </div>
-  </section>
+  </div>
 
   <Hero
-    headline="Content That Ranks Itself"
+    headline="Content that ranks itself"
     subheadline="Generate SEO-optimized articles, images, and legal pages with AI. Extract keywords, publish to your CMS, and submit for indexing — all from one platform."
     badge="AI Content Generation"
     primaryCta={{ label: 'Start Publishing', href: 'https://app.1platform.pro/app/?intent=content' }}
     secondaryCta={{ label: 'See Pricing', href: '/pricing/' }}
   />
 
+  <!-- What it is: an editorial statement, then the four claims -->
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>What You Get</h2>
-        <p>A complete content engine — research, generation, publishing, and indexing in one API.</p>
+      <div class="statement reveal">
+        <p class="eyebrow">What you get</p>
+        <h2 class="statement__lead">
+          A complete content engine — research, generation, publishing, and indexing in one API.
+        </h2>
       </div>
-      <div class="grid-2 stagger-grid">
-        {features.map((f) => (
-          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+
+      <div class="pillars">
+        {features.map((feature) => (
+          <Card
+            variant="bare"
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            class="reveal"
+          />
         ))}
       </div>
     </div>
   </section>
 
+  <!-- The pipeline, drawn as a spine rather than four emoji -->
   <section class="section section--alt">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>How It Works</h2>
-        <p>From keyword to indexed article in four steps.</p>
+      <div class="section__rule">
+        <p class="eyebrow">How it works</p>
       </div>
-      <PipelineAnimation steps={contentSteps} />
+      <h2 class="section__lead">From keyword to indexed article, without leaving the platform.</h2>
+      <ProcessSpine steps={contentSteps} label="How content generation works, step by step" />
     </div>
   </section>
 
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>What It Replaces</h2>
-        <p>One platform, not four different subscriptions.</p>
+      <div class="section__rule">
+        <p class="eyebrow">What it replaces</p>
       </div>
+      <h2 class="section__lead">One platform instead of separate tools</h2>
       <ComparisonTable rows={comparisonRows} />
     </div>
   </section>
 
+  <!-- Related work, as an index of linked cards -->
   <section class="section section--alt">
     <div class="container">
-      <div class="pricing-callout reveal">
-        <h2>Transparent Pricing</h2>
-        <p>Pay only for what you use — no subscriptions, no hidden fees.</p>
-        <div class="pricing-callout__actions">
-          <a href="/pricing/" class="btn btn--primary">View Pricing</a>
-          <a href="https://app.1platform.pro/app/?intent=content" class="btn btn--ghost">Start Free</a>
-        </div>
+      <div class="section__rule">
+        <p class="eyebrow">Related solutions</p>
       </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <div class="section__header reveal">
-        <h2>Related Solutions</h2>
-        <p>Pair content with the rest of the platform.</p>
-      </div>
-      <div class="grid-3 stagger-grid">
-        {related.map((r) => (
-          <SolutionCard icon={r.icon} title={r.title} description={r.description} href={r.href} />
+      <h2 class="section__lead">Pair content with the rest of the platform.</h2>
+      <div class="related">
+        {related.map((item) => (
+          <Card
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            href={item.href}
+            class="reveal"
+          />
         ))}
       </div>
     </div>
   </section>
 
-  <section class="section cta-banner">
+  <!-- Page-specific next step. The general closing CTA lives in the footer. -->
+  <section class="section">
     <div class="container">
-      <div class="cta-banner__content reveal">
-        <h2>Ready to Publish?</h2>
-        <p>Stop juggling four different subscriptions. Generate, publish, and rank content from one platform.</p>
-        <div class="cta-banner__actions">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">Next step</p>
+          <h2 class="next__title">Ready to publish?</h2>
+          <p class="next__desc">
+            Pay only for what you use — no subscriptions, no hidden fees. Generate,
+            publish, and rank content from one platform.
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            Read the content API docs
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+        <div class="next__actions">
           <a href="https://app.1platform.pro/app/?intent=content" class="btn btn--primary">Start Publishing</a>
-          <a href="https://developer.1platform.pro/" class="btn btn--ghost">For Developers</a>
+          <a href="/pricing/" class="btn btn--ghost">View Pricing</a>
         </div>
       </div>
     </div>
@@ -169,32 +206,110 @@ const related = [
 </BaseLayout>
 
 <style>
-  .section { padding-block: var(--space-20); }
-  .section--breadcrumb { padding-block: var(--space-4) 0; padding-top: calc(var(--header-height) + var(--space-4)); }
-  .section--alt {
-    background-color: var(--color-bg-alt, #ffffff);
-    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  /* The hero carries its own header offset, so it is neutralised below the
+     breadcrumb strip to avoid stacking two header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-height) + var(--space-8));
   }
-  .container { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-6); }
-  .section__header { text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: var(--space-12); }
-  .section__header h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
-  .section__header p { font-size: var(--text-lg); color: var(--color-text-secondary); }
-  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
-  @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* Bare, generous, no surfaces — these are claims, not tiles. */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10) var(--space-12);
+  }
+
+  .related {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* Closing band: left-aligned, bordered, no wash. */
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding-top: var(--space-10);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .related {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
   @media (max-width: 640px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .section { padding-block: var(--space-12); }
+    .pillars,
+    .related {
+      grid-template-columns: 1fr;
+    }
+
+    .pillars {
+      gap: var(--space-8);
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
   }
-  .pricing-callout { text-align: center; max-width: 700px; margin-inline: auto; }
-  .pricing-callout h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
-  .pricing-callout p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
-  .pricing-callout__actions, .cta-banner__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
-  .cta-banner {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
-    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
-  }
-  .cta-banner__content { text-align: center; max-width: 700px; margin-inline: auto; }
-  .cta-banner__content h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
-  .cta-banner__content p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
 </style>

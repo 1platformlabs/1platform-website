@@ -2,8 +2,10 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import Hero from '@components/Hero.astro';
-import FeatureCard from '@components/FeatureCard.astro';
-import SolutionCard from '@components/SolutionCard.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import type { IconName } from '@components/icons';
 
 const title = 'Manage Client Websites & Stores from One Dashboard | 1Platform';
 const description = 'Run client stores and websites from one dashboard. Whitelabel branding, per-client billing, and a built-in content engine — for agencies and consultants.';
@@ -26,139 +28,289 @@ const jsonLd = [
   },
 ];
 
-const features = [
+const features: { icon: IconName; title: string; description: string }[] = [
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg>',
+    icon: 'monitor',
     title: 'Multi-site management',
-    description: 'Register, configure, and operate multiple client sites from one account. Switch context in a click.',
+    description: 'Register, configure and operate multiple client sites from one account. Switch context in a click.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+    icon: 'content',
     title: 'Content engine included',
-    description: 'AI articles, images, comments, and legal pages across every client site — generated and published at scale.',
+    description: 'AI articles, images, comments and legal pages across every client site — generated and published at scale.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>',
+    icon: 'dashboard',
     title: 'Whitelabel optional',
     description: 'Surface every dashboard under your agency brand — or use 1Platform directly. Your call, per client.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    icon: 'card',
     title: 'Payments & invoicing',
-    description: 'Accept payments and issue compliant invoices for every client — without juggling six different services.',
+    description: 'Accept payments and issue compliant invoices for every client — without juggling separate services.',
   },
 ];
 
-const related = [
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>', title: 'Whitelabel Dashboard', description: 'Brand every client dashboard under your agency name.', href: '/solutions/whitelabel/' },
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>', title: 'AI Content Generation', description: 'Scale content production across every client site.', href: '/solutions/content/' },
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', title: 'For Developers', description: 'Integrate 1Platform into your agency stack via REST API.', href: '/for-developers/' },
+/** The sequence an agency actually runs, per client. */
+const clientSteps = [
+  { label: 'Create your agency account' },
+  { label: 'Add a client site' },
+  { label: 'Connect the client domain' },
+  { label: 'Apply your branding' },
+  { label: 'Generate content' },
+  { label: 'Bill the client' },
+];
+
+const related: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'dashboard',
+    title: 'Whitelabel Dashboard',
+    description: 'Brand every client dashboard under your agency name.',
+    href: '/solutions/whitelabel/',
+  },
+  {
+    icon: 'content',
+    title: 'AI Content Generation',
+    description: 'Scale content production across every client site.',
+    href: '/solutions/content/',
+  },
+  {
+    icon: 'code',
+    title: 'For Developers',
+    description: 'Integrate 1Platform into your agency stack via REST API.',
+    href: '/for-developers/',
+  },
 ];
 ---
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd}>
-  <section class="section section--breadcrumb">
-    <div class="container">
-      <Breadcrumb items={[
-        { label: 'Home', href: '/' },
-        { label: 'For Agencies' },
-      ]} />
-    </div>
-  </section>
+  <div class="container crumbs">
+    <Breadcrumb items={[
+      { label: 'Home', href: '/' },
+      { label: 'For Agencies' },
+    ]} />
+  </div>
 
   <Hero
-    headline="Manage Client Sites at Scale"
-    subheadline="Run dozens of client stores and websites from one dashboard. Whitelabel optional, billing per client, content engine included — built for agencies and consultants."
+    headline="Manage client sites at scale"
+    subheadline="Run every client store and website from one dashboard. Whitelabel optional, billing per client, content engine included — built for agencies and consultants."
     badge="For Agencies"
     primaryCta={{ label: 'Contact Sales', href: '/contact/?topic=agency' }}
     secondaryCta={{ label: 'Read API Docs', href: 'https://developer.1platform.pro/' }}
   />
 
+  <!-- What you get -->
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>What You Get</h2>
-        <p>A unified control plane for every client site you operate.</p>
+      <div class="section__rule">
+        <p class="eyebrow">What you get</p>
       </div>
-      <div class="grid-2 stagger-grid">
-        {features.map((f) => (
-          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+      <h2 class="section__lead">A single control plane for every client site you operate</h2>
+
+      <div class="features">
+        {features.map((feature) => (
+          <Card
+            variant="bare"
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            class="reveal"
+          />
         ))}
       </div>
     </div>
   </section>
 
+  <!-- The per-client sequence -->
   <section class="section section--alt">
     <div class="container">
-      <div class="contact-callout reveal">
-        <h2>Talk to Our Team</h2>
-        <p>Tell us about your agency setup — expected sites, billing model, whitelabel needs — and we'll build the right onboarding plan with you.</p>
-        <div class="contact-callout__actions">
+      <div class="section__rule">
+        <p class="eyebrow">Per client</p>
+      </div>
+      <h2 class="section__lead">The same sequence, however many clients you run</h2>
+      <ProcessSpine steps={clientSteps} label="Onboarding a client, step by step" />
+    </div>
+  </section>
+
+  <!-- Talk to us -->
+  <section class="section">
+    <div class="container">
+      <div class="panel reveal">
+        <div class="panel__copy">
+          <p class="eyebrow">Onboarding</p>
+          <h2>Talk to our team</h2>
+          <p>
+            Tell us about your agency setup — how many sites you expect to run, how you bill
+            your clients, and whether you need whitelabel — and we'll build the right
+            onboarding plan with you.
+          </p>
+        </div>
+        <div class="panel__actions">
           <a href="/contact/?topic=agency" class="btn btn--primary">Contact Sales</a>
           <a href="https://developer.1platform.pro/" class="btn btn--ghost">Read API Docs</a>
         </div>
-        <span class="contact-callout__hint">Response within 24 hours</span>
       </div>
     </div>
   </section>
 
-  <section class="section">
+  <!-- Related -->
+  <section class="section section--alt">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>Related Solutions</h2>
-        <p>Build your agency stack on top of 1Platform.</p>
+      <div class="section__rule">
+        <p class="eyebrow">Related</p>
       </div>
-      <div class="grid-3 stagger-grid">
-        {related.map((r) => (
-          <SolutionCard icon={r.icon} title={r.title} description={r.description} href={r.href} />
+      <h2 class="section__lead">Build your agency stack on top of 1Platform</h2>
+
+      <ul class="related">
+        {related.map((item) => (
+          <li>
+            <a href={item.href} class="related__link">
+              <span class="related__icon"><Icon name={item.icon} size={20} /></span>
+              <span class="related__text">
+                <span class="related__title">{item.title}</span>
+                <span class="related__desc">{item.description}</span>
+              </span>
+              <Icon name="arrow-right" size={16} class="related__arrow" />
+            </a>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   </section>
-
-  <section class="section cta-banner">
-    <div class="container">
-      <div class="cta-banner__content reveal">
-        <h2>Run Every Client from One Place</h2>
-        <p>Stop juggling per-client tool stacks. One platform, every client, one bill.</p>
-        <div class="cta-banner__actions">
-          <a href="/contact/?topic=agency" class="btn btn--primary">Contact Sales</a>
-          <a href="/solutions/whitelabel/" class="btn btn--ghost">See Whitelabel</a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
 </BaseLayout>
 
 <style>
-  .section { padding-block: var(--space-20); }
-  .section--breadcrumb { padding-block: var(--space-4) 0; padding-top: calc(var(--header-height) + var(--space-4)); }
-  .section--alt {
-    background-color: var(--color-bg-alt, #ffffff);
-    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  /* Breadcrumbs clear the fixed header; the hero then drops its own top
+     offset so the two don't stack into a canyon of whitespace. */
+  .crumbs {
+    padding-top: calc(var(--header-height) + var(--space-8));
   }
-  .container { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-6); }
-  .section__header { text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: var(--space-12); }
-  .section__header h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
-  .section__header p { font-size: var(--text-lg); color: var(--color-text-secondary); }
-  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
-  @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+
+  .crumbs + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== What you get ===== */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10) var(--space-12);
+  }
+
+  /* ===== Contact panel ===== */
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: var(--space-10);
+    align-items: end;
+    padding: var(--space-10);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background: var(--color-bg-alt);
+  }
+
+  .panel__copy h2 {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-3) var(--space-4);
+  }
+
+  .panel__copy p {
+    max-width: 38rem;
+    margin: 0;
+  }
+
+  .panel__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* ===== Related ===== */
+  .related {
+    display: grid;
+    max-width: 52rem;
+  }
+
+  .related li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related li:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .related__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding-block: var(--space-5);
+    color: var(--color-text);
+  }
+
+  .related__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .related__text {
+    display: grid;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .related__title {
+    font-weight: 600;
+  }
+
+  .related__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .related__link :global(.related__arrow) {
+    color: var(--color-text-tertiary);
+  }
+
+  .related__link:hover {
+    color: var(--color-accent);
+  }
+
+  .related__link:hover :global(.related__arrow) {
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .related__link :global(.related__arrow) {
+      transition: transform var(--duration-fast) var(--ease-out-expo),
+                  color var(--duration-fast) ease;
+    }
+
+    .related__link:hover :global(.related__arrow) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .panel {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: var(--space-8);
+      padding: var(--space-8);
+    }
+  }
+
   @media (max-width: 640px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .section { padding-block: var(--space-12); }
+    .features {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
   }
-  .contact-callout { text-align: center; max-width: 700px; margin-inline: auto; }
-  .contact-callout h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
-  .contact-callout p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
-  .contact-callout__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-4); }
-  .contact-callout__hint { font-size: var(--text-xs); color: var(--color-text-tertiary); }
-  .cta-banner {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
-    border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
-  }
-  .cta-banner__content { text-align: center; max-width: 700px; margin-inline: auto; }
-  .cta-banner__content h2 { font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance; }
-  .cta-banner__content p { font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8); }
-  .cta-banner__actions { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
 </style>
