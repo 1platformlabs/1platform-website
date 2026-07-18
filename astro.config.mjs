@@ -25,9 +25,14 @@ export default defineConfig({
       // own validation error, logs a warning, and emits nothing: the build goes
       // green with no sitemap at all. A test asserts the file exists for exactly
       // this reason.
+      // Bare language tags, matching the <head> block exactly. Regional tags
+      // would say two different things in two channels: `en-US` narrows the
+      // root to American English while the head declares it x-default for all
+      // English, and `es-ES` targets Spain — the one Spanish-speaking market
+      // this product does not serve (payments and FEL invoicing are Guatemala).
       i18n: {
         defaultLocale: 'en',
-        locales: { en: 'en-US', es: 'es-ES' },
+        locales: { en: 'en', es: 'es' },
       },
     }),
   ],
