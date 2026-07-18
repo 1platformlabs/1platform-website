@@ -86,8 +86,13 @@ export default defineMessages({
     'share.copyLink': 'Copy link',
     'share.copied': 'Link copied',
     'share.copyFailed': 'Could not copy the link',
-    'code.copy': 'Copy code',
-    'code.copied': 'Copied',
+    // Three jobs, three keys. The visible label is deliberately terser than the
+    // accessible name — collapsing them onto one key renamed the button AND
+    // shortened its accessible name, which is an accessibility regression
+    // wearing a rename's clothes.
+    'code.copy': 'Copy',
+    'code.copyAria': 'Copy code to clipboard',
+    'code.copied': 'Copied!',
     'code.copyFailed': 'Failed',
 
     // — Legal document set —————————————————————————————————————
@@ -170,8 +175,9 @@ export default defineMessages({
     'share.copyLink': 'Copiar enlace',
     'share.copied': 'Enlace copiado',
     'share.copyFailed': 'No se pudo copiar el enlace',
-    'code.copy': 'Copiar código',
-    'code.copied': 'Copiado',
+    'code.copy': 'Copiar',
+    'code.copyAria': 'Copiar el código al portapapeles',
+    'code.copied': '¡Copiado!',
     'code.copyFailed': 'Error',
 
     // — Conjunto de documentos legales —————————————————————————

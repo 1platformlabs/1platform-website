@@ -9,6 +9,10 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
+    // Title case, unlike the footer's sentence-case brand line. They were two
+    // distinct strings before this epic and reusing one key for both quietly
+    // rewrote this heading.
+    'about.rail.lead': 'One Platform. Every Solution.',
     'about.title': 'About 1Platform Labs — One Platform for Online Business',
     'about.description':
       'Learn about 1Platform Labs and our mission to make online stores, websites, payments, AI content, and a developer-grade API available from a single platform.',
@@ -84,6 +88,7 @@ export default defineMessages({
     'about.team.facts.languages.value': 'Spanish · English',
   },
   es: {
+    'about.rail.lead': 'One Platform. Every Solution.',
     'about.title': 'Nosotros — 1Platform Labs, una sola plataforma para tu negocio online',
     'about.description':
       'Conoce 1Platform Labs y nuestra misión: reunir tiendas online, sitios web, pagos, contenido con IA y una API de nivel profesional en una sola plataforma.',

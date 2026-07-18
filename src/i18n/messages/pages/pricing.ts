@@ -132,7 +132,7 @@ export default defineMessages({
     'pricing.quoted.payment.name': 'Payment processing',
     'pricing.quoted.payment.reason': 'set by the card networks in your country',
     'pricing.quoted.invoicing.name': 'Electronic invoicing',
-    'pricing.quoted.invoicing.reason': "set by your tax authority's certification regime",
+    'pricing.quoted.invoicing.reason': "set by your tax authority’s certification regime",
     'pricing.quoted.linkBuilding.name': 'Link building placements',
     'pricing.quoted.linkBuilding.reason': 'set by the publisher you place with',
     'pricing.quoted.volume.name': 'Volume rates for metered operations',
