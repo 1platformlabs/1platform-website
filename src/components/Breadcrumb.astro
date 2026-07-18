@@ -29,7 +29,10 @@ const jsonLd = {
         {item.href ? (
           <a href={item.href}>{item.label}</a>
         ) : (
-          <span aria-current="page">{item.label}</span>
+          /* aria-current="page" belongs to the last crumb only. A middle crumb
+             can legitimately have no href when no index page exists for that
+             level — it is a label, not the current page. */
+          <span aria-current={i === items.length - 1 ? 'page' : undefined}>{item.label}</span>
         )}
         {i < items.length - 1 && <span class="breadcrumb__sep" aria-hidden="true">/</span>}
       </li>

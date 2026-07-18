@@ -17,17 +17,21 @@ interface Props {
 
 const { class: className } = Astro.props;
 
+/* Geometry note: node widths and centres are chosen so the gaps between boxes
+   are even (~17px in, ~16px out) across the 90..510 span of the spine. The
+   first pass packed the inputs into uneven pairs (4px / 14px / 4px) and left
+   the output boxes overlapping by a pixel. */
 const inputs = [
-  { label: 'keywords', cx: 145, trace: 'M145,92 V130 L175,160 V185' },
+  { label: 'keywords', cx: 136, trace: 'M136,92 V130 L170,160 V185' },
   { label: 'ai content', cx: 245, trace: 'M245,92 V185' },
-  { label: 'images', cx: 355, trace: 'M355,92 V185' },
-  { label: 'indexing', cx: 455, trace: 'M455,92 V130 L425,160 V185' },
+  { label: 'images', cx: 354, trace: 'M354,92 V185' },
+  { label: 'indexing', cx: 463, trace: 'M463,92 V130 L429,160 V185' },
 ];
 
 const outputs = [
-  { label: 'storefront', cx: 185, trace: 'M215,215 V240 L185,270 V308' },
+  { label: 'storefront', cx: 180, trace: 'M215,215 V240 L180,270 V308' },
   { label: 'payments', cx: 300, trace: 'M300,215 V308' },
-  { label: 'invoicing', cx: 415, trace: 'M385,215 V240 L415,270 V308' },
+  { label: 'invoicing', cx: 420, trace: 'M385,215 V240 L420,270 V308' },
 ];
 ---
 
@@ -54,7 +58,7 @@ const outputs = [
     <!-- Input nodes -->
     {inputs.map((n) => (
       <g class="motif__node">
-        <rect x={n.cx - 52} y="58" width="104" height="34" rx="5" />
+        <rect x={n.cx - 46} y="58" width="92" height="34" rx="5" />
         <text x={n.cx} y="79">{n.label}</text>
       </g>
     ))}
@@ -69,7 +73,7 @@ const outputs = [
     <!-- Output nodes -->
     {outputs.map((n) => (
       <g class="motif__node motif__node--out">
-        <rect x={n.cx - 58} y="308" width="116" height="34" rx="5" />
+        <rect x={n.cx - 52} y="308" width="104" height="34" rx="5" />
         <text x={n.cx} y="329">{n.label}</text>
       </g>
     ))}
