@@ -31,7 +31,24 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#fafafa" />
+    <meta name="theme-color" content="#F6F5F2" />
+
+    <!-- Self-hosted display + text faces; the rest load on demand with swap. -->
+    <link
+      rel="preload"
+      href="/fonts/space-grotesk-latin-700-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/inter-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/logo-oauth-120x120.png" />
     <link rel="canonical" href={canonicalURL} />
@@ -70,8 +87,7 @@ const ogImageURL = new URL(ogImage, Astro.site);
       "@type": "Organization",
       "name": "1Platform",
       "url": "https://1platform.pro",
-      "logo": "https://1platform.pro/favicon.svg",
-      "sameAs": []
+      "logo": "https://1platform.pro/favicon.svg"
     }
     </script>
   </head>

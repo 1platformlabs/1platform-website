@@ -45,62 +45,121 @@ ul, ol {
   list-style: none;
 }
 
-/* ===== CSS Variables — 1Platform Design System (LIGHT) ===== */
+/* ===== Typefaces — self-hosted (SIL OFL, see public/fonts/LICENSE-*.txt) =====
+   Display: Space Grotesk · Text: Inter · Data/labels: JetBrains Mono
+   Latin subsets only, weights deliberately limited. */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== Design tokens — "ink & signal" =====
+   One accent (cobalt). One signal (amber), reserved for the interconnect motif.
+   Everything else is ink on paper. Contrast verified against WCAG AA on --paper:
+   ink 16.6:1 · muted 5.85:1 · subtle 4.74:1 · cobalt 5.92:1. */
 :root {
-  /* Surfaces */
-  --color-bg:          #fafafa;
-  --color-bg-alt:      #ffffff;
-  --color-bg-elevated: #ffffff;
-  --color-surface:     #ffffff;
-  --color-bg-muted:    #f4f4f5;
+  /* Primitives */
+  --ink:         #14161B;
+  --paper:       #F6F5F2;
+  --surface:     #FFFFFF;
+  --recessed:    #EFEEEA;
+  --cobalt:      #1F4FE0;
+  --cobalt-deep: #1A44C4;
+  --cobalt-wash: #ECF0FD;
+  /* Reserved for the interconnect motif. Never text — 1.87:1 on paper. */
+  --signal:      #F5A524;
+  --muted:       #5B5F6B;
+  --subtle:      #696D79;
+  --hairline:        rgba(20, 22, 27, 0.10);
+  --hairline-strong: rgba(20, 22, 27, 0.16);
 
-  /* Borders — neutral hairlines */
-  --color-border:        rgba(0, 0, 0, 0.08);
-  --color-border-hover:  rgba(0, 0, 0, 0.16);
-  --color-border-strong: rgba(0, 0, 0, 0.12);
+  /* Semantic surfaces */
+  --color-bg:          var(--paper);
+  --color-bg-alt:      var(--surface);
+  --color-bg-elevated: var(--surface);
+  --color-surface:     var(--surface);
+  --color-bg-muted:    var(--recessed);
 
-  /* Foreground */
-  --color-text:           #0a0a0a;
-  --color-text-secondary: #52525b;
-  --color-text-tertiary:  #a1a1a1;
-  --color-text-inverse:   #ffffff;
+  /* Semantic borders */
+  --color-border:        var(--hairline);
+  --color-border-hover:  var(--hairline-strong);
+  --color-border-strong: var(--hairline-strong);
 
-  /* Brand / Accent */
-  --color-accent:       #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-accent-glow:  rgba(37, 99, 235, 0.08);
-  --color-accent-ring:  rgba(37, 99, 235, 0.24);
-  --color-accent-soft:  #eff6ff;
+  /* Semantic foreground */
+  --color-text:           var(--ink);
+  --color-text-secondary: var(--muted);
+  --color-text-tertiary:  var(--subtle);
+  --color-text-inverse:   var(--surface);
 
-  /* Supporting hues */
-  --color-purple: #7c3aed;
-  --color-cyan:   #0891b2;
-  --color-green:  #059669;
-  --color-red:    #dc2626;
-  --color-amber:  #d97706;
+  /* Accent */
+  --color-accent:       var(--cobalt);
+  --color-accent-hover: var(--cobalt-deep);
+  --color-accent-soft:  var(--cobalt-wash);
+  --color-accent-glow:  rgba(31, 79, 224, 0.07);
+  --color-accent-ring:  rgba(31, 79, 224, 0.28);
 
-  /* Semantic */
-  --color-success:    var(--color-green);
-  --color-success-bg: #ecfdf5;
-  --color-danger:     var(--color-red);
-  --color-danger-bg:  #fef2f2;
-  --color-warning:    var(--color-amber);
-  --color-warning-bg: #fffbeb;
+  /* Functional status only — never decoration */
+  --color-success:    #0F7B4F;
+  --color-success-bg: #E9F6EF;
+  --color-danger:     #B4291F;
+  --color-danger-bg:  #FBEDEC;
+  --color-warning:    #8A5A08;
+  --color-warning-bg: #FBF3E4;
 
-  /* Gradients — quieter on light */
-  --gradient-text: linear-gradient(135deg, var(--color-accent), var(--color-purple));
-  --gradient-cta:  linear-gradient(180deg, #ffffff, #f4f4f5);
-
-  /* Shadows — subtle, neutral */
-  --shadow-sm:          0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md:          0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-lg:          0 12px 32px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
-  --shadow-card-hover:  0 8px 24px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-glow-ring:   0 0 0 3px var(--color-accent-ring);
+  /* Shadows — restrained, neutral */
+  --shadow-sm:         0 1px 2px rgba(20, 22, 27, 0.04);
+  --shadow-md:         0 4px 12px rgba(20, 22, 27, 0.05), 0 1px 2px rgba(20, 22, 27, 0.04);
+  --shadow-lg:         0 12px 32px rgba(20, 22, 27, 0.07), 0 2px 6px rgba(20, 22, 27, 0.04);
+  --shadow-card-hover: 0 6px 20px rgba(20, 22, 27, 0.06);
+  --shadow-glow-ring:  0 0 0 3px var(--color-accent-ring);
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  --font-display: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans:    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', Consolas, monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -131,16 +190,16 @@ ul, ol {
   --max-width: 1200px;
   --max-width-narrow: 800px;
   --header-height: 64px;
-  --border-radius: 8px;
-  --border-radius-lg: 12px;
-  --border-radius-xl: 16px;
+  --border-radius: 6px;
+  --border-radius-lg: 10px;
+  --border-radius-xl: 14px;
   --border-radius-pill: 9999px;
 
   /* Animation */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-fast: 150ms;
   --duration-normal: 250ms;
-  --duration-slow: 600ms;
+  --duration-slow: 500ms;
 }
 
 /* ===== Base Styles ===== */
@@ -157,30 +216,49 @@ body {
 
 ::selection {
   background: var(--color-accent-ring);
-  color: var(--color-text);
+  color: var(--ink);
 }
 
-/* ===== Typography ===== */
+/* ===== Typography =====
+   The display face carries the headings; the text face carries the reading. */
 h1, h2, h3, h4, h5, h6 {
-  line-height: 1.15;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.022em;
   text-wrap: balance;
   color: var(--color-text);
 }
 
-h1 { font-size: var(--text-5xl); font-weight: 700; letter-spacing: -0.03em; }
-h2 { font-size: var(--text-3xl); }
-h3 { font-size: var(--text-xl); letter-spacing: -0.01em; }
-h4 { font-size: var(--text-lg); letter-spacing: -0.01em; }
+h1 { font-size: var(--text-5xl); letter-spacing: -0.032em; }
+h2 { font-size: var(--text-3xl); letter-spacing: -0.026em; }
+h3 { font-size: var(--text-xl); font-weight: 500; letter-spacing: -0.014em; }
+h4 { font-size: var(--text-lg); font-weight: 500; letter-spacing: -0.012em; }
 
 p {
   text-wrap: pretty;
   color: var(--color-text-secondary);
 }
 
-code, pre {
+code, pre, kbd, samp {
   font-family: var(--font-mono);
+}
+
+/* ===== Eyebrow — the structural label device =====
+   Mono, tracked out, naming a section. Belongs to the product's
+   developer-grade world rather than decorating the page. */
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.eyebrow--accent {
+  color: var(--color-accent);
 }
 
 /* ===== Layout Utilities ===== */
@@ -205,10 +283,20 @@ code, pre {
   border-bottom: 1px solid var(--color-border);
 }
 
-/* ===== Dot Grid Background ===== */
-.dot-grid {
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
+/* Rule-led section opener: a mono label against a hairline, instead of
+   another centered header block. */
+.section__rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.section__rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
 }
 
 /* ===== Skip Link ===== */
@@ -253,11 +341,12 @@ code, pre {
   border-width: 0;
 }
 
-/* ===== Reveal Animation ===== */
+/* ===== Reveal =====
+   One sober fade-up. No per-index cascades, no staged choreography. */
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(12px);
     transition: opacity var(--duration-slow) var(--ease-out-expo),
                 transform var(--duration-slow) var(--ease-out-expo);
   }
