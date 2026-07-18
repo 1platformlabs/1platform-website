@@ -31,6 +31,6 @@ export default defineMessages({
     'interconnect.output.storefront': 'tienda',
     'interconnect.output.payments': 'pagos',
     'interconnect.output.invoicing': 'facturación',
-    'interconnect.aria': 'Esquema de la plataforma: palabras clave, contenido con IA, imágenes e indexación se resuelven a través de una única API de 1Platform, que entrega una tienda online, pagos y facturación.',
+    'interconnect.aria': 'Esquema de la plataforma: palabras clave, contenido con IA, imágenes e indexación se resuelven a través de una única API de 1Platform, que entrega una tienda, pagos y facturación.',
   },
 });

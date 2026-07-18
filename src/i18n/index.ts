@@ -62,6 +62,34 @@ const DICTIONARIES: Record<Locale, Record<string, string>> = {
   es: buildDictionary('es'),
 };
 
+/**
+ * Parity, enforced at build rather than only in the type system.
+ *
+ * `defineMessages` already types Spanish against English, so a gap is a
+ * compile error — but `astro build` does not typecheck, so on its own that
+ * guarantee only holds for whoever remembers to run `npm run typecheck`. A
+ * guarantee that depends on remembering is not one. This runs on every build,
+ * for everyone, and costs a set comparison.
+ */
+function assertParity(): void {
+  const en = Object.keys(DICTIONARIES.en);
+  const es = Object.keys(DICTIONARIES.es);
+
+  const missing = en.filter((key) => !(key in DICTIONARIES.es));
+  const extra = es.filter((key) => !(key in DICTIONARIES.en));
+
+  if (missing.length || extra.length) {
+    const lines = [
+      '[i18n] The catalogues are out of sync.',
+      ...missing.map((k) => `  missing from Spanish: ${k}`),
+      ...extra.map((k) => `  only in Spanish: ${k}`),
+    ];
+    throw new Error(lines.join('\n'));
+  }
+}
+
+assertParity();
+
 /** Every key defined across all modules, for the parity test. */
 export function dictionaryFor(locale: Locale): Record<string, string> {
   return DICTIONARIES[locale];

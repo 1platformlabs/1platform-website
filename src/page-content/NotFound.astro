@@ -17,7 +17,17 @@ const destinations: { icon: IconName; label: string; detail: string; href: strin
 ];
 ---
 
-<BaseLayout title={title} description={description} alternates={{ en: l('/404/') }}>
+<!--
+  No language alternates, deliberately.
+
+  The origin never serves this file as its error document — ErrorDocument lives
+  in an .htaccess the deploy excludes on purpose — so there is no Spanish twin
+  to declare, and the English "alternate" would have pointed at /404/, which
+  does not resolve either (the file is served at /404.html, if at all). A page
+  nobody can navigate to should not be making claims to a crawler about what
+  exists in which language.
+-->
+<BaseLayout title={title} description={description} alternates={{}}>
   <section class="error">
     <div class="container error__inner">
       <div class="error__copy">
