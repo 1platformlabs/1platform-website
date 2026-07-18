@@ -98,8 +98,9 @@ ul, ol {
 
 /* ===== Design tokens — "ink & signal" =====
    One accent (cobalt). One signal (amber), reserved for the interconnect motif.
-   Everything else is ink on paper. Contrast verified against WCAG AA on --paper:
-   ink 16.6:1 · muted 5.85:1 · subtle 4.74:1 · cobalt 5.92:1. */
+   Everything else is ink on paper. Text tokens are verified against WCAG AA on
+   their WORST surface (--paper / --surface / --recessed):
+   ink 15.59:1 · muted 5.49:1 · subtle 4.73:1 · cobalt 5.56:1. */
 :root {
   /* Primitives */
   --ink:         #14161B;
@@ -112,7 +113,10 @@ ul, ol {
   /* Reserved for the interconnect motif. Never text — 1.87:1 on paper. */
   --signal:      #F5A524;
   --muted:       #5B5F6B;
-  --subtle:      #696D79;
+  /* Checked against every surface it can land on, not just --paper: the
+     earlier #696D79 cleared paper (4.74) and surface (5.17) but fell to 4.45
+     on --recessed, which is where code-block headers sit. */
+  --subtle:      #656974;
   --hairline:        rgba(20, 22, 27, 0.10);
   --hairline-strong: rgba(20, 22, 27, 0.16);
 
@@ -342,8 +346,14 @@ code, pre, kbd, samp {
 }
 
 /* ===== Reveal =====
-   One sober fade-up. No per-index cascades, no staged choreography. */
-@media (prefers-reduced-motion: no-preference) {
+   One sober fade-up. No per-index cascades, no staged choreography.
+
+   Gated on `scripting: enabled` as well as motion preference: the class starts
+   at opacity 0 and only JS adds .is-visible, so without this gate a browser
+   with JS off (or a script that failed to load) renders every section below the
+   hero blank. Browsers that don't support the query simply show the content
+   unanimated, which is the right way to fail. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
   .reveal {
     opacity: 0;
     transform: translateY(12px);
