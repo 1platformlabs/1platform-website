@@ -37,8 +37,14 @@ export default defineConfig({
     }),
   ],
 
+  // `/why-1platform/` is a legacy English URL that really was published. There
+  // is no Spanish equivalent to retire, and adding one out of symmetry was a
+  // mistake: Astro's redirect stub has no <html> element at all — so no `lang`
+  // — and its visible fallback text is hardcoded English, which put English
+  // chrome on a nominally Spanish URL for anyone with meta-refresh disabled or
+  // a slow connection. Redirecting a URL that never existed bought nothing and
+  // cost the only Spanish-caused accessibility defect in the build.
   redirects: {
     '/why-1platform/': '/for-developers/',
-    '/es/why-1platform/': '/es/for-developers/',
   },
 });
