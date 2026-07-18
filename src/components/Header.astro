@@ -306,8 +306,13 @@ const currentPath = Astro.url.pathname;
     gap: var(--space-8);
   }
 
+  /* `align-items` matters here: the Solutions item is taller than the rest
+     (it carries the chevron button), so with the default `stretch` every other
+     item stretched to match while its inline <a> stayed pinned to the top of
+     that taller row — the links sat ~4px above the logo and the CTA. */
   .site-header__nav ul {
     display: flex;
+    align-items: center;
     gap: var(--space-6);
   }
 
