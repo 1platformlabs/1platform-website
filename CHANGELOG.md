@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **The site is bilingual.** Every page now exists in Spanish under `/es/`, at the same slug — 36 English pages and 36 Spanish ones, including the blog (8 posts), the changelog (7 entries) and the three legal policies. **No English URL moved**, which was the hardest constraint: the existing URLs are indexed and the site has no mechanism to redirect them.
+- **Language selection on first visit.** An inline script in the `<head>` sends Spanish and non-English browsers to `/es/`; English browsers stay. `/es/` is *never* redirected — a shared link outranks a browser setting, and Googlebot renders JavaScript as `en-US`, so redirecting the Spanish tree would risk deindexing it. The `1p_lang` cookie always wins over the guess.
+- **A language control** in the header and mobile menu. Two real links rather than a JS disclosure, so it still works with JavaScript disabled; its destinations come from the page's own `hreflang`, so it cannot offer a translation that does not exist.
+- **Bilingual SEO**: reciprocal `hreflang` with `x-default`, per-locale `canonical`, `og:locale`, `<html lang>`, localised JSON-LD (`url`, `@id`, `item`, FAQ text), a sitemap carrying alternates, and a separate RSS feed per language for both the blog and the changelog.
+- **An i18n layer** (`src/i18n/`): one source of layout in `src/page-content/`, copy in per-page message modules, and three-line route shells per language. A missing Spanish key fails the build rather than falling back to English — enforced by the type of `defineMessages` *and* by an assertion that runs on every build, because `astro build` does not typecheck.
+- **`scripts/check-tells-self-test.sh`** — 24 cases that seed each design-system tell and assert the guard reports *that category*. Writing it found three holes in the guard itself (see Fixed).
+- **A Playwright suite** (`npm test`) — 36 tests run against the real `dist/`, the same bytes the deploy ships.
+
+### Changed
+- `readingTime` in the blog frontmatter is a number, not the rendered phrase `"8 min read"`; the unit is composed once per language.
+- Content collections carry their locale in the directory (`src/content/blog/{en,es}/`), paired by a required `translationKey`.
+- `CATEGORY_LABELS` existed in five copies; it is now one definition per language in the catalogue.
+
+### Fixed
+- **The active-nav underline was dead on every Spanish page.** `Header.astro` and `LegalLayout.astro` compared the current path against English root hrefs, so nothing was ever marked active under `/es/`.
+- **Three holes in `check-tells.sh` that predate this change.** `perl -ne` without `-CSD` read bytes, so the emoji ranges never matched and the scan was blind to every real emoji; the HTML-entity bounds could not match the six-digit and five-hex forms its own comment cites; and the provider-name exemption matched a path that no longer held the privacy policy's prose.
+- All five `getCollection` calls read unfiltered, which would have mixed languages on the blog index, the category pages, related posts and both RSS feeds.
+- Dates were formatted with a hardcoded `'en-US'` in four places, and without a pinned timezone — so a build machine west of Greenwich rendered every post a day early.
+
+### Added
 - **Design system rebuilt around "ink & signal"** (`src/styles/global.css`). Near-monochrome ink on warm paper with one accent (`--cobalt`) and one signal (`--signal`, amber) reserved exclusively for the interconnect motif. Text tokens are verified against WCAG AA on the worst surface they can land on, not just on `--paper`.
 - **Typography is now actually embedded.** Space Grotesk (display), Inter (text) and JetBrains Mono (labels/data) are self-hosted as latin-subset WOFF2 under `public/fonts/` with `@font-face` + `swap`, display 700 and text 400 preloaded. The faces had been *declared* since the beginning but never shipped, so every page had been rendering in `system-ui`.
 - **`InterconnectDiagram.astro`** — the signature motif. The platform drawn as a schematic: real capabilities enter from the top, resolve through one API spine, and leave as storefront / payments / invoicing, with an amber signal travelling the traces. Inline SVG, no JS, static under `prefers-reduced-motion`. Used on the home hero only.
