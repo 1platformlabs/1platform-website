@@ -1,0 +1,792 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Icon from '@components/Icon.astro';
+import Check from '@components/Check.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('pricing.title');
+const description = t('pricing.description');
+
+/* Answers describe the billing mechanism as it actually runs: a prepaid
+   balance, a hold taken before the work and captured only on success, and
+   per-account rates. Nothing here promises a feature the platform does not
+   have — the previous copy advertised hard spending caps that auto-pause,
+   which do not exist; the prepaid balance is what actually bounds spend. */
+const faqs = [
+  {
+    question: t('pricing.faq.howPricingWorks.question'),
+    answer: t('pricing.faq.howPricingWorks.answer'),
+  },
+  {
+    question: t('pricing.faq.whyRatesHidden.question'),
+    answer: t('pricing.faq.whyRatesHidden.answer'),
+  },
+  {
+    question: t('pricing.faq.freePlan.question'),
+    answer: t('pricing.faq.freePlan.answer'),
+  },
+  {
+    question: t('pricing.faq.operationFails.question'),
+    answer: t('pricing.faq.operationFails.answer'),
+  },
+  {
+    question: t('pricing.faq.unexpectedBill.question'),
+    answer: t('pricing.faq.unexpectedBill.answer'),
+  },
+  {
+    question: t('pricing.faq.volumeDiscount.question'),
+    answer: t('pricing.faq.volumeDiscount.answer'),
+  },
+  {
+    question: t('pricing.faq.paymentMethods.question'),
+    answer: t('pricing.faq.paymentMethods.answer'),
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.answer,
+    },
+  })),
+};
+
+const pageUrl = new URL(l('/pricing/'), 'https://1platform.pro').toString();
+const homeUrl = new URL(l('/'), 'https://1platform.pro').toString();
+
+const pageJsonLd = [
+  faqJsonLd,
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: t('nav.pricing'),
+    description,
+    url: pageUrl,
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: homeUrl },
+        { '@type': 'ListItem', position: 2, name: t('nav.pricing') },
+      ],
+    },
+  },
+];
+
+/* How the model works, stated as four checkable facts about the ledger.
+   Replaces the four vanity tiles (zero-subscriptions / infinite-scale /
+   turnaround / percent-transparent), which asserted nothing a reader could
+   verify and one thing that was not true — usage is bounded by the balance,
+   not uncapped. */
+const model = [
+  {
+    label: t('pricing.model.noSub.label'),
+    body: t('pricing.model.noSub.body'),
+  },
+  {
+    label: t('pricing.model.chargedOnSuccess.label'),
+    body: t('pricing.model.chargedOnSuccess.body'),
+  },
+  {
+    label: t('pricing.model.itemised.label'),
+    body: t('pricing.model.itemised.body'),
+  },
+  {
+    label: t('pricing.model.bounded.label'),
+    body: t('pricing.model.bounded.body'),
+  },
+];
+
+const chargeSteps = [
+  { label: t('pricing.charge.step1') },
+  { label: t('pricing.charge.step2') },
+  { label: t('pricing.charge.step3') },
+  { label: t('pricing.charge.step4') },
+  { label: t('pricing.charge.step5') },
+  { label: t('pricing.charge.step6') },
+];
+
+/* The metered operations and the unit each is billed by. The unit is the part
+   that is fixed and publishable; the rate attached to it is per-account, which
+   is why no figures appear here rather than invented ones. */
+const metered: { icon: IconName; name: string; unit: string; note: string }[] = [
+  {
+    icon: 'content',
+    name: t('pricing.metered.content.name'),
+    unit: t('pricing.metered.content.unit'),
+    note: t('pricing.metered.content.note'),
+  },
+  {
+    icon: 'image',
+    name: t('pricing.metered.image.name'),
+    unit: t('pricing.metered.image.unit'),
+    note: t('pricing.metered.image.note'),
+  },
+  {
+    icon: 'image',
+    name: t('pricing.metered.stockImage.name'),
+    unit: t('pricing.metered.stockImage.unit'),
+    note: t('pricing.metered.stockImage.note'),
+  },
+  {
+    icon: 'keyword',
+    name: t('pricing.metered.keyword.name'),
+    unit: t('pricing.metered.keyword.unit'),
+    note: t('pricing.metered.keyword.note'),
+  },
+  {
+    icon: 'indexing',
+    name: t('pricing.metered.indexing.name'),
+    unit: t('pricing.metered.indexing.unit'),
+    note: t('pricing.metered.indexing.note'),
+  },
+  {
+    icon: 'message',
+    name: t('pricing.metered.comment.name'),
+    unit: t('pricing.metered.comment.unit'),
+    note: t('pricing.metered.comment.note'),
+  },
+  {
+    icon: 'user',
+    name: t('pricing.metered.profile.name'),
+    unit: t('pricing.metered.profile.unit'),
+    note: t('pricing.metered.profile.note'),
+  },
+  {
+    icon: 'logs',
+    name: t('pricing.metered.legalPage.name'),
+    unit: t('pricing.metered.legalPage.unit'),
+    note: t('pricing.metered.legalPage.note'),
+  },
+  {
+    icon: 'chart',
+    name: t('pricing.metered.searchConsole.name'),
+    unit: t('pricing.metered.searchConsole.unit'),
+    note: t('pricing.metered.searchConsole.note'),
+  },
+  {
+    icon: 'agent',
+    name: t('pricing.metered.agent.name'),
+    unit: t('pricing.metered.agent.unit'),
+    note: t('pricing.metered.agent.note'),
+  },
+];
+
+/* Capabilities with no per-operation charge attached. Grouped rather than
+   listed flat, so the page reads as a document instead of another card grid. */
+const included: { group: string; items: string[] }[] = [
+  {
+    group: t('pricing.included.platform.title'),
+    items: [
+      t('pricing.included.platform.item1'),
+      t('pricing.included.platform.item2'),
+      t('pricing.included.platform.item3'),
+      t('pricing.included.platform.item4'),
+    ],
+  },
+  {
+    group: t('pricing.included.storefront.title'),
+    items: [
+      t('pricing.included.storefront.item1'),
+      t('pricing.included.storefront.item2'),
+      t('pricing.included.storefront.item3'),
+      t('pricing.included.storefront.item4'),
+    ],
+  },
+  {
+    group: t('pricing.included.brand.title'),
+    items: [
+      t('pricing.included.brand.item1'),
+      t('pricing.included.brand.item2'),
+      t('pricing.included.brand.item3'),
+      t('pricing.included.brand.item4'),
+    ],
+  },
+  {
+    // Support carries no per-operation charge. Stated qualitatively on purpose:
+    // the previous page named specific tiers ("Community on free tier",
+    // "Dedicated on custom plans") that nothing in the product backs.
+    group: t('pricing.included.support.title'),
+    items: [
+      t('pricing.included.support.item1'),
+      t('pricing.included.support.item2'),
+      t('pricing.included.support.item3'),
+      t('pricing.included.support.item4'),
+    ],
+  },
+];
+
+/* The only things that genuinely need a conversation: their cost is set
+   outside the platform, by a registry, a card network, or a tax authority. */
+const quoted = [
+  { name: t('pricing.quoted.domain.name'), reason: t('pricing.quoted.domain.reason') },
+  { name: t('pricing.quoted.payment.name'), reason: t('pricing.quoted.payment.reason') },
+  { name: t('pricing.quoted.invoicing.name'), reason: t('pricing.quoted.invoicing.reason') },
+  { name: t('pricing.quoted.linkBuilding.name'), reason: t('pricing.quoted.linkBuilding.reason') },
+  { name: t('pricing.quoted.volume.name'), reason: t('pricing.quoted.volume.reason') },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={pageJsonLd}>
+  <Hero
+    headline={t('pricing.hero.headline')}
+    subheadline={t('pricing.hero.subheadline')}
+    primaryCta={{ label: t('pricing.cta.startFree'), href: 'https://app.1platform.pro/app/' }}
+    secondaryCta={{ label: t('pricing.cta.contactSales'), href: l('/contact/') }}
+    badge={t('nav.pricing')}
+  />
+
+  <div class="crumbs">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('nav.pricing') },
+      ]} />
+    </div>
+  </div>
+
+  <!-- The model, as four checkable facts rather than four large numbers -->
+  <section class="section" id="model">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('pricing.model.eyebrow')}</p>
+        <h2 class="statement__lead">{t('pricing.model.statement')}</h2>
+      </div>
+
+      <ol class="model">
+        {model.map((item, i) => (
+          <li class="model__item reveal">
+            <p class="model__label">
+              <span class="model__num">{String(i + 1).padStart(2, '0')}</span>
+              {item.label}
+            </p>
+            <p class="model__body">{item.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- The mechanism, drawn on the spine -->
+  <section class="section section--alt" id="how-a-charge-works">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('pricing.charge.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('pricing.charge.lead')}</h2>
+      <ProcessSpine steps={chargeSteps} label={t('pricing.charge.spineLabel')} />
+    </div>
+  </section>
+
+  <!-- The rate card: what is metered, and by what unit -->
+  <section class="section" id="metered">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('pricing.metered.eyebrow')}</p>
+      </div>
+
+      <div class="rates__intro">
+        <h2>{t('pricing.metered.introTitle')}</h2>
+        <p>
+          {t('pricing.metered.introBody')}
+        </p>
+      </div>
+
+      <ul class="rates">
+        {metered.map((item) => (
+          <li class="rates__row reveal">
+            <span class="rates__icon"><Icon name={item.icon} size={20} /></span>
+            <div class="rates__main">
+              <h3 class="rates__name">{item.name}</h3>
+              <p class="rates__note">{item.note}</p>
+            </div>
+            <span class="rates__unit">{item.unit}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- The other half of the answer: what is not metered at all -->
+  <section class="section section--alt" id="included">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('pricing.included.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('pricing.included.lead')}</h2>
+
+      <div class="included">
+        {included.map((column) => (
+          <div class="included__group">
+            <h3 class="included__title">{column.group}</h3>
+            <ul class="included__list">
+              {column.items.map((item) => (
+                <li class="included__item">
+                  <Check yes={true} label={t('pricing.included.checkLabel')} />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <p class="included__all">
+        <a href={l('/solutions/')} class="link-cue">
+          {t('pricing.included.allLink')}
+          <Icon name="arrow-right" size={15} />
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Two honest routes in: open an account, or ask for a rate card -->
+  <section class="section" id="start">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('pricing.start.eyebrow')}</p>
+      </div>
+
+      <div class="panels">
+        <div class="panel card reveal">
+          <p class="panel__kicker">{t('pricing.start.panel1.kicker')}</p>
+          <h3 class="panel__title">{t('pricing.start.panel1.title')}</h3>
+          <p class="panel__body">
+            {t('pricing.start.panel1.body')}
+          </p>
+          <a href="https://app.1platform.pro/app/" class="btn btn--primary panel__cta">{t('pricing.cta.startFree')}</a>
+        </div>
+
+        <div class="panel card reveal">
+          <p class="panel__kicker">{t('pricing.start.panel2.kicker')}</p>
+          <h3 class="panel__title">{t('pricing.start.panel2.title')}</h3>
+          <p class="panel__body">
+            {t('pricing.start.panel2.body')}
+          </p>
+          <ul class="panel__list">
+            {quoted.map((item) => (
+              <li>
+                <span class="panel__list-name">{item.name}</span>
+                <span class="panel__list-reason">{item.reason}</span>
+              </li>
+            ))}
+          </ul>
+          <a href={l('/contact/')} class="btn btn--ghost panel__cta">{t('pricing.cta.contactSales')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="faq">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('pricing.faq.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('pricing.faq.lead')}</h2>
+
+      <div class="faq">
+        {faqs.map((faq) => (
+          <details class="faq__item reveal">
+            <summary class="faq__q">
+              <span>{faq.question}</span>
+              <span class="faq__chevron"><Icon name="chevron-down" size={18} /></span>
+            </summary>
+            <div class="faq__a">
+              <p>{faq.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+</BaseLayout>
+
+<style>
+  /* Breadcrumbs sit tight under the hero rather than owning a full section
+     band of their own. */
+  .crumbs {
+    padding-block: var(--space-6);
+  }
+
+  /* ===== Opening statement ===== */
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== The model: four statements on rules, numbered in mono ===== */
+  .model {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 var(--space-12);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 58rem;
+  }
+
+  .model__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* The last row in each column closes the block. */
+  .model__item:nth-last-child(-n + 2) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .model__label {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .model__num {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+  }
+
+  .model__body {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  /* ===== Rate card ===== */
+  .rates__intro {
+    max-width: 40rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .rates__intro h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  .rates {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .rates__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: var(--space-5);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .rates__row:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .rates__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    /* Baseline alignment would hang the glyph off the cap height. */
+    align-self: start;
+    padding-top: 2px;
+  }
+
+  .rates__main {
+    min-width: 0;
+  }
+
+  .rates__name {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+
+  .rates__note {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  /* The unit is the data on this page, so it is set in the data face. */
+  .rates__unit {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  /* ===== Not metered ===== */
+  /* Count-agnostic, so adding a group doesn't strand one on its own row. */
+  .included {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-8);
+  }
+
+  .included__title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-5);
+  }
+
+  .included__list {
+    display: grid;
+    gap: var(--space-3);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .included__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .included__all {
+    margin-top: var(--space-10);
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== The two routes in ===== */
+  .panels {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8);
+  }
+
+  .panel__kicker {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+  }
+
+  .panel__title {
+    margin-bottom: var(--space-3);
+  }
+
+  .panel__body {
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-6);
+  }
+
+  .panel__list {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .panel__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .panel__list li:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .panel__list-name {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .panel__list-reason {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .panel__cta {
+    align-self: flex-start;
+    margin-top: auto;
+  }
+
+  /* ===== FAQ ===== */
+  .faq {
+    display: grid;
+    gap: 0;
+    max-width: 46rem;
+  }
+
+  .faq__item {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .faq__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .faq__q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 44px;
+    padding-block: var(--space-5);
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--color-text);
+    font-size: var(--text-base);
+    list-style: none;
+  }
+
+  .faq__q::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__q::marker {
+    content: '';
+  }
+
+  .faq__chevron {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--color-text-tertiary);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .faq__chevron {
+      transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+  }
+
+  .faq__item[open] .faq__chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq__item[open] .faq__q {
+    color: var(--color-accent);
+  }
+
+  .faq__a {
+    padding-bottom: var(--space-5);
+    max-width: 40rem;
+  }
+
+  .faq__a p {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .faq__q:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--border-radius);
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .included {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .panels {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
+
+    .model,
+    .included {
+      grid-template-columns: 1fr;
+    }
+
+    /* Single column: only the true last item closes the block. */
+    .model__item:nth-last-child(-n + 2) {
+      border-bottom: none;
+    }
+
+    .model__item:last-child {
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* The unit drops under the name rather than squeezing the note. */
+    .rates__row {
+      grid-template-columns: auto minmax(0, 1fr);
+      row-gap: var(--space-2);
+    }
+
+    .rates__unit {
+      grid-column: 2;
+      text-align: left;
+    }
+
+    .panel {
+      padding: var(--space-6);
+    }
+  }
+</style>

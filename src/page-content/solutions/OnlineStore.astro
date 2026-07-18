@@ -1,0 +1,410 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Check from '@components/Check.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('solutions-online-store.title');
+const description = t('solutions-online-store.description');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: t('nav.solutions.onlineStore'),
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: new URL(l('/solutions/online-store/'), Astro.site).toString(),
+    areaServed: t('solutions-online-store.jsonld.areaServed'),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 3, name: t('nav.solutions.onlineStore') },
+    ],
+  },
+];
+
+const features: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'cart',
+    title: t('solutions-online-store.feature.storefront.title'),
+    description: t('solutions-online-store.feature.storefront.desc'),
+  },
+  {
+    icon: 'card',
+    title: t('solutions-online-store.feature.payments.title'),
+    description: t('solutions-online-store.feature.payments.desc'),
+  },
+  {
+    icon: 'invoice',
+    title: t('solutions-online-store.feature.invoicing.title'),
+    description: t('solutions-online-store.feature.invoicing.desc'),
+  },
+  {
+    icon: 'domain',
+    title: t('solutions-online-store.feature.domain.title'),
+    description: t('solutions-online-store.feature.domain.desc'),
+  },
+];
+
+/** Concrete pieces that ship with the store, drawn from the capabilities above. */
+const included = [
+  t('solutions-online-store.included.catalog'),
+  t('solutions-online-store.included.checkout'),
+  t('solutions-online-store.included.accounts'),
+  t('solutions-online-store.included.payments'),
+  t('solutions-online-store.included.webhooks'),
+  t('solutions-online-store.included.reconciliation'),
+  t('solutions-online-store.included.invoices'),
+  t('solutions-online-store.included.tax'),
+  t('solutions-online-store.included.domainReg'),
+  t('solutions-online-store.included.dns'),
+];
+
+const storeSteps = [
+  { label: t('solutions-online-store.step.createAccount') },
+  { label: t('solutions-online-store.step.addProducts') },
+  { label: t('solutions-online-store.step.connectDomain') },
+  { label: t('solutions-online-store.step.goLive') },
+];
+
+/**
+ * Compared by what a fragmented stack costs you to run. The monthly prices
+ * previously listed here were invented and have been removed.
+ */
+const comparisonRows = [
+  { without: t('solutions-online-store.compare.ecommerce.without'), with_: t('solutions-online-store.compare.ecommerce.with') },
+  { without: t('solutions-online-store.compare.payments.without'), with_: t('solutions-online-store.compare.payments.with') },
+  { without: t('solutions-online-store.compare.invoicing.without'), with_: t('solutions-online-store.compare.invoicing.with') },
+  { without: t('solutions-online-store.compare.domain.without'), with_: t('solutions-online-store.compare.domain.with') },
+];
+
+const related: { title: string; description: string; href: string }[] = [
+  {
+    title: t('nav.solutions.payments'),
+    description: t('solutions-online-store.related.payments.desc'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    title: t('solutions-online-store.related.content.title'),
+    description: t('solutions-online-store.related.content.desc'),
+    href: l('/solutions/content/'),
+  },
+  {
+    title: t('nav.solutions.whitelabel'),
+    description: t('solutions-online-store.related.whitelabel.desc'),
+    href: l('/solutions/whitelabel/'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} ogImage="/og/solution-online-store.png" jsonLd={jsonLd}>
+  <div class="page-top">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('nav.solutions'), href: l('/solutions/') },
+        { label: t('nav.solutions.onlineStore') },
+      ]} />
+    </div>
+  </div>
+
+  <Hero
+    headline={t('solutions-online-store.hero.headline')}
+    subheadline={t('solutions-online-store.hero.subheadline')}
+    badge={t('solutions-online-store.hero.badge')}
+    primaryCta={{ label: t('cta.launchStore'), href: 'https://app.1platform.pro/app/?intent=store' }}
+    secondaryCta={{ label: t('solutions-online-store.hero.cta.secondary'), href: l('/pricing/') }}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('solutions-online-store.whatYouGet.eyebrow')}</p>
+        <h2 class="statement__lead">
+          {t('solutions-online-store.whatYouGet.lead')}
+        </h2>
+      </div>
+
+      <div class="features">
+        {features.map((feature) => (
+          <Card
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- The concrete inventory, so "everything you need" is checkable -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-online-store.inTheBox.eyebrow')}</p>
+          <h2>{t('solutions-online-store.inTheBox.title')}</h2>
+          <p>
+            {t('solutions-online-store.inTheBox.desc')}
+          </p>
+        </div>
+
+        <ul class="included">
+          {included.map((item) => (
+            <li class="included__item">
+              <Check yes label={t('solutions-online-store.inTheBox.includedLabel')} />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-online-store.howItWorks.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-online-store.howItWorks.lead')}</h2>
+      <ProcessSpine steps={storeSteps} label={t('solutions-online-store.howItWorks.aria')} />
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-online-store.whatItReplaces.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-online-store.whatItReplaces.lead')}</h2>
+      <ComparisonTable rows={comparisonRows} />
+    </div>
+  </section>
+
+  <!-- Related work, as a readable index rather than another row of cards -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-online-store.related.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-online-store.related.lead')}</h2>
+
+      <ul class="index">
+        {related.map((item) => (
+          <li class="index__item">
+            <h3 class="index__title">
+              <a href={item.href} class="index__link">{item.title}</a>
+            </h3>
+            <p class="index__desc">{item.description}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Page-specific next step. The general closing CTA lives in the footer. -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">{t('solutions-online-store.next.eyebrow')}</p>
+          <h2 class="next__title">{t('solutions-online-store.next.title')}</h2>
+          <p class="next__desc">
+            {t('solutions-online-store.next.desc')}
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            {t('solutions-online-store.next.linkCue')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+        <div class="next__actions">
+          <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--primary">{t('cta.launchStore')}</a>
+          <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions-online-store.next.actions.viewPricing')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The hero carries its own header offset, so it is neutralised below the
+     breadcrumb strip to avoid stacking two header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+
+  /* ===== Split: claim on the left, the inventory on the right ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin: 0;
+  }
+
+  .included {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3) var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .included__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== Related: a bordered index ===== */
+  .index {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 52rem;
+  }
+
+  .index__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .index__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .index__title {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+  }
+
+  .index__link {
+    color: var(--color-text);
+  }
+
+  .index__link:hover {
+    color: var(--color-accent);
+  }
+
+  .index__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Closing band ===== */
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .features,
+    .included {
+      grid-template-columns: 1fr;
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

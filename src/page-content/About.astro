@@ -1,0 +1,374 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Icon from '@components/Icon.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('about.title');
+const description = t('about.description');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: title,
+  description,
+  url: new URL(l('/about/'), 'https://1platform.pro').toString(),
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), 'https://1platform.pro').toString() },
+      { '@type': 'ListItem', position: 2, name: t('footer.link.about') },
+    ],
+  },
+};
+
+/**
+ * What a fragmented stack costs, stated as experience rather than as an
+ * invented dollar figure. Each row is the same claim the old two-column
+ * "problem card" made — now rendered by the shared comparison, so the ticks
+ * come from Check.astro instead of escaped entity glyphs.
+ */
+const fragmentation = [
+  { without: t('about.fragmentation.row1.without'), with_: t('about.fragmentation.row1.with') },
+  { without: t('about.fragmentation.row2.without'), with_: t('about.fragmentation.row2.with') },
+  { without: t('about.fragmentation.row3.without'), with_: t('about.fragmentation.row3.with') },
+  { without: t('about.fragmentation.row4.without'), with_: t('about.fragmentation.row4.with') },
+  { without: t('about.fragmentation.row5.without'), with_: t('about.fragmentation.row5.with') },
+];
+
+/**
+ * The capability set, grouped rather than tiled. Seventeen identical icon
+ * cards in a 3-up grid said nothing about how the capabilities relate; the
+ * grouping does.
+ */
+const capabilityGroups: { group: string; items: { label: string; icon: IconName }[] }[] = [
+  {
+    group: t('about.capabilities.group.content'),
+    items: [
+      { label: t('about.capabilities.item.aiContent'), icon: 'content' },
+      { label: t('about.capabilities.item.keywords'), icon: 'keyword' },
+      { label: t('about.capabilities.item.images'), icon: 'image' },
+      { label: t('about.capabilities.item.comments'), icon: 'message' },
+      { label: t('about.capabilities.item.legalPages'), icon: 'shield' },
+      { label: t('about.capabilities.item.cmsPublishing'), icon: 'cms' },
+      { label: t('about.capabilities.item.indexing'), icon: 'indexing' },
+      { label: t('about.capabilities.item.linkBuilding'), icon: 'link' },
+      { label: t('about.capabilities.item.searchConsole'), icon: 'globe-check' },
+    ],
+  },
+  {
+    group: t('about.capabilities.group.commerce'),
+    items: [
+      { label: t('about.capabilities.item.payments'), icon: 'card' },
+      { label: t('about.capabilities.item.invoicing'), icon: 'invoice' },
+    ],
+  },
+  {
+    group: t('about.capabilities.group.site'),
+    items: [
+      { label: t('about.capabilities.item.websiteManagement'), icon: 'monitor' },
+      { label: t('about.capabilities.item.profiles'), icon: 'user' },
+      { label: t('about.capabilities.item.analytics'), icon: 'chart' },
+      { label: t('about.capabilities.item.adRevenue'), icon: 'wallet' },
+    ],
+  },
+  {
+    group: t('about.capabilities.group.developer'),
+    items: [
+      { label: t('about.capabilities.item.aiAgents'), icon: 'agent' },
+      { label: t('about.capabilities.item.activityLogs'), icon: 'logs' },
+    ],
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <div class="container crumbs">
+    <Breadcrumb items={[
+      { label: t('breadcrumb.home'), href: l('/') },
+      { label: t('footer.link.about') },
+    ]} />
+  </div>
+
+  <Hero
+    headline={t('about.hero.headline')}
+    subheadline={t('about.hero.subheadline')}
+    badge={t('about.hero.badge')}
+    primaryCta={{ label: t('cta.getStarted'), href: 'https://app.1platform.pro/app/' }}
+    secondaryCta={{ label: t('about.hero.secondaryCta'), href: l('/solutions/') }}
+  />
+
+  <!-- Mission: a labelled rail against the prose, not a centred column -->
+  <section class="section">
+    <div class="container">
+      <div class="rail reveal">
+        <div class="rail__label">
+          <p class="eyebrow">{t('about.mission.eyebrow')}</p>
+        </div>
+        <div class="rail__body">
+          <!-- The brand slogan, re-cased as a headline. Hardcoded English in
+               both trees, like Footer.astro:70 — a brand line that changes
+               per language is no longer a brand line. -->
+          <h2 class="rail__lead">{t('brand.slogan')}</h2>
+          <p>{t('about.mission.p1')}</p>
+          <p>{t('about.mission.p2')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The problem, compared by experience -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('about.fragmentation.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('about.fragmentation.lead')}</h2>
+      <p class="section__note">{t('about.fragmentation.note')}</p>
+      <ComparisonTable rows={fragmentation} />
+    </div>
+  </section>
+
+  <!-- What we build, grouped -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('about.capabilities.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('about.capabilities.lead')}</h2>
+
+      <div class="capabilities reveal">
+        {capabilityGroups.map((group) => (
+          <div class="capabilities__group">
+            <h3 class="capabilities__title">{group.group}</h3>
+            <ul class="capabilities__list">
+              {group.items.map((item) => (
+                <li class="capabilities__item">
+                  <span class="capabilities__icon"><Icon name={item.icon} size={18} /></span>
+                  {item.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <p class="capabilities__docs">
+        <a href="https://developer.1platform.pro/" class="link-cue">
+          {t('about.capabilities.docsLink')}
+          <Icon name="arrow-right" size={15} />
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="rail reveal">
+        <div class="rail__label">
+          <p class="eyebrow">{t('about.team.eyebrow')}</p>
+        </div>
+        <div class="rail__body">
+          <h2 class="rail__lead">{t('about.team.lead')}</h2>
+          <p>{t('about.team.p1')}</p>
+          <p>{t('about.team.p2')}</p>
+          <dl class="facts">
+            <div class="facts__row">
+              <dt>{t('about.team.facts.basedIn.term')}</dt>
+              <dd>{t('about.team.facts.basedIn.value')}</dd>
+            </div>
+            <div class="facts__row">
+              <dt>{t('about.team.facts.serving.term')}</dt>
+              <dd>{t('about.team.facts.serving.value')}</dd>
+            </div>
+            <div class="facts__row">
+              <dt>{t('about.team.facts.languages.term')}</dt>
+              <dd>{t('about.team.facts.languages.value')}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+</BaseLayout>
+
+<style>
+  /* Breadcrumbs clear the fixed header; the hero then drops its own top
+     offset so the two don't stack into a canyon of whitespace. */
+  .crumbs {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .crumbs + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  /* ===== Labelled rail ===== */
+  .rail {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 8fr);
+    gap: var(--space-12);
+  }
+
+  .rail__label {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-8));
+    align-self: start;
+    padding-top: var(--space-2);
+  }
+
+  .rail__body {
+    max-width: 40rem;
+  }
+
+  .rail__lead {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-6);
+  }
+
+  .rail__body p {
+    margin-bottom: var(--space-5);
+    line-height: 1.75;
+  }
+
+  .rail__body p:last-of-type {
+    margin-bottom: 0;
+  }
+
+  /* ===== Section openers ===== */
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .section__note {
+    max-width: 42rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== Capability index ===== */
+  .capabilities {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-10) var(--space-8);
+    align-items: start;
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .capabilities__title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+  }
+
+  .capabilities__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .capabilities__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .capabilities__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .capabilities__docs {
+    margin-top: var(--space-8);
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Facts ===== */
+  .facts {
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .facts__row {
+    display: grid;
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .facts dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    align-self: center;
+  }
+
+  .facts dd {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1024px) {
+    .capabilities {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .rail {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+    }
+
+    .rail__label {
+      position: static;
+      padding-top: 0;
+    }
+
+    .facts__row {
+      grid-template-columns: 8rem minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .capabilities {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+</style>

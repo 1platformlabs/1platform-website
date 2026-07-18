@@ -1,0 +1,320 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('for-agencies.title');
+const description = t('for-agencies.description');
+
+// "For Agencies" is the same phrase in the shared nav/footer (common.ts:
+// footer.link.forAgencies), so it is reused rather than redefined — for the
+// breadcrumb crumb, the hero badge, and the JSON-LD breadcrumb name alike.
+const forAgenciesLabel = t('footer.link.forAgencies');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: title,
+    description,
+    url: new URL(l('/for-agencies/'), 'https://1platform.pro').toString(),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), 'https://1platform.pro').toString() },
+      { '@type': 'ListItem', position: 2, name: forAgenciesLabel },
+    ],
+  },
+];
+
+const features: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'monitor',
+    title: t('for-agencies.features.multiSite.title'),
+    description: t('for-agencies.features.multiSite.description'),
+  },
+  {
+    icon: 'content',
+    title: t('for-agencies.features.contentEngine.title'),
+    description: t('for-agencies.features.contentEngine.description'),
+  },
+  {
+    icon: 'dashboard',
+    title: t('for-agencies.features.whitelabel.title'),
+    description: t('for-agencies.features.whitelabel.description'),
+  },
+  {
+    icon: 'card',
+    title: t('for-agencies.features.payments.title'),
+    description: t('for-agencies.features.payments.description'),
+  },
+];
+
+/** The sequence an agency actually runs, per client. */
+const clientSteps = [
+  { label: t('for-agencies.steps.createAccount') },
+  { label: t('for-agencies.steps.addSite') },
+  { label: t('for-agencies.steps.connectDomain') },
+  { label: t('for-agencies.steps.applyBranding') },
+  { label: t('for-agencies.steps.generateContent') },
+  { label: t('for-agencies.steps.billClient') },
+];
+
+const related: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'dashboard',
+    title: t('nav.solutions.whitelabel'),
+    description: t('for-agencies.related.whitelabel.description'),
+    href: l('/solutions/whitelabel/'),
+  },
+  {
+    icon: 'content',
+    title: t('for-agencies.related.content.title'),
+    description: t('for-agencies.related.content.description'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'code',
+    title: t('footer.link.forDevelopers'),
+    description: t('for-agencies.related.developers.description'),
+    href: l('/for-developers/'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <div class="container crumbs">
+    <Breadcrumb items={[
+      { label: t('breadcrumb.home'), href: l('/') },
+      { label: forAgenciesLabel },
+    ]} />
+  </div>
+
+  <Hero
+    headline={t('for-agencies.hero.headline')}
+    subheadline={t('for-agencies.hero.subheadline')}
+    badge={forAgenciesLabel}
+    primaryCta={{ label: t('for-agencies.cta.contactSales'), href: l('/contact/?topic=agency') }}
+    secondaryCta={{ label: t('for-agencies.cta.readApiDocs'), href: 'https://developer.1platform.pro/' }}
+  />
+
+  <!-- What you get -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('for-agencies.whatYouGet.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('for-agencies.whatYouGet.lead')}</h2>
+
+      <div class="features">
+        {features.map((feature) => (
+          <Card
+            variant="bare"
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- The per-client sequence -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('for-agencies.perClient.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('for-agencies.perClient.lead')}</h2>
+      <ProcessSpine steps={clientSteps} label={t('for-agencies.perClient.processLabel')} />
+    </div>
+  </section>
+
+  <!-- Talk to us -->
+  <section class="section">
+    <div class="container">
+      <div class="panel reveal">
+        <div class="panel__copy">
+          <p class="eyebrow">{t('for-agencies.talk.eyebrow')}</p>
+          <h2>{t('for-agencies.talk.title')}</h2>
+          <p>{t('for-agencies.talk.body')}</p>
+        </div>
+        <div class="panel__actions">
+          <a href={l('/contact/?topic=agency')} class="btn btn--primary">{t('for-agencies.cta.contactSales')}</a>
+          <a href="https://developer.1platform.pro/" class="btn btn--ghost">{t('for-agencies.cta.readApiDocs')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('for-agencies.related.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('for-agencies.related.lead')}</h2>
+
+      <ul class="related">
+        {related.map((item) => (
+          <li>
+            <a href={item.href} class="related__link">
+              <span class="related__icon"><Icon name={item.icon} size={20} /></span>
+              <span class="related__text">
+                <span class="related__title">{item.title}</span>
+                <span class="related__desc">{item.description}</span>
+              </span>
+              <Icon name="arrow-right" size={16} class="related__arrow" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+</BaseLayout>
+
+<style>
+  /* Breadcrumbs clear the fixed header; the hero then drops its own top
+     offset so the two don't stack into a canyon of whitespace. */
+  .crumbs {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .crumbs + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== What you get ===== */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10) var(--space-12);
+  }
+
+  /* ===== Contact panel ===== */
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: var(--space-10);
+    align-items: end;
+    padding: var(--space-10);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background: var(--color-bg-alt);
+  }
+
+  .panel__copy h2 {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-3) var(--space-4);
+  }
+
+  .panel__copy p {
+    max-width: 38rem;
+    margin: 0;
+  }
+
+  .panel__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* ===== Related ===== */
+  .related {
+    display: grid;
+    max-width: 52rem;
+  }
+
+  .related li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related li:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .related__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding-block: var(--space-5);
+    color: var(--color-text);
+  }
+
+  .related__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .related__text {
+    display: grid;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .related__title {
+    font-weight: 600;
+  }
+
+  .related__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .related__link :global(.related__arrow) {
+    color: var(--color-text-tertiary);
+  }
+
+  .related__link:hover {
+    color: var(--color-accent);
+  }
+
+  .related__link:hover :global(.related__arrow) {
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .related__link :global(.related__arrow) {
+      transition: transform var(--duration-fast) var(--ease-out-expo),
+                  color var(--duration-fast) ease;
+    }
+
+    .related__link:hover :global(.related__arrow) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .panel {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: var(--space-8);
+      padding: var(--space-8);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .features {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+</style>

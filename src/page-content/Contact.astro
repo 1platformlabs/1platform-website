@@ -1,0 +1,401 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('contact.title');
+const description = t('contact.description');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: title,
+  description,
+  url: new URL(l('/contact/'), 'https://1platform.pro').toString(),
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), 'https://1platform.pro').toString() },
+      { '@type': 'ListItem', position: 2, name: t('contact.breadcrumb') },
+    ],
+  },
+};
+
+/** What the reader needs to know before writing — kept as a ledger, not as
+ *  three identical boxes. */
+const expectations: { icon: IconName; term: string; detail: string }[] = [
+  {
+    icon: 'clock',
+    term: t('contact.expectations.responseTime.term'),
+    detail: t('contact.expectations.responseTime.detail'),
+  },
+  {
+    icon: 'clipboard',
+    term: t('contact.expectations.whatToInclude.term'),
+    detail: t('contact.expectations.whatToInclude.detail'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <section class="section">
+    <div class="container">
+      <Breadcrumb items={[{ label: t('breadcrumb.home'), href: l('/') }, { label: t('contact.breadcrumb') }]} />
+
+      <div class="contact">
+        <!-- Left: the ask -->
+        <header class="contact__intro reveal">
+          <p class="eyebrow">{t('contact.eyebrow')}</p>
+          <h1 class="contact__headline">
+            {t('contact.headline.pre')} <span class="contact__accent">{t('contact.headline.accent')}</span>.
+          </h1>
+          <p class="contact__sub">
+            {t('contact.sub.pre')} <strong>{t('contact.sub.strong')}</strong> {t('contact.sub.post')}
+          </p>
+          <p
+            class="contact__topic"
+            data-contact-topic
+            hidden
+            data-topic-agency={t('contact.topics.agency')}
+            data-topic-whitelabel={t('contact.topics.whitelabel')}
+            data-topic-enterprise={t('contact.topics.enterprise')}
+            data-topic-custom={t('contact.topics.custom')}
+            data-topic-default={t('contact.topics.default')}
+          >
+            {t('contact.topicPrefix')} <strong data-contact-topic-label></strong>
+          </p>
+
+          <dl class="expectations">
+            {expectations.map((row) => (
+              <div class="expectations__row">
+                <dt class="expectations__term">
+                  <span class="expectations__icon"><Icon name={row.icon} size={18} /></span>
+                  {row.term}
+                </dt>
+                <dd class="expectations__detail">{row.detail}</dd>
+              </div>
+            ))}
+            <div class="expectations__row">
+              <dt class="expectations__term">
+                <span class="expectations__icon"><Icon name="code" size={18} /></span>
+                {t('contact.expectations.technical.term')}
+              </dt>
+              <dd class="expectations__detail">
+                {t('contact.expectations.technical.detailBefore')}{' '}
+                <a href="https://developer.1platform.pro/">{t('contact.expectations.technical.linkText')}</a>{' '}
+                {t('contact.expectations.technical.detailAfter')}
+              </dd>
+            </div>
+          </dl>
+        </header>
+
+        <!-- Right: the address itself, given its own surface -->
+        <div class="card contact__panel reveal">
+          <div class="panel-mark" aria-hidden="true"><Icon name="mail" size={22} /></div>
+
+          <h2 class="panel__title">{t('contact.panel.title')}</h2>
+
+          <p
+            class="panel__email"
+            aria-label={t('contact.panel.emailAria')}
+            data-contact-email
+            data-user="sales"
+            data-domain="1platform.pro"
+          >
+            <noscript>{t('contact.panel.noscript')}</noscript>
+          </p>
+
+          <div class="panel__actions">
+            <button type="button" class="btn btn--primary" data-contact-open>
+              {t('contact.panel.openEmail')}
+              <Icon name="arrow-right" size={16} />
+            </button>
+            <button
+              type="button"
+              class="btn btn--ghost"
+              data-contact-copy
+              aria-live="polite"
+              data-idle-label={t('contact.panel.copyEmail')}
+              data-copied-label={t('contact.panel.copiedLabel')}
+              data-selected-label={t('contact.panel.selectedLabel')}
+            >
+              {t('contact.panel.copyEmail')}
+            </button>
+          </div>
+
+          <p class="panel__hint">
+            {t('contact.panel.hint.pre')}
+            <a href="https://app.1platform.pro/app/">app.1platform.pro</a>
+            {t('contact.panel.hint.post')}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  /*
+    A browser script cannot see the build-time translation catalogue, so every
+    user-facing string it needs travels in as a `data-*` attribute set from
+    t() in the markup above — same pattern as ShareButtons.astro and
+    CodeBlock.astro. Nothing in this script is a literal copy string.
+  */
+  const TOPIC_KEYS = ['agency', 'whitelabel', 'enterprise', 'custom'] as const;
+
+  function resolveTopic(topicsEl: HTMLElement | null): { subject: string; label: string | null } {
+    const fallback = topicsEl?.dataset.topicDefault ?? '';
+    const raw = new URLSearchParams(globalThis.location.search).get('topic');
+    if (!raw || !topicsEl) return { subject: fallback, label: null };
+
+    const key = raw.toLowerCase().replace(/[^a-z]/g, '');
+    if (!(TOPIC_KEYS as readonly string[]).includes(key)) return { subject: fallback, label: null };
+
+    const datasetKey = `topic${key.charAt(0).toUpperCase()}${key.slice(1)}`;
+    const label = topicsEl.dataset[datasetKey];
+    if (!label) return { subject: fallback, label: null };
+    return { subject: label, label };
+  }
+
+  function wireContactPage() {
+    const target = document.querySelector('[data-contact-email]') as HTMLElement | null;
+    const openBtn = document.querySelector('[data-contact-open]') as HTMLButtonElement | null;
+    const copyBtn = document.querySelector('[data-contact-copy]') as HTMLButtonElement | null;
+    const topicEl = document.querySelector('[data-contact-topic]') as HTMLElement | null;
+    const topicLabelEl = document.querySelector('[data-contact-topic-label]') as HTMLElement | null;
+    if (!target) return;
+
+    const user = target.dataset.user ?? '';
+    const dom = target.dataset.domain ?? '';
+    if (!user || !dom) return;
+
+    const email = user + '@' + dom;
+    target.textContent = email;
+
+    const { subject, label } = resolveTopic(topicEl);
+    if (label && topicEl && topicLabelEl) {
+      topicLabelEl.textContent = label;
+      topicEl.hidden = false;
+    }
+
+    openBtn?.addEventListener('click', () => {
+      globalThis.location.href = 'mailto:' + email + '?subject=' + encodeURIComponent(subject);
+    });
+
+    copyBtn?.addEventListener('click', async () => {
+      const idle = copyBtn.dataset.idleLabel ?? '';
+      try {
+        await navigator.clipboard.writeText(email);
+        copyBtn.textContent = copyBtn.dataset.copiedLabel ?? '';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        const sel = globalThis.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        copyBtn.textContent = copyBtn.dataset.selectedLabel ?? '';
+      }
+      globalThis.setTimeout(() => {
+        copyBtn.textContent = idle;
+      }, 1800);
+    });
+  }
+
+  document.addEventListener('astro:page-load', wireContactPage);
+</script>
+
+<style>
+  /* Asymmetric split: the argument on the left, the address on the right.
+     The old page stacked both, centred, down the middle of the viewport. */
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: var(--space-16);
+    align-items: start;
+    margin-top: var(--space-10);
+  }
+
+  .contact__intro {
+    max-width: 34rem;
+  }
+
+  .contact__headline {
+    font-size: var(--text-5xl);
+    line-height: 1.06;
+    text-wrap: balance;
+    margin: var(--space-5) 0 var(--space-5);
+  }
+
+  /* The emphasis is carried by the one accent in the system, not by a
+     gradient wash across the letterforms. */
+  .contact__accent {
+    color: var(--color-accent);
+  }
+
+  .contact__sub {
+    color: var(--color-text-secondary);
+    font-size: var(--text-lg);
+    margin: 0;
+  }
+
+  .contact__sub strong {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .contact__topic {
+    display: inline-block;
+    margin: var(--space-5) 0 0;
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    color: var(--color-text-secondary);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent-ring);
+    border-radius: var(--border-radius);
+  }
+
+  .contact__topic strong {
+    color: var(--color-accent);
+    margin-left: var(--space-1);
+  }
+
+  /* ===== Expectations: term against detail, on hairlines ===== */
+  .expectations {
+    margin: var(--space-12) 0 0;
+  }
+
+  .expectations__row {
+    display: grid;
+    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .expectations__row:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .expectations__term {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .expectations__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .expectations__detail {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* Underlined, not colour-only: a link sitting inside a run of text needs a
+     non-colour cue. Matches the .prose a convention. */
+  .expectations__detail a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ===== The address panel ===== */
+  /* Surface comes from the shared .card; only the additive bits live here. */
+  .contact__panel {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-8));
+    padding: var(--space-8);
+    box-shadow: var(--shadow-md);
+  }
+
+  .panel-mark {
+    display: inline-flex;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+  }
+
+  .panel__title {
+    font-size: var(--text-xl);
+    margin: 0 0 var(--space-4);
+  }
+
+  .panel__email {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    margin: 0 0 var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg-muted);
+    border-radius: var(--border-radius);
+    user-select: all;
+    word-break: break-all;
+  }
+
+  .panel__email noscript {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .panel__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+
+  .panel__actions .btn {
+    min-height: 44px;
+  }
+
+  .panel__hint {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    margin: 0;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .panel__hint a {
+    color: var(--color-accent);
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .contact {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+    }
+
+    /* Sticky is only useful next to a long column. */
+    .contact__panel {
+      position: static;
+    }
+
+    .contact__intro {
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .expectations__row {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+
+    .contact__panel {
+      padding: var(--space-6);
+    }
+  }
+</style>

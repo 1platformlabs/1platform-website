@@ -1,0 +1,474 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Hero from '@components/Hero.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import Card from '@components/Card.astro';
+import Check from '@components/Check.astro';
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+/**
+ * This page compares 1Platform with the *category* of automated WordPress
+ * content plugins, never with a named product. The route is unchanged so no
+ * link breaks, but every mention — copy, headings, metadata and structured
+ * data — describes the category.
+ */
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('compareWpAutoPro.title');
+const description = t('compareWpAutoPro.description');
+
+const comparison: {
+  group: string;
+  note: string;
+  rows: { capability: string; plugin: boolean }[];
+}[] = [
+  {
+    group: t('compareWpAutoPro.group1.name'),
+    note: t('compareWpAutoPro.group1.note'),
+    rows: [
+      { capability: t('compareWpAutoPro.group1.row1'), plugin: true },
+      { capability: t('compareWpAutoPro.group1.row2'), plugin: true },
+      { capability: t('compareWpAutoPro.group1.row3'), plugin: true },
+    ],
+  },
+  {
+    group: t('compareWpAutoPro.group2.name'),
+    note: t('compareWpAutoPro.group2.note'),
+    rows: [
+      { capability: t('compareWpAutoPro.group2.row1'), plugin: false },
+      { capability: t('compareWpAutoPro.group2.row2'), plugin: false },
+      { capability: t('compareWpAutoPro.group2.row3'), plugin: false },
+      { capability: t('compareWpAutoPro.group2.row4'), plugin: false },
+      { capability: t('compareWpAutoPro.group2.row5'), plugin: false },
+    ],
+  },
+];
+
+const differentiators: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'indexing',
+    title: t('compareWpAutoPro.differentiators.item1.title'),
+    description: t('compareWpAutoPro.differentiators.item1.description'),
+  },
+  {
+    icon: 'code',
+    title: t('compareWpAutoPro.differentiators.item2.title'),
+    description: t('compareWpAutoPro.differentiators.item2.description'),
+  },
+  {
+    icon: 'card',
+    title: t('compareWpAutoPro.differentiators.item3.title'),
+    description: t('compareWpAutoPro.differentiators.item3.description'),
+  },
+];
+
+const faqItems = [
+  {
+    question: t('compareWpAutoPro.faq.item1.question'),
+    answer: t('compareWpAutoPro.faq.item1.answer'),
+  },
+  {
+    question: t('compareWpAutoPro.faq.item2.question'),
+    answer: t('compareWpAutoPro.faq.item2.answer'),
+  },
+  {
+    question: t('compareWpAutoPro.faq.item3.question'),
+    answer: t('compareWpAutoPro.faq.item3.answer'),
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+};
+
+// The cURL sample is technical demonstration code — request shape, headers,
+// endpoint — not prose, so it is not run through t() in either tree. Only its
+// CodeBlock title (a UI label) is translated.
+const apiExample = `curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "keyword": "best project management tools",
+    "lang": "en",
+    "country": "us"
+  }'`;
+---
+
+<BaseLayout title={title} description={description} jsonLd={faqJsonLd}>
+  <Hero
+    badge={t('compareWpAutoPro.hero.badge')}
+    headline={t('compareWpAutoPro.hero.headline')}
+    subheadline={t('compareWpAutoPro.hero.subheadline')}
+    primaryCta={{ label: t('compareWpAutoPro.hero.primaryCta'), href: 'https://developer.1platform.pro/' }}
+    secondaryCta={{ label: t('compareWpAutoPro.hero.secondaryCta'), href: l('/pricing/') }}
+  />
+
+  <!-- Feature comparison, split into what they share and what they don't -->
+  <section class="section">
+    <div class="container">
+      <Breadcrumb
+        items={[
+          { label: t('breadcrumb.home'), href: l('/') },
+          { label: t('compareWpAutoPro.breadcrumb.compare') },
+          { label: t('compareWpAutoPro.breadcrumb.current') },
+        ]}
+      />
+
+      <div class="section__rule">
+        <p class="eyebrow">{t('compareWpAutoPro.matrix.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('compareWpAutoPro.matrix.lead')}</h2>
+
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <caption class="sr-only">
+            {t('compareWpAutoPro.matrix.caption')}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">{t('compareWpAutoPro.matrix.col.capability')}</th>
+              <th scope="col" class="matrix__mark-col matrix__mark-col--us">{t('compareWpAutoPro.matrix.col.us')}</th>
+              <th scope="col" class="matrix__mark-col">{t('compareWpAutoPro.matrix.col.them')}</th>
+            </tr>
+          </thead>
+          {comparison.map((group) => (
+            <tbody>
+              <tr class="matrix__group">
+                <th scope="rowgroup" colspan="3">
+                  {group.group}
+                  <span class="matrix__note">{group.note}</span>
+                </th>
+              </tr>
+              {group.rows.map((row) => (
+                <tr>
+                  <th scope="row">{row.capability}</th>
+                  <td class="matrix__mark-col"><Check yes={true} /></td>
+                  <td class="matrix__mark-col"><Check yes={row.plugin} /></td>
+                </tr>
+              ))}
+            </tbody>
+          ))}
+        </table>
+      </div>
+
+      <p class="matrix__caveat">
+        {t('compareWpAutoPro.matrix.caveat')}
+      </p>
+    </div>
+  </section>
+
+  <!-- Why the difference matters, as an editorial list rather than a card grid -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('compareWpAutoPro.differentiators.eyebrow')}</p>
+      </div>
+
+      <ul class="reasons">
+        {differentiators.map((item) => (
+          <li class="reasons__item reveal">
+            <span class="reasons__icon"><Icon name={item.icon} size={20} /></span>
+            <div>
+              <h3 class="reasons__title">{item.title}</h3>
+              <p class="reasons__desc">{item.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- One call, any stack -->
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy">
+          <p class="eyebrow">{t('compareWpAutoPro.integrate.eyebrow')}</p>
+          <h2>{t('compareWpAutoPro.integrate.heading')}</h2>
+          <p>
+            {t('compareWpAutoPro.integrate.body')}
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            {t('compareWpAutoPro.integrate.linkCue')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title={t('compareWpAutoPro.integrate.codeTitle')}
+            code={apiExample}
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Questions -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('compareWpAutoPro.faq.eyebrow')}</p>
+      </div>
+
+      <div class="qa">
+        {faqItems.map((item) => (
+          <div class="qa__item">
+            <h2 class="qa__q">{item.question}</h2>
+            <p class="qa__a">{item.answer}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sideways links; the closing CTA lives in the footer on every page -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('compareWpAutoPro.more.eyebrow')}</p>
+      </div>
+
+      <div class="more">
+        <Card
+          headingLevel={2}
+          title={t('compareWpAutoPro.more.card1.title')}
+          description={t('compareWpAutoPro.more.card1.description')}
+          href={l('/compare/1platform-vs-ai-writing-tools/')}
+        />
+        <Card
+          headingLevel={2}
+          title={t('compareWpAutoPro.more.card2.title')}
+          description={t('compareWpAutoPro.more.card2.description')}
+          href={l('/compare/1platform-vs-custom-integration/')}
+        />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== Capability matrix =====
+     A real table: the row and column headers are what make the marks readable
+     to a screen reader, so they stay semantic rather than becoming divs. */
+  .matrix-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background: var(--color-bg-alt);
+  }
+
+  .matrix {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .matrix th,
+  .matrix td {
+    padding: var(--space-4) var(--space-6);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .matrix thead th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+  }
+
+  /* The claim column reads in the accent; the other stays ink. */
+  .matrix__mark-col--us {
+    color: var(--color-accent);
+  }
+
+  .matrix tbody th,
+  .matrix tbody td {
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* Group label, plus the one line that says what the group means. */
+  .matrix__group th {
+    font-weight: 500;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    background: var(--color-bg-muted);
+    padding-block: var(--space-3);
+  }
+
+  .matrix__note {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    margin-top: var(--space-1);
+  }
+
+  .matrix tbody th[scope='row'] {
+    font-weight: 500;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .matrix__mark-col {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  .matrix__caveat {
+    max-width: 40rem;
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  /* ===== Reasons: a bordered editorial list ===== */
+  .reasons {
+    display: grid;
+    max-width: 52rem;
+  }
+
+  .reasons__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .reasons__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .reasons__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    padding-top: 2px;
+  }
+
+  .reasons__title {
+    margin-bottom: var(--space-2);
+  }
+
+  .reasons__desc {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ===== Split: copy + code ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Long code lines would otherwise widen the whole grid past the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Questions ===== */
+  .qa {
+    display: grid;
+    max-width: 46rem;
+  }
+
+  .qa__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .qa__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .qa__q {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    margin-bottom: var(--space-3);
+  }
+
+  .qa__a {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ===== More comparisons ===== */
+  .more {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .more {
+      grid-template-columns: 1fr;
+    }
+
+    .matrix th,
+    .matrix td {
+      padding: var(--space-3) var(--space-4);
+    }
+  }
+</style>

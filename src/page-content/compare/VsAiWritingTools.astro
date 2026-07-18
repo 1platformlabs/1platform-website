@@ -1,0 +1,459 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Hero from '@components/Hero.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import Card from '@components/Card.astro';
+import Check from '@components/Check.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('compareAiWritingTools.title');
+const description = t('compareAiWritingTools.description');
+
+/**
+ * The comparison, grouped by the stage of work each capability belongs to.
+ * Writing tools cover one stage well; the argument of this page is what
+ * happens either side of it, so the table is organised by stage rather than
+ * as a flat feature list.
+ */
+const stages: {
+  stage: string;
+  rows: { capability: string; writingTools: boolean }[];
+}[] = [
+  {
+    stage: t('compareAiWritingTools.stage1.name'),
+    rows: [{ capability: t('compareAiWritingTools.stage1.row1'), writingTools: false }],
+  },
+  {
+    stage: t('compareAiWritingTools.stage2.name'),
+    rows: [
+      { capability: t('compareAiWritingTools.stage2.row1'), writingTools: true },
+      { capability: t('compareAiWritingTools.stage2.row2'), writingTools: false },
+    ],
+  },
+  {
+    stage: t('compareAiWritingTools.stage3.name'),
+    rows: [
+      { capability: t('compareAiWritingTools.stage3.row1'), writingTools: false },
+      { capability: t('compareAiWritingTools.stage3.row2'), writingTools: false },
+      { capability: t('compareAiWritingTools.stage3.row3'), writingTools: false },
+    ],
+  },
+  {
+    stage: t('compareAiWritingTools.stage4.name'),
+    rows: [
+      { capability: t('compareAiWritingTools.stage4.row1'), writingTools: false },
+      { capability: t('compareAiWritingTools.stage4.row2'), writingTools: false },
+    ],
+  },
+];
+
+const pipelineSteps = [
+  { label: t('compareAiWritingTools.pipeline.step1') },
+  { label: t('compareAiWritingTools.pipeline.step2') },
+  { label: t('compareAiWritingTools.pipeline.step3') },
+  { label: t('compareAiWritingTools.pipeline.step4') },
+  { label: t('compareAiWritingTools.pipeline.step5') },
+  { label: t('compareAiWritingTools.pipeline.step6') },
+];
+
+const faqItems = [
+  {
+    question: t('compareAiWritingTools.faq.item1.question'),
+    answer: t('compareAiWritingTools.faq.item1.answer'),
+  },
+  {
+    question: t('compareAiWritingTools.faq.item2.question'),
+    answer: t('compareAiWritingTools.faq.item2.answer'),
+  },
+  {
+    question: t('compareAiWritingTools.faq.item3.question'),
+    answer: t('compareAiWritingTools.faq.item3.answer'),
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+};
+
+// Technical demonstration code — endpoints, headers, JSON body — not prose,
+// so it is not run through t() in either tree.
+const apiExample = `# Step 1: extract keywords from a domain
+curl -X POST https://api.1platform.pro/api/v1/posts/keywords/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -d '{ "domain": "example.com", "country": "us", "lang": "en" }'
+
+# Step 2: generate content from the top keyword (async job)
+curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -d '{ "keyword": "best project management tools 2026", "lang": "en", "country": "us" }'`;
+---
+
+<BaseLayout title={title} description={description} jsonLd={faqJsonLd}>
+  <Hero
+    badge={t('compareAiWritingTools.hero.badge')}
+    headline={t('compareAiWritingTools.hero.headline')}
+    subheadline={t('compareAiWritingTools.hero.subheadline')}
+    primaryCta={{ label: t('compareAiWritingTools.hero.primaryCta'), href: 'https://developer.1platform.pro/' }}
+    secondaryCta={{ label: t('compareAiWritingTools.hero.secondaryCta'), href: l('/solutions/') }}
+  />
+
+  <!-- Capability by capability, grouped by stage of work -->
+  <section class="section">
+    <div class="container">
+      <Breadcrumb
+        items={[
+          { label: t('breadcrumb.home'), href: l('/') },
+          { label: t('compareAiWritingTools.breadcrumb.compare') },
+          { label: t('compareAiWritingTools.breadcrumb.current') },
+        ]}
+      />
+
+      <div class="section__rule">
+        <p class="eyebrow">{t('compareAiWritingTools.matrix.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('compareAiWritingTools.matrix.lead')}</h2>
+
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <caption class="sr-only">
+            {t('compareAiWritingTools.matrix.caption')}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">{t('compareAiWritingTools.matrix.col.capability')}</th>
+              <th scope="col" class="matrix__mark-col matrix__mark-col--us">{t('compareAiWritingTools.matrix.col.us')}</th>
+              <th scope="col" class="matrix__mark-col">{t('compareAiWritingTools.matrix.col.them')}</th>
+            </tr>
+          </thead>
+          {stages.map((group) => (
+            <tbody>
+              <tr class="matrix__group">
+                <th scope="rowgroup" colspan="3">{group.stage}</th>
+              </tr>
+              {group.rows.map((row) => (
+                <tr>
+                  <th scope="row">{row.capability}</th>
+                  <td class="matrix__mark-col"><Check yes={true} /></td>
+                  <td class="matrix__mark-col"><Check yes={row.writingTools} /></td>
+                </tr>
+              ))}
+            </tbody>
+          ))}
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- The argument, then the pipeline drawn as a sequence -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('compareAiWritingTools.pipeline.eyebrow')}</p>
+      </div>
+
+      <p class="lede reveal">
+        {t('compareAiWritingTools.pipeline.lede')}
+      </p>
+
+      <div class="notes reveal">
+        <p>
+          {t('compareAiWritingTools.pipeline.note1')}
+        </p>
+        <p>
+          {t('compareAiWritingTools.pipeline.note2')}
+        </p>
+      </div>
+
+      <ProcessSpine steps={pipelineSteps} label={t('compareAiWritingTools.pipeline.spineLabel')} />
+    </div>
+  </section>
+
+  <!-- Copy and code, side by side -->
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy">
+          <p class="eyebrow">{t('compareAiWritingTools.integrate.eyebrow')}</p>
+          <h2>{t('compareAiWritingTools.integrate.heading')}</h2>
+          <p>
+            {t('compareAiWritingTools.integrate.body')}
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            {t('compareAiWritingTools.integrate.linkCue')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title={t('compareAiWritingTools.integrate.codeTitle')}
+            code={apiExample}
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Questions -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('compareAiWritingTools.faq.eyebrow')}</p>
+      </div>
+
+      <div class="qa">
+        {faqItems.map((item) => (
+          <div class="qa__item">
+            <h2 class="qa__q">{item.question}</h2>
+            <p class="qa__a">{item.answer}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sideways links, rather than another closing CTA band (the footer carries it) -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('compareAiWritingTools.more.eyebrow')}</p>
+      </div>
+
+      <div class="more">
+        <Card
+          headingLevel={2}
+          title={t('compareAiWritingTools.more.card1.title')}
+          description={t('compareAiWritingTools.more.card1.description')}
+          href={l('/compare/1platform-vs-custom-integration/')}
+        />
+        <Card
+          headingLevel={2}
+          title={t('compareAiWritingTools.more.card2.title')}
+          description={t('compareAiWritingTools.more.card2.description')}
+          href={l('/compare/1platform-vs-wp-auto-pro/')}
+        />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== Capability matrix =====
+     A real table: the row and column headers are what make the marks readable
+     to a screen reader, so they stay semantic rather than becoming divs. */
+  .matrix-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background: var(--color-bg-alt);
+  }
+
+  .matrix {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .matrix th,
+  .matrix td {
+    padding: var(--space-4) var(--space-6);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .matrix thead th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+  }
+
+  /* The claim column reads in the accent; the other stays ink. */
+  .matrix__mark-col--us {
+    color: var(--color-accent);
+  }
+
+  .matrix tbody th,
+  .matrix tbody td {
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* Stage label: the same mono device the eyebrows use, set into the table.
+     Secondary rather than tertiary ink — at 12px on the recessed surface,
+     tertiary sits right on the AA boundary. */
+  .matrix__group th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-muted);
+    padding-block: var(--space-2);
+  }
+
+  .matrix tbody th[scope='row'] {
+    font-weight: 500;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .matrix__mark-col {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  /* ===== Editorial notes ===== */
+  .lede {
+    max-width: 40rem;
+    font-size: var(--text-xl);
+    line-height: 1.5;
+    color: var(--color-text);
+    margin-bottom: var(--space-8);
+  }
+
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+    max-width: 56rem;
+    padding-bottom: var(--space-12);
+    margin-bottom: var(--space-12);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .notes p {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+  }
+
+  /* ===== Split: copy + code ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Long code lines would otherwise widen the whole grid past the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Questions =====
+     Three answers, all worth reading: shown open as an editorial list rather
+     than hidden behind disclosure toggles. */
+  .qa {
+    display: grid;
+    max-width: 46rem;
+  }
+
+  .qa__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .qa__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .qa__q {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    margin-bottom: var(--space-3);
+  }
+
+  .qa__a {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ===== More comparisons ===== */
+  .more {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    /* Two columns of body copy get too narrow to read below this. */
+    .notes {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .more {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+
+    .lede {
+      font-size: var(--text-lg);
+    }
+
+    .matrix th,
+    .matrix td {
+      padding: var(--space-3) var(--space-4);
+    }
+  }
+</style>

@@ -1,5 +1,6 @@
 ---
 import Icon from '@components/Icon.astro';
+import { useI18n } from '@i18n';
 import type { IconName } from '@components/icons';
 
 /**
@@ -30,13 +31,15 @@ interface Props {
   class?: string;
 }
 
+const { t } = useI18n(Astro.url.pathname);
+
 const {
   title,
   description,
   icon,
   href,
   meta,
-  metaLabel = 'Replaces',
+  metaLabel = t('card.metaLabel.default'),
   headingLevel = 3,
   variant = 'default',
   class: className,
@@ -77,7 +80,7 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
 
   {href && (
     <span class="card-item__cue" aria-hidden="true">
-      Learn more
+      {t('card.learnMore')}
       <Icon name="arrow-right" size={14} />
     </span>
   )}

@@ -1,0 +1,120 @@
+---
+import { useI18n } from '@i18n';
+
+const { l } = useI18n(Astro.url.pathname);
+---
+
+<h2>1. Información que recopilamos</h2>
+<p>Recopilamos información en las siguientes categorías:</p>
+
+<h3>Información que proporcionas directamente</h3>
+<ul>
+  <li><strong>Información de la cuenta:</strong> Nombre, dirección de correo electrónico, nombre de la empresa y contraseña al registrarte</li>
+  <li><strong>Información de facturación:</strong> Datos del método de pago (procesados de forma segura; nunca almacenamos los datos de tu tarjeta en nuestros servidores)</li>
+  <li><strong>Datos de contenido:</strong> Texto, palabras clave, URL, imágenes y demás contenido que envías para su procesamiento a través de nuestros servicios</li>
+  <li><strong>Datos de comunicación:</strong> Mensajes que envías a nuestro equipo de soporte o a través de los canales de comentarios</li>
+</ul>
+
+<h3>Información recopilada automáticamente</h3>
+<ul>
+  <li><strong>Datos de uso:</strong> Llamadas a la API, uso de funciones, marcas de tiempo y duración de la sesión</li>
+  <li><strong>Información del dispositivo:</strong> Tipo de navegador, sistema operativo, resolución de pantalla e identificadores del dispositivo</li>
+  <li><strong>Datos de registro:</strong> Direcciones IP, URL de referencia, páginas visitadas y registros de errores</li>
+  <li><strong>Cookies y tecnologías similares:</strong> Como se describe en nuestra <a href={l('/cookies/')}>Política de cookies</a></li>
+</ul>
+
+<h2>2. Cómo usamos tu información</h2>
+<p>Usamos tu información para:</p>
+<ul>
+  <li>Prestar, mantener y mejorar el Servicio</li>
+  <li>Procesar transacciones y enviar información relacionada (confirmaciones, facturas)</li>
+  <li>Enviar avisos técnicos, actualizaciones, alertas de seguridad y mensajes de soporte</li>
+  <li>Responder a tus comentarios, preguntas y solicitudes de soporte</li>
+  <li>Supervisar y analizar tendencias de uso para mejorar la experiencia del usuario</li>
+  <li>Detectar, investigar y prevenir actividad fraudulenta o no autorizada</li>
+  <li>Cumplir con obligaciones legales</li>
+</ul>
+
+<h2>3. Uso compartido de datos y proveedores externos</h2>
+<p>Para ofrecer las funciones de nuestra plataforma unificada, compartimos categorías específicas de datos con los siguientes proveedores externos de servicios:</p>
+
+<h3>Proveedores de procesamiento con IA</h3>
+<p>Usamos <strong>OpenAI</strong> para la generación de contenido con IA, la creación de comentarios y el procesamiento de texto. El contenido que envías para el procesamiento con IA (palabras clave, prompts, parámetros de artículos) se envía a la API de OpenAI para su procesamiento. Las políticas de uso de datos de OpenAI se aplican a este procesamiento.</p>
+
+<h3>API de motores de búsqueda</h3>
+<p>Usamos <strong>ValueSerp</strong> para obtener datos de resultados de motores de búsqueda para la investigación de palabras clave y el análisis de SERP. Las consultas de búsqueda y los datos de palabras clave se transmiten a ValueSerp para su procesamiento.</p>
+
+<h3>Proveedores de datos de búsqueda</h3>
+<p>El volumen de búsqueda, la dificultad de las palabras clave y los datos de palabras clave relacionadas pueden obtenerse a través de API de datos de búsqueda de terceros para ofrecer información integral sobre palabras clave.</p>
+
+<h3>Proveedores de obtención de imágenes</h3>
+<p>Usamos <strong>Pixabay</strong> y <strong>Pexels</strong> para obtener imágenes libres de regalías para tu contenido. Las consultas de búsqueda relacionadas con solicitudes de imágenes se transmiten a estos proveedores.</p>
+
+<h3>Proveedores de construcción de enlaces</h3>
+<p>Usamos <strong>Publisuites</strong> para servicios de construcción de enlaces y colocación de contenido patrocinado. Las URL del sitio web, el texto ancla y los parámetros de campaña se comparten según sea necesario para ejecutar las campañas de construcción de enlaces.</p>
+
+<h3>Procesadores de pago</h3>
+<p>Usamos <strong>Migo</strong> como nuestro proveedor de procesamiento de pagos en Guatemala. Cuando realizas un pago, los detalles de tu transacción (monto, moneda, método de pago) se transmiten de forma segura a Migo para su procesamiento. Nunca almacenamos tu información completa de tarjeta de crédito en nuestros servidores.</p>
+
+<h3>Proveedores de facturación</h3>
+<p>Usamos <strong>TribuTax</strong> como nuestro proveedor de facturación electrónica (FEL) para generar facturas conformes con la ley en Guatemala. Tu información de facturación (nombre, identificación fiscal, dirección) se comparte con TribuTax para generar y certificar facturas electrónicas según lo exige la legislación tributaria guatemalteca.</p>
+
+<h3>Otros usos compartidos</h3>
+<p>También podemos compartir tu información:</p>
+<ul>
+  <li>Cuando lo exija la ley, una normativa o un proceso legal</li>
+  <li>Para proteger los derechos, la propiedad o la seguridad de 1Platform Labs, nuestros usuarios o el público</li>
+  <li>En relación con una fusión, adquisición o venta de activos (con aviso previo)</li>
+  <li>Con tu consentimiento o por tu indicación</li>
+</ul>
+
+<h2>4. Almacenamiento y seguridad de los datos</h2>
+<p>Tus datos se almacenan en servidores seguros con protecciones estándar de la industria, entre ellas:</p>
+<ul>
+  <li>Cifrado en tránsito (TLS 1.2 o superior) y en reposo</li>
+  <li>Autenticación basada en tokens con separación de roles</li>
+  <li>Auditorías de seguridad periódicas y evaluaciones de vulnerabilidades</li>
+  <li>Controles de acceso que limitan el acceso a los datos únicamente al personal autorizado</li>
+</ul>
+<p>Aunque implementamos medidas de seguridad robustas, ningún método de transmisión o almacenamiento electrónico es 100 % seguro. No podemos garantizar la seguridad absoluta de tus datos.</p>
+
+<h2>5. Conservación de datos</h2>
+<p>Conservamos tus datos según el siguiente calendario:</p>
+<ul>
+  <li><strong>Datos de la cuenta:</strong> Se conservan mientras tu cuenta esté activa y durante 30 días después de su eliminación</li>
+  <li><strong>Contenido generado:</strong> Se conserva hasta por 90 días después de eliminar la cuenta</li>
+  <li><strong>Registros de la API:</strong> Se conservan durante 90 días para depuración y análisis</li>
+  <li><strong>Registros de facturación:</strong> Se conservan según lo exijan las leyes tributarias y contables aplicables</li>
+  <li><strong>Análisis anonimizados:</strong> Pueden conservarse indefinidamente de forma agregada</li>
+</ul>
+
+<h2>6. Tus derechos</h2>
+<p>Según tu jurisdicción, es posible que tengas los siguientes derechos respecto de tus datos personales:</p>
+<ul>
+  <li><strong>Acceso:</strong> Solicitar una copia de los datos personales que tenemos sobre ti</li>
+  <li><strong>Rectificación:</strong> Solicitar la corrección de datos inexactos o incompletos</li>
+  <li><strong>Eliminación:</strong> Solicitar la eliminación de tus datos personales (sujeta a los requisitos legales de conservación)</li>
+  <li><strong>Portabilidad:</strong> Solicitar tus datos en un formato estructurado y legible por máquina</li>
+  <li><strong>Oposición:</strong> Oponerte al procesamiento de tus datos para determinados fines</li>
+  <li><strong>Limitación:</strong> Solicitar la limitación del procesamiento en determinadas circunstancias</li>
+</ul>
+<p>Para ejercer cualquiera de estos derechos, contáctanos en <strong>privacy@1platform.pro</strong>. Responderemos a tu solicitud en un plazo de 30 días.</p>
+
+<h2>7. Cookies</h2>
+<p>Usamos cookies y tecnologías de seguimiento similares para mejorar tu experiencia. Para obtener información detallada sobre las cookies que usamos y cómo gestionarlas, consulta nuestra <a href={l('/cookies/')}>Política de cookies</a>.</p>
+
+<h2>8. Privacidad de los menores</h2>
+<p>El Servicio no está dirigido a personas menores de 18 años. No recopilamos a sabiendas información personal de menores. Si llegamos a tener conocimiento de que hemos recopilado datos personales de un menor sin el consentimiento de sus padres o tutores, tomaremos medidas para eliminar esa información con prontitud.</p>
+
+<h2>9. Transferencias internacionales de datos</h2>
+<p>Tus datos pueden transferirse y procesarse en países distintos al de tu residencia. Cuando transferimos datos internacionalmente, nos aseguramos de contar con las salvaguardas adecuadas para proteger tu información de conformidad con esta Política de privacidad.</p>
+
+<h2>10. Cambios a esta política</h2>
+<p>Podemos actualizar esta Política de privacidad periódicamente. Te notificaremos los cambios sustanciales publicando la política actualizada en nuestro sitio web y actualizando la fecha de «Última actualización». El uso continuado del Servicio después de que los cambios entren en vigor constituye la aceptación de la política revisada.</p>
+
+<h2>11. Información de contacto</h2>
+<p>Si tienes preguntas o inquietudes sobre esta Política de privacidad o nuestras prácticas de datos, contáctanos:</p>
+<ul>
+  <li><strong>Correo electrónico:</strong> privacy@1platform.pro</li>
+  <li><strong>Sitio web:</strong> <a href="https://1platform.pro">https://1platform.pro</a></li>
+</ul>

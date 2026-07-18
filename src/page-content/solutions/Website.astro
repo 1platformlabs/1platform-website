@@ -1,0 +1,370 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('solutions-website.title');
+const description = t('solutions-website.description');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: t('nav.solutions.website'),
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: new URL(l('/solutions/website/'), Astro.site).toString(),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 3, name: t('solutions-website.breadcrumb.website') },
+    ],
+  },
+];
+
+const features: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'globe',
+    title: t('solutions-website.feature.domain.title'),
+    description: t('solutions-website.feature.domain.desc'),
+  },
+  {
+    icon: 'content',
+    title: t('solutions-website.feature.content.title'),
+    description: t('solutions-website.feature.content.desc'),
+  },
+  {
+    icon: 'cms',
+    title: t('solutions-website.feature.cms.title'),
+    description: t('solutions-website.feature.cms.desc'),
+  },
+  {
+    icon: 'indexing',
+    title: t('solutions-website.feature.seo.title'),
+    description: t('solutions-website.feature.seo.desc'),
+  },
+];
+
+const websiteSteps = [
+  { label: t('solutions-website.step.createAccount') },
+  { label: t('solutions-website.step.connectDomain') },
+  { label: t('solutions-website.step.generateContent') },
+  { label: t('solutions-website.step.publish') },
+];
+
+/**
+ * Compared by what running a fragmented site stack actually involves. The
+ * monthly prices this table used to quote were invented and are gone.
+ */
+const comparisonRows = [
+  { without: t('solutions-website.compare.builder.without'), with_: t('solutions-website.compare.builder.with') },
+  { without: t('solutions-website.compare.aiWriting.without'), with_: t('solutions-website.compare.aiWriting.with') },
+  { without: t('solutions-website.compare.stockImages.without'), with_: t('solutions-website.compare.stockImages.with') },
+  { without: t('solutions-website.compare.domain.without'), with_: t('solutions-website.compare.domain.with') },
+];
+
+const related: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'content',
+    title: t('solutions-website.related.content.title'),
+    description: t('solutions-website.related.content.desc'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'cart',
+    title: t('nav.solutions.onlineStore'),
+    description: t('solutions-website.related.onlineStore.desc'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    icon: 'code',
+    title: t('solutions-website.related.developers.title'),
+    description: t('solutions-website.related.developers.desc'),
+    href: l('/for-developers/'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} ogImage="/og/solution-website.png" jsonLd={jsonLd}>
+  <div class="page-top">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('nav.solutions'), href: l('/solutions/') },
+        { label: t('solutions-website.breadcrumb.website') },
+      ]} />
+    </div>
+  </div>
+
+  <Hero
+    headline={t('solutions-website.hero.headline')}
+    subheadline={t('solutions-website.hero.subheadline')}
+    badge={t('nav.solutions.website')}
+    primaryCta={{ label: t('solutions-website.hero.cta.primary'), href: 'https://app.1platform.pro/app/?intent=website' }}
+    secondaryCta={{ label: t('solutions-website.hero.cta.secondary'), href: l('/pricing/') }}
+  />
+
+  <!-- Capabilities as an editorial spread: claim held left, detail listed right -->
+  <section class="section">
+    <div class="container spread">
+      <div class="spread__intro reveal">
+        <p class="eyebrow">{t('solutions-website.whatYouGet.eyebrow')}</p>
+        <h2 class="spread__title">
+          {t('solutions-website.whatYouGet.title')}
+        </h2>
+        <p class="spread__desc">
+          {t('solutions-website.whatYouGet.desc')}
+        </p>
+      </div>
+
+      <ul class="capabilities">
+        {features.map((feature) => (
+          <li class="capabilities__item">
+            <span class="capabilities__icon"><Icon name={feature.icon} size={20} /></span>
+            <div class="capabilities__body">
+              <h3 class="capabilities__title">{feature.title}</h3>
+              <p class="capabilities__desc">{feature.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-website.howItWorks.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-website.howItWorks.lead')}</h2>
+      <ProcessSpine steps={websiteSteps} label={t('solutions-website.howItWorks.aria')} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-website.whatItReplaces.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-website.whatItReplaces.lead')}</h2>
+      <ComparisonTable rows={comparisonRows} />
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-website.related.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-website.related.lead')}</h2>
+      <div class="related">
+        {related.map((item) => (
+          <Card
+            variant="bare"
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            href={item.href}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Page-specific next step. The general closing CTA lives in the footer. -->
+  <section class="section">
+    <div class="container">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">{t('solutions-website.next.eyebrow')}</p>
+          <h2 class="next__title">{t('solutions-website.next.title')}</h2>
+          <p class="next__desc">
+            {t('solutions-website.next.desc')}
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            {t('solutions-website.next.linkCue')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+        <div class="next__actions">
+          <a href="https://app.1platform.pro/app/?intent=website" class="btn btn--primary">{t('solutions-website.hero.cta.primary')}</a>
+          <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions-website.next.actions.viewPricing')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The hero carries its own header offset, so it is neutralised below the
+     breadcrumb strip to avoid stacking two header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== Editorial spread ===== */
+  .spread {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-16);
+    align-items: start;
+  }
+
+  .spread__intro {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-10));
+  }
+
+  .spread__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .spread__desc {
+    margin: 0;
+  }
+
+  .capabilities {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .capabilities__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .capabilities__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .capabilities__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    padding-top: 2px;
+  }
+
+  .capabilities__body {
+    min-width: 0;
+  }
+
+  .capabilities__title {
+    font-size: var(--text-lg);
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .capabilities__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  /* ===== Related ===== */
+  .related {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-10);
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Closing band ===== */
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .spread {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+    }
+
+    .spread__intro {
+      position: static;
+    }
+
+    .related {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .related {
+      grid-template-columns: 1fr;
+    }
+
+    .spread__title {
+      font-size: var(--text-2xl);
+    }
+  }
+</style>

@@ -61,6 +61,12 @@ export default defineMessages({
     'footer.link.cookies': 'Cookie Policy',
     'footer.copyright': '© {year} 1Platform Labs. All rights reserved.',
 
+    // The slogan is brand, not copy: it reads the same in both trees, and the
+    // Spanish-only sibling site keeps it in English too. It lives here rather
+    // than as a literal so the decision is visible instead of looking like a
+    // string somebody forgot.
+    'brand.slogan': 'One platform. Every solution.',
+
     // — Layout chrome —————————————————————————————————————————
     'layout.skipToContent': 'Skip to main content',
     'layout.logoLabel': '1Platform Home',
@@ -142,6 +148,8 @@ export default defineMessages({
     'footer.link.privacy': 'Política de privacidad',
     'footer.link.cookies': 'Política de cookies',
     'footer.copyright': '© {year} 1Platform Labs. Todos los derechos reservados.',
+
+    'brand.slogan': 'One platform. Every solution.',
 
     // — Estructura de la página ———————————————————————————————
     'layout.skipToContent': 'Saltar al contenido principal',
