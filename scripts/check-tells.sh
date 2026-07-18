@@ -24,6 +24,24 @@ FAILED=0
 # exists to police.
 SRC="src/pages src/components src/layouts src/i18n src/page-content"
 
+# The content collections — 30 Markdown files, ~17,500 words of client-facing
+# prose in both languages — are scanned SEPARATELY, and only by the rules whose
+# policy is absolute regardless of medium.
+#
+# They were scanned by nothing at all, which meant a provider name in a blog
+# post shipped with this script green: a direct breach of the one rule the
+# ecosystem calls critical. That is fixed below.
+#
+# The rest of the rules deliberately stop at markup, because they are design-
+# system rules and their intent does not survive the move to long-form prose.
+# `→` in "webhook → notification" is punctuation in a sentence, not a glyph
+# standing in for an icon; an article observing that teams juggle several tools
+# is editorial context, not the site claiming it replaces them. Pointing those
+# rules at prose produces false positives that teach people to ignore the
+# script, which costs more than the coverage is worth.
+PROSE="src/content"
+
+
 # Documentation comments legitimately name the patterns they removed, so a
 # JSDoc/line/HTML comment is not a finding. Everything else is.
 strip_comments() {
@@ -57,7 +75,7 @@ command -v perl >/dev/null 2>&1 || {
 # A scan directory that no longer exists must stop the script, not print a
 # `find: no such file` line above a green "ok". Renaming a source directory is
 # exactly how a rule quietly stops seeing the code it guards.
-for dir in $SRC; do
+for dir in $SRC $PROSE; do
   [ -d "$dir" ] || {
     printf '%sFAIL%s  preflight: scan directory %s does not exist\n' "$RED" "$RESET" "$dir"
     printf '%s      every directory in SRC must exist, or rules silently scan less%s\n' \
@@ -66,7 +84,7 @@ for dir in $SRC; do
   }
 done
 
-FILES=$(find $SRC -type f \( -name '*.astro' -o -name '*.ts' -o -name '*.css' \))
+FILES=$(find $SRC -type f \( -name '*.astro' -o -name '*.ts' -o -name '*.css' -o -name '*.md' \))
 
 # 1. Emoji and HTML entity glyphs standing in for icons.
 # `-CSD` is load-bearing, not decoration. Without it perl reads bytes, so a
@@ -90,7 +108,7 @@ report "no retired card/kit components" \
        "one Card primitive with variants replaced the four near-identical cards" "$m"
 
 # 3. Fabricated pricing and vanity metrics.
-m=$(grep -rnE '\$[0-9]+ ?\+?/ ?mo|around \$[0-9]|[0-9],?[0-9]*\+ (Stores|Invoices|Articles)|Platform in Numbers|data-count-to' $SRC | strip_comments)
+m=$(grep -rnE '\$[0-9]+ ?\+?/ ?mo|\$[0-9]+ ?/ ?mes|around \$[0-9]|desde \$[0-9]|[0-9],?[0-9]*\+ (Stores|Invoices|Articles)|Platform in Numbers|data-count-to' $SRC $PROSE | strip_comments)
 report "no fabricated prices or vanity metrics" \
        "competitor prices and hand-maintained traction numbers had no source" "$m"
 
@@ -161,7 +179,7 @@ report "fonts are self-hosted and preloaded" \
 # out: an earlier version of this rule matched only `privacy.astro|privacy.ts`,
 # which silently excluded nothing that mattered and turned the legally-required
 # processor disclosure into a permanent red.
-m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b' $SRC \
+m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b' $SRC $PROSE \
   | grep -viE '(^|/)privacy(\.(en|es))?\.(astro|ts):' | strip_comments)
 report "no external provider names outside the privacy policy" \
        "capabilities are presented as native product features" "$m"
@@ -173,7 +191,10 @@ report "no client:* directives" \
 
 # 12. A pinned locale tag renders one language's dates in both trees. The tags
 #     live in the i18n module, keyed by locale; nothing else may name one.
-m=$(grep -rnE "['\"](en-US|es-ES|en-GB|es-MX)['\"]" $SRC \
+# Matched by shape rather than by a list of four: `es-419` and `es-GT` are just
+# as pinned as `en-US`, and a template literal is just as hardcoded as a quoted
+# string.
+m=$(grep -rnE "['\"\`][a-z]{2}-[A-Za-z0-9]{2,3}['\"\`]" $SRC \
   | grep -v 'src/i18n/ui.ts' | strip_comments)
 report "no hardcoded locale tags" \
        "dates and numbers format from the page's locale, not a literal" "$m"
@@ -181,9 +202,15 @@ report "no hardcoded locale tags" \
 # 13. Copy belongs in a message module, so a literal in the markup is a string
 #     that exists in one language only. Catches the common slip of translating a
 #     page but leaving one heading or aria-label behind.
-m=$(grep -rnE '(aria-label|title|alt|placeholder)="[A-Za-z][A-Za-z ,.!?'"'"'-]{7,}"' \
-  src/page-content src/components src/layouts 2>/dev/null \
-  | grep -viE 'aria-label=\{|title=\{|\{t\(|Astro\.props' | strip_comments)
+# perl, not grep: the character class has to include accented letters, and this
+# is a bilingual site. With `[A-Za-z ,.!?'-]` the rule could not see
+# `alt="Panel de administración"` — every Spanish attribute carrying an accent
+# was invisible to the one rule that exists to catch untranslated attributes.
+m=$(perl -CSD -ne '
+  next if /aria-label=\{|title=\{|\{t\(|Astro\.props/;
+  print "$ARGV:$.:$_" if /(?:aria-label|title|alt|placeholder)="\p{L}[\p{L}0-9 ,.!?'"'"'-]{7,}"/;
+  close ARGV if eof;
+' $(find src/page-content src/components src/layouts -type f -name '*.astro') | strip_comments)
 report "no untranslated literal attributes" \
        "visible and accessible text comes from t(), not from a literal" "$m"
 

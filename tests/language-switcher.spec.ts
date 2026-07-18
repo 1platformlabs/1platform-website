@@ -135,3 +135,27 @@ test('the logo returns to the home page of the language being read', async ({ pa
   await page.locator('header a.logo').click();
   await expect(page).toHaveURL(/\/es\/$/);
 });
+
+test('a modifier click does not record a preference in this tab', async ({ context, page }) => {
+  // Cmd/ctrl-click opens the other language in a NEW tab and leaves this one
+  // where it is. Recording the choice here would pin this tab to a language the
+  // reader never switched it to — and because the preference outranks
+  // detection, it would keep doing so on every later visit.
+  await page.goto('/pricing/');
+  await page.locator('a[data-lang-choice="es"]').first().click({ modifiers: ['Meta'] });
+
+  await expect(page).toHaveURL(/\/pricing\/$/);
+  expect((await context.cookies()).find((c) => c.name === '1p_lang')).toBeUndefined();
+});
+
+test('the language code carries lang, the accessible name does not', async ({ page }) => {
+  // The accessible name is written in the language of the PAGE, so marking the
+  // whole anchor as the OTHER language made a screen reader read an English
+  // sentence with Spanish phonemes.
+  await page.goto('/pricing/');
+  const link = page.locator('.lang--desktop a[data-lang-choice="es"]');
+
+  await expect(link).toHaveAttribute('hreflang', 'es');
+  await expect(link).not.toHaveAttribute('lang', /.*/);
+  await expect(link.locator('span[lang="es"]')).toHaveText('ES');
+});

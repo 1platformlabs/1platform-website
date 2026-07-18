@@ -71,7 +71,7 @@ test.describe('treats any other language as Spanish', () => {
 test.describe('an explicit choice beats the browser', () => {
   test.use({ locale: 'es-MX' });
 
-  test('the cookie suppresses the redirect', async ({ context, page }) => {
+  test('choosing English keeps a Spanish browser on English', async ({ context, page }) => {
     await context.addCookies([
       { name: '1p_lang', value: 'en', url: 'http://localhost:4321' },
     ]);
@@ -79,6 +79,52 @@ test.describe('an explicit choice beats the browser', () => {
     await page.goto('/pricing/');
     await expect(page).toHaveURL(/\/pricing\/$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
+  test('a cookie that is not one of the two known values is ignored', async ({
+    context,
+    page,
+  }) => {
+    // A stale, truncated or externally-set cookie must degrade to detection.
+    // Reading it as "some preference exists" would pin the reader to English
+    // with no way back except finding the control.
+    for (const value of ['', 'fr', 'garbage', 'EN-GB']) {
+      await context.clearCookies();
+      await context.addCookies([
+        { name: '1p_lang', value, url: 'http://localhost:4321' },
+      ]);
+
+      await page.goto('/pricing/');
+      await expect(page, `cookie value ${JSON.stringify(value)}`).toHaveURL(/\/es\/pricing\/$/);
+    }
+  });
+});
+
+test.describe('choosing Spanish is honoured, not merely noted', () => {
+  // The browser is English here, so only the stored choice can produce Spanish.
+  // This is the case that was inverted: the cookie was tested for PRESENCE, so
+  // choosing "Español" suppressed the redirect and the only way to be shown
+  // Spanish was to have expressed no preference at all.
+  test.use({ locale: 'en-US' });
+
+  test('an English browser that chose Spanish gets Spanish', async ({ context, page }) => {
+    await context.addCookies([
+      { name: '1p_lang', value: 'es', url: 'http://localhost:4321' },
+    ]);
+
+    await page.goto('/pricing/');
+    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  });
+
+  test('the choice is honoured on a page with no Spanish version', async ({ context, page }) => {
+    await context.addCookies([
+      { name: '1p_lang', value: 'es', url: 'http://localhost:4321' },
+    ]);
+
+    // Preferring Spanish still cannot conjure a page that does not exist.
+    await page.goto('/404.html');
+    await expect(page).toHaveURL(/\/404\.html$/);
   });
 });
 

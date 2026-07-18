@@ -4,7 +4,8 @@ import Breadcrumb from '@components/Breadcrumb.astro';
 import BlogPostCard from '@components/BlogPostCard.astro';
 import Icon from '@components/Icon.astro';
 import { useI18n } from '@i18n';
-import { bareSlug } from '@i18n/collections';
+import { bareSlug, categoryAlternates } from '@i18n/collections';
+import { localizePath } from '@i18n';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -16,6 +17,12 @@ interface Props {
 const { posts, category, siblings } = Astro.props;
 const { t, l } = useI18n(Astro.url.pathname);
 
+// Declared from the categories that actually publish in each language, not
+// assumed from the slug: a category can exist in one tree and not the other.
+const alternates = await categoryAlternates(category, (locale, slug) =>
+  localizePath(`/blog/category/${slug}/`, locale),
+);
+
 const categoryLabel = t(`blog.category.${category}`);
 // The plural used to be baked into a template literal, so it only ever agreed
 // in English. Both forms now live in the catalogue, one per language.
@@ -25,6 +32,7 @@ const countLabel = t.plural(posts.length, 'blog.category.count_one', 'blog.categ
 <BaseLayout
   title={t('blog.category.title', { category: categoryLabel })}
   description={t('blog.category.description', { category: categoryLabel })}
+  alternates={alternates}
 >
   <section class="section">
     <div class="container">

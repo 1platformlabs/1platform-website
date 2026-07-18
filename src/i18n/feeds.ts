@@ -4,6 +4,18 @@ import { localizePath, useI18n, type Locale } from '@i18n';
 import { bareSlug, getLocalized } from '@i18n/collections';
 
 /**
+ * The channel `<link>` — the element that says "this feed describes THIS site".
+ *
+ * It comes from `site`, so passing the bare origin made the Spanish feed point
+ * a subscriber at the English homepage. Item links are unaffected: they are
+ * root-relative, and a root-relative path resolves against the origin, not the
+ * base path, so `/es/blog/x/` stays `/es/blog/x/` either way.
+ */
+function channelSite(context: { site?: URL | null }, locale: Locale): string {
+  return new URL(localizePath('/', locale), context.site!).toString();
+}
+
+/**
  * The two RSS feeds, one builder each, parameterised by locale.
  *
  * Both used to read their collection unfiltered, so once Spanish entries
@@ -19,7 +31,10 @@ export async function blogFeed(context: APIContext, locale: Locale) {
   return rss({
     title: t('blog.feed.title'),
     description: t('blog.feed.description'),
-    site: context.site!.toString(),
+    site: channelSite(context, locale),
+    // Without this a reader has no way to tell the two feeds apart except by
+    // reading the entries.
+    customData: `<language>${locale}</language>`,
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
@@ -37,11 +52,15 @@ export async function changelogFeed(context: APIContext, locale: Locale) {
   return rss({
     title: t('changelog.feed.title'),
     description: t('changelog.feed.description'),
-    site: context.site!.toString(),
+    site: channelSite(context, locale),
+    customData: `<language>${locale}</language>`,
     items: entries.map((entry) => ({
       title: entry.data.title,
       pubDate: entry.data.date,
-      link: localizePath('/changelog/', locale),
+      // Changelog entries share one page, so a constant link gave all seven
+      // items the same derived guid and a reader deduped them down to one. The
+      // anchor makes each guid unique and still lands on the right release.
+      link: `${localizePath('/changelog/', locale)}#${entry.data.version ?? bareSlug(entry.slug)}`,
       categories: [entry.data.category],
     })),
   });

@@ -139,7 +139,7 @@ export default defineMessages({
     'solutions-online-store.step.createAccount': 'Crea tu cuenta',
     'solutions-online-store.step.addProducts': 'Agrega productos',
     'solutions-online-store.step.connectDomain': 'Conecta tu dominio',
-    'solutions-online-store.step.goLive': 'Sal en vivo',
+    'solutions-online-store.step.goLive': 'Publica',
 
     'solutions-online-store.whatItReplaces.eyebrow': 'Lo que reemplaza',
     'solutions-online-store.whatItReplaces.lead': 'Una plataforma en lugar de herramientas separadas',

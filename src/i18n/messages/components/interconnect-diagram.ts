@@ -25,7 +25,7 @@ export default defineMessages({
   },
   es: {
     'interconnect.input.keywords': 'palabras clave',
-    'interconnect.input.aiContent': 'contenido ia',
+    'interconnect.input.aiContent': 'contenido con IA',
     'interconnect.input.images': 'imágenes',
     'interconnect.input.indexing': 'indexación',
     'interconnect.output.storefront': 'tienda',

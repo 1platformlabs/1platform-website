@@ -49,8 +49,8 @@ const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
 
     if (!href) {
       return (
-        <span class="lang__item lang__item--off" aria-disabled="true" lang={code}>
-          {SHORT[code]}
+        <span class="lang__item lang__item--off" aria-disabled="true">
+          <span lang={code}>{SHORT[code]}</span>
           <span class="sr-only">
             {` — ${t('lang.unavailable', { language: LOCALE_NAMES[code] })}`}
           </span>
@@ -63,11 +63,17 @@ const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
         class="lang__item"
         href={href}
         hreflang={code}
-        lang={code}
         data-lang-choice={code}
         aria-label={t('lang.aria.switchTo', { language: LOCALE_NAMES[code] })}
       >
-        {SHORT[code]}
+        {/*
+          `lang` belongs on the two-letter code, which really is in that
+          language — not on the anchor, whose accessible name is written in the
+          language of the PAGE. With it on the anchor a screen reader switched
+          its phoneme set and then read an English sentence as Spanish.
+          `hreflang` is the correct annotation for where the link goes.
+        */}
+        <span lang={code}>{SHORT[code]}</span>
       </a>
     );
   })}
@@ -86,6 +92,25 @@ const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
    * link, so it survives every swap without accumulating duplicates.
    */
   function rememberLanguageChoice(event: MouseEvent) {
+    /*
+      Only a click that actually navigates THIS tab is a preference.
+
+      A cmd/ctrl-click opens the other language in a new tab and leaves this one
+      where it was — recording the choice here would pin this tab to a language
+      the reader did not switch it to, and, because the preference outranks
+      detection, would keep doing so on every later visit. Same for a
+      middle-click and a shift-click.
+
+      Deliberately NOT checking `defaultPrevented`: the client router intercepts
+      same-origin clicks and prevents the default to swap the document itself,
+      so treating that as "something else handled it" rejected every ordinary
+      click and the preference was never written at all. The router leaves
+      modified clicks alone, which is exactly why the checks below still catch
+      the case this guard is for.
+    */
+    if (event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
     const target = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-lang-choice]');
     if (!target) return;
 

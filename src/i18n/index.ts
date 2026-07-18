@@ -21,11 +21,16 @@ type MessageModule = { en: Record<string, string>; es: Record<string, string> };
  * own module and removes the shared file entirely.
  *
  * The trade-off is that the key union is no longer statically known, so `t()`
- * is not autocompleted. The two properties that actually matter are kept:
- * `defineMessages` still makes a missing Spanish key a *compile* error in the
- * module where it belongs, and `t()` throws on an unknown key — which fails the
- * build, because a static build renders every page and therefore executes every
- * `t()` call. Nothing degrades silently to English.
+ * is not autocompleted. `defineMessages` still makes a missing Spanish key a
+ * compile error in the module where it belongs, and `t()` throws rather than
+ * falling back to English.
+ *
+ * That throw is NOT a complete net, and it is worth being precise about why:
+ * "the build renders every page, so every t() call runs" sounds right and is
+ * false. A `t()` on a branch that never renders — `blog.updated`, behind an
+ * `updatedDate` no entry sets — can name a key that does not exist and pass the
+ * build, the typecheck and the browser suite. `tests/i18n-catalogue.spec.ts`
+ * closes that statically, in both directions.
  */
 const modules = import.meta.glob<{ default: MessageModule }>('./messages/**/*.ts', {
   eager: true,
@@ -43,7 +48,7 @@ function buildDictionary(locale: Locale): Record<string, string> {
     for (const [key, value] of Object.entries(messages)) {
       // Two modules owning the same key is how one page silently rewrites
       // another page's copy. Cheap to detect here, invisible otherwise.
-      if (key in dictionary) {
+      if (Object.hasOwn(dictionary, key)) {
         throw new Error(
           `[i18n] Duplicate key "${key}" defined in both ${origin[key]} and ${path}. ` +
             'Each key belongs to exactly one message module.',
@@ -75,14 +80,25 @@ function assertParity(): void {
   const en = Object.keys(DICTIONARIES.en);
   const es = Object.keys(DICTIONARIES.es);
 
-  const missing = en.filter((key) => !(key in DICTIONARIES.es));
-  const extra = es.filter((key) => !(key in DICTIONARIES.en));
+  const missing = en.filter((key) => !Object.hasOwn(DICTIONARIES.es, key));
+  const extra = es.filter((key) => !Object.hasOwn(DICTIONARIES.en, key));
 
-  if (missing.length || extra.length) {
+  // An empty value is a gap that comparing key sets cannot see: it type-checks,
+  // it satisfies parity, and `t()` returns it happily. It renders as a blank
+  // heading — which is worse than a missing key, because nothing anywhere goes
+  // red and the page merely looks unfinished.
+  const blank = [...LOCALES].flatMap((locale) =>
+    Object.entries(DICTIONARIES[locale])
+      .filter(([, value]) => value.trim() === '')
+      .map(([key]) => `  empty ${locale} value: ${key}`),
+  );
+
+  if (missing.length || extra.length || blank.length) {
     const lines = [
       '[i18n] The catalogues are out of sync.',
       ...missing.map((k) => `  missing from Spanish: ${k}`),
       ...extra.map((k) => `  only in Spanish: ${k}`),
+      ...blank,
     ];
     throw new Error(lines.join('\n'));
   }

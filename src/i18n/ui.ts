@@ -145,7 +145,12 @@ export function createTranslator(
   dictionary: Record<string, string>,
 ): Translator {
   const t = ((key: string, vars?: Record<string, string | number>): string => {
-    const value = dictionary[key];
+    // `Object.hasOwn`, not `dictionary[key] !== undefined`: a plain object
+    // inherits from Object.prototype, so `t('constructor')` resolved to the
+    // Object constructor and rendered "function Object() { [native code] }"
+    // into an aria-label instead of throwing. About a dozen names escaped the
+    // "no fallback by design" guarantee that way.
+    const value = Object.hasOwn(dictionary, key) ? dictionary[key] : undefined;
     if (value === undefined) {
       throw new Error(
         `[i18n] Missing translation for key "${key}" in locale "${locale}". ` +

@@ -99,7 +99,7 @@ export default defineMessages({
       'Saldo, conteos sin leer, contadores en curso y feature gates resueltos en la misma llamada — sin viajes adicionales antes de que la primera pantalla sea útil.',
     'solutions-whitelabel.spec.contract.term': 'El contrato que usamos nosotros mismos',
     'solutions-whitelabel.spec.contract.detail':
-      'El panel de 1Platform está construido sobre esta misma respuesta de arranque. Estás configurando la misma superficie que nosotros usamos, no una edición de marca blanca aparte.',
+      'El panel de 1Platform está construido sobre esta misma respuesta de arranque. Estás configurando la misma superficie que publicamos, no una edición de marca blanca aparte.',
 
     'solutions-whitelabel.howItWorks.eyebrow': 'Cómo funciona',
     'solutions-whitelabel.howItWorks.lead': 'De la configuración del tenant a un panel con tu marca en producción.',

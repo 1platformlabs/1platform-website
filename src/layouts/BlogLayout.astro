@@ -75,7 +75,7 @@ const articleJsonLd = {
 ---
 
 <BaseLayout
-  title={`${frontmatter.title} | 1Platform Blog`}
+  title={t('blog.post.title', { title: frontmatter.title })}
   description={frontmatter.description}
   ogImage={frontmatter.ogImage}
   jsonLd={articleJsonLd}

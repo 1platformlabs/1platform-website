@@ -182,7 +182,7 @@ export default defineMessages({
       'Envía URLs a los buscadores para un rastreo más rápido. Procesamiento por lotes y seguimiento de estado.',
     'features.distribution.item4.title': 'Link Building',
     'features.distribution.item4.description':
-      'Marketplace integrado para guest posts y backlinks — construye autoridad mediante la API.',
+      'Marketplace integrado para guest posts y backlinks — construye autoridad de forma programática.',
     'features.demo.indexing.title': 'Enviar una URL para indexación',
 
     // — Plataforma para desarrolladores ——————————————————————————

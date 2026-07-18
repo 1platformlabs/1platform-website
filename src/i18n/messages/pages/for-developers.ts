@@ -110,7 +110,7 @@ export default defineMessages({
     'for-developers.related.eyebrow': 'Relacionado',
     'for-developers.related.lead': 'Impulsa tu producto con el resto de la plataforma',
     'for-developers.related.whitelabel.description': 'Inicializa un panel con tu marca para tu propio SaaS en una sola llamada a la API.',
-    'for-developers.related.payments.description': 'Agrega a tu producto pagos y facturación electrónica, vía REST.',
+    'for-developers.related.payments.description': 'Agrega a tu producto pagos y facturación conforme, vía REST.',
     'for-developers.related.content.title': 'Generación de contenido con IA',
     'for-developers.related.content.description': 'Integra generación de contenido, imágenes y SEO dentro de tu producto.',
   },

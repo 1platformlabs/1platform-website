@@ -86,6 +86,31 @@ export async function categoryPaths(locale: Locale) {
 }
 
 /**
+ * Which languages actually publish a given blog category.
+ *
+ * Category pages are generated from the posts that exist, so a category can be
+ * present in one language and absent in the other. Falling back to "same slug
+ * in both languages" would then declare an alternate pointing at a page that
+ * was never built — the one thing the hreflang-as-single-source design exists
+ * to prevent, reintroduced through the back door.
+ */
+export async function categoryAlternates(
+  category: string,
+  pathFor: (locale: Locale, category: string) => string,
+): Promise<Partial<Record<Locale, string>>> {
+  const alternates: Partial<Record<Locale, string>> = {};
+
+  for (const locale of LOCALES) {
+    const posts = await getLocalized('blog', locale);
+    if (posts.some((post) => post.data.category === category)) {
+      alternates[locale] = pathFor(locale, category);
+    }
+  }
+
+  return alternates;
+}
+
+/**
  * Which languages a given entry exists in, as paths.
  *
  * Feeds the hreflang block, the language switcher and the auto-detect script
@@ -100,9 +125,25 @@ export async function entryAlternates<C extends LocalizableCollection>(
   const all = await getCollection(collection);
   const alternates: Partial<Record<Locale, string>> = {};
 
+  const claimedBy: Partial<Record<Locale, string>> = {};
+
   for (const entry of all) {
     if (entry.data.translationKey !== translationKey) continue;
-    alternates[localeOf(entry.id)] = pathFor(localeOf(entry.id), bareSlug(entry.slug));
+    const locale = localeOf(entry.id);
+
+    // Two entries in the SAME language claiming one translationKey is a typo,
+    // not a translation. Silently keeping the last one produced a page whose
+    // self-referential hreflang pointed at a different article, and a language
+    // control that sent readers to the translation of something else.
+    if (claimedBy[locale]) {
+      throw new Error(
+        `[i18n] translationKey "${translationKey}" is claimed by two ${locale} entries in ` +
+          `"${collection}": ${claimedBy[locale]} and ${entry.id}. Each language may claim it once.`,
+      );
+    }
+
+    claimedBy[locale] = entry.id;
+    alternates[locale] = pathFor(locale, bareSlug(entry.slug));
   }
 
   return alternates;

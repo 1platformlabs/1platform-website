@@ -89,7 +89,7 @@ export default defineMessages({
     'for-agencies.talk.title': 'Habla con nuestro equipo',
     'for-agencies.talk.body':
       'Cuéntanos cómo es tu agencia — cuántos sitios esperas operar, cómo facturas a tus clientes y si necesitas marca blanca — y construimos contigo el plan de onboarding correcto.',
-    'for-agencies.cta.contactSales': 'Contactar a ventas',
+    'for-agencies.cta.contactSales': 'Contacta a ventas',
     'for-agencies.cta.readApiDocs': 'Ver documentación de la API',
 
     'for-agencies.related.eyebrow': 'Relacionado',

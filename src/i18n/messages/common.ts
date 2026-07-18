@@ -129,7 +129,7 @@ export default defineMessages({
     'nav.solutions.payments': 'Pagos y facturación',
     'nav.solutions.viewAll': 'Ver todas las soluciones',
 
-    'cta.getStarted': 'Empezar gratis',
+    'cta.getStarted': 'Empieza gratis',
     'cta.launchStore': 'Lanza tu tienda',
     'cta.viewDocs': 'Ver la documentación',
 

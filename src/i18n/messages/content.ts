@@ -21,7 +21,6 @@ export default defineMessages({
       'How we build the platform, and how to build on top of it — stores, payments, invoicing, content, and the API underneath all of it.',
     'blog.subscribe': 'Subscribe via RSS',
     'blog.readingTime': '{n} min read',
-    'blog.by': 'By {author}',
     'blog.writtenBy': 'Written by',
     'blog.length': 'Length',
     'blog.published': 'Published',
@@ -38,7 +37,6 @@ export default defineMessages({
     'blog.category.other': 'Other topics',
     'blog.category.otherAria': 'Other topics',
     'blog.category.all': 'All articles',
-    'blog.category.more': 'More topics',
     'blog.category.count_one': '{n} article',
     'blog.category.count_other': '{n} articles',
 
@@ -51,6 +49,11 @@ export default defineMessages({
     'blog.category.payments-invoicing': 'Payments & invoicing',
 
     // — RSS feeds ——————————————————————————————————————————————
+    // The post <title> was assembled from a template literal in BlogLayout, so
+    // it bypassed the catalogue entirely and every Spanish post shipped an
+    // English title — in the browser tab and in search results.
+    'blog.post.title': '{title} | 1Platform Blog',
+    'blog.readArticle': 'Read the article',
     'blog.feed.title': '1Platform Blog',
     'blog.feed.description':
       'Insights on SEO automation, AI content generation, API tutorials, and product updates from the 1Platform team.',
@@ -83,7 +86,6 @@ export default defineMessages({
       'Cómo construimos la plataforma y cómo construir sobre ella — tiendas, pagos, facturación, contenido y la API que hay debajo de todo.',
     'blog.subscribe': 'Suscríbete por RSS',
     'blog.readingTime': '{n} min de lectura',
-    'blog.by': 'Por {author}',
     'blog.writtenBy': 'Escrito por',
     'blog.length': 'Extensión',
     'blog.published': 'Publicado',
@@ -100,7 +102,6 @@ export default defineMessages({
     'blog.category.other': 'Otros temas',
     'blog.category.otherAria': 'Otros temas',
     'blog.category.all': 'Todos los artículos',
-    'blog.category.more': 'Más temas',
     'blog.category.count_one': '{n} artículo',
     'blog.category.count_other': '{n} artículos',
 
@@ -112,6 +113,8 @@ export default defineMessages({
     'blog.category.payments-invoicing': 'Pagos y facturación',
 
     // — Feeds RSS ——————————————————————————————————————————————
+    'blog.post.title': '{title} | Blog de 1Platform',
+    'blog.readArticle': 'Leer el artículo',
     'blog.feed.title': 'Blog de 1Platform',
     'blog.feed.description':
       'Ideas sobre automatización de SEO, generación de contenido con IA, tutoriales de la API y novedades del producto, del equipo de 1Platform.',

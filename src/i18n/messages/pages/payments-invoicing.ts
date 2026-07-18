@@ -107,7 +107,7 @@ export default defineMessages({
 
     'paymentsInvoicing.faq.countries.q': '¿Para qué países está disponible la facturación electrónica?',
     'paymentsInvoicing.faq.countries.a':
-      'Hoy la facturación electrónica emite comprobantes conformes para Guatemala (FEL). Más países están en el roadmap — contacta a ventas para conocer los plazos.',
+      'Hoy la facturación electrónica emite facturas conformes para Guatemala (FEL). Más jurisdicciones están en el roadmap — contacta a ventas para conocer los plazos.',
     'paymentsInvoicing.faq.currencies.q': '¿Qué monedas y métodos de pago aceptan?',
     'paymentsInvoicing.faq.currencies.a':
       'Aceptamos las principales tarjetas de crédito y débito. La moneda de liquidación se configura por comercio — contacta a ventas para habilitar monedas adicionales.',

@@ -280,9 +280,9 @@ export default defineMessages({
     'pricing.start.panel2.kicker': 'Solicita una cotización',
     'pricing.start.panel2.title': 'Pide tu tarifario',
     'pricing.start.panel2.body':
-      'Algunos costos no son nuestros para publicar: los define alguien fuera de la plataforma y solo los trasladamos. Esos costos, más las tarifas por volumen, son justo para lo que sirve una cotización:',
+      'Algunos costos no nos corresponde publicarlos: los define alguien fuera de la plataforma y solo los trasladamos. Esos costos, más las tarifas por volumen, son justo para lo que sirve una cotización:',
     'pricing.quoted.domain.name': 'Registro, transferencia y renovación de dominios',
-    'pricing.quoted.domain.reason': 'lo define la extensión y el registrador',
+    'pricing.quoted.domain.reason': 'lo definen la extensión y el registro',
     'pricing.quoted.payment.name': 'Procesamiento de pagos',
     'pricing.quoted.payment.reason': 'lo definen las redes de tarjetas en tu país',
     'pricing.quoted.invoicing.name': 'Facturación electrónica',
@@ -303,7 +303,7 @@ export default defineMessages({
       'Las tarifas se definen por cuenta en lugar de publicarse en una sola lista, porque varían según el volumen y el país donde operas. La unidad con la que se factura cada operación es fija y está listada arriba; la tarifa asignada a cada unidad viene en tu tarifario.',
     'pricing.faq.freePlan.question': '¿Hay un plan gratuito?',
     'pricing.faq.freePlan.answer':
-      'Sí. Crea una cuenta sin tarjeta de crédito y obtienes una cuota diaria para generación de contenido y extracción de palabras clave, además de acceso completo a la API REST. Cuando necesites más que la cuota diaria, añade saldo: nada de cómo construyes cambia.',
+      'Sí. Crea una cuenta sin tarjeta de crédito y obtienes una cuota diaria para generación de contenido y extracción de palabras clave, además de acceso completo a la API REST. Cuando necesites más que la cuota diaria, añade saldo: nada cambia en tu forma de construir.',
     'pricing.faq.operationFails.question': '¿Qué pasa si una operación falla?',
     'pricing.faq.operationFails.answer':
       'No se cobra nada. El costo se retiene contra tu saldo antes de que el trabajo empiece y se captura solo cuando la operación se completa. Si falla, la retención se libera y tu saldo queda intacto. Los reintentos llevan una clave de idempotencia, así que una llamada repetida nunca se cobra dos veces.',
