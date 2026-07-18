@@ -1,4 +1,6 @@
 ---
+import InterconnectDiagram from '@components/InterconnectDiagram.astro';
+
 interface IntentChip {
   label: string;
   href: string;
@@ -9,8 +11,15 @@ interface Props {
   subheadline: string;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
+  /** Mono label sitting above the headline. */
   badge?: string;
   intentChips?: IntentChip[];
+  /**
+   * Mounts the interconnect motif alongside the copy. Reserved for the home
+   * page — the signature stays singular by only appearing where it argues the
+   * brand's central claim.
+   */
+  motif?: boolean;
 }
 
 const {
@@ -20,184 +29,95 @@ const {
   secondaryCta = { label: 'View Documentation', href: 'https://developer.1platform.pro/' },
   badge,
   intentChips,
+  motif = false,
 } = Astro.props;
-
-const words = headline.split(' ');
-const chipsDelay = String(words.length * 100 + 400);
 ---
 
-<section class="hero dot-grid">
-  <div class="hero__aurora" aria-hidden="true">
-    <div class="hero__blob hero__blob--1"></div>
-    <div class="hero__blob hero__blob--2"></div>
-    <div class="hero__blob hero__blob--3"></div>
-  </div>
+<section class:list={['hero', motif && 'hero--motif']}>
+  <div class="container hero__inner">
+    <div class="hero__copy">
+      {badge && <p class="eyebrow hero__eyebrow">{badge}</p>}
 
-  <div class="container hero__content">
-    {badge && <span class="badge hero__badge reveal">{badge}</span>}
+      <h1 class="hero__headline">{headline}</h1>
 
-    <h1 class="hero__headline">
-      {words.map((word, i) => (
-        <span class="hero__word reveal" data-delay={String(i * 100)}>
-          {word}{' '}
-        </span>
-      ))}
-    </h1>
+      <p class="hero__sub">{subheadline}</p>
 
-    <p class="hero__sub reveal" data-delay={String(words.length * 100)}>
-      {subheadline}
-    </p>
+      <div class="hero__actions">
+        <a href={primaryCta.href} class="btn btn--primary">{primaryCta.label}</a>
+        <a href={secondaryCta.href} class="btn btn--ghost">{secondaryCta.label}</a>
+      </div>
 
-    <div class="hero__actions reveal" data-delay={String(words.length * 100 + 200)}>
-      <a href={primaryCta.href} class="btn btn--primary">{primaryCta.label}</a>
-      <a href={secondaryCta.href} class="btn btn--ghost">{secondaryCta.label}</a>
+      {intentChips && intentChips.length > 0 && (
+        <nav class="hero__chips" aria-label="Where do you want to start?">
+          {intentChips.map((chip) => (
+            <a href={chip.href} class="hero__chip">{chip.label}</a>
+          ))}
+        </nav>
+      )}
     </div>
 
-    {intentChips && intentChips.length > 0 && (
-      <nav class="hero__chips reveal" data-delay={chipsDelay} aria-label="Where do you want to start?">
-        {intentChips.map((chip) => (
-          <a href={chip.href} class="hero__chip">{chip.label}</a>
-        ))}
-      </nav>
+    {motif && (
+      <div class="hero__motif">
+        <InterconnectDiagram />
+      </div>
     )}
   </div>
 </section>
 
 <style>
   .hero {
-    position: relative;
-    overflow: hidden;
-    padding-top: calc(var(--header-height) + var(--space-20));
-    padding-bottom: var(--space-20);
-    min-height: 80vh;
-    display: flex;
-    align-items: center;
+    padding-top: calc(var(--header-height) + var(--space-16));
+    padding-bottom: var(--space-16);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  .hero__aurora {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
+  .hero__inner {
+    display: grid;
+    gap: var(--space-12);
   }
 
-  .hero__blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.12;
-    mix-blend-mode: multiply;
+  /* Copy sits left, not centred — the centred stack is the template posture
+     this redesign leaves behind. */
+  .hero__copy {
+    max-width: 34rem;
   }
 
-  .hero__blob--1 {
-    width: 500px;
-    height: 500px;
-    background: var(--color-accent);
-    top: -10%;
-    left: 20%;
-  }
-
-  .hero__blob--2 {
-    width: 400px;
-    height: 400px;
-    background: var(--color-purple);
-    top: 30%;
-    right: 10%;
-  }
-
-  .hero__blob--3 {
-    width: 350px;
-    height: 350px;
-    background: var(--color-cyan);
-    bottom: -5%;
-    left: 40%;
-    opacity: 0.08;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .hero__blob--1 {
-      animation: float1 30s ease-in-out infinite;
-    }
-
-    .hero__blob--2 {
-      animation: float2 35s ease-in-out infinite;
-    }
-
-    .hero__blob--3 {
-      animation: float3 40s ease-in-out infinite;
-    }
-
-    @keyframes float1 {
-      0%, 100% { transform: translate(0, 0); }
-      33% { transform: translate(30px, -20px); }
-      66% { transform: translate(-20px, 15px); }
-    }
-
-    @keyframes float2 {
-      0%, 100% { transform: translate(0, 0); }
-      33% { transform: translate(-25px, 20px); }
-      66% { transform: translate(15px, -15px); }
-    }
-
-    @keyframes float3 {
-      0%, 100% { transform: translate(0, 0); }
-      33% { transform: translate(20px, 15px); }
-      66% { transform: translate(-15px, -20px); }
-    }
-  }
-
-  .hero__content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    max-width: 800px;
-    margin-inline: auto;
-  }
-
-  .hero__badge {
-    margin-bottom: var(--space-6);
+  .hero__eyebrow {
+    margin-bottom: var(--space-5);
   }
 
   .hero__headline {
     font-size: var(--text-6xl);
-    font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.04;
     margin-bottom: var(--space-6);
-  }
-
-  .hero__word {
-    margin-right: 0.3em;
-    display: inline-block;
   }
 
   .hero__sub {
     font-size: var(--text-lg);
-    max-width: 600px;
-    margin-inline: auto;
-    margin-bottom: var(--space-10);
+    line-height: 1.6;
+    margin-bottom: var(--space-8);
   }
 
   .hero__actions {
     display: flex;
-    gap: var(--space-4);
-    justify-content: center;
+    gap: var(--space-3);
     flex-wrap: wrap;
   }
 
   .hero__chips {
     margin-top: var(--space-8);
     display: flex;
-    gap: var(--space-3);
-    justify-content: center;
+    gap: var(--space-2);
     flex-wrap: wrap;
   }
 
   .hero__chip {
     display: inline-flex;
     align-items: center;
+    min-height: 44px;
     padding: var(--space-2) var(--space-4);
     border: 1px solid var(--color-border);
-    border-radius: 9999px;
+    border-radius: var(--border-radius);
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     background: var(--color-bg-alt);
@@ -206,28 +126,48 @@ const chipsDelay = String(words.length * 100 + 400);
   @media (prefers-reduced-motion: no-preference) {
     .hero__chip {
       transition: color var(--duration-fast) ease,
-                  border-color var(--duration-fast) ease,
-                  background var(--duration-fast) ease;
+                  border-color var(--duration-fast) ease;
     }
   }
 
   .hero__chip:hover {
     color: var(--color-accent);
-    border-color: var(--color-accent);
+    border-color: var(--color-border-hover);
+  }
+
+  .hero__motif {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Asymmetric split: the copy holds the left, the schematic gets room to be
+     read. */
+  @media (min-width: 900px) {
+    .hero--motif .hero__inner {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: center;
+      gap: var(--space-16);
+    }
+
+    .hero--motif .hero__copy {
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .hero__motif {
+      max-width: 32rem;
+    }
   }
 
   @media (max-width: 768px) {
     .hero {
-      min-height: auto;
-      padding-top: calc(var(--header-height) + var(--space-12));
+      padding-top: calc(var(--header-height) + var(--space-10));
       padding-bottom: var(--space-12);
     }
 
-    .hero__blob--1,
-    .hero__blob--2,
-    .hero__blob--3 {
-      width: 250px;
-      height: 250px;
+    .hero__headline {
+      font-size: var(--text-5xl);
     }
   }
 </style>

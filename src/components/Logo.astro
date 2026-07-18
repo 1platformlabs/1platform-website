@@ -2,6 +2,10 @@
 /**
  * Shared Logo component — single source of truth for 1Platform branding.
  * Used in Header, Footer, and anywhere the brand logo appears.
+ *
+ * The "1" is set as a node: the same cobalt rounded square the interconnect
+ * schematic uses for a capability. The wordmark and the motif are the same
+ * drawing at two scales.
  */
 interface Props {
   /** Accessible label for the logo link. */
@@ -14,23 +18,37 @@ const { label = '1Platform Home', class: className } = Astro.props;
 ---
 
 <a href="/" class:list={['logo', className]} aria-label={label}>
-  <span class="logo-1">1</span><span class="logo-text">Platform</span>
+  <span class="logo__mark" aria-hidden="true">1</span><span class="logo__text">Platform</span>
 </a>
 
 <style>
   .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.36em;
+    font-family: var(--font-display);
     font-size: var(--text-xl);
     font-weight: 700;
+    letter-spacing: -0.03em;
     white-space: nowrap;
-    display: inline-block;
   }
 
-  .logo-1 {
-    color: var(--color-accent);
-    font-weight: 800;
+  .logo__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.32em;
+    height: 1.32em;
+    border-radius: 0.26em;
+    background: var(--cobalt);
+    color: var(--surface);
+    font-size: 0.82em;
+    line-height: 1;
+    /* Optical centring: the numeral's flag sits left of its own box. */
+    padding-right: 0.04em;
   }
 
-  .logo-text {
+  .logo__text {
     color: var(--color-text);
   }
 </style>

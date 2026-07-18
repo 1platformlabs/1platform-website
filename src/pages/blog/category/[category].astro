@@ -3,6 +3,19 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import BlogPostCard from '@components/BlogPostCard.astro';
+import Icon from '@components/Icon.astro';
+
+/** Initialisms mean these cannot be title-cased by rule. See BlogPostCard. */
+const CATEGORY_LABELS: Record<string, string> = {
+  'seo-automation': 'SEO automation',
+  'ai-content': 'AI content',
+  'api-tutorials': 'API tutorials',
+  'product-updates': 'Product updates',
+  ecommerce: 'Ecommerce',
+  'payments-invoicing': 'Payments & invoicing',
+};
+
+const labelFor = (slug: string) => CATEGORY_LABELS[slug] ?? slug.replace(/-/g, ' ');
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -15,20 +28,29 @@ export async function getStaticPaths() {
         .filter((post) => post.data.category === category)
         .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
       category,
+      /** The sibling topics, so a dead end always offers a way onward. */
+      siblings: categories
+        .filter((c) => c !== category)
+        .map((c) => ({
+          slug: c,
+          count: posts.filter((p) => p.data.category === c).length,
+        }))
+        .sort((a, b) => b.count - a.count || a.slug.localeCompare(b.slug)),
     },
   }));
 }
 
-const { posts, category } = Astro.props;
+const { posts, category, siblings } = Astro.props;
 
-const categoryLabel = category.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+const categoryLabel = labelFor(category);
+const countLabel = `${posts.length} ${posts.length === 1 ? 'article' : 'articles'}`;
 ---
 
 <BaseLayout
   title={`${categoryLabel} | 1Platform Blog`}
   description={`Browse ${categoryLabel} articles on the 1Platform blog.`}
 >
-  <section class="category-listing section">
+  <section class="section">
     <div class="container">
       <Breadcrumb items={[
         { label: 'Home', href: '/' },
@@ -36,13 +58,13 @@ const categoryLabel = category.replace(/-/g, ' ').replace(/\b\w/g, (c: string) =
         { label: categoryLabel },
       ]} />
 
-      <header class="category-listing__header">
-        <span class="badge">{categoryLabel}</span>
+      <header class="topic-head">
+        <p class="eyebrow">Topic</p>
         <h1>{categoryLabel}</h1>
-        <p>{posts.length} {posts.length === 1 ? 'article' : 'articles'}</p>
+        <p class="topic-head__count">{countLabel}</p>
       </header>
 
-      <div class="category-listing__grid">
+      <div class="topic-list">
         {posts.map((post) => (
           <BlogPostCard
             title={post.data.title}
@@ -52,37 +74,123 @@ const categoryLabel = category.replace(/-/g, ' ').replace(/\b\w/g, (c: string) =
             slug={post.slug}
             author={post.data.author}
             readingTime={post.data.readingTime}
+            headingLevel={2}
+            class="reveal"
           />
         ))}
       </div>
+
+      <nav class="onward" aria-label="Other topics">
+        <div class="section__rule">
+          <h2 class="eyebrow">Other topics</h2>
+        </div>
+        <ul class="onward__list">
+          {siblings.map((sibling) => (
+            <li>
+              <a href={`/blog/category/${sibling.slug}/`} class="onward__link">
+                <span class="onward__icon"><Icon name="tag" size={16} /></span>
+                {labelFor(sibling.slug)}
+                <span class="onward__count">{sibling.count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href="/blog/" class="onward__all">
+          All articles
+          <Icon name="arrow-right" size={15} />
+        </a>
+      </nav>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .category-listing__header {
+  .topic-head {
+    max-width: 40rem;
     margin-bottom: var(--space-10);
   }
 
-  .category-listing__header h1 {
-    margin-top: var(--space-3);
-    margin-bottom: var(--space-2);
+  .topic-head h1 {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-3);
   }
 
-  .category-listing__header p {
+  .topic-head__count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .topic-list {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .onward {
+    margin-top: var(--space-16);
+  }
+
+  .onward__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+  }
+
+  .onward__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
     font-size: var(--text-sm);
+    color: var(--color-text);
   }
 
-  .category-listing__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--space-8);
+  .onward__icon {
+    display: inline-flex;
+    color: var(--color-text-tertiary);
   }
 
-  @media (max-width: 480px) {
-    .category-listing__grid {
-      grid-template-columns: 1fr;
+  .onward__link:hover {
+    color: var(--color-accent);
+  }
+
+  .onward__link:hover .onward__icon {
+    color: var(--color-accent);
+  }
+
+  .onward__count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .onward__all {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .onward__all :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .onward__all:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .onward {
+      margin-top: var(--space-10);
     }
   }
 </style>

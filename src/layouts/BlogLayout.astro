@@ -22,7 +22,31 @@ interface Props {
   slug: string;
 }
 
+/** Initialisms mean these cannot be title-cased by rule. See BlogPostCard. */
+const CATEGORY_LABELS: Record<string, string> = {
+  'seo-automation': 'SEO automation',
+  'ai-content': 'AI content',
+  'api-tutorials': 'API tutorials',
+  'product-updates': 'Product updates',
+  ecommerce: 'Ecommerce',
+  'payments-invoicing': 'Payments & invoicing',
+};
+
 const { frontmatter, headings = [], slug } = Astro.props;
+
+const categoryLabel =
+  CATEGORY_LABELS[frontmatter.category] ?? frontmatter.category.replace(/-/g, ' ');
+
+const dateFormat: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+};
+
+/** Only worth showing when it actually says something new. */
+const showUpdated =
+  frontmatter.updatedDate &&
+  frontmatter.updatedDate.valueOf() !== frontmatter.pubDate.valueOf();
 
 const ogImage = frontmatter.ogImage || frontmatter.image || '/og/default.png';
 const ogImageURL = new URL(ogImage, 'https://1platform.pro').href;
@@ -70,15 +94,46 @@ const articleJsonLd = {
       ]} />
 
       <header class="blog-post__header">
-        <span class="badge">{frontmatter.category.replace(/-/g, ' ')}</span>
+        <a href={`/blog/category/${frontmatter.category}/`} class="eyebrow blog-post__category">
+          {categoryLabel}
+        </a>
+
         <h1>{frontmatter.title}</h1>
-        <div class="blog-post__meta">
-          <span>By {frontmatter.author}</span>
-          <time datetime={frontmatter.pubDate.toISOString()}>
-            {frontmatter.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </time>
-          {frontmatter.readingTime && <span>{frontmatter.readingTime}</span>}
-        </div>
+
+        <p class="blog-post__standfirst">{frontmatter.description}</p>
+
+        <!-- Byline data, set in the label voice and divided by rules rather
+             than by a punctuation glyph. -->
+        <dl class="blog-post__byline">
+          <div class="blog-post__byline-item">
+            <dt>Written by</dt>
+            <dd>{frontmatter.author}</dd>
+          </div>
+          <div class="blog-post__byline-item">
+            <dt>Published</dt>
+            <dd>
+              <time datetime={frontmatter.pubDate.toISOString()}>
+                {frontmatter.pubDate.toLocaleDateString('en-US', dateFormat)}
+              </time>
+            </dd>
+          </div>
+          {showUpdated && frontmatter.updatedDate && (
+            <div class="blog-post__byline-item">
+              <dt>Updated</dt>
+              <dd>
+                <time datetime={frontmatter.updatedDate.toISOString()}>
+                  {frontmatter.updatedDate.toLocaleDateString('en-US', dateFormat)}
+                </time>
+              </dd>
+            </div>
+          )}
+          {frontmatter.readingTime && (
+            <div class="blog-post__byline-item">
+              <dt>Length</dt>
+              <dd>{frontmatter.readingTime}</dd>
+            </div>
+          )}
+        </dl>
       </header>
 
       <div class="blog-post__layout">
@@ -100,34 +155,66 @@ const articleJsonLd = {
 </BaseLayout>
 
 <style>
+  /* The title block keeps to a reading measure rather than running the full
+     grid width — a headline set across 1200px is a landing page, not an
+     article. */
   .blog-post__header {
-    margin-bottom: var(--space-10);
+    max-width: 44rem;
+    margin-bottom: var(--space-12);
     padding-bottom: var(--space-8);
     border-bottom: 1px solid var(--color-border);
   }
 
+  .blog-post__category {
+    display: inline-block;
+    min-height: 24px;
+  }
+
+  .blog-post__category:hover {
+    color: var(--color-accent);
+  }
+
   .blog-post__header h1 {
     margin-top: var(--space-4);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-5);
     font-size: var(--text-4xl);
   }
 
-  .blog-post__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-    color: var(--color-text-tertiary);
-    font-size: var(--text-sm);
+  .blog-post__standfirst {
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    margin-bottom: var(--space-8);
   }
 
-  .blog-post__meta span:not(:last-child)::after {
-    content: '\00b7';
-    margin-left: var(--space-4);
+  .blog-post__byline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+  }
+
+  .blog-post__byline-item {
+    display: grid;
+    gap: var(--space-1);
+    padding-left: var(--space-4);
+    border-left: 1px solid var(--color-border-strong);
+  }
+
+  .blog-post__byline dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .blog-post__byline dd {
+    font-size: var(--text-sm);
+    color: var(--color-text);
   }
 
   .blog-post__layout {
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: 220px minmax(0, 1fr);
     gap: var(--space-12);
     align-items: start;
   }
@@ -135,22 +222,40 @@ const articleJsonLd = {
   .blog-post__sidebar {
     position: sticky;
     top: calc(var(--header-height) + var(--space-8));
+    min-width: 0;
+  }
+
+  .blog-post__content {
+    min-width: 0;
   }
 
   .blog-post__footer {
+    max-width: 70ch;
     margin-top: var(--space-12);
+    margin-left: calc(220px + var(--space-12));
     padding-top: var(--space-8);
     border-top: 1px solid var(--color-border);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     .blog-post__layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-8);
     }
 
     .blog-post__sidebar {
       position: static;
       order: -1;
+    }
+
+    .blog-post__footer {
+      margin-left: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .blog-post__byline {
+      gap: var(--space-4);
     }
   }
 </style>

@@ -1,14 +1,12 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Hero from '@components/Hero.astro';
-import PillarSection from '@components/PillarSection.astro';
-import SolutionCard from '@components/SolutionCard.astro';
-import MetricCounter from '@components/MetricCounter.astro';
-import PipelineAnimation from '@components/PipelineAnimation.astro';
-import LogoCarousel from '@components/LogoCarousel.astro';
-import UseCaseCard from '@components/UseCaseCard.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 import CodeBlock from '@components/CodeBlock.astro';
+import type { IconName } from '@components/icons';
 
 const title = '1Platform — Online Store, Website & Payments in One Platform';
 const description = 'Launch an online store or website with payments, electronic invoicing, AI content, and your own domain — all from one platform. Or integrate it via REST API.';
@@ -43,160 +41,111 @@ const jsonLd = [
   },
 ];
 
-const pillars = [
+const pillars: { icon: IconName; title: string; description: string }[] = [
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    icon: 'cart',
     title: 'Sell online from day one',
-    description: 'Checkout, payments, electronic invoicing, and your own domain — ready to go without integrating five separate providers.',
+    description: 'Checkout, payments, electronic invoicing, and your own domain — ready to go without integrating separate providers.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+    icon: 'content',
     title: 'Content that ranks itself',
     description: 'Articles, images, comments, and legal pages generated and published by AI — optimized for search and conversion.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/><path d="M7 12h2"/><path d="M11 12h6"/><path d="M7 15h10"/></svg>',
+    icon: 'dashboard',
     title: 'Your own brand, your own dashboard',
     description: 'Whitelabel the entire experience under your brand — colors, layout, KPIs, and localization — from a single API call.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+    icon: 'code',
     title: 'Built on a developer-grade API',
     description: 'Everything above is available via REST. Dual-token auth, async jobs, predictable envelopes — power your own SaaS on top.',
   },
 ];
 
-const solutions = [
+/** The four outcomes most people arrive for. */
+const featured: { icon: IconName; title: string; description: string; href: string }[] = [
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    icon: 'cart',
     title: 'Online Store',
     description: 'Launch a store with checkout, catalog, and customer accounts — no plugins, no patchwork.',
     href: '/solutions/online-store/',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    icon: 'card',
     title: 'Payment Processing',
     description: 'Accept card payments via API. Checkout URLs, webhook notifications, and automatic balance crediting.',
     href: '/payments-invoicing/',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
+    icon: 'invoice',
     title: 'Electronic Invoicing',
     description: 'Generate compliant electronic invoices automatically from every transaction — PDF + XML out of the box.',
     href: '/payments-invoicing/',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
-    title: 'Custom Domain',
-    description: 'Register domains, manage DNS records, configure nameservers, and handle transfers and renewals — all via API.',
-    href: '/solutions/website/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+    icon: 'content',
     title: 'AI Content Generation',
     description: 'Generate full SEO-optimized articles, descriptions, and landing copy from a single keyword.',
     href: '/solutions/content/',
   },
+];
+
+/** Everything else, grouped — an index, not another wall of cards. */
+const capabilityGroups: { group: string; items: { title: string; href: string }[] }[] = [
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/><path d="M7 12h2"/><path d="M11 12h6"/><path d="M7 15h10"/></svg>',
-    title: 'Whitelabel Dashboard',
-    description: 'Bootstrap a fully branded dashboard from one API call — branding, theme, layout, i18n, and KPIs.',
-    href: '/solutions/whitelabel/',
+    group: 'Content & SEO',
+    items: [
+      { title: 'AI Image Generation', href: '/solutions/content/' },
+      { title: 'AI Keyword Extraction', href: '/solutions/content/' },
+      { title: 'CMS Publishing', href: '/solutions/content/' },
+      { title: 'Indexing Automation', href: '/solutions/content/' },
+      { title: 'Link Building', href: '/solutions/content/' },
+      { title: 'Search Console', href: '/solutions/content/' },
+      { title: 'Legal Page Generation', href: '/solutions/content/' },
+    ],
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
-    title: 'AI Image Generation',
-    description: 'Create unique AI visuals or source from premium libraries automatically — commercial license included.',
-    href: '/solutions/content/',
+    group: 'Storefront & brand',
+    items: [
+      { title: 'Custom Domain', href: '/solutions/website/' },
+      { title: 'Whitelabel Dashboard', href: '/solutions/whitelabel/' },
+    ],
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
-    title: 'Legal Page Generation',
-    description: 'Auto-generate privacy policies, terms of service, and cookie notices — tailored to your business.',
-    href: '/solutions/content/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>',
-    title: 'CMS Publishing',
-    description: 'Publish content directly to WordPress and other CMS platforms — schedule, categorize, manage media.',
-    href: '/solutions/content/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 8h6"/><path d="M11 5v6"/></svg>',
-    title: 'AI Keyword Extraction',
-    description: 'Extract SEO keywords with volume, intent, and cannibalization detection from any domain.',
-    href: '/solutions/content/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-    title: 'Indexing Automation',
-    description: 'Submit URLs directly to search engines for faster crawling — batch processing and status tracking.',
-    href: '/solutions/content/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
-    title: 'Link Building',
-    description: 'Integrated marketplace for guest posts and backlinks — build authority programmatically.',
-    href: '/solutions/content/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="3"/><path d="M12 8v3"/></svg>',
-    title: 'AI Agents',
-    description: 'Deploy autonomous AI agents that execute tasks, follow schedules, and request human approval.',
-    href: '/for-developers/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92V21a1 1 0 0 1-1.09 1 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 3.18 4.18 1 1 0 0 1 4.21 3h4.09a1 1 0 0 1 1 .75 12.84 12.84 0 0 0 .7 2.81 1 1 0 0 1-.27 1L8.09 9.21a16 16 0 0 0 6 6l1.65-1.65a1 1 0 0 1 1-.27 12.84 12.84 0 0 0 2.81.7 1 1 0 0 1 .75 1z"/></svg>',
-    title: 'Webhooks',
-    description: 'Subscribe to real-time payment lifecycle events with HMAC-signed payloads and secret rotation.',
-    href: '/for-developers/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>',
-    title: 'Activity Logs',
-    description: 'Track every API call with detailed logs, filter by endpoint or status, and register client-side events.',
-    href: '/for-developers/',
-  },
-  {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
-    title: 'Search Console',
-    description: 'Connect, verify, submit sitemaps, and monitor performance programmatically.',
-    href: '/solutions/content/',
+    group: 'Developer platform',
+    items: [
+      { title: 'Webhooks', href: '/for-developers/' },
+      { title: 'AI Agents', href: '/for-developers/' },
+      { title: 'Activity Logs', href: '/for-developers/' },
+    ],
   },
 ];
 
-// Metrics are hardcoded and refreshed manually per release — these are traction
-// signals, not a contract. Values reflect platform totals at last release.
-const metrics = [
-  { value: 250, suffix: '+', label: 'Stores Live' },
-  { value: 5000, suffix: '+', label: 'Invoices Issued' },
-  { value: 10000, suffix: '+', label: 'Articles Generated' },
-  { value: 19, suffix: '+', label: 'Integrated Solutions' },
-];
-
-const useCases = [
+const useCases: { icon: IconName; title: string; description: string }[] = [
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+    icon: 'monitor',
     title: 'Small business owners',
     description: 'Launch your store or website in days, not months — payments, invoicing, and content handled for you.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    icon: 'cart',
     title: 'Online sellers & creators',
     description: 'Sell products, services, or digital downloads — accept payments and issue compliant invoices automatically.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    icon: 'message',
     title: 'Service-based businesses',
     description: 'Book services, collect deposits, send invoices, and publish your portfolio — all from one dashboard.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    icon: 'users',
     title: 'Agencies managing client sites',
     description: 'Run dozens of client stores and websites from one dashboard — whitelabel optional, billing per client.',
   },
   {
-    icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+    icon: 'code',
     title: 'Developers building SaaS',
     description: 'Use 1Platform as the backend for your own product — payments, invoicing, content, and dashboard included.',
   },
@@ -210,7 +159,6 @@ const intentChips = [
 ---
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd}>
-  <!-- Hero -->
   <Hero
     headline="One Platform. Every Solution."
     subheadline="Launch your online store or website with payments, electronic invoicing, AI-generated content, and your own domain — all from one platform. Or integrate it into your product via one REST API."
@@ -218,92 +166,110 @@ const intentChips = [
     primaryCta={{ label: 'Launch Your Store', href: 'https://app.1platform.pro/app/?intent=store' }}
     secondaryCta={{ label: 'For Developers — View API', href: 'https://developer.1platform.pro/' }}
     intentChips={intentChips}
+    motif
   />
 
-  <!-- Logo Carousel -->
+  <!-- What it is: a wide editorial statement, then the four claims -->
   <section class="section">
     <div class="container">
-      <LogoCarousel />
-    </div>
-  </section>
-
-  <!-- Platform Pillars -->
-  <section class="section section--alt">
-    <div class="container">
-      <div class="section__header reveal">
-        <h2>Built on 4 Core Pillars</h2>
-        <p>From your storefront to your customer's invoice — every capability works together in one ecosystem.</p>
+      <div class="statement reveal">
+        <p class="eyebrow">What you get</p>
+        <h2 class="statement__lead">
+          Everything a business needs to sell online, already connected.
+        </h2>
       </div>
-      <div class="grid-4 stagger-grid">
-        {pillars.map((pillar, i) => (
-          <PillarSection
+
+      <div class="pillars">
+        {pillars.map((pillar) => (
+          <Card
+            variant="bare"
             icon={pillar.icon}
             title={pillar.title}
             description={pillar.description}
-            index={i}
+            class="reveal"
           />
         ))}
       </div>
     </div>
   </section>
 
-  <!-- Metrics -->
-  <section class="section">
-    <div class="container">
-      <div class="section__header reveal">
-        <h2>Platform in Numbers</h2>
-        <p>Powering stores, websites, and SaaS products every day.</p>
-      </div>
-      <div class="grid-4 stagger-grid">
-        {metrics.map((m) => (
-          <MetricCounter value={m.value} suffix={m.suffix} label={m.label} />
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Solutions Overview -->
+  <!-- Capabilities: four featured, the rest as a readable index -->
   <section class="section section--alt" id="solutions">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>Every Solution, One Platform</h2>
-        <p>Online store, payments, invoicing, your own domain, AI content, whitelabel dashboard, and more — unified under a single REST API.</p>
+      <div class="section__rule">
+        <p class="eyebrow">Capabilities</p>
       </div>
-      <div class="grid-3 stagger-grid">
-        {solutions.map((solution) => (
-          <SolutionCard
-            icon={solution.icon}
-            title={solution.title}
-            description={solution.description}
-            href={solution.href}
+
+      <div class="featured">
+        {featured.map((item) => (
+          <Card
+            variant="lead"
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            href={item.href}
+            class="reveal"
           />
         ))}
       </div>
+
+      <div class="index reveal">
+        {capabilityGroups.map((group) => (
+          <div class="index__group">
+            <h3 class="index__title">{group.group}</h3>
+            <ul class="index__list">
+              {group.items.map((item) => (
+                <li>
+                  <a href={item.href} class="index__link">{item.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <p class="index__all">
+        <a href="/solutions/" class="link-cue">
+          See all solutions
+          <Icon name="arrow-right" size={15} />
+        </a>
+      </p>
     </div>
   </section>
 
-  <!-- How It Works -->
+  <!-- How it works: the schematic, unrolled as a sequence -->
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>How It Works</h2>
-        <p>From account to live store or website — six steps, all in one platform.</p>
+      <div class="section__rule">
+        <p class="eyebrow">How it works</p>
       </div>
-      <PipelineAnimation />
+      <h2 class="section__lead">From account to live store, in one platform.</h2>
+      <ProcessSpine />
     </div>
   </section>
 
-  <!-- API Preview -->
+  <!-- Integrate: copy and code, side by side -->
   <section class="section section--alt">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>Integrate in Minutes</h2>
-        <p>A clean REST API with predictable endpoints. One token pair, consistent responses, zero surprises.</p>
-      </div>
-      <CodeBlock
-        language="bash"
-        title="Create a payment transaction"
-        code={`curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">Integrate</p>
+          <h2>A REST API with no surprises</h2>
+          <p>
+            Predictable endpoints, one token pair, consistent response envelopes.
+            Everything the dashboard does, your product can do too.
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            Read the API docs
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title="Create a payment transaction"
+            code={`curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
   -H "Authorization: Bearer $APP_TOKEN" \\
   -H "x-user-token: $USER_TOKEN" \\
   -H "Content-Type: application/json" \\
@@ -311,153 +277,216 @@ const intentChips = [
     "amount": 25.00,
     "description": "Order #1042"
   }'`}
-      />
-    </div>
-  </section>
-
-  <!-- Use Cases -->
-  <section class="section">
-    <div class="container">
-      <div class="section__header reveal">
-        <h2>Built for Every Business</h2>
-        <p>From first-time sellers to developers building SaaS — 1Platform adapts to your needs.</p>
-      </div>
-      <div class="grid-3 stagger-grid">
-        {useCases.map((useCase) => (
-          <UseCaseCard
-            icon={useCase.icon}
-            title={useCase.title}
-            description={useCase.description}
           />
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Comparison Table -->
-  <section class="section section--alt">
-    <div class="container">
-      <div class="section__header reveal">
-        <h2>Why 1Platform Wins</h2>
-        <p>See the difference between juggling six different services and using one unified platform.</p>
-      </div>
-      <ComparisonTable />
-    </div>
-  </section>
-
-  <!-- CTA Banner -->
-  <section class="section cta-banner">
-    <div class="container">
-      <div class="cta-banner__content reveal">
-        <h2>Stop Juggling 6 Different Services</h2>
-        <p>Start with one platform. Sell online, issue invoices, and publish content — all from one dashboard, one API, one bill.</p>
-        <div class="cta-banner__actions">
-          <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--primary">Launch Your Store</a>
-          <a href="https://developer.1platform.pro/" class="btn btn--ghost">View API Docs</a>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Who it's for: an editorial list, not a grid of identical cards -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">Who it's for</p>
+      </div>
+
+      <ul class="audience">
+        {useCases.map((useCase) => (
+          <li class="audience__item reveal">
+            <span class="audience__icon"><Icon name={useCase.icon} size={20} /></span>
+            <div>
+              <h3 class="audience__title">{useCase.title}</h3>
+              <p class="audience__desc">{useCase.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Unified vs fragmented -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">Unified vs fragmented</p>
+      </div>
+      <h2 class="section__lead">What changes when it's one platform</h2>
+      <ComparisonTable />
+    </div>
+  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
 </BaseLayout>
 
 <style>
-  .section {
-    padding-block: var(--space-20);
-  }
-
-  .section--alt {
-    background-color: var(--color-bg-alt, #ffffff);
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .container {
-    max-width: 1200px;
-    margin-inline: auto;
-    padding-inline: var(--space-6);
-  }
-
-  .section__header {
-    text-align: center;
-    max-width: 700px;
-    margin-inline: auto;
+  /* ===== Editorial statement ===== */
+  .statement {
+    max-width: 40rem;
     margin-bottom: var(--space-12);
   }
 
-  .section__header h2 {
-    font-size: var(--text-3xl);
-    font-weight: 700;
-    margin-bottom: var(--space-4);
-    text-wrap: balance;
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
   }
 
-  .section__header p {
-    font-size: var(--text-lg);
-    color: var(--color-text-secondary);
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
   }
 
-  .grid-4 {
+  /* ===== Pillars: 2x2, generous, no surfaces ===== */
+  .pillars {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-6);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10) var(--space-12);
   }
 
-  .grid-3 {
+  /* ===== Featured capabilities ===== */
+  .featured {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-12);
+  }
+
+  /* ===== The index of everything else ===== */
+  .index {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-6);
+    gap: var(--space-8);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
   }
 
-  @media (max-width: 1024px) {
-    .grid-4 {
-      grid-template-columns: repeat(2, 1fr);
+  .index__title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+  }
+
+  .index__list {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .index__link {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .index__link:hover {
+    color: var(--color-accent);
+  }
+
+  .index__all {
+    margin-top: var(--space-8);
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
     }
 
-    .grid-3 {
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Split: copy + code ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Grid children default to min-width:auto, which lets the code block's long
+     lines push the whole page wider than the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  /* ===== Audience list ===== */
+  .audience {
+    display: grid;
+    gap: 0;
+    max-width: 52rem;
+  }
+
+  .audience__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .audience__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .audience__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    padding-top: 2px;
+  }
+
+  .audience__title {
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .audience__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .index {
       grid-template-columns: repeat(2, 1fr);
     }
   }
 
   @media (max-width: 640px) {
-    .grid-4,
-    .grid-3 {
+    .pillars,
+    .featured,
+    .index {
       grid-template-columns: 1fr;
     }
 
-    .section {
-      padding-block: var(--space-12);
+    .pillars {
+      gap: var(--space-8);
     }
-  }
 
-  .cta-banner {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .cta-banner__content {
-    text-align: center;
-    max-width: 700px;
-    margin-inline: auto;
-  }
-
-  .cta-banner__content h2 {
-    font-size: var(--text-3xl);
-    font-weight: 700;
-    margin-bottom: var(--space-4);
-    text-wrap: balance;
-  }
-
-  .cta-banner__content p {
-    font-size: var(--text-lg);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-8);
-  }
-
-  .cta-banner__actions {
-    display: flex;
-    gap: var(--space-4);
-    justify-content: center;
-    flex-wrap: wrap;
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
   }
 </style>

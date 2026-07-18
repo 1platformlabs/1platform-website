@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
 
 const title = 'Contact Sales — Custom Quotes & Onboarding | 1Platform';
 const description = 'Talk to the 1Platform sales team. Custom quotes, demos, onboarding help, and partnership inquiries. Response within 24 hours, business days.';
@@ -19,6 +21,21 @@ const jsonLd = {
     ],
   },
 };
+
+/** What the reader needs to know before writing — kept as a ledger, not as
+ *  three identical boxes. */
+const expectations: { icon: IconName; term: string; detail: string }[] = [
+  {
+    icon: 'clock',
+    term: 'Response time',
+    detail: 'Within 24 hours on business days (GMT-6).',
+  },
+  {
+    icon: 'clipboard',
+    term: 'What to include',
+    detail: 'Use case, expected volume, team size, and any deadline you are working to.',
+  },
+];
 ---
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd}>
@@ -26,61 +43,77 @@ const jsonLd = {
     <div class="container">
       <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Contact' }]} />
 
-      <header class="contact-hero reveal">
-        <span class="badge">Talk to Sales</span>
-        <h1>Let's talk about <span class="contact-hero__accent">your scale</span>.</h1>
-        <p class="contact-hero__sub">
-          Need a custom quote, a live demo, or onboarding help for your team? Our sales engineers
-          reply within <strong>24 hours</strong> on business days.
-        </p>
-        <p class="contact-hero__topic" data-contact-topic hidden>
-          Asking about <strong data-contact-topic-label></strong>
-        </p>
-      </header>
+      <div class="contact">
+        <!-- Left: the ask -->
+        <header class="contact__intro reveal">
+          <p class="eyebrow">Talk to sales</p>
+          <h1 class="contact__headline">
+            Let's talk about <span class="contact__accent">your scale</span>.
+          </h1>
+          <p class="contact__sub">
+            Need a custom quote, a live demo, or onboarding help for your team? Our sales engineers
+            reply within <strong>24 hours</strong> on business days.
+          </p>
+          <p class="contact__topic" data-contact-topic hidden>
+            Asking about <strong data-contact-topic-label></strong>
+          </p>
 
-      <div class="contact-card reveal">
-        <h2>Email Sales</h2>
-        <p
-          class="contact-card__email"
-          aria-label="sales at 1platform dot pro"
-          data-contact-email
-          data-user="sales"
-          data-domain="1platform.pro"
-        >
-          <noscript>Enable JavaScript to see the email address, or use the Open Email button below.</noscript>
-        </p>
-        <div class="contact-card__actions">
-          <button type="button" class="btn btn--primary btn--lg" data-contact-open>
-            Open Email
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <button type="button" class="btn btn--ghost" data-contact-copy aria-live="polite">
-            Copy Email
-          </button>
+          <dl class="expectations">
+            {expectations.map((row) => (
+              <div class="expectations__row">
+                <dt class="expectations__term">
+                  <span class="expectations__icon"><Icon name={row.icon} size={18} /></span>
+                  {row.term}
+                </dt>
+                <dd class="expectations__detail">{row.detail}</dd>
+              </div>
+            ))}
+            <div class="expectations__row">
+              <dt class="expectations__term">
+                <span class="expectations__icon"><Icon name="code" size={18} /></span>
+                Technical questions
+              </dt>
+              <dd class="expectations__detail">
+                Check the <a href="https://developer.1platform.pro/">developer documentation</a>
+                first — it covers most integrations.
+              </dd>
+            </div>
+          </dl>
+        </header>
+
+        <!-- Right: the address itself, given its own surface -->
+        <div class="card contact__panel reveal">
+          <div class="panel-mark" aria-hidden="true"><Icon name="mail" size={22} /></div>
+
+          <h2 class="panel__title">Email sales</h2>
+
+          <p
+            class="panel__email"
+            aria-label="sales at 1platform dot pro"
+            data-contact-email
+            data-user="sales"
+            data-domain="1platform.pro"
+          >
+            <noscript>Enable JavaScript to see the email address, or use the Open Email button below.</noscript>
+          </p>
+
+          <div class="panel__actions">
+            <button type="button" class="btn btn--primary" data-contact-open>
+              Open Email
+              <Icon name="arrow-right" size={16} />
+            </button>
+            <button type="button" class="btn btn--ghost" data-contact-copy aria-live="polite">
+              Copy Email
+            </button>
+          </div>
+
+          <p class="panel__hint">
+            Already on 1Platform? Sign in at
+            <a href="https://app.1platform.pro/app/">app.1platform.pro</a>
+            and use the in-app chat for faster support.
+          </p>
         </div>
-        <p class="contact-card__hint">
-          Already on 1Platform? Sign in at
-          <a href="https://app.1platform.pro/app/">app.1platform.pro</a>
-          and use the in-app chat for faster support.
-        </p>
       </div>
-
-      <ul class="contact-expectations reveal">
-        <li>
-          <strong>Response time</strong>
-          <span>Within 24 hours on business days (GMT-6).</span>
-        </li>
-        <li>
-          <strong>What to include</strong>
-          <span>Use case, expected volume, team size, and any deadline.</span>
-        </li>
-        <li>
-          <strong>Technical questions</strong>
-          <span>Check the <a href="https://developer.1platform.pro/">developer documentation</a> first — it covers most integrations.</span>
-        </li>
-      </ul>
     </div>
   </section>
 </BaseLayout>
@@ -150,70 +183,130 @@ const jsonLd = {
 </script>
 
 <style>
-  .contact-hero {
-    text-align: center;
-    margin: var(--space-8) 0 var(--space-12);
+  /* Asymmetric split: the argument on the left, the address on the right.
+     The old page stacked both, centred, down the middle of the viewport. */
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: var(--space-16);
+    align-items: start;
+    margin-top: var(--space-10);
   }
 
-  .contact-hero .badge {
-    margin-bottom: var(--space-4);
+  .contact__intro {
+    max-width: 34rem;
   }
 
-  .contact-hero h1 {
-    font-size: clamp(var(--text-4xl), 5vw, var(--text-6xl));
+  .contact__headline {
+    font-size: var(--text-5xl);
+    line-height: 1.06;
     text-wrap: balance;
-    margin: 0 auto var(--space-4);
-    max-width: 18ch;
+    margin: var(--space-5) 0 var(--space-5);
   }
 
-  .contact-hero__accent {
-    background: var(--gradient-text);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  /* The emphasis is carried by the one accent in the system, not by a
+     gradient wash across the letterforms. */
+  .contact__accent {
+    color: var(--color-accent);
   }
 
-  .contact-hero__sub {
+  .contact__sub {
     color: var(--color-text-secondary);
-    max-width: 56ch;
-    margin: 0 auto;
     font-size: var(--text-lg);
+    margin: 0;
   }
 
-  .contact-hero__topic {
+  .contact__sub strong {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .contact__topic {
     display: inline-block;
-    margin: var(--space-4) auto 0;
+    margin: var(--space-5) 0 0;
     padding: var(--space-2) var(--space-3);
-    font-size: var(--text-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
     color: var(--color-text-secondary);
-    background: var(--color-accent-glow);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent-ring);
     border-radius: var(--border-radius);
   }
 
-  .contact-hero__topic strong {
-    color: var(--color-text);
+  .contact__topic strong {
+    color: var(--color-accent);
     margin-left: var(--space-1);
   }
 
-  .contact-card {
-    max-width: 640px;
-    margin: 0 auto var(--space-12);
+  /* ===== Expectations: term against detail, on hairlines ===== */
+  .expectations {
+    margin: var(--space-12) 0 0;
+  }
+
+  .expectations__row {
+    display: grid;
+    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .expectations__row:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .expectations__term {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .expectations__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .expectations__detail {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* Underlined, not colour-only: a link sitting inside a run of text needs a
+     non-colour cue. Matches the .prose a convention. */
+  .expectations__detail a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ===== The address panel ===== */
+  /* Surface comes from the shared .card; only the additive bits live here. */
+  .contact__panel {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-8));
     padding: var(--space-8);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    background: var(--color-bg-elevated);
-    box-shadow: var(--shadow-md, 0 1px 3px rgba(0, 0, 0, 0.04));
-    text-align: center;
+    box-shadow: var(--shadow-md);
   }
 
-  .contact-card h2 {
+  .panel-mark {
+    display: inline-flex;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+  }
+
+  .panel__title {
     font-size: var(--text-xl);
-    margin: 0 0 var(--space-2);
+    margin: 0 0 var(--space-4);
   }
 
-  .contact-card__email {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: var(--text-lg);
+  .panel__email {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
     color: var(--color-text);
     margin: 0 0 var(--space-6);
     padding: var(--space-3) var(--space-4);
@@ -223,72 +316,60 @@ const jsonLd = {
     word-break: break-all;
   }
 
-  .contact-card__email noscript {
+  .panel__email noscript {
     font-family: var(--font-sans);
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
   }
 
-  .contact-card__actions {
+  .panel__actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-    justify-content: center;
-    margin-bottom: var(--space-5);
+    margin-bottom: var(--space-6);
   }
 
-  .btn--lg {
-    padding: var(--space-3) var(--space-6);
-    font-size: var(--text-base);
+  .panel__actions .btn {
+    min-height: 44px;
   }
 
-  .contact-card__hint {
+  .panel__hint {
     color: var(--color-text-secondary);
     font-size: var(--text-sm);
     margin: 0;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
   }
 
-  .contact-card__hint a {
+  .panel__hint a {
     color: var(--color-accent);
   }
 
-  .contact-expectations {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .contact {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+    }
 
-  @media (min-width: 720px) {
-    .contact-expectations {
-      grid-template-columns: repeat(3, 1fr);
+    /* Sticky is only useful next to a long column. */
+    .contact__panel {
+      position: static;
+    }
+
+    .contact__intro {
+      max-width: none;
     }
   }
 
-  .contact-expectations li {
-    padding: var(--space-5);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    background: var(--color-bg-alt);
-  }
+  @media (max-width: 600px) {
+    .expectations__row {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
 
-  .contact-expectations strong {
-    display: block;
-    font-size: var(--text-sm);
-    color: var(--color-text);
-    margin-bottom: var(--space-2);
-  }
-
-  .contact-expectations span {
-    display: block;
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-  }
-
-  .contact-expectations a {
-    color: var(--color-accent);
+    .contact__panel {
+      padding: var(--space-6);
+    }
   }
 </style>

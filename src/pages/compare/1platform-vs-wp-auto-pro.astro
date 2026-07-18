@@ -1,17 +1,76 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import Hero from '@components/Hero.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import CodeBlock from '@components/CodeBlock.astro';
+import Card from '@components/Card.astro';
+import Check from '@components/Check.astro';
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
 
-const title = '1Platform vs. WP Auto Pro: API Platform vs Plugin | 1Platform';
+/**
+ * This page compares 1Platform with the *category* of automated WordPress
+ * content plugins, never with a named product. The route is unchanged so no
+ * link breaks, but every mention — copy, headings, metadata and structured
+ * data — describes the category.
+ */
+const title = '1Platform vs. WordPress Content Plugins: Platform vs. Plugin | 1Platform';
 const description =
-  'Compare 1Platform with WP Auto Pro. See why an API-first platform with full pipeline automation, payments, invoicing, and link building beats a WordPress-only plugin.';
+  'Compare 1Platform with automated WordPress content plugins. See why an API-first platform with a full pipeline, payments, invoicing, and link building goes further than a plugin that lives inside one CMS.';
+
+const comparison: {
+  group: string;
+  note: string;
+  rows: { capability: string; plugin: boolean }[];
+}[] = [
+  {
+    group: 'Where they overlap',
+    note: 'Both automate content work, and both can be driven programmatically.',
+    rows: [
+      { capability: 'API access', plugin: true },
+      { capability: 'Multi-site support', plugin: true },
+      { capability: 'Async processing', plugin: true },
+    ],
+  },
+  {
+    group: 'Where they diverge',
+    note: 'A plugin runs inside one CMS; a platform sits in front of all of them.',
+    rows: [
+      { capability: 'Full automation pipeline', plugin: false },
+      { capability: 'Payment processing', plugin: false },
+      { capability: 'Electronic invoicing', plugin: false },
+      { capability: 'Link building', plugin: false },
+      { capability: 'Framework agnostic', plugin: false },
+    ],
+  },
+];
+
+const differentiators: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'indexing',
+    title: 'Beyond content generation',
+    description:
+      'Automated content plugins focus on one job: creating WordPress content. 1Platform runs the whole pipeline — keyword research, AI content generation, image sourcing, CMS publishing, search engine indexing, link building, payment processing and electronic invoicing — connected through a single API.',
+  },
+  {
+    icon: 'code',
+    title: 'No vendor lock-in',
+    description:
+      'A plugin ties your automation to the WordPress ecosystem. 1Platform is a REST API that works with any stack: React, Vue, Astro, mobile apps, custom backends. Change framework without rewriting your automation logic.',
+  },
+  {
+    icon: 'card',
+    title: 'Built-in monetization',
+    description:
+      'Payment processing and electronic invoicing are part of the platform. Monetize the content pipeline without adding a payment gateway and a billing system to the stack — content creation through to revenue collection stays in one place.',
+  },
+];
 
 const faqItems = [
   {
-    question: 'Can I migrate from WP Auto Pro to 1Platform?',
+    question: 'Can I migrate from a WordPress content plugin to 1Platform?',
     answer:
-      'Yes. 1Platform is API-first, so you can integrate it into any existing WordPress site or any other framework. Simply replace your plugin calls with 1Platform API endpoints and gain access to the full automation pipeline, including payments, invoicing, and link building.',
+      'Yes. 1Platform is API-first, so you can integrate it into an existing WordPress site or any other framework. Replace your plugin calls with 1Platform API endpoints and gain access to the full automation pipeline, including payments, invoicing, and link building.',
   },
   {
     question: 'Does 1Platform work only with WordPress?',
@@ -21,7 +80,7 @@ const faqItems = [
   {
     question: 'How does 1Platform handle multi-site content?',
     answer:
-      'With 1Platform, a single API account manages content across unlimited sites. Each site can have its own configuration, publishing schedule, and analytics. No need for separate plugin installations or licenses per site.',
+      'With 1Platform, a single API account manages content across unlimited sites. Each site can have its own configuration, publishing schedule, and analytics. No separate plugin installation or licence per site.',
   },
 ];
 
@@ -50,414 +109,371 @@ const apiExample = `curl -X POST https://api.1platform.pro/api/v1/posts/content/
 ---
 
 <BaseLayout title={title} description={description} jsonLd={faqJsonLd}>
-  <section class="section hero-section">
+  <Hero
+    badge="Compare"
+    headline="1Platform vs. WordPress content plugins"
+    subheadline="A content plugin automates writing inside one CMS. An API-first platform runs the pipeline around it — research, publishing, indexing, and getting paid — from any stack you like."
+    primaryCta={{ label: 'View API Docs', href: 'https://developer.1platform.pro/' }}
+    secondaryCta={{ label: 'See Pricing', href: '/pricing/' }}
+  />
+
+  <!-- Feature comparison, split into what they share and what they don't -->
+  <section class="section">
     <div class="container">
       <Breadcrumb
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Compare', href: '/compare/' },
-          { label: '1Platform vs. WP Auto Pro' },
+          { label: 'Compare' },
+          { label: '1Platform vs. WordPress Content Plugins' },
         ]}
       />
 
-      <h1>1Platform vs. WP Auto Pro</h1>
-      <p class="subtitle">API-first platform vs. WordPress plugin</p>
-    </div>
-  </section>
+      <div class="section__rule">
+        <p class="eyebrow">Feature by feature</p>
+      </div>
+      <h2 class="section__lead">The same starting point, a different ceiling.</h2>
 
-  <section class="section">
-    <div class="container">
-      <h2>Feature Comparison</h2>
-      <div class="table-wrapper">
-        <table class="comparison-table" role="table">
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <caption class="sr-only">
+            Capabilities covered by 1Platform compared with automated WordPress content
+            plugins, split into shared capabilities and points of divergence.
+          </caption>
           <thead>
             <tr>
-              <th scope="col">Feature</th>
-              <th scope="col">1Platform</th>
-              <th scope="col">WP Auto Pro</th>
+              <th scope="col">Capability</th>
+              <th scope="col" class="matrix__mark-col matrix__mark-col--us">1Platform</th>
+              <th scope="col" class="matrix__mark-col">Content plugin</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>API Access</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-            </tr>
-            <tr>
-              <td>Full Automation Pipeline</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Multi-site Support</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-            </tr>
-            <tr>
-              <td>Payment Processing</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Invoicing</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Link Building</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Framework Agnostic</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="cross" aria-label="No">&#10005;</span></td>
-            </tr>
-            <tr>
-              <td>Async Processing</td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-              <td><span class="check" aria-label="Yes">&#10003;</span></td>
-            </tr>
-          </tbody>
+          {comparison.map((group) => (
+            <tbody>
+              <tr class="matrix__group">
+                <th scope="rowgroup" colspan="3">
+                  {group.group}
+                  <span class="matrix__note">{group.note}</span>
+                </th>
+              </tr>
+              {group.rows.map((row) => (
+                <tr>
+                  <th scope="row">{row.capability}</th>
+                  <td class="matrix__mark-col"><Check yes={true} /></td>
+                  <td class="matrix__mark-col"><Check yes={row.plugin} /></td>
+                </tr>
+              ))}
+            </tbody>
+          ))}
         </table>
       </div>
+
+      <p class="matrix__caveat">
+        Compared against automated WordPress content plugins as a category — individual
+        plugins differ in what they cover.
+      </p>
     </div>
   </section>
 
+  <!-- Why the difference matters, as an editorial list rather than a card grid -->
   <section class="section section--alt">
     <div class="container">
-      <h2>Key Differentiators</h2>
-      <div class="differentiators">
-        <div class="differentiator">
-          <h3>Beyond content generation</h3>
+      <div class="section__rule">
+        <p class="eyebrow">Key differentiators</p>
+      </div>
+
+      <ul class="reasons">
+        {differentiators.map((item) => (
+          <li class="reasons__item reveal">
+            <span class="reasons__icon"><Icon name={item.icon} size={20} /></span>
+            <div>
+              <h3 class="reasons__title">{item.title}</h3>
+              <p class="reasons__desc">{item.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- One call, any stack -->
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy">
+          <p class="eyebrow">Integrate</p>
+          <h2>One call, from whatever you build in</h2>
           <p>
-            WP Auto Pro focuses on automating WordPress content creation. 1Platform goes further
-            with a complete pipeline: keyword research, AI content generation, image sourcing,
-            CMS publishing, search engine indexing, link building, payment processing, and
-            electronic invoicing. Every step is connected and automated through a single API.
+            A single request generates optimized content, ready to publish anywhere. No
+            install, no per-site licence, no CMS to be inside of — just an HTTP call your
+            stack already knows how to make.
           </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            Read the API docs
+            <Icon name="arrow-right" size={15} />
+          </a>
         </div>
-        <div class="differentiator">
-          <h3>No vendor lock-in</h3>
-          <p>
-            A WordPress plugin locks you into the WordPress ecosystem. 1Platform is a REST API
-            that works with any technology stack. Build with React, Vue, Astro, mobile apps, or
-            custom backends. Switch frameworks without rewriting your automation logic.
-          </p>
-        </div>
-        <div class="differentiator">
-          <h3>Built-in monetization</h3>
-          <p>
-            1Platform includes native payment processing and electronic invoicing. Monetize your
-            content pipeline from day one without integrating third-party payment gateways or
-            billing systems. One platform handles everything from content creation to revenue
-            collection.
-          </p>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title="Generate content"
+            code={apiExample}
+          />
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      <h2>Get Started in Minutes</h2>
-      <p class="section-desc">
-        A single API call generates optimized content, ready for publishing across any platform.
-      </p>
-      <CodeBlock
-        language="bash"
-        title="Generate content with 1Platform API"
-        code={apiExample}
-      />
-    </div>
-  </section>
-
+  <!-- Questions -->
   <section class="section section--alt">
     <div class="container">
-      <h2>Frequently Asked Questions</h2>
-      <div class="faq-list">
+      <div class="section__rule">
+        <p class="eyebrow">Questions</p>
+      </div>
+
+      <div class="qa">
         {faqItems.map((item) => (
-          <details class="faq-item">
-            <summary>{item.question}</summary>
-            <p>{item.answer}</p>
-          </details>
+          <div class="qa__item">
+            <h2 class="qa__q">{item.question}</h2>
+            <p class="qa__a">{item.answer}</p>
+          </div>
         ))}
       </div>
     </div>
   </section>
 
-  <section class="section cta-section">
-    <div class="container cta-container">
-      <h2>Ready to Go Beyond a Plugin?</h2>
-      <p>
-        Replace your WordPress plugin with a full automation platform. Start building with 1Platform today.
-      </p>
-      <div class="cta-buttons">
-        <a href="https://developer.1platform.pro/" class="btn btn--primary">View API Docs</a>
-        <a href="/pricing/" class="btn btn--ghost">See Pricing</a>
+  <!-- Sideways links; the closing CTA lives in the footer on every page -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">More comparisons</p>
+      </div>
+
+      <div class="more">
+        <Card
+          headingLevel={2}
+          title="1Platform vs. AI writing tools"
+          description="Where a writing tool stops, and what the rest of the content pipeline has to cover."
+          href="/compare/1platform-vs-ai-writing-tools/"
+        />
+        <Card
+          headingLevel={2}
+          title="1Platform vs. building your own integration"
+          description="What it takes to wire the same capabilities together yourself, and what stays your problem afterwards."
+          href="/compare/1platform-vs-custom-integration/"
+        />
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .hero-section {
-    padding-top: calc(var(--header-height) + var(--space-16));
-    padding-bottom: var(--space-12);
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
   }
 
-  h1 {
-    font-size: var(--text-5xl);
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: var(--space-4);
-  }
-
-  .subtitle {
-    font-size: var(--text-xl);
-    color: var(--color-text-secondary);
-    max-width: 600px;
-  }
-
-  .section {
-    padding: var(--space-20) 0;
-  }
-
-  .section--alt {
-    background-color: var(--color-bg-alt);
-  }
-
-  .container {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 var(--space-6);
-  }
-
-  h2 {
-    font-size: var(--text-3xl);
-    margin-bottom: var(--space-8);
-  }
-
-  .section-desc {
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-8);
-    max-width: 600px;
-  }
-
-  /* Comparison Table */
-  .table-wrapper {
+  /* ===== Capability matrix =====
+     A real table: the row and column headers are what make the marks readable
+     to a screen reader, so they stay semantic rather than becoming divs. */
+  .matrix-wrap {
     overflow-x: auto;
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-lg);
+    background: var(--color-bg-alt);
   }
 
-  .comparison-table {
+  .matrix {
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--text-base);
+    text-align: left;
   }
 
-  .comparison-table th,
-  .comparison-table td {
+  .matrix th,
+  .matrix td {
     padding: var(--space-4) var(--space-6);
     text-align: left;
-    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
   }
 
-  .comparison-table thead th {
-    background-color: var(--color-bg-elevated);
-    font-weight: 600;
-    font-size: var(--text-sm);
+  .matrix thead th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-secondary);
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
   }
 
-  .comparison-table tbody tr:last-child td {
-    border-bottom: none;
-  }
-
-  .comparison-table tbody td:first-child {
-    font-weight: 500;
-  }
-
-  .check {
-    color: var(--color-green);
-    font-size: var(--text-xl);
-    font-weight: 700;
-  }
-
-  .cross {
-    color: var(--color-red);
-    font-size: var(--text-xl);
-    font-weight: 700;
-  }
-
-  /* Differentiators */
-  .differentiators {
-    display: grid;
-    gap: var(--space-8);
-  }
-
-  .differentiator h3 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-3);
+  /* The claim column reads in the accent; the other stays ink. */
+  .matrix__mark-col--us {
     color: var(--color-accent);
   }
 
-  .differentiator p {
+  .matrix tbody th,
+  .matrix tbody td {
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* Group label, plus the one line that says what the group means. */
+  .matrix__group th {
+    font-weight: 500;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    background: var(--color-bg-muted);
+    padding-block: var(--space-3);
+  }
+
+  .matrix__note {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: var(--text-xs);
     color: var(--color-text-secondary);
-    line-height: 1.7;
+    margin-top: var(--space-1);
   }
 
-  /* FAQ */
-  .faq-list {
-    display: grid;
-    gap: var(--space-4);
-    max-width: var(--max-width-narrow);
-  }
-
-  .faq-item {
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-  }
-
-  .faq-item summary {
-    padding: var(--space-4) var(--space-6);
-    font-weight: 600;
-    cursor: pointer;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-  }
-
-  .faq-item summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .faq-item summary::after {
-    content: '+';
-    font-size: var(--text-xl);
-    color: var(--color-text-tertiary);
-    flex-shrink: 0;
-  }
-
-  .faq-item[open] summary::after {
-    content: '\2212';
-  }
-
-  .faq-item summary:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: -2px;
-  }
-
-  .faq-item p {
-    padding: 0 var(--space-6) var(--space-6);
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .faq-item summary {
-      transition: background-color var(--duration-fast) var(--ease-out-expo);
-    }
-
-    .faq-item summary:hover {
-      background-color: var(--color-bg-elevated);
-    }
-  }
-
-  /* CTA */
-  .cta-section {
-    text-align: center;
-  }
-
-  .cta-container {
-    max-width: var(--max-width-narrow);
-  }
-
-  .cta-container h2 {
-    font-size: var(--text-4xl);
-  }
-
-  .cta-container > p {
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-8);
-    font-size: var(--text-lg);
-  }
-
-  .cta-buttons {
-    display: flex;
-    gap: var(--space-4);
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-3) var(--space-6);
-    border-radius: var(--border-radius);
-    font-weight: 600;
-    font-size: var(--text-base);
-    min-height: 48px;
-    min-width: 48px;
-    cursor: pointer;
-    text-decoration: none;
-    border: none;
-  }
-
-  .btn--primary {
-    background-color: var(--color-accent);
-    color: #fff;
-  }
-
-  .btn--ghost {
-    background: transparent;
-    border: 1px solid var(--color-border);
+  .matrix tbody th[scope='row'] {
+    font-weight: 500;
+    font-size: var(--text-sm);
     color: var(--color-text);
   }
 
-  .btn:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+  .matrix__mark-col {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  .matrix__caveat {
+    max-width: 40rem;
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  /* ===== Reasons: a bordered editorial list ===== */
+  .reasons {
+    display: grid;
+    max-width: 52rem;
+  }
+
+  .reasons__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .reasons__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .reasons__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    padding-top: 2px;
+  }
+
+  .reasons__title {
+    margin-bottom: var(--space-2);
+  }
+
+  .reasons__desc {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ===== Split: copy + code ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Long code lines would otherwise widen the whole grid past the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .btn--primary:hover {
-      filter: brightness(1.1);
-      transform: scale(1.02);
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
     }
 
-    .btn--ghost:hover {
-      border-color: var(--color-accent);
-      box-shadow: 0 0 12px var(--color-accent-glow);
-    }
-
-    .btn {
-      transition: transform var(--duration-fast) var(--ease-out-expo),
-        filter var(--duration-fast) var(--ease-out-expo),
-        border-color var(--duration-fast) var(--ease-out-expo),
-        box-shadow var(--duration-fast) var(--ease-out-expo);
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
     }
   }
 
-  @media (max-width: 768px) {
-    h1 {
-      font-size: var(--text-3xl);
+  /* ===== Questions ===== */
+  .qa {
+    display: grid;
+    max-width: 46rem;
+  }
+
+  .qa__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .qa__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .qa__q {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    margin-bottom: var(--space-3);
+  }
+
+  .qa__a {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ===== More comparisons ===== */
+  .more {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .more {
+      grid-template-columns: 1fr;
     }
 
-    .comparison-table th,
-    .comparison-table td {
+    .matrix th,
+    .matrix td {
       padding: var(--space-3) var(--space-4);
-      font-size: var(--text-sm);
     }
   }
 </style>

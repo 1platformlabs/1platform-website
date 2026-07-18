@@ -9,10 +9,10 @@ const tocHeadings = headings.filter((h) => h.depth <= 3);
 
 {tocHeadings.length > 0 && (
   <nav class="toc" aria-label="Table of contents">
-    <h2 class="toc__title">On This Page</h2>
-    <ul>
+    <h2 class="eyebrow toc__title">On this page</h2>
+    <ul class="toc__list">
       {tocHeadings.map((heading) => (
-        <li class:list={[`toc__item--${heading.depth}`]}>
+        <li class:list={['toc__item', `toc__item--${heading.depth}`]}>
           <a href={`#${heading.slug}`}>{heading.text}</a>
         </li>
       ))}
@@ -21,41 +21,59 @@ const tocHeadings = headings.filter((h) => h.depth <= 3);
 )}
 
 <style>
+  /* Was a bordered box floating beside the article. A card next to a page of
+     paper reads as a widget bolted on; a rail hung off a hairline reads as
+     part of the same sheet. */
   .toc {
-    padding: var(--space-4);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    background: var(--color-bg-alt);
+    padding-left: var(--space-4);
+    border-left: 1px solid var(--color-border-strong);
   }
 
   .toc__title {
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-tertiary);
+    display: block;
     margin-bottom: var(--space-3);
   }
 
-  .toc ul {
+  .toc__list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    max-height: min(60vh, 32rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .toc a {
-    display: block;
-    padding: var(--space-1) var(--space-2);
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding-block: var(--space-1);
+    padding-right: var(--space-2);
     font-size: var(--text-sm);
+    line-height: 1.4;
     color: var(--color-text-secondary);
-    border-radius: 4px;
   }
 
   .toc a:hover {
     color: var(--color-accent);
-    background: var(--color-accent-glow);
   }
 
-  .toc__item--3 {
+  /* Depth is carried by indent alone — no second colour, no second size. */
+  .toc__item--3 a {
     padding-left: var(--space-4);
+    color: var(--color-text-tertiary);
+  }
+
+  @media (max-width: 768px) {
+    .toc {
+      padding-left: 0;
+      padding-block: var(--space-4);
+      border-left: none;
+      border-block: 1px solid var(--color-border);
+    }
+
+    .toc__list {
+      max-height: none;
+      overflow-y: visible;
+    }
   }
 </style>

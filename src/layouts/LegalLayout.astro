@@ -9,6 +9,19 @@ interface Props {
 }
 
 const { title, description, lastUpdated } = Astro.props;
+
+/**
+ * The three policies are one document set and are read as one — a reader
+ * checking cookies usually wants the privacy policy next. Until now they were
+ * only reachable from each other via the footer.
+ */
+const documents = [
+  { label: 'Terms of Service', href: '/terms/' },
+  { label: 'Privacy Policy', href: '/privacy/' },
+  { label: 'Cookie Policy', href: '/cookies/' },
+];
+
+const currentPath = Astro.url.pathname;
 ---
 
 <BaseLayout title={`${title} | 1Platform`} description={description}>
@@ -20,13 +33,36 @@ const { title, description, lastUpdated } = Astro.props;
       ]} />
 
       <header class="legal__header">
+        <p class="eyebrow">Legal</p>
         <h1>{title}</h1>
         {lastUpdated && (
-          <p class="legal__date">Last updated: {lastUpdated}</p>
+          <p class="legal__date">
+            <span class="legal__date-label">Last updated</span>
+            {lastUpdated}
+          </p>
         )}
       </header>
 
-      <div class="prose">
+      <nav class="legal__docs" aria-label="Legal documents">
+        <ul>
+          {documents.map((doc) => {
+            const isCurrent = currentPath.startsWith(doc.href);
+            return (
+              <li>
+                <a
+                  href={doc.href}
+                  class:list={['legal__doc', isCurrent && 'legal__doc--current']}
+                  aria-current={isCurrent ? 'page' : undefined}
+                >
+                  {doc.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <div class="prose legal__body">
         <slot />
       </div>
     </div>
@@ -35,18 +71,69 @@ const { title, description, lastUpdated } = Astro.props;
 
 <style>
   .legal__header {
-    margin-top: var(--space-6);
-    margin-bottom: var(--space-10);
-    padding-bottom: var(--space-6);
-    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-6);
   }
 
   .legal__header h1 {
-    margin-bottom: var(--space-2);
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-4);
   }
 
   .legal__date {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+  }
+
+  .legal__date-label {
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  /* A tab strip on the hairline: which document you are in, and the other two.
+     The current one is marked by ink weight and a rule, not by a filled pill. */
+  .legal__docs ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--space-10);
+  }
+
+  .legal__doc {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     font-size: var(--text-sm);
     color: var(--color-text-tertiary);
+    border-bottom: 1.5px solid transparent;
+    margin-bottom: -1px;
+  }
+
+  .legal__doc:hover {
+    color: var(--color-text);
+  }
+
+  .legal__doc--current {
+    color: var(--color-text);
+    font-weight: 500;
+    border-bottom-color: var(--color-accent);
+  }
+
+  /* Legal prose runs long, so the section headings need to be findable at a
+     glance rather than blending into the paragraphs under them. */
+  .legal__body :global(h2) {
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .legal__body :global(h2:first-child) {
+    padding-top: 0;
+    border-top: none;
   }
 </style>

@@ -2,10 +2,12 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
 import Hero from '@components/Hero.astro';
-import FeatureCard from '@components/FeatureCard.astro';
-import SolutionCard from '@components/SolutionCard.astro';
-import PipelineAnimation from '@components/PipelineAnimation.astro';
+import Card from '@components/Card.astro';
+import Check from '@components/Check.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
 
 const title = 'Online Store Platform — Launch Your Store in Minutes | 1Platform';
 const description = 'Launch a full online store with checkout, payments, electronic invoicing, and your own domain — all from one platform. No plugins, no patchwork.';
@@ -31,41 +33,82 @@ const jsonLd = [
   },
 ];
 
-const iconCart = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
-const iconCard = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
-const iconInvoice = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>';
-const iconDomain = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+const features: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'cart',
+    title: 'Storefront & checkout',
+    description: 'Catalog, cart, and one-page checkout — ready to publish on your own domain.',
+  },
+  {
+    icon: 'card',
+    title: 'Payments built in',
+    description: 'Accept card payments out of the box. Webhook notifications and automatic balance reconciliation.',
+  },
+  {
+    icon: 'invoice',
+    title: 'Compliant invoicing',
+    description: 'Issue electronic invoices automatically for every transaction. PDF + XML included.',
+  },
+  {
+    icon: 'domain',
+    title: 'Your own domain',
+    description: 'Register or connect a domain in minutes. DNS, nameservers, and renewals handled for you.',
+  },
+];
 
-const features = [
-  { icon: iconCart, title: 'Storefront & checkout', description: 'Catalog, cart, and one-page checkout — ready to publish on your own domain.' },
-  { icon: iconCard, title: 'Payments built in', description: 'Accept card payments out of the box. Webhook notifications and automatic balance reconciliation.' },
-  { icon: iconInvoice, title: 'Compliant invoicing', description: 'Issue electronic invoices automatically for every transaction. PDF + XML included.' },
-  { icon: iconDomain, title: 'Your own domain', description: 'Register or connect a domain in minutes. DNS, nameservers, and renewals handled for you.' },
+/** Concrete pieces that ship with the store, drawn from the capabilities above. */
+const included = [
+  'Product catalog and cart',
+  'One-page checkout',
+  'Customer accounts',
+  'Card payments via API',
+  'Webhook notifications on every transaction',
+  'Automatic balance reconciliation',
+  'Electronic invoices as PDF and XML',
+  'Automatic tax calculation on invoice lines',
+  'Domain registration and transfer',
+  'DNS records and nameserver management',
 ];
 
 const storeSteps = [
-  { label: 'Create your account', icon: '&#128100;' },
-  { label: 'Add products', icon: '&#128722;' },
-  { label: 'Connect your domain', icon: '&#127760;' },
-  { label: 'Go live', icon: '&#128640;' },
+  { label: 'Create your account' },
+  { label: 'Add products' },
+  { label: 'Connect your domain' },
+  { label: 'Go live' },
 ];
 
+/**
+ * Compared by what a fragmented stack costs you to run. The monthly prices
+ * previously listed here were invented and have been removed.
+ */
 const comparisonRows = [
-  { without: 'Ecommerce platform — around $30/mo', with_: 'Storefront included' },
-  { without: 'Payment processor — separate account + fees', with_: 'Payments built in' },
-  { without: 'Invoicing software — around $15/mo', with_: 'Electronic invoicing included' },
-  { without: 'Domain registrar — separate dashboard', with_: 'Domain managed for you' },
+  { without: 'An ecommerce platform on its own plan', with_: 'Storefront included' },
+  { without: 'A payment processor with a separate account and onboarding', with_: 'Payments built in' },
+  { without: 'Invoicing software billed and managed on its own', with_: 'Electronic invoicing included' },
+  { without: 'A registrar dashboard you log into separately', with_: 'Domain managed for you' },
 ];
 
-const related = [
-  { icon: iconCard, title: 'Payments & Invoicing', description: 'Accept payments and issue compliant electronic invoices — automatically.', href: '/payments-invoicing/' },
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>', title: 'AI Content Generation', description: 'Generate product descriptions, blog posts, and landing copy with AI.', href: '/solutions/content/' },
-  { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/></svg>', title: 'Whitelabel Dashboard', description: 'Brand the entire experience under your own name — from a single API call.', href: '/solutions/whitelabel/' },
+const related: { title: string; description: string; href: string }[] = [
+  {
+    title: 'Payments & Invoicing',
+    description: 'Accept payments and issue compliant electronic invoices — automatically.',
+    href: '/payments-invoicing/',
+  },
+  {
+    title: 'AI Content Generation',
+    description: 'Generate product descriptions, blog posts, and landing copy with AI.',
+    href: '/solutions/content/',
+  },
+  {
+    title: 'Whitelabel Dashboard',
+    description: 'Brand the entire experience under your own name — from a single API call.',
+    href: '/solutions/whitelabel/',
+  },
 ];
 ---
 
 <BaseLayout title={title} description={description} ogImage="/og/solution-online-store.png" jsonLd={jsonLd}>
-  <section class="section section--breadcrumb">
+  <div class="page-top">
     <div class="container">
       <Breadcrumb items={[
         { label: 'Home', href: '/' },
@@ -73,10 +116,10 @@ const related = [
         { label: 'Online Store' },
       ]} />
     </div>
-  </section>
+  </div>
 
   <Hero
-    headline="Launch Your Online Store"
+    headline="Launch your online store"
     subheadline="Sell online from day one. Storefront, payments, electronic invoicing, and your own domain — all from one platform. No plugins, no integrations, no patchwork."
     badge="Online Store Platform"
     primaryCta={{ label: 'Launch Your Store', href: 'https://app.1platform.pro/app/?intent=store' }}
@@ -85,73 +128,111 @@ const related = [
 
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>What You Get</h2>
-        <p>Everything you need to sell online — in one place, one bill, one dashboard.</p>
+      <div class="statement reveal">
+        <p class="eyebrow">What you get</p>
+        <h2 class="statement__lead">
+          Everything you need to sell online — one place, one bill, one dashboard.
+        </h2>
       </div>
-      <div class="grid-2 stagger-grid">
-        {features.map((f) => (
-          <FeatureCard icon={f.icon} title={f.title} description={f.description} />
+
+      <div class="features">
+        {features.map((feature) => (
+          <Card
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            class="reveal"
+          />
         ))}
       </div>
     </div>
   </section>
 
+  <!-- The concrete inventory, so "everything you need" is checkable -->
   <section class="section section--alt">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>How It Works</h2>
-        <p>Four steps from idea to live store.</p>
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">In the box</p>
+          <h2>No plugin list to assemble</h2>
+          <p>
+            These are not add-ons to buy later. Every item ships with the store and is
+            available from the dashboard and the REST API on the day you open it.
+          </p>
+        </div>
+
+        <ul class="included">
+          {included.map((item) => (
+            <li class="included__item">
+              <Check yes label="Included:" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <PipelineAnimation steps={storeSteps} />
     </div>
   </section>
 
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>What It Replaces</h2>
-        <p>One platform, not six different services.</p>
+      <div class="section__rule">
+        <p class="eyebrow">How it works</p>
       </div>
+      <h2 class="section__lead">Four steps from idea to live store.</h2>
+      <ProcessSpine steps={storeSteps} label="How to launch a store, step by step" />
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">What it replaces</p>
+      </div>
+      <h2 class="section__lead">One platform instead of separate tools</h2>
       <ComparisonTable rows={comparisonRows} />
     </div>
   </section>
 
-  <section class="section section--alt">
-    <div class="container">
-      <div class="pricing-callout reveal">
-        <h2>Transparent Pricing</h2>
-        <p>Pay only for what you use — no subscriptions, no hidden fees. Free tier included for testing every solution.</p>
-        <div class="pricing-callout__actions">
-          <a href="/pricing/" class="btn btn--primary">View Pricing</a>
-          <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--ghost">Start Free</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  <!-- Related work, as a readable index rather than another row of cards -->
   <section class="section">
     <div class="container">
-      <div class="section__header reveal">
-        <h2>Related Solutions</h2>
-        <p>Everything your store needs to grow.</p>
+      <div class="section__rule">
+        <p class="eyebrow">Related solutions</p>
       </div>
-      <div class="grid-3 stagger-grid">
-        {related.map((r) => (
-          <SolutionCard icon={r.icon} title={r.title} description={r.description} href={r.href} />
+      <h2 class="section__lead">Everything your store needs to grow.</h2>
+
+      <ul class="index">
+        {related.map((item) => (
+          <li class="index__item">
+            <h3 class="index__title">
+              <a href={item.href} class="index__link">{item.title}</a>
+            </h3>
+            <p class="index__desc">{item.description}</p>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   </section>
 
-  <section class="section cta-banner">
+  <!-- Page-specific next step. The general closing CTA lives in the footer. -->
+  <section class="section section--alt">
     <div class="container">
-      <div class="cta-banner__content reveal">
-        <h2>Ready to Sell Online?</h2>
-        <p>Stop juggling six different services. Start with one platform — store, payments, invoicing, and domain included.</p>
-        <div class="cta-banner__actions">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">Next step</p>
+          <h2 class="next__title">Ready to sell online?</h2>
+          <p class="next__desc">
+            Pay only for what you use — no subscriptions, no hidden fees, and a free tier
+            for testing every solution before you open the doors.
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            Read the API docs
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+        <div class="next__actions">
           <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--primary">Launch Your Store</a>
-          <a href="https://developer.1platform.pro/" class="btn btn--ghost">For Developers</a>
+          <a href="/pricing/" class="btn btn--ghost">View Pricing</a>
         </div>
       </div>
     </div>
@@ -159,61 +240,170 @@ const related = [
 </BaseLayout>
 
 <style>
-  .section { padding-block: var(--space-20); }
-  .section--breadcrumb {
-    padding-block: var(--space-4) 0;
-    padding-top: calc(var(--header-height) + var(--space-4));
+  /* The hero carries its own header offset, so it is neutralised below the
+     breadcrumb strip to avoid stacking two header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-height) + var(--space-8));
   }
-  .section--alt {
-    background-color: var(--color-bg-alt, #ffffff);
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+
+  /* ===== Split: claim on the left, the inventory on the right ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin: 0;
+  }
+
+  .included {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3) var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .included__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== Related: a bordered index ===== */
+  .index {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 52rem;
+  }
+
+  .index__item {
+    padding-block: var(--space-6);
     border-top: 1px solid var(--color-border);
+  }
+
+  .index__item:last-child {
     border-bottom: 1px solid var(--color-border);
   }
-  .container { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-6); }
-  .section__header {
-    text-align: center; max-width: 700px; margin-inline: auto; margin-bottom: var(--space-12);
+
+  .index__title {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
   }
-  .section__header h2 {
-    font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance;
+
+  .index__link {
+    color: var(--color-text);
   }
-  .section__header p { font-size: var(--text-lg); color: var(--color-text-secondary); }
-  .grid-2 {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6);
+
+  .index__link:hover {
+    color: var(--color-accent);
   }
-  .grid-3 {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6);
+
+  .index__desc {
+    font-size: var(--text-sm);
+    margin: 0;
   }
-  @media (max-width: 1024px) {
-    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
   }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Closing band ===== */
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+
   @media (max-width: 640px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .section { padding-block: var(--space-12); }
-  }
-  .pricing-callout {
-    text-align: center; max-width: 700px; margin-inline: auto;
-  }
-  .pricing-callout h2 {
-    font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance;
-  }
-  .pricing-callout p {
-    font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8);
-  }
-  .pricing-callout__actions, .cta-banner__actions {
-    display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap;
-  }
-  .cta-banner {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(8, 145, 178, 0.05));
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
-  .cta-banner__content {
-    text-align: center; max-width: 700px; margin-inline: auto;
-  }
-  .cta-banner__content h2 {
-    font-size: var(--text-3xl); font-weight: 700; margin-bottom: var(--space-4); text-wrap: balance;
-  }
-  .cta-banner__content p {
-    font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-8);
+    .features,
+    .included {
+      grid-template-columns: 1fr;
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
   }
 </style>

@@ -281,6 +281,12 @@ const currentPath = Astro.url.pathname;
 </script>
 
 <style>
+  /* The frosted, saturated glass bar went. Two reasons, both about this
+     system rather than about taste: it was a hardcoded white at 80% sitting
+     over warm paper, so it read as a colour mismatch rather than a decision;
+     and `saturate(180%) blur()` is the generic SaaS chrome this redesign is
+     trying to stop sounding like. The header is now simply paper with a
+     hairline — it holds the top of the page without competing with it. */
   .site-header {
     position: fixed;
     top: 0;
@@ -288,9 +294,7 @@ const currentPath = Astro.url.pathname;
     right: 0;
     z-index: 100;
     height: var(--header-height);
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: saturate(180%) blur(12px);
-    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    background: var(--color-bg);
     border-bottom: 1px solid var(--color-border);
   }
 
@@ -319,21 +323,22 @@ const currentPath = Astro.url.pathname;
     color: var(--color-text);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .site-header__nav .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--color-accent);
-      transition: width var(--duration-normal) var(--ease-out-expo);
-    }
+  /* The underline marks where you are, and nothing else. It used to sweep out
+     from zero on hover too, which spent motion on a state the colour change
+     already communicates and made every link look like the current one. */
+  .site-header__nav .nav-link.is-active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: var(--color-accent);
+  }
 
-    .site-header__nav .nav-link:hover::after,
-    .site-header__nav .nav-link.is-active::after {
-      width: 100%;
+  @media (prefers-reduced-motion: no-preference) {
+    .site-header__nav .nav-link {
+      transition: color var(--duration-fast) ease;
     }
   }
 
@@ -376,10 +381,8 @@ const currentPath = Astro.url.pathname;
     top: calc(100% + var(--space-2));
     left: 0;
     min-width: 240px;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: saturate(180%) blur(12px);
-    -webkit-backdrop-filter: saturate(180%) blur(12px);
-    border: 1px solid var(--color-border);
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border-strong);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-card-hover);
     padding: var(--space-2);
@@ -418,14 +421,10 @@ const currentPath = Astro.url.pathname;
     white-space: nowrap;
   }
 
-  .dropdown-panel a::after {
-    display: none;
-  }
-
   .dropdown-panel a:hover,
   .dropdown-panel a:focus-visible {
     color: var(--color-text);
-    background: var(--color-bg-alt);
+    background: var(--color-bg-muted);
   }
 
   .dropdown-divider {
@@ -511,7 +510,7 @@ const currentPath = Astro.url.pathname;
   }
 
   .mobile-menu a:hover {
-    background: var(--color-bg-alt);
+    background: var(--color-bg-muted);
   }
 
   .mobile-menu .mobile-menu__sublist {
@@ -523,6 +522,9 @@ const currentPath = Astro.url.pathname;
   }
 
   .mobile-menu .mobile-menu__sublist a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
     padding: var(--space-2) var(--space-4);
     font-size: var(--text-base);
     font-weight: 400;

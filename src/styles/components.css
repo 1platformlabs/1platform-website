@@ -15,7 +15,8 @@
   white-space: nowrap;
   text-decoration: none;
   touch-action: manipulation;
-  min-height: 40px;
+  /* WCAG target-size floor. */
+  min-height: 44px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -59,10 +60,11 @@
   background: var(--color-bg-alt);
 }
 
+/* Visually smaller, but never below the tap-target floor. */
 .btn--sm {
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-xs);
-  min-height: 32px;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  min-height: 44px;
 }
 
 .btn--full {
@@ -78,18 +80,18 @@
   padding: var(--space-6);
 }
 
+/* Hover firms up the edge rather than lifting the card off the page —
+   the generic float is one of the tells this system removes. */
 @media (prefers-reduced-motion: no-preference) {
   .card {
-    transition: transform var(--duration-normal) var(--ease-out-expo),
-                box-shadow var(--duration-normal) ease,
+    transition: box-shadow var(--duration-normal) ease,
                 border-color var(--duration-normal) ease;
   }
+}
 
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-card-hover);
-    border-color: var(--color-border-hover);
-  }
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-border-hover);
 }
 
 /* ===== Code Blocks ===== */
@@ -142,14 +144,16 @@
   border-color: var(--color-border-hover);
 }
 
-/* ===== Badge ===== */
+/* ===== Badge — mono, to match the eyebrow device ===== */
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px var(--space-3);
+  padding: 4px var(--space-3);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  font-weight: 500;
-  border-radius: var(--border-radius-pill);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  border-radius: var(--border-radius);
   background: var(--color-accent-soft);
   color: var(--color-accent);
   border: 1px solid var(--color-accent-ring);
@@ -158,16 +162,8 @@
 /* ===== Section Divider ===== */
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+  background: var(--color-border);
   border: none;
-}
-
-/* ===== Gradient Heading ===== */
-.gradient-text {
-  background: var(--gradient-text);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* ===== Grid Layouts ===== */
