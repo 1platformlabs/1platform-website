@@ -1,0 +1,52 @@
+---
+/**
+ * The single yes/no mark, shared by every comparison and feature table.
+ *
+ * Replaces four separate implementations (an inline SVG on pricing, escaped
+ * \2713 in about, &#10003; across compare/*, &#x2713; in ComparisonTable) that
+ * each rendered at a different weight and colour.
+ *
+ * The state is conveyed by an accessible label, not by colour alone.
+ */
+interface Props {
+  /** Whether the capability is present. */
+  yes: boolean;
+  /** Accessible label. Defaults to "Yes"/"No". */
+  label?: string;
+}
+
+const { yes, label } = Astro.props;
+const text = label ?? (yes ? 'Yes' : 'No');
+---
+
+<span class:list={['mark', yes ? 'mark--yes' : 'mark--no']}>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+    {yes ? (
+      <path d="M3.5 8.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+    ) : (
+      <path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+    )}
+  </svg>
+  <span class="sr-only">{text}</span>
+</span>
+
+<style>
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--border-radius);
+  }
+
+  .mark--yes {
+    color: var(--color-success);
+    background: var(--color-success-bg);
+  }
+
+  .mark--no {
+    color: var(--color-text-tertiary);
+    background: var(--color-bg-muted);
+  }
+</style>

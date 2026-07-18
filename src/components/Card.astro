@@ -1,0 +1,159 @@
+---
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
+
+/**
+ * The one card primitive.
+ *
+ * Replaces PillarSection / FeatureCard / UseCaseCard / SolutionCard, which were
+ * the same "icon tile + h3 + p" block four times over with different gradient
+ * tiles. The variants below encode real differences — whether the card is a
+ * link, and how much weight it carries — not cosmetic ones.
+ */
+interface Props {
+  title: string;
+  description?: string;
+  icon?: IconName;
+  /** When set, the whole card becomes a link and gets a "learn more" cue. */
+  href?: string;
+  /** Small labelled meta line, e.g. what this replaces. */
+  meta?: string;
+  metaLabel?: string;
+  /** Heading level, so cards slot into the page outline correctly. */
+  headingLevel?: 2 | 3 | 4;
+  /**
+   * `default` — standard weight.
+   * `lead` — a featured card: larger title, more room.
+   * `bare` — no surface, for editorial lists that shouldn't read as a grid.
+   */
+  variant?: 'default' | 'lead' | 'bare';
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  icon,
+  href,
+  meta,
+  metaLabel = 'Replaces',
+  headingLevel = 3,
+  variant = 'default',
+  class: className,
+} = Astro.props;
+
+const Tag = href ? 'a' : 'div';
+const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
+---
+
+<Tag
+  href={href}
+  class:list={[
+    'card-item',
+    `card-item--${variant}`,
+    variant !== 'bare' && 'card',
+    href && 'card-item--linked',
+    className,
+  ]}
+>
+  {icon && (
+    <span class="card-item__icon">
+      <Icon name={icon} size={variant === 'lead' ? 24 : 20} />
+    </span>
+  )}
+
+  <Heading class="card-item__title">{title}</Heading>
+
+  {description && <p class="card-item__desc">{description}</p>}
+
+  <slot />
+
+  {meta && (
+    <p class="card-item__meta">
+      <span class="card-item__meta-label">{metaLabel}</span>
+      {meta}
+    </p>
+  )}
+
+  {href && (
+    <span class="card-item__cue" aria-hidden="true">
+      Learn more
+      <Icon name="arrow-right" size={14} />
+    </span>
+  )}
+</Tag>
+
+<style>
+  .card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .card-item--bare {
+    padding: 0;
+  }
+
+  /* Bare icon in the accent, rather than a gradient tile. */
+  .card-item__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    margin-bottom: var(--space-1);
+  }
+
+  .card-item__title {
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .card-item--lead .card-item__title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .card-item__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .card-item--lead .card-item__desc {
+    font-size: var(--text-base);
+  }
+
+  .card-item__meta {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    margin: 0;
+  }
+
+  .card-item__meta-label {
+    font-family: var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: var(--space-2);
+  }
+
+  .card-item__cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: auto;
+    padding-top: var(--space-1);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card-item__cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .card-item--linked:hover .card-item__cue :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+</style>

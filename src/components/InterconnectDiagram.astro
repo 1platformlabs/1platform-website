@@ -1,0 +1,178 @@
+---
+/**
+ * The signature motif: a schematic of the platform itself.
+ *
+ * Capabilities enter from the top, resolve through one API spine, and leave as
+ * the things a business actually ships. An amber signal travels the traces to
+ * say the one thing the brand claims — that these are not separate products.
+ *
+ * Every node is a capability that exists. Pure inline SVG: no island, no JS,
+ * no layout shift. Motion is decorative and collapses to a static schematic
+ * under prefers-reduced-motion.
+ */
+interface Props {
+  /** Extra class for the wrapping figure. */
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const inputs = [
+  { label: 'keywords', cx: 145, trace: 'M145,92 V130 L175,160 V185' },
+  { label: 'ai content', cx: 245, trace: 'M245,92 V185' },
+  { label: 'images', cx: 355, trace: 'M355,92 V185' },
+  { label: 'indexing', cx: 455, trace: 'M455,92 V130 L425,160 V185' },
+];
+
+const outputs = [
+  { label: 'storefront', cx: 185, trace: 'M215,215 V240 L185,270 V308' },
+  { label: 'payments', cx: 300, trace: 'M300,215 V308' },
+  { label: 'invoicing', cx: 415, trace: 'M385,215 V240 L415,270 V308' },
+];
+---
+
+<figure class:list={['motif', className]}>
+  <svg
+    viewBox="0 0 600 400"
+    role="img"
+    aria-label="Schematic of the platform: keywords, AI content, images and indexing all resolve through one 1Platform API, which delivers a storefront, payments and invoicing."
+    class="motif__svg"
+  >
+    <!-- Traces: structure first, so nodes sit above them -->
+    {[...inputs, ...outputs].map((n, i) => (
+      <>
+        <path d={n.trace} class="motif__trace" />
+        <path
+          d={n.trace}
+          class="motif__signal"
+          pathLength="100"
+          style={`--delay: ${i * 0.32}s`}
+        />
+      </>
+    ))}
+
+    <!-- Input nodes -->
+    {inputs.map((n) => (
+      <g class="motif__node">
+        <rect x={n.cx - 52} y="58" width="104" height="34" rx="5" />
+        <text x={n.cx} y="79">{n.label}</text>
+      </g>
+    ))}
+
+    <!-- The spine -->
+    <g class="motif__spine">
+      <rect x="90" y="185" width="420" height="30" rx="6" />
+      <path d="M90,200 H510" class="motif__spine-signal" pathLength="100" />
+      <text x="300" y="205">1PLATFORM API</text>
+    </g>
+
+    <!-- Output nodes -->
+    {outputs.map((n) => (
+      <g class="motif__node motif__node--out">
+        <rect x={n.cx - 58} y="308" width="116" height="34" rx="5" />
+        <text x={n.cx} y="329">{n.label}</text>
+      </g>
+    ))}
+  </svg>
+</figure>
+
+<style>
+  .motif {
+    width: 100%;
+    margin: 0;
+  }
+
+  .motif__svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* ===== Structure ===== */
+  .motif__trace {
+    fill: none;
+    stroke: var(--color-border-strong);
+    stroke-width: 1.25;
+  }
+
+  .motif__node rect {
+    fill: var(--surface);
+    stroke: var(--hairline-strong);
+    stroke-width: 1;
+  }
+
+  .motif__node text {
+    fill: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-anchor: middle;
+  }
+
+  .motif__spine rect {
+    fill: var(--cobalt);
+  }
+
+  .motif__spine text {
+    fill: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-anchor: middle;
+  }
+
+  /* ===== Signal =====
+     Amber is reserved for this: the one thing that moves. */
+  .motif__signal {
+    fill: none;
+    stroke: var(--signal);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 9 100;
+    /* Static schematic by default; the pulse is opt-in below. */
+    stroke-dashoffset: 40;
+    opacity: 0;
+  }
+
+  .motif__spine-signal {
+    fill: none;
+    stroke: var(--signal);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 14 100;
+    stroke-dashoffset: 50;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .motif__signal {
+      opacity: 1;
+      animation: trace-pulse 2.8s var(--delay, 0s) linear infinite;
+    }
+
+    .motif__spine-signal {
+      opacity: 0.9;
+      animation: spine-pulse 2.8s 0.9s linear infinite;
+    }
+
+    @keyframes trace-pulse {
+      0%   { stroke-dashoffset: 109; opacity: 0; }
+      12%  { opacity: 1; }
+      88%  { opacity: 1; }
+      100% { stroke-dashoffset: -9; opacity: 0; }
+    }
+
+    @keyframes spine-pulse {
+      0%   { stroke-dashoffset: 114; opacity: 0; }
+      15%  { opacity: 0.9; }
+      85%  { opacity: 0.9; }
+      100% { stroke-dashoffset: -14; opacity: 0; }
+    }
+  }
+
+  @media (max-width: 640px) {
+    .motif__node text,
+    .motif__spine text {
+      font-size: 14px;
+    }
+  }
+</style>

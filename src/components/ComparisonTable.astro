@@ -1,33 +1,42 @@
 ---
+import Check from '@components/Check.astro';
+
+/**
+ * Unified vs fragmented, compared by experience rather than by price.
+ *
+ * The previous version quoted competitor pricing ("around $30/mo", "$120+/mo")
+ * that had no source behind it. Those numbers are gone: what is actually true
+ * and checkable is what a fragmented stack costs you in effort.
+ */
 interface Props {
   rows?: { without: string; with_: string }[];
 }
 
 const { rows = [
-  { without: 'Ecommerce platform — around $30/mo', with_: 'One platform' },
-  { without: 'Payment processor — separate account + fees', with_: 'Built-in payments' },
-  { without: 'Invoicing software — around $15/mo', with_: 'Electronic invoicing included' },
-  { without: 'AI writing tool — around $49/mo', with_: 'AI content built in' },
-  { without: 'Stock image subscription — around $29/mo', with_: 'AI images included' },
-  { without: 'Domain registrar — separate dashboard', with_: 'Domains managed for you' },
-  { without: 'Total: $120+/mo plus per-transaction fees', with_: 'Pay only for what you use' },
+  { without: 'A separate subscription per tool to manage and renew', with_: 'One account, one bill' },
+  { without: 'You wire the integrations between them yourself', with_: 'Capabilities already connected' },
+  { without: 'Each tool ships its own API, auth and error format', with_: 'One REST API, one token pair' },
+  { without: 'Customer and order data split across dashboards', with_: 'One dashboard, one source of truth' },
+  { without: 'Invoices reconciled by hand against payments', with_: 'Invoices issued from every transaction' },
+  { without: 'Content copy-pasted between tools to publish', with_: 'Content generated and published in place' },
 ] } = Astro.props;
 ---
 
 <div class="comparison reveal">
-  <div class="comparison__header">
-    <div class="comparison__col comparison__col--without">Without 1Platform</div>
-    <div class="comparison__col comparison__col--with">With 1Platform</div>
+  <div class="comparison__head">
+    <p class="eyebrow comparison__col-label">Separate tools</p>
+    <p class="eyebrow eyebrow--accent comparison__col-label">1Platform</p>
   </div>
+
   {rows.map((row) => (
     <div class="comparison__row">
-      <div class="comparison__cell comparison__cell--without">
-        <span class="comparison__icon" aria-hidden="true">&#x2717;</span>
-        {row.without}
+      <div class="comparison__cell">
+        <Check yes={false} label="Separate tools:" />
+        <span>{row.without}</span>
       </div>
       <div class="comparison__cell comparison__cell--with">
-        <span class="comparison__icon" aria-hidden="true">&#x2713;</span>
-        {row.with_}
+        <Check yes={true} label="1Platform:" />
+        <span>{row.with_}</span>
       </div>
     </div>
   ))}
@@ -38,29 +47,17 @@ const { rows = [
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-lg);
     overflow: hidden;
+    background: var(--color-bg-alt);
   }
 
-  .comparison__header {
+  .comparison__head {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    font-weight: 600;
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
   }
 
-  .comparison__col {
+  .comparison__col-label {
     padding: var(--space-4) var(--space-6);
-  }
-
-  .comparison__col--without {
-    background: rgba(239, 68, 68, 0.05);
-    color: var(--color-red);
-  }
-
-  .comparison__col--with {
-    background: rgba(16, 185, 129, 0.05);
-    color: var(--color-green);
+    margin: 0;
   }
 
   .comparison__row {
@@ -70,30 +67,32 @@ const { rows = [
   }
 
   .comparison__cell {
-    padding: var(--space-3) var(--space-6);
+    padding: var(--space-4) var(--space-6);
     font-size: var(--text-sm);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--space-3);
     color: var(--color-text-secondary);
   }
 
-  .comparison__cell--without .comparison__icon {
-    color: var(--color-red);
-  }
-
-  .comparison__cell--with .comparison__icon {
-    color: var(--color-green);
+  /* The right-hand column is the claim: give it the page's surface and ink. */
+  .comparison__cell--with {
+    background: var(--color-bg);
+    color: var(--color-text);
+    border-left: 1px solid var(--color-border);
   }
 
   @media (max-width: 768px) {
-    .comparison__header,
+    .comparison__head {
+      display: none;
+    }
+
     .comparison__row {
       grid-template-columns: 1fr;
     }
 
-    .comparison__col--with,
     .comparison__cell--with {
+      border-left: none;
       border-top: 1px solid var(--color-border);
     }
   }
