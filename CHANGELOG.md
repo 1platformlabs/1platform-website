@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Design system rebuilt around "ink & signal"** (`src/styles/global.css`). Near-monochrome ink on warm paper with one accent (`--cobalt`) and one signal (`--signal`, amber) reserved exclusively for the interconnect motif. Text tokens are verified against WCAG AA on the worst surface they can land on, not just on `--paper`.
+- **Typography is now actually embedded.** Space Grotesk (display), Inter (text) and JetBrains Mono (labels/data) are self-hosted as latin-subset WOFF2 under `public/fonts/` with `@font-face` + `swap`, display 700 and text 400 preloaded. The faces had been *declared* since the beginning but never shipped, so every page had been rendering in `system-ui`.
+- **`InterconnectDiagram.astro`** — the signature motif. The platform drawn as a schematic: real capabilities enter from the top, resolve through one API spine, and leave as storefront / payments / invoicing, with an amber signal travelling the traces. Inline SVG, no JS, static under `prefers-reduced-motion`. Used on the home hero only.
+- **`Card.astro`, `Icon.astro` + `icons.ts`, `Check.astro`, `ProcessSpine.astro`** — one card primitive with real variants, one icon set, one yes/no mark, one numbered-sequence device.
+- **`scripts/check-tells.sh`** — a design-system guard covering eleven categories of template tell. This repo has no pull-request CI (`prod.yml` runs on push to `main` only and its Lighthouse step is informative), so this is the durable net; run it before opening a PR.
+
+### Changed
+- **Home page rebuilt** with varied editorial layouts — asymmetric hero, wide statement, curated capabilities (four featured plus a grouped index instead of a wall of sixteen identical cards), process spine, copy/code split, audience list. Section openers are left-aligned and named by a mono eyebrow, replacing the repeated "centred header + subhead + grid + `section--alt`" cadence.
+- **Pricing page rewritten** (WDR-07): the nine hardcoded rainbow hexes and the inline `style={color: ...}` injection are gone, as are the `$0 / ∞ / 24h / 100%` vanity tiles. The pay-as-you-use model is now explained.
+- **`compare/*` unified** (WDR-08): the three pages each carried a near-identical ~250-line `<style>` block that rebuilt a parallel design system. They now compose the shared components. `1platform-vs-wp-auto-pro` compares against the generic category ("WordPress content plugins") rather than a named competitor, resolving a long-standing conflict with the ecosystem rule; the route is unchanged.
+- **`CLAUDE.md` resynced with reality** — it described dark mode `#0a0a0a`, a cosmos.so animation system, an 8-step pipeline, components that no longer exist, and version 0.9.0 against a package at 2.5.4.
+- Shared `.btn` tap target raised from 40px (and `.btn--sm` from 32px) to the 44px WCAG floor.
+
+### Removed
+- **Fabricated content.** "Platform in Numbers" (250+ / 5,000+ / 10,000+ / 19+, hand-maintained and unsourced) and its animated count-up; competitor prices ("around $30/mo", "$120+/mo") across the comparison table and solution pages; invented figures on `compare/1platform-vs-custom-integration` ("19+ APIs", "6-12 weeks", "tens of thousands of dollars"). The site's contradictory "replaces 4 / 5 / 6 / 19+ / 13+ services" claims are now one phrase carrying no number.
+- **The template kit**: aurora blobs and dot-grid from the hero, the marquee of capability pills, the per-index reveal cascade, gradient text, 135deg gradient icon tiles, and the frosted-glass header chrome. `PillarSection`, `FeatureCard`, `UseCaseCard`, `SolutionCard`, `MetricCounter`, `LogoCarousel`, `PipelineAnimation` and `scripts/pipeline.ts` are deleted.
+- Empty `sameAs: []` stub from the Organization JSON-LD — no real profiles exist to list.
+
+### Fixed
+- **AA contrast failure** on the home page (code block header at 4.45:1), fixed at the token so it holds on every surface rather than at the instance.
+- **Content no longer requires JavaScript to be visible.** `.reveal` starts at `opacity: 0` and only JS adds `.is-visible`, so with JS disabled every section below the hero rendered blank. The rule is now gated on `scripting: enabled`.
+- **Horizontal overflow on mobile** caused by the code block's long lines (grid children default to `min-width: auto`).
+
+### Added
 - **Solutions navbar dropdown** in `src/components/Header.astro`. The Solutions label remains a link to `/solutions/`; an adjacent chevron `<button>` toggles a panel with Online Store, Website Builder, AI Content, Whitelabel Dashboard, Payments & Invoicing, a divider, and View all solutions. Full keyboard a11y (Enter/Space toggle from chevron, Escape closes + restores focus, ArrowUp/ArrowDown cycle items, Tab exits the panel), `aria-expanded` / `aria-controls` / `role="menu"` / `role="menuitem"`, and click-outside / hover-to-open behavior. On mobile (≤768px) the chevron and floating panel are hidden and the items render as an indented inline sub-list inside the existing mobile menu. Vanilla JS, no React island.
 - **Blog categories** `ecommerce` and `payments-invoicing` added to `src/content/config.ts` so posts can be organized around the refocused outcome narrative.
 - **Three new blog posts** under the refocused categories:
