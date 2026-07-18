@@ -17,7 +17,12 @@ cd "$(dirname "$0")/.."
 
 RED=$'\033[0;31m'; GREEN=$'\033[0;32m'; DIM=$'\033[2m'; RESET=$'\033[0m'
 FAILED=0
-SRC="src/pages src/components src/layouts"
+# Every rule scans this surface, so it has to name every place authored copy and
+# markup can live. The i18n epic moved ~1,050 strings into src/i18n and all page
+# markup into src/page-content; leaving those out would have kept the script
+# green while it watched two directories that no longer held the content it
+# exists to police.
+SRC="src/pages src/components src/layouts src/i18n src/page-content"
 
 # Documentation comments legitimately name the patterns they removed, so a
 # JSDoc/line/HTML comment is not a finding. Everything else is.
@@ -49,12 +54,31 @@ command -v perl >/dev/null 2>&1 || {
   exit 1
 }
 
+# A scan directory that no longer exists must stop the script, not print a
+# `find: no such file` line above a green "ok". Renaming a source directory is
+# exactly how a rule quietly stops seeing the code it guards.
+for dir in $SRC; do
+  [ -d "$dir" ] || {
+    printf '%sFAIL%s  preflight: scan directory %s does not exist\n' "$RED" "$RESET" "$dir"
+    printf '%s      every directory in SRC must exist, or rules silently scan less%s\n' \
+      "$DIM" "$RESET"
+    exit 1
+  }
+done
+
 FILES=$(find $SRC -type f \( -name '*.astro' -o -name '*.ts' -o -name '*.css' \))
 
 # 1. Emoji and HTML entity glyphs standing in for icons.
-m=$(perl -ne '
+# `-CSD` is load-bearing, not decoration. Without it perl reads bytes, so a
+# 4-byte emoji arrives as four separate latin-1 characters and the \x{1F000}
+# range never matches: the scan reported "clean" against files full of emoji.
+# The entity bounds were short for the same reason — the pasted form of an
+# emoji is six decimal digits (&#128640;) or five hex (&#x1F680;), both of
+# which fell outside {4,5} and {4}. Widening them is what makes the rule cover
+# the case its own comment describes.
+m=$(perl -CSD -ne '
   print "$ARGV:$.:$_" if !/&#x27;/
-    && /[\x{1F000}-\x{1FAFF}]|[\x{2190}-\x{27BF}]|&#[0-9]{4,5};|&#x[0-9A-Fa-f]{4};/;
+    && /[\x{1F000}-\x{1FAFF}]|[\x{2190}-\x{27BF}]|&#[0-9]{4,6};|&#x[0-9A-Fa-f]{4,6};/;
   close ARGV if eof;
 ' $FILES | strip_comments)
 report "no emoji or entity glyphs as icons" \
@@ -77,14 +101,23 @@ report "no fabricated prices or vanity metrics" \
 #    between the number and the noun. Count words are spelled out as well as
 #    numeric. "one X" is the unified claim, not a fragmented count, so it is
 #    excluded rather than matched.
+#    The Spanish half is not optional: half the site's copy is Spanish now, and
+#    the English noun list cannot see "seis servicios distintos". Spanish puts
+#    the qualifier after the noun, so the shape is mirrored, not copied. As in
+#    English, "un/una X" is the unified claim and is excluded rather than
+#    matched — only real counts start at two/dos.
 m=$(grep -rniE '\b(two|three|four|five|six|seven|eight|nine|ten|[0-9]+) +(different +|separate +|distinct +)?(vendors?|accounts?|services?|tools?|subscriptions?|providers?|platforms?|apis?|dashboards?|logins?|bills?|integrations?)\b|\b(19|13)\+' $SRC \
   | strip_comments)
+m2=$(grep -rniE '\b(dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|[0-9]+) +(herramientas?|servicios?|proveedores?|cuentas?|suscripciones?|plataformas?|paneles?|panel|integraciones?|facturas?|apis?|accesos?|programas?|aplicaciones?)( +(distintas?|distintos?|separadas?|separados?|diferentes?|sueltas?|sueltos?))?\b' $SRC \
+  | strip_comments)
+m=$(printf '%s\n%s' "$m" "$m2" | grep -v '^$' || true)
 report "no numbered replace-count claim" \
        "the site contradicted itself (4 / 5 / 6 / 19+ / 13+); the agreed phrasing carries no number" "$m"
 
 # 5. Brand colour as a hex literal instead of a token. Neutral #fff/#000
 #    shorthand inside authored SVG is tolerated; brand colours are not.
-m=$(grep -rnE '#[0-9a-fA-F]{6}' src/pages src/components \
+# (src/layouts stays out: BaseLayout legitimately carries the theme-color meta.)
+m=$(grep -rnE '#[0-9a-fA-F]{6}' src/pages src/components src/page-content src/i18n \
   | grep -viE '#(ffffff|000000)\b' | strip_comments)
 report "no hardcoded brand colours" \
        "colour decisions live in the token layer (global.css), not in pages" "$m"
@@ -118,8 +151,14 @@ report "fonts are self-hosted and preloaded" \
        "the faces were declared but never embedded, so everything rendered in system-ui" "$m"
 
 # 10. Provider names are client-facing only in the privacy policy.
+# The exclusion follows the privacy policy's CONTENT, not one path. Under the
+# shell pattern src/pages/privacy.astro is four lines and the prose that names
+# processors lives in src/page-content/Privacy.astro and its message module —
+# and there is now a Spanish shell at src/pages/es/privacy.astro too. Pinning
+# the old path would have exempted a file with nothing in it while policing the
+# three files that actually carry the text.
 m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b' $SRC \
-  | grep -v 'src/pages/privacy.astro' | strip_comments)
+  | grep -viE '(^|/)privacy\.(astro|ts):' | strip_comments)
 report "no external provider names outside the privacy policy" \
        "capabilities are presented as native product features" "$m"
 
@@ -127,6 +166,22 @@ report "no external provider names outside the privacy policy" \
 m=$(grep -rnE 'client:(load|idle|visible|media|only)' $SRC | strip_comments)
 report "no client:* directives" \
        "the site ships static HTML; islands would blow the JS budget" "$m"
+
+# 12. A pinned locale tag renders one language's dates in both trees. The tags
+#     live in the i18n module, keyed by locale; nothing else may name one.
+m=$(grep -rnE "['\"](en-US|es-ES|en-GB|es-MX)['\"]" $SRC \
+  | grep -v 'src/i18n/ui.ts' | strip_comments)
+report "no hardcoded locale tags" \
+       "dates and numbers format from the page's locale, not a literal" "$m"
+
+# 13. Copy belongs in a message module, so a literal in the markup is a string
+#     that exists in one language only. Catches the common slip of translating a
+#     page but leaving one heading or aria-label behind.
+m=$(grep -rnE '(aria-label|title|alt|placeholder)="[A-Za-z][A-Za-z ,.!?'"'"'-]{7,}"' \
+  src/page-content src/components src/layouts 2>/dev/null \
+  | grep -viE 'aria-label=\{|title=\{|\{t\(|Astro\.props' | strip_comments)
+report "no untranslated literal attributes" \
+       "visible and accessible text comes from t(), not from a literal" "$m"
 
 echo
 if [ "$FAILED" -ne 0 ]; then

@@ -1,4 +1,7 @@
----
+---import { useI18n } from '@i18n';
+const { t, l } = useI18n(Astro.url.pathname);
+
+
 /**
  * Shared Logo component — single source of truth for 1Platform branding.
  * Used in Header, Footer, and anywhere the brand logo appears.
@@ -14,10 +17,11 @@ interface Props {
   class?: string;
 }
 
-const { label = '1Platform Home', class: className } = Astro.props;
+const { label, class: className } = Astro.props;
+const accessibleLabel = label ?? t('layout.logoLabel');
 ---
 
-<a href="/" class:list={['logo', className]} aria-label={label}>
+<a href={l('/')} class:list={['logo', className]} aria-label={accessibleLabel}>
   <span class="logo__mark" aria-hidden="true">1</span><span class="logo__text">Platform</span>
 </a>
 

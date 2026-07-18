@@ -1,44 +1,47 @@
 ---
 import Logo from '@components/Logo.astro';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
 
 const columns = [
   {
-    title: 'Solutions',
+    title: t('footer.col.solutions'),
     links: [
-      { label: 'Online Store', href: '/solutions/online-store/' },
-      { label: 'Website Builder', href: '/solutions/website/' },
-      { label: 'AI Content', href: '/solutions/content/' },
-      { label: 'Whitelabel Dashboard', href: '/solutions/whitelabel/' },
-      { label: 'Payments & Invoicing', href: '/payments-invoicing/' },
-      { label: 'For Agencies', href: '/for-agencies/' },
-      { label: 'For Developers', href: '/for-developers/' },
-      { label: 'All Solutions', href: '/solutions/' },
+      { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
+      { label: t('nav.solutions.website'), href: l('/solutions/website/') },
+      { label: t('nav.solutions.content'), href: l('/solutions/content/') },
+      { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
+      { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
+      { label: t('footer.link.forAgencies'), href: l('/for-agencies/') },
+      { label: t('footer.link.forDevelopers'), href: l('/for-developers/') },
+      { label: t('footer.link.allSolutions'), href: l('/solutions/') },
     ],
   },
   {
-    title: 'Resources',
+    title: t('footer.col.resources'),
     links: [
-      { label: 'Documentation', href: 'https://developer.1platform.pro/' },
-      { label: 'API Reference', href: 'https://developer.1platform.pro/api-docs' },
-      { label: 'Code Examples', href: 'https://developer.1platform.pro/' },
-      { label: 'Blog', href: '/blog/' },
-      { label: 'Changelog', href: '/changelog/' },
+      { label: t('footer.link.documentation'), href: 'https://developer.1platform.pro/' },
+      { label: t('footer.link.apiReference'), href: 'https://developer.1platform.pro/api-docs' },
+      { label: t('footer.link.codeExamples'), href: 'https://developer.1platform.pro/' },
+      { label: t('nav.blog'), href: l('/blog/') },
+      { label: t('footer.link.changelog'), href: l('/changelog/') },
     ],
   },
   {
-    title: 'Company',
+    title: t('footer.col.company'),
     links: [
-      { label: 'About', href: '/about/' },
-      { label: 'For Developers', href: '/for-developers/' },
-      { label: 'Pricing', href: '/pricing/' },
+      { label: t('footer.link.about'), href: l('/about/') },
+      { label: t('footer.link.forDevelopers'), href: l('/for-developers/') },
+      { label: t('nav.pricing'), href: l('/pricing/') },
     ],
   },
   {
-    title: 'Legal',
+    title: t('footer.col.legal'),
     links: [
-      { label: 'Terms of Service', href: '/terms/' },
-      { label: 'Privacy Policy', href: '/privacy/' },
-      { label: 'Cookie Policy', href: '/cookies/' },
+      { label: t('footer.link.terms'), href: l('/terms/') },
+      { label: t('footer.link.privacy'), href: l('/privacy/') },
+      { label: t('footer.link.cookies'), href: l('/cookies/') },
     ],
   },
 ];
@@ -50,11 +53,11 @@ const year = new Date().getFullYear();
   <div class="container">
     <!-- Closing CTA -->
     <div class="footer-cta">
-      <h2>Stop juggling separate tools</h2>
-      <p>Start with one platform. Sell online, issue invoices, and publish content — from one dashboard, one API, one bill.</p>
+      <h2>{t('footer.cta.title')}</h2>
+      <p>{t('footer.cta.body')}</p>
       <div class="footer-cta__actions">
-        <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--primary">Launch Your Store</a>
-        <a href="https://developer.1platform.pro/" class="btn btn--ghost">View Documentation</a>
+        <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--primary">{t('cta.launchStore')}</a>
+        <a href="https://developer.1platform.pro/" class="btn btn--ghost">{t('cta.viewDocs')}</a>
       </div>
     </div>
 
@@ -83,7 +86,7 @@ const year = new Date().getFullYear();
 
     <!-- Bottom -->
     <div class="footer-bottom">
-      <p>&copy; {year} 1Platform Labs. All rights reserved.</p>
+      <p>{t('footer.copyright', { year })}</p>
     </div>
   </div>
 </footer>

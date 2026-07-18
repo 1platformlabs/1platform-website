@@ -2,6 +2,9 @@
 import { getCollection } from 'astro:content';
 import BlogPostCard from './BlogPostCard.astro';
 
+import { useI18n } from '@i18n';
+const { t } = useI18n(Astro.url.pathname);
+
 interface Props {
   currentSlug: string;
   currentCategory: string;
@@ -24,7 +27,7 @@ const related = allPosts
   <section class="related section section--alt" aria-labelledby="related-heading">
     <div class="container">
       <div class="section__rule">
-        <h2 class="eyebrow" id="related-heading">Keep reading</h2>
+        <h2 class="eyebrow" id="related-heading">{t('related.title')}</h2>
       </div>
 
       <div class="related__grid">

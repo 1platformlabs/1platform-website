@@ -1,14 +1,17 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import Breadcrumb from '@components/Breadcrumb.astro';
+import { formatDate, useI18n } from '@i18n';
 
 interface Props {
   title: string;
   description: string;
-  lastUpdated?: string;
+  /** Real date, formatted in the page's locale — not a pre-rendered string. */
+  lastUpdated?: Date;
 }
 
 const { title, description, lastUpdated } = Astro.props;
+const { t, l, locale } = useI18n(Astro.url.pathname);
 
 /**
  * The three policies are one document set and are read as one — a reader
@@ -16,9 +19,9 @@ const { title, description, lastUpdated } = Astro.props;
  * only reachable from each other via the footer.
  */
 const documents = [
-  { label: 'Terms of Service', href: '/terms/' },
-  { label: 'Privacy Policy', href: '/privacy/' },
-  { label: 'Cookie Policy', href: '/cookies/' },
+  { label: t('legal.doc.terms'), href: l('/terms/') },
+  { label: t('legal.doc.privacy'), href: l('/privacy/') },
+  { label: t('legal.doc.cookies'), href: l('/cookies/') },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -28,22 +31,22 @@ const currentPath = Astro.url.pathname;
   <div class="legal section">
     <div class="container container--narrow">
       <Breadcrumb items={[
-        { label: 'Home', href: '/' },
+        { label: t('breadcrumb.home'), href: l('/') },
         { label: title },
       ]} />
 
       <header class="legal__header">
-        <p class="eyebrow">Legal</p>
+        <p class="eyebrow">{t('legal.eyebrow')}</p>
         <h1>{title}</h1>
         {lastUpdated && (
           <p class="legal__date">
-            <span class="legal__date-label">Last updated</span>
-            {lastUpdated}
+            <span class="legal__date-label">{t('legal.lastUpdated')}</span>
+            {formatDate(lastUpdated, locale)}
           </p>
         )}
       </header>
 
-      <nav class="legal__docs" aria-label="Legal documents">
+      <nav class="legal__docs" aria-label={t('legal.docsAria')}>
         <ul>
           {documents.map((doc) => {
             const isCurrent = currentPath.startsWith(doc.href);
