@@ -74,6 +74,7 @@ const countLabel = `${posts.length} ${posts.length === 1 ? 'article' : 'articles
             slug={post.slug}
             author={post.data.author}
             readingTime={post.data.readingTime}
+            headingLevel={2}
             class="reveal"
           />
         ))}
@@ -81,7 +82,7 @@ const countLabel = `${posts.length} ${posts.length === 1 ? 'article' : 'articles
 
       <nav class="onward" aria-label="Other topics">
         <div class="section__rule">
-          <p class="eyebrow">Other topics</p>
+          <h2 class="eyebrow">Other topics</h2>
         </div>
         <ul class="onward__list">
           {siblings.map((sibling) => (

@@ -144,7 +144,7 @@ curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
           {stages.map((group) => (
             <tbody>
               <tr class="matrix__group">
-                <th scope="colgroup" colspan="3">{group.stage}</th>
+                <th scope="rowgroup" colspan="3">{group.stage}</th>
               </tr>
               {group.rows.map((row) => (
                 <tr>
@@ -312,14 +312,16 @@ curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
     border-top: 1px solid var(--color-border);
   }
 
-  /* Stage label: the same mono device the eyebrows use, set into the table. */
+  /* Stage label: the same mono device the eyebrows use, set into the table.
+     Secondary rather than tertiary ink — at 12px on the recessed surface,
+     tertiary sits right on the AA boundary. */
   .matrix__group th {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     font-weight: 400;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
     background: var(--color-bg-muted);
     padding-block: var(--space-2);
   }

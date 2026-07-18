@@ -82,7 +82,7 @@ const expectations: { icon: IconName; term: string; detail: string }[] = [
         </header>
 
         <!-- Right: the address itself, given its own surface -->
-        <div class="contact__panel reveal">
+        <div class="card contact__panel reveal">
           <div class="panel-mark" aria-hidden="true"><Icon name="mail" size={22} /></div>
 
           <h2 class="panel__title">Email sales</h2>
@@ -276,18 +276,20 @@ const expectations: { icon: IconName; term: string; detail: string }[] = [
     color: var(--color-text-secondary);
   }
 
+  /* Underlined, not colour-only: a link sitting inside a run of text needs a
+     non-colour cue. Matches the .prose a convention. */
   .expectations__detail a {
     color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   /* ===== The address panel ===== */
+  /* Surface comes from the shared .card; only the additive bits live here. */
   .contact__panel {
     position: sticky;
     top: calc(var(--header-height) + var(--space-8));
     padding: var(--space-8);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    background: var(--color-bg-alt);
     box-shadow: var(--shadow-md);
   }
 

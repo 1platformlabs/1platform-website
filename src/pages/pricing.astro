@@ -206,6 +206,18 @@ const included: { group: string; items: string[] }[] = [
       'Low-balance and activity notifications',
     ],
   },
+  {
+    // Support carries no per-operation charge. Stated qualitatively on purpose:
+    // the previous page named specific tiers ("Community on free tier",
+    // "Dedicated on custom plans") that nothing in the product backs.
+    group: 'Support',
+    items: [
+      'In-app help center',
+      'Support tickets from the dashboard',
+      'Documentation and API reference',
+      'Dedicated support on custom plans',
+    ],
+  },
 ];
 
 /* The only things that genuinely need a conversation: their cost is set
@@ -536,9 +548,10 @@ const quoted = [
   }
 
   /* ===== Not metered ===== */
+  /* Count-agnostic, so adding a group doesn't strand one on its own row. */
   .included {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--space-8);
   }
 

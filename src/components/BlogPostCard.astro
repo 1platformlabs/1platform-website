@@ -23,6 +23,12 @@ interface Props {
   author: string;
   readingTime?: string;
   variant?: 'row' | 'lead' | 'card';
+  /**
+   * So a list of posts slots into the page outline without skipping a level.
+   * A category page hangs posts straight off its h1; the blog index groups
+   * them under "Latest" / "Archive" headings first.
+   */
+  headingLevel?: 2 | 3;
   class?: string;
 }
 
@@ -49,8 +55,11 @@ const {
   author,
   readingTime,
   variant = 'row',
+  headingLevel = 3,
   class: className,
 } = Astro.props;
+
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
 
 const categoryLabel = CATEGORY_LABELS[category] ?? category.replace(/-/g, ' ');
 const dateISO = pubDate.toISOString();
@@ -67,16 +76,16 @@ const dateLabel = pubDate.toLocaleDateString('en-US', {
       <time datetime={dateISO}>{dateLabel}</time>
     </span>
 
-    <span class="post__body">
-      <h3 class="post__title">{title}</h3>
-      <span class="post__standfirst">{description}</span>
+    <div class="post__body">
+      <Heading class="post__title">{title}</Heading>
+      <p class="post__standfirst">{description}</p>
 
       <span class="post__meta">
         <span class="post__category">{categoryLabel}</span>
         <span class="post__author">{author}</span>
         {readingTime && <span class="post__reading">{readingTime}</span>}
       </span>
-    </span>
+    </div>
 
     {variant === 'lead' && (
       <span class="post__cue" aria-hidden="true">
@@ -99,7 +108,7 @@ const dateLabel = pubDate.toLocaleDateString('en-US', {
   }
 
   .post__standfirst {
-    display: block;
+    margin: 0;
     font-size: var(--text-sm);
     line-height: 1.6;
     color: var(--color-text-secondary);
@@ -231,10 +240,6 @@ const dateLabel = pubDate.toLocaleDateString('en-US', {
     flex-direction: column;
     gap: var(--space-3);
     height: 100%;
-  }
-
-  .post--card .post__date-rail {
-    order: -1;
   }
 
   .post--card .post__body {

@@ -71,8 +71,14 @@ report "no fabricated prices or vanity metrics" \
        "competitor prices and hand-maintained traction numbers had no source" "$m"
 
 # 4. The "replaces N tools" claim must carry no unverifiable number.
-m=$(grep -rniE '(six|five|four|seven|[0-9]+) (different )?(services|tools|subscriptions|providers|platforms)\b|\b(19|13)\+' $SRC \
-  | grep -viE 'separate (tools|services)' | strip_comments)
+#    The noun list and the optional qualifier both matter: the first version of
+#    this rule missed "four vendors", "four accounts" and "five separate
+#    providers" because it only knew five nouns and allowed only "different"
+#    between the number and the noun. Count words are spelled out as well as
+#    numeric. "one X" is the unified claim, not a fragmented count, so it is
+#    excluded rather than matched.
+m=$(grep -rniE '\b(two|three|four|five|six|seven|eight|nine|ten|[0-9]+) +(different +|separate +|distinct +)?(vendors?|accounts?|services?|tools?|subscriptions?|providers?|platforms?|apis?|dashboards?|logins?|bills?|integrations?)\b|\b(19|13)\+' $SRC \
+  | strip_comments)
 report "no numbered replace-count claim" \
        "the site contradicted itself (4 / 5 / 6 / 19+ / 13+); the agreed phrasing carries no number" "$m"
 
