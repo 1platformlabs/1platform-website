@@ -4,6 +4,7 @@ import Breadcrumb from '@components/Breadcrumb.astro';
 import TOC from '@components/TOC.astro';
 import ShareButtons from '@components/ShareButtons.astro';
 import RelatedPosts from '@components/RelatedPosts.astro';
+import { formatDate, useI18n, type Locale } from '@i18n';
 
 interface Props {
   frontmatter: {
@@ -15,33 +16,26 @@ interface Props {
     category: string;
     image?: string;
     ogImage?: string;
-    readingTime?: string;
+    readingTime?: number;
     tags?: string[];
   };
   headings?: { depth: number; slug: string; text: string }[];
   slug: string;
+  /** Omitting a locale here is how a post with no twin declares that. */
+  alternates?: Partial<Record<Locale, string>>;
 }
 
-/** Initialisms mean these cannot be title-cased by rule. See BlogPostCard. */
-const CATEGORY_LABELS: Record<string, string> = {
-  'seo-automation': 'SEO automation',
-  'ai-content': 'AI content',
-  'api-tutorials': 'API tutorials',
-  'product-updates': 'Product updates',
-  ecommerce: 'Ecommerce',
-  'payments-invoicing': 'Payments & invoicing',
-};
+const { frontmatter, headings = [], slug, alternates } = Astro.props;
+const { t, l, locale } = useI18n(Astro.url.pathname);
 
-const { frontmatter, headings = [], slug } = Astro.props;
+const categoryLabel = t(`blog.category.${frontmatter.category}`);
 
-const categoryLabel =
-  CATEGORY_LABELS[frontmatter.category] ?? frontmatter.category.replace(/-/g, ' ');
-
-const dateFormat: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-};
+// Built from the page's own locale so the canonical, the share URL and the
+// Article @id all point at the language being read. These used to be pinned to
+// the English origin, so a Spanish post advertised the English URL as its
+// canonical identity.
+const postPath = l(`/blog/${slug}/`);
+const postURL = new URL(postPath, 'https://1platform.pro').href;
 
 /** Only worth showing when it actually says something new. */
 const showUpdated =
@@ -72,9 +66,10 @@ const articleJsonLd = {
       url: 'https://1platform.pro/favicon.svg',
     },
   },
+  inLanguage: locale,
   mainEntityOfPage: {
     '@type': 'WebPage',
-    '@id': `https://1platform.pro/blog/${slug}/`,
+    '@id': postURL,
   },
 };
 ---
@@ -84,17 +79,18 @@ const articleJsonLd = {
   description={frontmatter.description}
   ogImage={frontmatter.ogImage}
   jsonLd={articleJsonLd}
+  alternates={alternates}
 >
   <article class="blog-post section">
     <div class="container">
       <Breadcrumb items={[
-        { label: 'Home', href: '/' },
-        { label: 'Blog', href: '/blog/' },
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('blog.h1'), href: l('/blog/') },
         { label: frontmatter.title },
       ]} />
 
       <header class="blog-post__header">
-        <a href={`/blog/category/${frontmatter.category}/`} class="eyebrow blog-post__category">
+        <a href={l(`/blog/category/${frontmatter.category}/`)} class="eyebrow blog-post__category">
           {categoryLabel}
         </a>
 
@@ -106,31 +102,31 @@ const articleJsonLd = {
              than by a punctuation glyph. -->
         <dl class="blog-post__byline">
           <div class="blog-post__byline-item">
-            <dt>Written by</dt>
+            <dt>{t('blog.writtenBy')}</dt>
             <dd>{frontmatter.author}</dd>
           </div>
           <div class="blog-post__byline-item">
-            <dt>Published</dt>
+            <dt>{t('blog.published')}</dt>
             <dd>
               <time datetime={frontmatter.pubDate.toISOString()}>
-                {frontmatter.pubDate.toLocaleDateString('en-US', dateFormat)}
+                {formatDate(frontmatter.pubDate, locale)}
               </time>
             </dd>
           </div>
           {showUpdated && frontmatter.updatedDate && (
             <div class="blog-post__byline-item">
-              <dt>Updated</dt>
+              <dt>{t('blog.updated')}</dt>
               <dd>
                 <time datetime={frontmatter.updatedDate.toISOString()}>
-                  {frontmatter.updatedDate.toLocaleDateString('en-US', dateFormat)}
+                  {formatDate(frontmatter.updatedDate, locale)}
                 </time>
               </dd>
             </div>
           )}
           {frontmatter.readingTime && (
             <div class="blog-post__byline-item">
-              <dt>Length</dt>
-              <dd>{frontmatter.readingTime}</dd>
+              <dt>{t('blog.length')}</dt>
+              <dd>{t('blog.readingTime', { n: frontmatter.readingTime })}</dd>
             </div>
           )}
         </dl>
@@ -146,7 +142,7 @@ const articleJsonLd = {
       </div>
 
       <footer class="blog-post__footer">
-        <ShareButtons title={frontmatter.title} url={`https://1platform.pro/blog/${slug}/`} />
+        <ShareButtons title={frontmatter.title} url={postURL} />
       </footer>
     </div>
   </article>

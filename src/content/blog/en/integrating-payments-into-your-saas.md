@@ -4,7 +4,8 @@ description: "A developer-focused walkthrough of adding a payments API to your S
 pubDate: 2026-05-20
 author: "1Platform Team"
 category: "payments-invoicing"
-readingTime: "11 min read"
+translationKey: "integrating-payments-into-your-saas"
+readingTime: 11
 ogImage: "/og/blog-integrating-payments-into-your-saas.png"
 tags: ["payments api", "saas", "developer", "webhooks", "billing"]
 ---

@@ -4,7 +4,8 @@ description: "Discover proven strategies for generating AI content that ranks we
 pubDate: 2024-11-28
 author: "1Platform Team"
 category: "ai-content"
-readingTime: "6 min read"
+translationKey: "ai-content-best-practices"
+readingTime: 6
 tags: ["ai", "content", "seo", "best-practices"]
 ---
 

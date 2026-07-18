@@ -4,7 +4,8 @@ description: "A quick-start tutorial showing how to go from account creation to 
 pubDate: 2024-10-25
 author: "1Platform Team"
 category: "api-tutorials"
-readingTime: "5 min read"
+translationKey: "getting-started-5-minutes"
+readingTime: 5
 tags: ["tutorial", "getting-started", "api", "quickstart"]
 ---
 

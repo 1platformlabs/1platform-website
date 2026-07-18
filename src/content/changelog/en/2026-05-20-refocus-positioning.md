@@ -2,6 +2,7 @@
 title: "Website refocused on online store, payments and developer platform"
 date: 2026-05-20
 category: "improvement"
+translationKey: "2026-05-20-refocus-positioning"
 ---
 
 ## Website

@@ -4,7 +4,8 @@ description: "How to approach link building programmatically through APIs instea
 pubDate: 2024-11-10
 author: "1Platform Team"
 category: "seo-automation"
-readingTime: "7 min read"
+translationKey: "programmatic-link-building"
+readingTime: 7
 tags: ["link-building", "seo", "automation", "developers"]
 ---
 

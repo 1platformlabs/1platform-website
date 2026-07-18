@@ -1,5 +1,6 @@
 ---
 import Icon from '@components/Icon.astro';
+import { formatDate, useI18n } from '@i18n';
 
 /**
  * One post, in the three shapes the blog actually needs.
@@ -21,7 +22,7 @@ interface Props {
   category: string;
   slug: string;
   author: string;
-  readingTime?: string;
+  readingTime?: number;
   variant?: 'row' | 'lead' | 'card';
   /**
    * So a list of posts slots into the page outline without skipping a level.
@@ -32,19 +33,6 @@ interface Props {
   class?: string;
 }
 
-/**
- * Categories carry initialisms, so they cannot be title-cased by rule —
- * `seo-automation` came out as "Seo Automation". The set is closed by the
- * content schema, so it is written out.
- */
-const CATEGORY_LABELS: Record<string, string> = {
-  'seo-automation': 'SEO automation',
-  'ai-content': 'AI content',
-  'api-tutorials': 'API tutorials',
-  'product-updates': 'Product updates',
-  ecommerce: 'Ecommerce',
-  'payments-invoicing': 'Payments & invoicing',
-};
 
 const {
   title,
@@ -61,9 +49,11 @@ const {
 
 const Heading = `h${headingLevel}` as 'h2' | 'h3';
 
-const categoryLabel = CATEGORY_LABELS[category] ?? category.replace(/-/g, ' ');
+const { t, l, locale } = useI18n(Astro.url.pathname);
+
+const categoryLabel = t(`blog.category.${category}`);
 const dateISO = pubDate.toISOString();
-const dateLabel = pubDate.toLocaleDateString('en-US', {
+const dateLabel = formatDate(pubDate, locale, {
   year: 'numeric',
   month: 'short',
   day: 'numeric',
@@ -71,7 +61,7 @@ const dateLabel = pubDate.toLocaleDateString('en-US', {
 ---
 
 <article class:list={['post', `post--${variant}`, variant === 'card' && 'card', className]}>
-  <a href={`/blog/${slug}/`} class="post__link">
+  <a href={l(`/blog/${slug}/`)} class="post__link">
     <span class="post__date-rail eyebrow">
       <time datetime={dateISO}>{dateLabel}</time>
     </span>
@@ -83,7 +73,7 @@ const dateLabel = pubDate.toLocaleDateString('en-US', {
       <span class="post__meta">
         <span class="post__category">{categoryLabel}</span>
         <span class="post__author">{author}</span>
-        {readingTime && <span class="post__reading">{readingTime}</span>}
+        {readingTime && <span class="post__reading">{t('blog.readingTime', { n: readingTime })}</span>}
       </span>
     </div>
 

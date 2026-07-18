@@ -4,7 +4,8 @@ description: "A practical guide to launching an online store with checkout, paym
 pubDate: 2026-05-20
 author: "1Platform Team"
 category: "ecommerce"
-readingTime: "9 min read"
+translationKey: "launch-online-store-30-minutes"
+readingTime: 9
 ogImage: "/og/blog-launch-online-store-30-minutes.png"
 tags: ["ecommerce", "online store", "payments", "invoicing", "launch"]
 ---

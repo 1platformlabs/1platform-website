@@ -1,0 +1,206 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Icon from '@components/Icon.astro';
+import { formatDate, useI18n } from '@i18n';
+import { getLocalized } from '@i18n/collections';
+
+const { t, l, locale } = useI18n(Astro.url.pathname);
+
+const entries = await getLocalized('changelog', locale);
+
+const renderedEntries = await Promise.all(
+  entries.map(async (entry) => {
+    const { Content } = await entry.render();
+    return { entry, Content };
+  })
+);
+
+/*
+ * There was a colour per category here — cyan, amber, violet, blue — which
+ * gave four unrelated hues to a system that has one accent, and did it with
+ * raw hex plus a token-with-hex-fallback that quietly bypassed the system.
+ * The category is a label, so it is now written as one, and the four labels
+ * now live in the catalogue with everything else.
+ */
+---
+
+<BaseLayout title={t('changelog.title')} description={t('changelog.description')}>
+  <section class="section">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('changelog.h1') },
+      ]} />
+
+      <header class="masthead">
+        <p class="eyebrow">{t('changelog.eyebrow')}</p>
+        <h1>{t('changelog.h1')}</h1>
+        <p class="masthead__lede">{t('changelog.lede')}</p>
+        <a href={l('/changelog/feed.xml')} class="masthead__feed">
+          <Icon name="rss" size={15} />
+          {t('blog.subscribe')}
+        </a>
+      </header>
+
+      <!-- The releases hang off a spine, in the same language as the
+           interconnect motif and the "how it works" sequence. -->
+      <ol class="timeline">
+        {renderedEntries.map(({ entry, Content }) => (
+          <li class="entry reveal">
+            <div class="entry__rail">
+              <span class="entry__node" aria-hidden="true"></span>
+              <time class="entry__date" datetime={entry.data.date.toISOString()}>
+                {formatDate(entry.data.date, locale)}
+              </time>
+              {entry.data.version && (
+                <span class="entry__version">v{entry.data.version}</span>
+              )}
+              <span class="entry__kind">
+                {t(`changelog.category.${entry.data.category}`)}
+              </span>
+            </div>
+
+            <div class="entry__body">
+              <h2 class="entry__title">{entry.data.title}</h2>
+              <div class="entry__content prose">
+                <Content />
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .masthead {
+    max-width: 40rem;
+    margin-bottom: var(--space-16);
+  }
+
+  .masthead h1 {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+
+  .masthead__lede {
+    font-size: var(--text-lg);
+    line-height: 1.6;
+  }
+
+  .masthead__feed {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .timeline {
+    display: grid;
+    gap: var(--space-16);
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: var(--space-10);
+  }
+
+  /* The rail carries the release metadata and draws the spine. */
+  .entry__rail {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    gap: var(--space-3);
+    padding-right: var(--space-6);
+    border-right: 1px solid var(--color-border);
+  }
+
+  /* The same cobalt rounded square the schematic and the step spine use. */
+  .entry__node {
+    position: absolute;
+    top: 7px;
+    right: -4.5px;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    background: var(--cobalt);
+  }
+
+  .entry__date,
+  .entry__version,
+  .entry__kind {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+  }
+
+  .entry__date {
+    color: var(--color-text);
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+
+  .entry__version {
+    padding: 3px var(--space-2);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--border-radius);
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry__kind {
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .entry__body {
+    min-width: 0;
+  }
+
+  .entry__title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-5);
+  }
+
+  .entry__content {
+    font-size: var(--text-sm);
+  }
+
+  /* Below the split, the spine turns into a rule under the metadata and the
+     rail lies flat — a vertical line beside a full-width column reads as an
+     accident on a narrow screen. */
+  @media (max-width: 860px) {
+    .timeline {
+      gap: var(--space-12);
+    }
+
+    .entry {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+
+    .entry__rail {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+      padding-right: 0;
+      padding-bottom: var(--space-4);
+      border-right: none;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .entry__node {
+      position: static;
+      align-self: center;
+    }
+  }
+</style>

@@ -4,7 +4,8 @@ description: "How to accept online payments and issue compliant electronic invoi
 pubDate: 2026-05-20
 author: "1Platform Team"
 category: "payments-invoicing"
-readingTime: "10 min read"
+translationKey: "electronic-invoicing-online-business"
+readingTime: 10
 ogImage: "/og/blog-electronic-invoicing-online-business.png"
 tags: ["electronic invoicing", "payments", "compliance", "ecommerce", "fel"]
 ---

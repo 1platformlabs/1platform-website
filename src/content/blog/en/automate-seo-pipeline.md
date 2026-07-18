@@ -4,7 +4,8 @@ description: "Learn how to build a fully automated SEO content pipeline — from
 pubDate: 2024-12-15
 author: "1Platform Team"
 category: "seo-automation"
-readingTime: "8 min read"
+translationKey: "automate-seo-pipeline"
+readingTime: 8
 tags: ["seo", "automation", "api", "pipeline"]
 ---
 

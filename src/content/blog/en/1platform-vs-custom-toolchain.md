@@ -4,7 +4,8 @@ description: "We break down the real costs of building and maintaining a custom 
 pubDate: 2024-10-05
 author: "1Platform Team"
 category: "product-updates"
-readingTime: "6 min read"
+translationKey: "1platform-vs-custom-toolchain"
+readingTime: 6
 tags: ["comparison", "cost", "toolchain", "integration"]
 ---
 
