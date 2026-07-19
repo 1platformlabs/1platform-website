@@ -91,11 +91,16 @@ on warm paper, **one** accent, and **one** signal colour reserved for a single m
   `--paper #F6F5F2` (page), `--surface #FFFFFF`, `--recessed #EFEEEA`,
   `--cobalt #1F4FE0` (the only accent: links, primary CTA, motif structure),
   `--signal #F5A524` (**motif strokes only** — it is 1.87:1 on paper and must never carry
-  text), `--muted #5B5F6B`, `--subtle #696D79`, `--hairline`.
+  text), `--muted #5B5F6B`, `--subtle #656974`, `--hairline`.
   Semantic aliases (`--color-text`, `--color-bg-alt`, `--color-accent`, …) map onto these;
   prefer the semantic name in components. Status colours are for **functional state only**,
   never decoration.
-  Verified contrast on `--paper`: ink 16.6:1, muted 5.85:1, subtle 4.74:1, cobalt 5.92:1.
+  **Contrast is verified against the WORST surface a token can land on** — `--paper`,
+  `--surface` and `--recessed` — not just `--paper`. Worst-case ratios: ink 15.59:1,
+  muted 5.49:1, subtle 4.73:1, cobalt 5.56:1, all on `--recessed`.
+  `--subtle` is `#656974` for exactly this reason: the earlier `#696D79` cleared paper
+  (4.74) and surface (5.17) but fell to **4.45 on `--recessed`**, which is where
+  code-block headers sit. Measuring only on paper is what hid it.
 - **Typography — self-hosted, latin subsets, in `public/fonts/` (SIL OFL):**
   **Space Grotesk** display (500/700) for headings and the logo · **Inter** text
   (400/500/600) · **JetBrains Mono** (400) for labels, data and code.
@@ -150,11 +155,29 @@ Restrained by design — over-animation was one of the tells this site was rebui
 
 The website **navbar AND footer** must stay in sync with the developer docs counterparts — users should perceive `1platform.pro` and `developer.1platform.pro` as one product.
 
-**Source of truth on each side:**
-- Website — `src/components/Header.astro` (navbar), `src/components/Footer.astro` (footer)
-- Developer docs — `../1platform-api-developer/docusaurus.config.ts` (navbar), `../1platform-api-developer/src/theme/Footer/index.tsx` + `styles.module.css` (footer swizzle)
+**The two sides now share the design system itself, not just the link lists.**
+The developer docs ship the same "ink & signal" tokens, the same three self-hosted
+typefaces (Space Grotesk / Inter / JetBrains Mono) and the same cobalt-node logo,
+ported from this repo. This repo is the **upstream** for all of it: a token value,
+a `@font-face`, or the logo geometry changes here first, and
+`../1platform-api-developer/src/css/custom.css` follows. The icon registry
+(`src/components/icons.ts`) is likewise upstream of
+`../1platform-api-developer/src/components/Icon/icons.ts` — copy paths across so a
+concept keeps the same drawing on both domains, rather than redrawing it.
 
-**Navbar contract:** Solutions, Features, Pricing, Docs, Blog + Get Started Free CTA. On the developer site, Solutions/Features/Pricing/Blog are absolute URLs back to this site; "Docs" points to `https://developer.1platform.pro/`.
+**Language is the one deliberate difference:** this site is English, the developer
+portal is Spanish. The harmony contract is about **order, destinations and
+structure**, never about the literal strings. Unifying the language is an open
+product decision, not a bug to fix in passing.
+
+**Source of truth on each side:**
+- Website — `src/components/Header.astro` (navbar), `src/components/Footer.astro` (footer),
+  `src/components/Logo.astro` (mark), `src/styles/global.css` (tokens), `src/components/icons.ts` (icons)
+- Developer docs — `../1platform-api-developer/docusaurus.config.ts` (navbar),
+  `.../src/theme/Footer/` (footer), `.../src/theme/Logo/` (mark),
+  `.../src/css/custom.css` (tokens), `.../src/components/Icon/icons.ts` (icons)
+
+**Navbar contract:** Solutions, Features, Pricing, Docs, Blog + Get Started Free CTA. On the developer site, Solutions/Features/Pricing/Blog are absolute URLs back to this site; "Docs" points to `https://developer.1platform.pro/`. The CTA carries a `min-height: 44px` target floor on both sides.
 
 **Solutions dropdown (source of truth — keep in sync with `docusaurus.config.ts` on the developer docs):** the "Solutions" item is a hybrid label-link + chevron-button. The label navigates to `/solutions/`; the chevron toggles a panel with these items in this exact order:
 
