@@ -1,5 +1,6 @@
 ---
 import Check from '@components/Check.astro';
+import { useI18n } from '@i18n';
 
 /**
  * Unified vs fragmented, compared by experience rather than by price.
@@ -12,30 +13,32 @@ interface Props {
   rows?: { without: string; with_: string }[];
 }
 
+const { t } = useI18n(Astro.url.pathname);
+
 const { rows = [
-  { without: 'A separate subscription per tool to manage and renew', with_: 'One account, one bill' },
-  { without: 'You wire the integrations between them yourself', with_: 'Capabilities already connected' },
-  { without: 'Each tool ships its own API, auth and error format', with_: 'One REST API, one token pair' },
-  { without: 'Customer and order data split across dashboards', with_: 'One dashboard, one source of truth' },
-  { without: 'Invoices reconciled by hand against payments', with_: 'Invoices issued from every transaction' },
-  { without: 'Content copy-pasted between tools to publish', with_: 'Content generated and published in place' },
+  { without: t('comparisonTable.row1.without'), with_: t('comparisonTable.row1.with') },
+  { without: t('comparisonTable.row2.without'), with_: t('comparisonTable.row2.with') },
+  { without: t('comparisonTable.row3.without'), with_: t('comparisonTable.row3.with') },
+  { without: t('comparisonTable.row4.without'), with_: t('comparisonTable.row4.with') },
+  { without: t('comparisonTable.row5.without'), with_: t('comparisonTable.row5.with') },
+  { without: t('comparisonTable.row6.without'), with_: t('comparisonTable.row6.with') },
 ] } = Astro.props;
 ---
 
 <div class="comparison reveal">
   <div class="comparison__head">
-    <p class="eyebrow comparison__col-label">Separate tools</p>
-    <p class="eyebrow eyebrow--accent comparison__col-label">1Platform</p>
+    <p class="eyebrow comparison__col-label">{t('comparisonTable.eyebrow.without')}</p>
+    <p class="eyebrow eyebrow--accent comparison__col-label">{t('comparisonTable.eyebrow.with')}</p>
   </div>
 
   {rows.map((row) => (
     <div class="comparison__row">
       <div class="comparison__cell">
-        <Check yes={false} label="Separate tools:" />
+        <Check yes={false} label={t('comparisonTable.mark.without')} />
         <span>{row.without}</span>
       </div>
       <div class="comparison__cell comparison__cell--with">
-        <Check yes={true} label="1Platform:" />
+        <Check yes={true} label={t('comparisonTable.mark.with')} />
         <span>{row.with_}</span>
       </div>
     </div>

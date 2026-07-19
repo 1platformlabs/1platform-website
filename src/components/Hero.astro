@@ -1,5 +1,6 @@
 ---
 import InterconnectDiagram from '@components/InterconnectDiagram.astro';
+import { useI18n } from '@i18n';
 
 interface IntentChip {
   label: string;
@@ -22,11 +23,16 @@ interface Props {
   motif?: boolean;
 }
 
+const { t } = useI18n(Astro.url.pathname);
+
 const {
   headline,
   subheadline,
-  primaryCta = { label: 'Get Started Free', href: 'https://app.1platform.pro/app/' },
-  secondaryCta = { label: 'View Documentation', href: 'https://developer.1platform.pro/' },
+  // Defaults reuse the shell's own CTA keys (`common.ts`) rather than
+  // redefining them here — "Get Started Free" has exactly one Spanish
+  // translation for the whole site, whichever page falls back to it.
+  primaryCta = { label: t('cta.getStarted'), href: 'https://app.1platform.pro/app/' },
+  secondaryCta = { label: t('cta.viewDocs'), href: 'https://developer.1platform.pro/' },
   badge,
   intentChips,
   motif = false,
@@ -48,7 +54,7 @@ const {
       </div>
 
       {intentChips && intentChips.length > 0 && (
-        <nav class="hero__chips" aria-label="Where do you want to start?">
+        <nav class="hero__chips" aria-label={t('hero.chips.aria')}>
           {intentChips.map((chip) => (
             <a href={chip.href} class="hero__chip">{chip.label}</a>
           ))}

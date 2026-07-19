@@ -1,0 +1,469 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import { useI18n } from '@i18n';
+import type { IconName } from '@components/icons';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('paymentsInvoicing.title');
+const description = t('paymentsInvoicing.description');
+
+// Absolute JSON-LD URLs must point at the page actually being served: `l()`
+// prefixes `/es` on the Spanish tree, so building the URL from it (rather than
+// repeating the English path as a literal) keeps the Service/BreadcrumbList
+// schema accurate on both trees instead of the Spanish page's structured data
+// silently claiming the English URL.
+const homeUrl = new URL(l('/'), Astro.site).toString();
+const pageUrl = new URL(l('/payments-invoicing/'), Astro.site).toString();
+
+const paymentsCrumbLabel = t('nav.solutions.payments');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: t('paymentsInvoicing.jsonld.serviceName'),
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: pageUrl,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: homeUrl },
+      { '@type': 'ListItem', position: 2, name: paymentsCrumbLabel },
+    ],
+  },
+];
+
+const faqs = [
+  {
+    question: t('paymentsInvoicing.faq.countries.q'),
+    answer: t('paymentsInvoicing.faq.countries.a'),
+  },
+  {
+    question: t('paymentsInvoicing.faq.currencies.q'),
+    answer: t('paymentsInvoicing.faq.currencies.a'),
+  },
+  {
+    question: t('paymentsInvoicing.faq.invoiceTypes.q'),
+    answer: t('paymentsInvoicing.faq.invoiceTypes.a'),
+  },
+  {
+    question: t('paymentsInvoicing.faq.reconciliation.q'),
+    answer: t('paymentsInvoicing.faq.reconciliation.a'),
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+};
+
+const capabilities: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'card',
+    title: t('paymentsInvoicing.capability.acceptPayments.title'),
+    description: t('paymentsInvoicing.capability.acceptPayments.description'),
+  },
+  {
+    icon: 'invoice',
+    title: t('paymentsInvoicing.capability.issueInvoices.title'),
+    description: t('paymentsInvoicing.capability.issueInvoices.description'),
+  },
+  {
+    icon: 'logs',
+    title: t('paymentsInvoicing.capability.trackEverything.title'),
+    description: t('paymentsInvoicing.capability.trackEverything.description'),
+  },
+];
+
+/**
+ * The states a transaction can report back, as the webhook emits them.
+ *
+ * Left untranslated in both languages on purpose: these are literal values
+ * from the real webhook payload (like the JSON field names in the curl
+ * example below), not prose — translating them would document a value the
+ * API never actually sends.
+ */
+const lifecycle = ['approved', 'denied', 'cancelled', 'expired', 'dismissed'];
+
+const related: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'cart',
+    title: t('nav.solutions.onlineStore'),
+    description: t('paymentsInvoicing.related.onlineStore.description'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    icon: 'code',
+    title: t('footer.link.forDevelopers'),
+    description: t('paymentsInvoicing.related.forDevelopers.description'),
+    href: l('/for-developers/'),
+  },
+  {
+    icon: 'dashboard',
+    title: t('nav.solutions.whitelabel'),
+    description: t('paymentsInvoicing.related.whitelabel.description'),
+    href: l('/solutions/whitelabel/'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} ogImage="/og/solution-payments-invoicing.png" jsonLd={[...jsonLd, faqJsonLd]}>
+  <div class="container crumbs">
+    <Breadcrumb items={[
+      { label: t('breadcrumb.home'), href: l('/') },
+      { label: paymentsCrumbLabel },
+    ]} />
+  </div>
+
+  <Hero
+    headline={t('paymentsInvoicing.hero.headline')}
+    subheadline={t('paymentsInvoicing.hero.subheadline')}
+    badge={t('paymentsInvoicing.hero.badge')}
+    primaryCta={{ label: t('paymentsInvoicing.hero.primaryCta'), href: 'https://app.1platform.pro/app/?intent=payments' }}
+    secondaryCta={{ label: t('paymentsInvoicing.hero.secondaryCta'), href: 'https://developer.1platform.pro/' }}
+  />
+
+  <!-- What you get -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('paymentsInvoicing.whatYouGet.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('paymentsInvoicing.whatYouGet.lead')}</h2>
+
+      <div class="capabilities">
+        {capabilities.map((capability) => (
+          <Card
+            variant="bare"
+            icon={capability.icon}
+            title={capability.title}
+            description={capability.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- One call, two outcomes -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('paymentsInvoicing.outcomes.eyebrow')}</p>
+          <h2>{t('paymentsInvoicing.outcomes.title')}</h2>
+          <p>{t('paymentsInvoicing.outcomes.body')}</p>
+
+          <div class="lifecycle">
+            <p class="lifecycle__label">{t('paymentsInvoicing.outcomes.lifecycleLabel')}</p>
+            <ul class="lifecycle__list">
+              {lifecycle.map((state) => (
+                <li class="lifecycle__state">{state}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title={t('paymentsInvoicing.outcomes.codeTitle')}
+            code={`curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "amount": 25.00,
+    "description": "Order #1042"
+  }'`}
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('paymentsInvoicing.questions.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('paymentsInvoicing.questions.lead')}</h2>
+
+      <div class="faq">
+        {faqs.map((faq) => (
+          <details class="faq__item">
+            <summary class="faq__question">
+              <span>{faq.question}</span>
+              <Icon name="chevron-down" size={20} class="faq__chevron" />
+            </summary>
+            <div class="faq__answer">
+              <p>{faq.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('paymentsInvoicing.related.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('paymentsInvoicing.related.lead')}</h2>
+
+      <ul class="related">
+        {related.map((item) => (
+          <li>
+            <a href={item.href} class="related__link">
+              <span class="related__icon"><Icon name={item.icon} size={20} /></span>
+              <span class="related__text">
+                <span class="related__title">{item.title}</span>
+                <span class="related__desc">{item.description}</span>
+              </span>
+              <Icon name="arrow-right" size={16} class="related__arrow" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+</BaseLayout>
+
+<style>
+  /* Breadcrumbs clear the fixed header; the hero then drops its own top
+     offset so the two don't stack into a canyon of whitespace. */
+  .crumbs {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .crumbs + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .section__lead {
+    max-width: 36rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== Capabilities ===== */
+  .capabilities {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-10);
+  }
+
+  /* ===== Split: copy + the call itself ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-8);
+  }
+
+  /* Grid children default to min-width:auto, which lets a long code line push
+     the whole page wider than the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  /* ===== Lifecycle states ===== */
+  .lifecycle {
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .lifecycle__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-3);
+  }
+
+  .lifecycle__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .lifecycle__state {
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== FAQ: hairline rows, not a stack of rounded cards ===== */
+  .faq {
+    max-width: 46rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .faq__item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    min-height: 44px;
+    padding-block: var(--space-4);
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-text);
+    list-style: none;
+  }
+
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__question::marker {
+    content: '';
+  }
+
+  .faq__question:hover {
+    color: var(--color-accent);
+  }
+
+  .faq__question :global(.faq__chevron) {
+    color: var(--color-text-tertiary);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .faq__question :global(.faq__chevron) {
+      transition: transform var(--duration-normal) var(--ease-out-expo);
+    }
+  }
+
+  .faq__item[open] .faq__question :global(.faq__chevron) {
+    transform: rotate(180deg);
+  }
+
+  .faq__question:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .faq__answer {
+    padding-bottom: var(--space-5);
+    max-width: 40rem;
+  }
+
+  .faq__answer p {
+    font-size: var(--text-sm);
+    line-height: 1.75;
+    margin: 0;
+  }
+
+  /* ===== Related ===== */
+  .related {
+    display: grid;
+    max-width: 52rem;
+  }
+
+  .related li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related li:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .related__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding-block: var(--space-5);
+    color: var(--color-text);
+  }
+
+  .related__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .related__text {
+    display: grid;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .related__title {
+    font-weight: 600;
+  }
+
+  .related__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .related__link :global(.related__arrow) {
+    color: var(--color-text-tertiary);
+  }
+
+  .related__link:hover {
+    color: var(--color-accent);
+  }
+
+  .related__link:hover :global(.related__arrow) {
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .related__link :global(.related__arrow) {
+      transition: transform var(--duration-fast) var(--ease-out-expo),
+                  color var(--duration-fast) ease;
+    }
+
+    .related__link:hover :global(.related__arrow) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .capabilities {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+</style>

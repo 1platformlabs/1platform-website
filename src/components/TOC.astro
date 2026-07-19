@@ -1,4 +1,7 @@
----
+---import { useI18n } from '@i18n';
+const { t } = useI18n(Astro.url.pathname);
+
+
 interface Props {
   headings: { depth: number; slug: string; text: string }[];
 }
@@ -8,8 +11,8 @@ const tocHeadings = headings.filter((h) => h.depth <= 3);
 ---
 
 {tocHeadings.length > 0 && (
-  <nav class="toc" aria-label="Table of contents">
-    <h2 class="eyebrow toc__title">On this page</h2>
+  <nav class="toc" aria-label={t('toc.aria')}>
+    <h2 class="eyebrow toc__title">{t('toc.title')}</h2>
     <ul class="toc__list">
       {tocHeadings.map((heading) => (
         <li class:list={['toc__item', `toc__item--${heading.depth}`]}>

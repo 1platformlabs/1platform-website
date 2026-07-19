@@ -1,4 +1,7 @@
----
+---import { useI18n } from '@i18n';
+const { t } = useI18n(Astro.url.pathname);
+
+
 /**
  * The single yes/no mark, shared by every comparison and feature table.
  *
@@ -16,7 +19,7 @@ interface Props {
 }
 
 const { yes, label } = Astro.props;
-const text = label ?? (yes ? 'Yes' : 'No');
+const text = label ?? (yes ? t('check.yes') : t('check.no'));
 ---
 
 <span class:list={['mark', yes ? 'mark--yes' : 'mark--no']}>

@@ -1,0 +1,138 @@
+---
+import { useI18n } from '@i18n';
+
+const { l } = useI18n(Astro.url.pathname);
+---
+
+<h2>1. Aceptación de los términos</h2>
+<p>Al acceder a 1Platform o utilizarlo (el «Servicio»), operado por 1Platform Labs («nosotros» o «nuestro»), aceptas quedar sujeto a estos Términos del servicio (los «Términos»). Si no aceptas estos Términos, no debes utilizar el Servicio.</p>
+<p>Estos Términos se aplican a todos los usuarios del Servicio, incluidos los consumidores de la API, los usuarios del panel y cualquier otro visitante o integrador. Nos reservamos el derecho de actualizar estos Términos en cualquier momento, y el uso continuado del Servicio después de dichos cambios constituye la aceptación de los Términos revisados.</p>
+
+<h2>2. Descripción del Servicio</h2>
+<p>1Platform es una plataforma unificada que integra múltiples soluciones de negocio, incluidas entre otras:</p>
+<ul>
+  <li>Generación de contenido con IA</li>
+  <li>Investigación y análisis de palabras clave</li>
+  <li>Obtención y generación de imágenes</li>
+  <li>Automatización de comentarios</li>
+  <li>Gestión de perfiles</li>
+  <li>Generación de páginas legales</li>
+  <li>Publicación en CMS</li>
+  <li>Indexación en Google</li>
+  <li>Construcción de enlaces</li>
+  <li>Procesamiento de pagos</li>
+  <li>Facturación electrónica</li>
+</ul>
+<p>Todos los servicios son accesibles a través de nuestra API REST unificada o del panel de 1Platform.</p>
+
+<h2>3. Registro de cuenta</h2>
+<p>Para usar el Servicio, debes crear una cuenta y proporcionar información precisa, completa y actualizada. Eres responsable de:</p>
+<ul>
+  <li>Mantener la confidencialidad de tus tokens de API y credenciales</li>
+  <li>Toda la actividad que ocurra bajo tu cuenta</li>
+  <li>Notificarnos de inmediato cualquier uso no autorizado de tu cuenta</li>
+</ul>
+<p>Debes tener al menos 18 años de edad para crear una cuenta. Las cuentas no son transferibles sin nuestro consentimiento previo por escrito.</p>
+
+<h2>4. Uso aceptable</h2>
+<p>Aceptas no utilizar el Servicio para:</p>
+<ul>
+  <li>Infringir cualquier ley o normativa aplicable</li>
+  <li>Vulnerar los derechos de propiedad intelectual de terceros</li>
+  <li>Generar, distribuir o publicar spam, malware o contenido dañino</li>
+  <li>Intentar obtener acceso no autorizado a cualquier parte del Servicio</li>
+  <li>Interferir con el correcto funcionamiento del Servicio</li>
+  <li>Aplicar ingeniería inversa, descompilar o desensamblar cualquier parte del Servicio</li>
+  <li>Utilizar el Servicio para crear productos que compitan con él</li>
+  <li>Revender o redistribuir el Servicio sin autorización</li>
+  <li>Generar contenido ilegal, difamatorio o que vulnere los derechos de terceros</li>
+</ul>
+
+<h2>5. Uso de la API</h2>
+<p>La API de 1Platform está sujeta a los siguientes términos:</p>
+<ul>
+  <li><strong>Autenticación:</strong> Todas las solicitudes a la API deben incluir tokens de autenticación válidos. El Servicio utiliza un sistema de dos tokens: un token de aplicación (Authorization: Bearer) y un token de usuario (encabezado x-user-token).</li>
+  <li><strong>Límites de frecuencia:</strong> El uso de la API está sujeto a límites de frecuencia según tu plan de suscripción. Superar los límites de frecuencia puede dar lugar a una limitación temporal o a la suspensión.</li>
+  <li><strong>Cuotas de uso:</strong> Cada plan de suscripción incluye cuotas de uso específicas. Superar las cuotas puede dar lugar a cargos adicionales o a restricciones del servicio.</li>
+  <li><strong>Versionado de la API:</strong> Podemos actualizar o descontinuar versiones de la API. Proporcionaremos un aviso razonable antes de retirar el soporte de cualquier versión de la API.</li>
+</ul>
+
+<h2>6. Aviso sobre contenido generado por IA</h2>
+<p>El contenido generado a través de nuestros servicios de IA se produce de forma algorítmica y puede requerir revisión humana antes de su publicación. Reconoces que:</p>
+<ul>
+  <li>El contenido generado por IA puede contener imprecisiones o errores</li>
+  <li>Eres el único responsable de revisar, editar y aprobar todo el contenido generado antes de usarlo</li>
+  <li>No ofrecemos garantías sobre la exactitud, calidad o idoneidad del contenido generado por IA</li>
+  <li>El contenido generado por IA no debe usarse como sustituto de asesoramiento profesional (legal, médico, financiero, etc.)</li>
+  <li>Conservas la responsabilidad de garantizar que el contenido generado cumpla con todas las leyes y normativas aplicables</li>
+</ul>
+
+<h2>7. Propiedad intelectual</h2>
+<p>El Servicio, incluidos su código fuente, diseño, documentación e identidad de marca, es propiedad de 1Platform Labs y está protegido por las leyes de propiedad intelectual. No puedes copiar, modificar ni distribuir ninguna parte del Servicio sin nuestro consentimiento por escrito.</p>
+<p>El contenido que crees o generes a través del Servicio sigue siendo de tu propiedad. Al usar el Servicio, nos otorgas una licencia limitada para procesar, almacenar y transmitir tu contenido únicamente con el fin de prestar el Servicio.</p>
+
+<h2>8. Pago y facturación</h2>
+<p>Ciertas funciones del Servicio requieren una suscripción de pago. Al suscribirte a un plan de pago, aceptas:</p>
+<ul>
+  <li>Pagar todas las tarifas asociadas a tu plan elegido</li>
+  <li>Proporcionar información de facturación precisa y completa</li>
+  <li>Autorizar los cargos recurrentes según lo especificado por tu plan de suscripción</li>
+</ul>
+<p>Los precios están sujetos a cambios con un aviso previo de 30 días. Todas las tarifas no son reembolsables, salvo que se indique lo contrario en nuestra política de reembolsos o lo exija la ley aplicable.</p>
+
+<h2>9. Seguridad de los pagos</h2>
+<p>1Platform nunca almacena los datos de tu tarjeta de crédito en nuestros servidores. Todas las transacciones de pago se procesan a través de procesadores de pago certificados según el estándar PCI DSS. Utilizamos cifrado y medidas de seguridad estándar de la industria para proteger tu información financiera durante la transmisión.</p>
+
+<h2>10. Servicios de terceros</h2>
+<p>El Servicio se integra con proveedores externos para ofrecer ciertas funciones, incluidos el procesamiento con IA, los datos de búsqueda, la obtención de imágenes, el procesamiento de pagos y la facturación. Al usar el Servicio, reconoces que:</p>
+<ul>
+  <li>Ciertos datos pueden compartirse con proveedores externos según sea necesario para prestar el Servicio</li>
+  <li>Los servicios de terceros están sujetos a sus propios términos y condiciones</li>
+  <li>No somos responsables de las acciones, el contenido o las políticas de los proveedores externos</li>
+</ul>
+<p>Para más detalles sobre qué proveedores externos utilizamos y cómo se comparten los datos, consulta nuestra <a href={l('/privacy/')}>Política de privacidad</a>.</p>
+
+<h2>11. Conservación de datos</h2>
+<p>Conservamos tus datos mientras tu cuenta esté activa o según sea necesario para prestar el Servicio. Al eliminar la cuenta:</p>
+<ul>
+  <li>Los datos personales se eliminan en un plazo de 30 días</li>
+  <li>El contenido generado y los registros de la API se conservan hasta por 90 días</li>
+  <li>Los registros de facturación se conservan según lo exija la ley aplicable</li>
+  <li>Los datos anonimizados y agregados pueden conservarse indefinidamente con fines analíticos</li>
+</ul>
+
+<h2>12. Disponibilidad del Servicio</h2>
+<p>Nos esforzamos por mantener una alta disponibilidad, pero no garantizamos un acceso ininterrumpido al Servicio. Nos reservamos el derecho de:</p>
+<ul>
+  <li>Realizar mantenimiento programado con un aviso previo razonable</li>
+  <li>Poner el Servicio fuera de línea para mantenimiento de emergencia</li>
+  <li>Modificar, suspender o descontinuar cualquier parte del Servicio</li>
+</ul>
+<p>No somos responsables de ningún tiempo de inactividad, pérdida de datos o interrupción del servicio, ya sea planificada o no.</p>
+
+<h2>13. Limitación de responsabilidad</h2>
+<p>En la máxima medida permitida por la ley, 1Platform Labs no será responsable de ningún daño indirecto, incidental, especial, consecuente o punitivo, incluidos entre otros:</p>
+<ul>
+  <li>Pérdida de ganancias, ingresos o datos</li>
+  <li>Interrupción del negocio</li>
+  <li>Costo de servicios sustitutos</li>
+  <li>Daños derivados del contenido generado por IA</li>
+</ul>
+<p>Nuestra responsabilidad total por cualquier reclamo derivado de o relacionado con el Servicio no excederá el monto que nos hayas pagado en los 12 meses anteriores al reclamo.</p>
+
+<h2>14. Terminación</h2>
+<p>Cualquiera de las partes puede terminar el acuerdo en cualquier momento. Nos reservamos el derecho de suspender o cancelar tu cuenta de inmediato si incumples estos Términos, sin previo aviso ni responsabilidad.</p>
+<p>Tras la terminación, tu derecho a usar el Servicio cesa de inmediato. Las disposiciones que por su naturaleza deban sobrevivir a la terminación (incluidas la propiedad intelectual, la limitación de responsabilidad y la resolución de disputas) permanecerán vigentes.</p>
+
+<h2>15. Modificaciones a los Términos</h2>
+<p>Podemos revisar estos Términos en cualquier momento publicando la versión actualizada en nuestro sitio web. Los cambios sustanciales se comunicarán por correo electrónico o a través del panel del Servicio. El uso continuado del Servicio después de la fecha de entrada en vigor de cualquier cambio constituye la aceptación de los Términos revisados.</p>
+
+<h2>16. Ley aplicable</h2>
+<p>Estos Términos se regirán e interpretarán de acuerdo con las leyes de Guatemala. Cualquier disputa derivada de estos Términos o del Servicio se resolverá ante los tribunales de la Ciudad de Guatemala, Guatemala.</p>
+
+<h2>17. Información de contacto</h2>
+<p>Si tienes preguntas sobre estos Términos del servicio, contáctanos:</p>
+<ul>
+  <li><strong>Correo electrónico:</strong> legal@1platform.pro</li>
+  <li><strong>Sitio web:</strong> <a href="https://1platform.pro">https://1platform.pro</a></li>
+</ul>

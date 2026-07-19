@@ -1,0 +1,317 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('solutions-content.title');
+const description = t('solutions-content.description');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: t('solutions-content.serviceName'),
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: new URL(l('/solutions/content/'), Astro.site).toString(),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 3, name: t('solutions-content.breadcrumb.content') },
+    ],
+  },
+];
+
+const features: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'content',
+    title: t('solutions-content.feature.articles.title'),
+    description: t('solutions-content.feature.articles.desc'),
+  },
+  {
+    icon: 'image',
+    title: t('solutions-content.feature.images.title'),
+    description: t('solutions-content.feature.images.desc'),
+  },
+  {
+    icon: 'keyword',
+    title: t('solutions-content.feature.keyword.title'),
+    description: t('solutions-content.feature.keyword.desc'),
+  },
+  {
+    icon: 'indexing',
+    title: t('solutions-content.feature.indexing.title'),
+    description: t('solutions-content.feature.indexing.desc'),
+  },
+];
+
+/* The sequence is the information here. Steps carry labels, not decoration. */
+const contentSteps = [
+  { label: t('solutions-content.step.extractKeywords') },
+  { label: t('solutions-content.step.generateContent') },
+  { label: t('solutions-content.step.publishCms') },
+  { label: t('solutions-content.step.submitIndexing') },
+];
+
+/**
+ * Compared by what a fragmented content stack costs you in effort. The prices
+ * that used to sit in this table were invented and are gone.
+ */
+const comparisonRows = [
+  { without: t('solutions-content.compare.aiWriting.without'), with_: t('solutions-content.compare.aiWriting.with') },
+  { without: t('solutions-content.compare.stockImages.without'), with_: t('solutions-content.compare.stockImages.with') },
+  { without: t('solutions-content.compare.keyword.without'), with_: t('solutions-content.compare.keyword.with') },
+  { without: t('solutions-content.compare.indexing.without'), with_: t('solutions-content.compare.indexing.with') },
+];
+
+const related: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'monitor',
+    title: t('nav.solutions.website'),
+    description: t('solutions-content.related.website.desc'),
+    href: l('/solutions/website/'),
+  },
+  {
+    icon: 'cart',
+    title: t('nav.solutions.onlineStore'),
+    description: t('solutions-content.related.onlineStore.desc'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    icon: 'code',
+    title: t('solutions-content.related.developers.title'),
+    description: t('solutions-content.related.developers.desc'),
+    href: l('/for-developers/'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} ogImage="/og/solution-content.png" jsonLd={jsonLd}>
+  <div class="page-top">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('nav.solutions'), href: l('/solutions/') },
+        { label: t('solutions-content.breadcrumb.content') },
+      ]} />
+    </div>
+  </div>
+
+  <Hero
+    headline={t('solutions-content.hero.headline')}
+    subheadline={t('solutions-content.hero.subheadline')}
+    badge={t('solutions-content.serviceName')}
+    primaryCta={{ label: t('solutions-content.hero.cta.primary'), href: 'https://app.1platform.pro/app/?intent=content' }}
+    secondaryCta={{ label: t('solutions-content.hero.cta.secondary'), href: l('/pricing/') }}
+  />
+
+  <!-- What it is: an editorial statement, then the four claims -->
+  <section class="section">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('solutions-content.whatYouGet.eyebrow')}</p>
+        <h2 class="statement__lead">
+          {t('solutions-content.whatYouGet.lead')}
+        </h2>
+      </div>
+
+      <div class="pillars">
+        {features.map((feature) => (
+          <Card
+            variant="bare"
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- The pipeline, drawn as a spine rather than four emoji -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-content.howItWorks.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-content.howItWorks.lead')}</h2>
+      <ProcessSpine steps={contentSteps} label={t('solutions-content.howItWorks.aria')} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-content.whatItReplaces.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-content.whatItReplaces.lead')}</h2>
+      <ComparisonTable rows={comparisonRows} />
+    </div>
+  </section>
+
+  <!-- Related work, as an index of linked cards -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-content.related.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-content.related.lead')}</h2>
+      <div class="related">
+        {related.map((item) => (
+          <Card
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            href={item.href}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Page-specific next step. The general closing CTA lives in the footer. -->
+  <section class="section">
+    <div class="container">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">{t('solutions-content.next.eyebrow')}</p>
+          <h2 class="next__title">{t('solutions-content.next.title')}</h2>
+          <p class="next__desc">
+            {t('solutions-content.next.desc')}
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            {t('solutions-content.next.linkCue')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+        <div class="next__actions">
+          <a href="https://app.1platform.pro/app/?intent=content" class="btn btn--primary">{t('solutions-content.hero.cta.primary')}</a>
+          <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions-content.next.actions.viewPricing')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The hero carries its own header offset, so it is neutralised below the
+     breadcrumb strip to avoid stacking two header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* Bare, generous, no surfaces — these are claims, not tiles. */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10) var(--space-12);
+  }
+
+  .related {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* Closing band: left-aligned, bordered, no wash. */
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding-top: var(--space-10);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .related {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .pillars,
+    .related {
+      grid-template-columns: 1fr;
+    }
+
+    .pillars {
+      gap: var(--space-8);
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

@@ -1,0 +1,207 @@
+---
+/**
+ * Language control.
+ *
+ * Two real links, not a JS dropdown. The plan sketched a disclosure like the
+ * Solutions menu, but that pattern opens from a script: with JavaScript off the
+ * panel never opens and the control becomes unreachable, which contradicts the
+ * hard requirement that the site stays fully usable without JS (RF-10/T-16).
+ * With exactly two languages a segmented pair is also less work to operate than
+ * a menu — one keystroke instead of three.
+ *
+ * Destinations come from the same `alternates` map that produces the page's
+ * hreflang block, so the control cannot offer a translation that does not
+ * exist. That single source is what makes a 404 structurally impossible here.
+ */
+import { LOCALES, LOCALE_NAMES, useI18n, type Locale } from '@i18n';
+
+interface Props {
+  /** Path per locale. A locale missing from the map has no translation. */
+  alternates: Partial<Record<Locale, string>>;
+  variant?: 'desktop' | 'mobile';
+}
+
+const { alternates, variant = 'desktop' } = Astro.props;
+const { t, locale: current } = useI18n(Astro.url.pathname);
+
+const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
+---
+
+<div
+  class:list={['lang', `lang--${variant}`]}
+  role="group"
+  aria-label={t('lang.label')}
+>
+  {LOCALES.map((code) => {
+    const href = alternates[code];
+    const isCurrent = code === current;
+
+    // The current language is not a link to itself; an unavailable one is not a
+    // link at all. Both stay in the DOM so the control never changes shape.
+    if (isCurrent) {
+      return (
+        <span class="lang__item lang__item--current" aria-current="true" lang={code}>
+          {SHORT[code]}
+          <span class="sr-only">{` — ${t('lang.aria.current', { language: LOCALE_NAMES[code] })}`}</span>
+        </span>
+      );
+    }
+
+    if (!href) {
+      // The reason this option is dead has to reach the eye too, not only the
+      // screen reader. Dimmed type plus `cursor: not-allowed` reads as "broken"
+      // rather than "not translated", and the cursor never appears at all on a
+      // touch screen. `title` reuses the string the sr-only text already
+      // carries, so no new copy and nothing new to keep in sync.
+      const why = t('lang.unavailable', { language: LOCALE_NAMES[code] });
+      return (
+        <span class="lang__item lang__item--off" aria-disabled="true" title={why}>
+          <span lang={code}>{SHORT[code]}</span>
+          <span class="sr-only">{` — ${why}`}</span>
+        </span>
+      );
+    }
+
+    return (
+      <a
+        class="lang__item"
+        href={href}
+        hreflang={code}
+        data-lang-choice={code}
+        aria-label={t('lang.aria.switchTo', { language: LOCALE_NAMES[code] })}
+      >
+        {/*
+          `lang` belongs on the two-letter code, which really is in that
+          language — not on the anchor, whose accessible name is written in the
+          language of the PAGE. With it on the anchor a screen reader switched
+          its phoneme set and then read an English sentence as Spanish.
+          `hreflang` is the correct annotation for where the link goes.
+        */}
+        <span lang={code}>{SHORT[code]}</span>
+      </a>
+    );
+  })}
+</div>
+
+<script>
+  /**
+   * Record the choice, then let the link navigate.
+   *
+   * The site mounts Astro's client router, so this click is intercepted and the
+   * document is swapped rather than reloaded. Writing the cookie in the click
+   * handler is what makes it land before that swap — after it, the auto-detect
+   * script has already decided for the next hard load.
+   *
+   * The listener is delegated and attached once per document rather than per
+   * link, so it survives every swap without accumulating duplicates.
+   */
+  function rememberLanguageChoice(event: MouseEvent) {
+    /*
+      Only a click that actually navigates THIS tab is a preference.
+
+      A cmd/ctrl-click opens the other language in a new tab and leaves this one
+      where it was — recording the choice here would pin this tab to a language
+      the reader did not switch it to, and, because the preference outranks
+      detection, would keep doing so on every later visit. Same for a
+      middle-click and a shift-click.
+
+      Deliberately NOT checking `defaultPrevented`: the client router intercepts
+      same-origin clicks and prevents the default to swap the document itself,
+      so treating that as "something else handled it" rejected every ordinary
+      click and the preference was never written at all. The router leaves
+      modified clicks alone, which is exactly why the checks below still catch
+      the case this guard is for.
+    */
+    if (event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const target = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-lang-choice]');
+    if (!target) return;
+
+    const choice = target.dataset.langChoice;
+    if (choice !== 'en' && choice !== 'es') return;
+
+    const sixMonths = 60 * 60 * 24 * 182;
+    const secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `1p_lang=${choice}; path=/; max-age=${sixMonths}; SameSite=Lax${secure}`;
+  }
+
+  document.addEventListener('click', rememberLanguageChoice);
+</script>
+
+<style>
+  /* A hairline segmented pair, sized to sit next to the CTA without competing
+     with it: this is a preference control, not an action. */
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  .lang__item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    min-height: 2rem;
+    padding: 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    color: var(--color-text-secondary);
+  }
+
+  .lang__item + .lang__item {
+    border-left: 1px solid var(--color-border);
+  }
+
+  .lang__item--current {
+    background: var(--color-bg-muted);
+    color: var(--color-text);
+  }
+
+  .lang__item--off {
+    color: var(--color-text-tertiary);
+    cursor: not-allowed;
+  }
+
+  a.lang__item:hover,
+  a.lang__item:focus-visible {
+    color: var(--color-text);
+    background: var(--color-bg-muted);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a.lang__item {
+      transition: color var(--duration-fast) ease, background var(--duration-fast) ease;
+    }
+  }
+
+  /* In the mobile panel the control sits below the CTA as its own row, with
+     touch-sized targets rather than the compact header sizing. */
+  .lang--mobile {
+    display: flex;
+    width: 100%;
+    margin-top: var(--space-4);
+  }
+
+  .lang--mobile .lang__item {
+    flex: 1;
+    min-height: 44px;
+    font-size: var(--text-sm);
+  }
+
+  @media (max-width: 768px) {
+    .lang--desktop {
+      display: none;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .lang--mobile {
+      display: none;
+    }
+  }
+</style>

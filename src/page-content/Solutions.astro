@@ -1,0 +1,560 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('solutions.title');
+const description = t('solutions.description');
+
+const breadcrumbs = [
+  { label: t('breadcrumb.home'), href: l('/') },
+  { label: t('nav.solutions') },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: title,
+  description,
+  url: new URL(l('/solutions/'), Astro.site).toString(),
+  isPartOf: {
+    '@type': 'WebSite',
+    name: '1Platform',
+    url: 'https://1platform.pro',
+  },
+};
+
+interface Solution {
+  icon: IconName;
+  title: string;
+  description: string;
+  replaces: string;
+  href: string;
+}
+
+/**
+ * The four outcomes people arrive for. Everything else is real, but these are
+ * the entry points — so they get weight instead of being one of 23 identical
+ * tiles.
+ */
+const featured: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'cart',
+    title: t('nav.solutions.onlineStore'),
+    description: t('solutions.featured.onlineStore.desc'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    icon: 'monitor',
+    title: t('nav.solutions.website'),
+    description: t('solutions.featured.website.desc'),
+    href: l('/solutions/website/'),
+  },
+  {
+    icon: 'card',
+    title: t('nav.solutions.payments'),
+    description: t('solutions.featured.payments.desc'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'dashboard',
+    title: t('nav.solutions.whitelabel'),
+    description: t('solutions.featured.whitelabel.desc'),
+    href: l('/solutions/whitelabel/'),
+  },
+];
+
+/* Sell & get paid — the monetization core. */
+const sellAndGetPaid: Solution[] = [
+  {
+    icon: 'card',
+    title: t('solutions.group.intelligence.item.paymentProcessing.title'),
+    description: t('solutions.group.intelligence.item.paymentProcessing.desc'),
+    replaces: t('solutions.group.intelligence.item.paymentProcessing.replaces'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'invoice',
+    title: t('solutions.group.intelligence.item.electronicInvoicing.title'),
+    description: t('solutions.group.intelligence.item.electronicInvoicing.desc'),
+    replaces: t('solutions.group.intelligence.item.electronicInvoicing.replaces'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'domain',
+    title: t('solutions.group.intelligence.item.domainManagement.title'),
+    description: t('solutions.group.intelligence.item.domainManagement.desc'),
+    replaces: t('solutions.group.intelligence.item.domainManagement.replaces'),
+    href: l('/solutions/website/'),
+  },
+  {
+    icon: 'wallet',
+    title: t('solutions.group.intelligence.item.subscriptionsBilling.title'),
+    description: t('solutions.group.intelligence.item.subscriptionsBilling.desc'),
+    replaces: t('solutions.group.intelligence.item.subscriptionsBilling.replaces'),
+    href: l('/pricing/'),
+  },
+];
+
+/* Build your site — everything a storefront or site is made of. */
+const buildYourSite: Solution[] = [
+  {
+    icon: 'cart',
+    title: t('nav.solutions.onlineStore'),
+    description: t('solutions.group.content.item.onlineStore.desc'),
+    replaces: t('solutions.group.content.item.onlineStore.replaces'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    icon: 'monitor',
+    title: t('nav.solutions.website'),
+    description: t('solutions.group.content.item.websiteBuilder.desc'),
+    replaces: t('solutions.group.content.item.websiteBuilder.replaces'),
+    href: l('/solutions/website/'),
+  },
+  {
+    icon: 'content',
+    title: t('solutions.group.content.item.aiContentGeneration.title'),
+    description: t('solutions.group.content.item.aiContentGeneration.desc'),
+    replaces: t('solutions.group.content.item.aiContentGeneration.replaces'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'image',
+    title: t('solutions.group.content.item.aiImageGeneration.title'),
+    description: t('solutions.group.content.item.aiImageGeneration.desc'),
+    replaces: t('solutions.group.content.item.aiImageGeneration.replaces'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'shield',
+    title: t('solutions.group.content.item.legalPageGeneration.title'),
+    description: t('solutions.group.content.item.legalPageGeneration.desc'),
+    replaces: t('solutions.group.content.item.legalPageGeneration.replaces'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'cms',
+    title: t('solutions.group.content.item.cmsPublishing.title'),
+    description: t('solutions.group.content.item.cmsPublishing.desc'),
+    replaces: t('solutions.group.content.item.cmsPublishing.replaces'),
+    href: l('/solutions/content/'),
+  },
+];
+
+/* Grow & reach — the distribution layer. */
+const growAndReach: Solution[] = [
+  {
+    icon: 'keyword',
+    title: t('solutions.group.distribution.item.seoIntelligence.title'),
+    description: t('solutions.group.distribution.item.seoIntelligence.desc'),
+    replaces: t('solutions.group.distribution.item.seoIntelligence.replaces'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'console',
+    title: t('solutions.group.distribution.item.searchConsole.title'),
+    description: t('solutions.group.distribution.item.searchConsole.desc'),
+    replaces: t('solutions.group.distribution.item.searchConsole.replaces'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'indexing',
+    title: t('solutions.group.distribution.item.indexingAutomation.title'),
+    description: t('solutions.group.distribution.item.indexingAutomation.desc'),
+    replaces: t('solutions.group.distribution.item.indexingAutomation.replaces'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'link',
+    title: t('solutions.group.distribution.item.linkBuilding.title'),
+    description: t('solutions.group.distribution.item.linkBuilding.desc'),
+    replaces: t('solutions.group.distribution.item.linkBuilding.replaces'),
+    href: l('/solutions/content/'),
+  },
+  {
+    icon: 'chart',
+    title: t('solutions.group.distribution.item.analytics.title'),
+    description: t('solutions.group.distribution.item.analytics.desc'),
+    replaces: t('solutions.group.distribution.item.analytics.replaces'),
+    href: l('/for-developers/'),
+  },
+  {
+    icon: 'trend',
+    title: t('solutions.group.distribution.item.adRevenueTracking.title'),
+    description: t('solutions.group.distribution.item.adRevenueTracking.desc'),
+    replaces: t('solutions.group.distribution.item.adRevenueTracking.replaces'),
+    href: l('/for-developers/'),
+  },
+];
+
+/* Developer platform — the operational layer for builders. */
+const developerPlatform: Solution[] = [
+  {
+    icon: 'dashboard',
+    title: t('nav.solutions.whitelabel'),
+    description: t('solutions.group.payments.item.whitelabelDashboard.desc'),
+    replaces: t('solutions.group.payments.item.whitelabelDashboard.replaces'),
+    href: l('/solutions/whitelabel/'),
+  },
+  {
+    icon: 'webhook',
+    title: t('solutions.group.payments.item.webhooks.title'),
+    description: t('solutions.group.payments.item.webhooks.desc'),
+    replaces: t('solutions.group.payments.item.webhooks.replaces'),
+    href: l('/for-developers/'),
+  },
+  {
+    icon: 'logs',
+    title: t('solutions.group.payments.item.activityLogs.title'),
+    description: t('solutions.group.payments.item.activityLogs.desc'),
+    replaces: t('solutions.group.payments.item.activityLogs.replaces'),
+    href: l('/for-developers/'),
+  },
+  {
+    icon: 'agent',
+    title: t('solutions.group.payments.item.aiAgents.title'),
+    description: t('solutions.group.payments.item.aiAgents.desc'),
+    replaces: t('solutions.group.payments.item.aiAgents.replaces'),
+    href: l('/for-developers/'),
+  },
+  {
+    icon: 'bell',
+    title: t('solutions.group.payments.item.inAppNotifications.title'),
+    description: t('solutions.group.payments.item.inAppNotifications.desc'),
+    replaces: t('solutions.group.payments.item.inAppNotifications.replaces'),
+    href: l('/for-developers/'),
+  },
+  {
+    icon: 'share',
+    title: t('solutions.group.payments.item.referrals.title'),
+    description: t('solutions.group.payments.item.referrals.desc'),
+    replaces: t('solutions.group.payments.item.referrals.replaces'),
+    href: l('/for-developers/'),
+  },
+  {
+    icon: 'support',
+    title: t('solutions.group.payments.item.supportCenter.title'),
+    description: t('solutions.group.payments.item.supportCenter.desc'),
+    replaces: t('solutions.group.payments.item.supportCenter.replaces'),
+    href: l('/for-developers/'),
+  },
+];
+
+/* ids are preserved from the previous structure so existing deep links keep working. */
+const groups: { id: string; eyebrow: string; title: string; description: string; solutions: Solution[] }[] = [
+  {
+    id: 'intelligence',
+    eyebrow: t('solutions.group.intelligence.eyebrow'),
+    title: t('solutions.group.intelligence.title'),
+    description: t('solutions.group.intelligence.desc'),
+    solutions: sellAndGetPaid,
+  },
+  {
+    id: 'content',
+    eyebrow: t('solutions.group.content.eyebrow'),
+    title: t('solutions.group.content.title'),
+    description: t('solutions.group.content.desc'),
+    solutions: buildYourSite,
+  },
+  {
+    id: 'distribution',
+    eyebrow: t('solutions.group.distribution.eyebrow'),
+    title: t('solutions.group.distribution.title'),
+    description: t('solutions.group.distribution.desc'),
+    solutions: growAndReach,
+  },
+  {
+    id: 'payments',
+    eyebrow: t('solutions.group.payments.eyebrow'),
+    title: t('solutions.group.payments.title'),
+    description: t('solutions.group.payments.desc'),
+    solutions: developerPlatform,
+  },
+];
+
+const intentChips = groups.map((group) => ({ label: group.eyebrow, href: `#${group.id}` }));
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <div class="page-top">
+    <div class="container">
+      <Breadcrumb items={breadcrumbs} />
+    </div>
+  </div>
+
+  <Hero
+    headline={t('solutions.hero.headline')}
+    subheadline={t('solutions.hero.subheadline')}
+    badge={t('solutions.hero.badge')}
+    primaryCta={{ label: t('cta.launchStore'), href: 'https://app.1platform.pro/app/?intent=store' }}
+    secondaryCta={{ label: t('solutions.hero.cta.secondary'), href: 'https://developer.1platform.pro/' }}
+    intentChips={intentChips}
+  />
+
+  <!-- The four entry points, given weight before the full index -->
+  <section class="section">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('solutions.startHere.eyebrow')}</p>
+        <h2 class="statement__lead">{t('solutions.startHere.lead')}</h2>
+      </div>
+
+      <div class="featured">
+        {featured.map((item) => (
+          <Card
+            variant="lead"
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            href={item.href}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- The full catalogue, grouped by what you are trying to do -->
+  {groups.map((group, index) => (
+    <section class:list={['section', index % 2 === 0 && 'section--alt']} id={group.id}>
+      <div class="container group">
+        <div class="group__intro reveal">
+          <p class="eyebrow">{group.eyebrow}</p>
+          <h2 class="group__title">{group.title}</h2>
+          <p class="group__desc">{group.description}</p>
+        </div>
+
+        <ul class="catalog">
+          {group.solutions.map((solution) => (
+            <li class="catalog__item">
+              <span class="catalog__icon"><Icon name={solution.icon} size={20} /></span>
+              <div class="catalog__body">
+                <h3 class="catalog__title">
+                  <a href={solution.href} class="catalog__link">{solution.title}</a>
+                </h3>
+                <p class="catalog__desc">{solution.description}</p>
+                <p class="catalog__meta">
+                  <span class="catalog__meta-label">{t('solutions.catalog.replacesLabel')}</span>
+                  {solution.replaces}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ))}
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions.comparison.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions.comparison.lead')}</h2>
+      <ComparisonTable />
+    </div>
+  </section>
+
+  <!-- Page-specific next step. The general closing CTA lives in the footer. -->
+  <section class="section">
+    <div class="container">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">{t('solutions.next.eyebrow')}</p>
+          <h2 class="next__title">{t('solutions.next.title')}</h2>
+          <p class="next__desc">
+            {t('footer.cta.body')}
+          </p>
+        </div>
+        <div class="next__actions">
+          <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--primary">{t('cta.launchStore')}</a>
+          <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions.next.actions.viewPricing')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Breadcrumb strip. The hero carries its own header offset, so it is
+     neutralised here to avoid stacking two full header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  /* ===== Editorial opener ===== */
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .featured {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+
+  /* ===== Group: intro on the left, catalogue on the right ===== */
+  .group {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: var(--space-16);
+    align-items: start;
+  }
+
+  .group__intro {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-10));
+  }
+
+  .group__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .group__desc {
+    font-size: var(--text-base);
+    margin: 0;
+  }
+
+  /* ===== Catalogue: a bordered index, not another grid of tiles ===== */
+  .catalog {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .catalog__item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .catalog__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .catalog__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    padding-top: 2px;
+  }
+
+  .catalog__body {
+    min-width: 0;
+  }
+
+  .catalog__title {
+    font-size: var(--text-lg);
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .catalog__link {
+    color: inherit;
+  }
+
+  /* The whole row is the hit area, but there is still exactly one link. */
+  .catalog__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .catalog__item:hover .catalog__title {
+    color: var(--color-accent);
+  }
+
+  .catalog__desc {
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-3);
+  }
+
+  .catalog__meta {
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    margin: 0;
+  }
+
+  .catalog__meta-label {
+    font-family: var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: var(--space-2);
+  }
+
+  /* ===== Closing next step: a band, left-aligned, no wash ===== */
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .group {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+    }
+
+    .group__intro {
+      position: static;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .featured {
+      grid-template-columns: 1fr;
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

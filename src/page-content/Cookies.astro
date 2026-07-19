@@ -1,0 +1,27 @@
+---
+/**
+ * Cookie policy — the frame is shared, the prose is per language.
+ *
+ * Structural pages keep their copy in a message module, because their text is
+ * short labels wrapped in real layout. A legal policy is the opposite: the
+ * layout is `<h2>` and `<p>`, and the page IS the prose. Two language versions
+ * of a legal text are two documents, not one document with substituted labels,
+ * so the prose lives in a partial per locale while everything around it —
+ * title, description, date, document nav — still comes from the catalogue.
+ */
+import LegalLayout from '@layouts/LegalLayout.astro';
+import { useI18n } from '@i18n';
+import BodyEn from './legal/cookies.en.astro';
+import BodyEs from './legal/cookies.es.astro';
+
+const { t, locale } = useI18n(Astro.url.pathname);
+const Body = locale === 'es' ? BodyEs : BodyEn;
+---
+
+<LegalLayout
+  title={t('cookies.title')}
+  description={t('cookies.description')}
+  lastUpdated={new Date('2024-03-01T00:00:00Z')}
+>
+  <Body />
+</LegalLayout>

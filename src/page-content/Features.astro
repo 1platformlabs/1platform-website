@@ -1,0 +1,594 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('features.title');
+const description = t('features.description');
+
+const pageUrl = new URL(l('/features/'), 'https://1platform.pro').toString();
+const homeUrl = new URL(l('/'), 'https://1platform.pro').toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: t('nav.features'),
+  description,
+  url: pageUrl,
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: homeUrl },
+      { '@type': 'ListItem', position: 2, name: t('nav.features') },
+    ],
+  },
+};
+
+/** The page is long and anchored — give the reader a real table of contents. */
+const contents: { label: string; href: string }[] = [
+  { label: t('features.section.ecommerce'), href: l('#ecommerce') },
+  { label: t('features.section.content'), href: l('#content') },
+  { label: t('features.section.distribution'), href: l('#distribution') },
+  { label: t('features.section.developer'), href: l('#developer') },
+];
+
+/** The monetization core — the four that have to work on day one. */
+const commerce: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'cart',
+    title: t('nav.solutions.onlineStore'),
+    description: t('features.commerce.store.description'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    icon: 'card',
+    title: t('features.commerce.payment.title'),
+    description: t('features.commerce.payment.description'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'invoice',
+    title: t('features.commerce.invoicing.title'),
+    description: t('features.commerce.invoicing.description'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'globe',
+    title: t('features.commerce.domain.title'),
+    description: t('features.commerce.domain.description'),
+    href: l('/solutions/website/'),
+  },
+];
+
+const contentEngine: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'content',
+    title: t('features.content.item1.title'),
+    description: t('features.content.item1.description'),
+  },
+  {
+    icon: 'image',
+    title: t('features.content.item2.title'),
+    description: t('features.content.item2.description'),
+  },
+  {
+    icon: 'message',
+    title: t('features.content.item3.title'),
+    description: t('features.content.item3.description'),
+  },
+  {
+    icon: 'user',
+    title: t('features.content.item4.title'),
+    description: t('features.content.item4.description'),
+  },
+  {
+    icon: 'shield',
+    title: t('features.content.item5.title'),
+    description: t('features.content.item5.description'),
+  },
+];
+
+/**
+ * Distribution genuinely runs in order — research, publish, get crawled, earn
+ * links — so it is drawn as a sequence rather than as four peer cards.
+ */
+const distribution: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'keyword',
+    title: t('features.distribution.item1.title'),
+    description: t('features.distribution.item1.description'),
+  },
+  {
+    icon: 'cms',
+    title: t('features.distribution.item2.title'),
+    description: t('features.distribution.item2.description'),
+  },
+  {
+    icon: 'indexing',
+    title: t('features.distribution.item3.title'),
+    description: t('features.distribution.item3.description'),
+  },
+  {
+    icon: 'link',
+    title: t('features.distribution.item4.title'),
+    description: t('features.distribution.item4.description'),
+  },
+];
+
+const developer: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'code',
+    title: t('features.developer.item1.title'),
+    description: t('features.developer.item1.description'),
+  },
+  {
+    icon: 'webhook',
+    title: t('features.developer.item2.title'),
+    description: t('features.developer.item2.description'),
+  },
+  {
+    icon: 'dashboard',
+    title: t('nav.solutions.whitelabel'),
+    description: t('features.developer.item3.description'),
+  },
+  {
+    icon: 'logs',
+    title: t('features.developer.item4.title'),
+    description: t('features.developer.item4.description'),
+  },
+  {
+    icon: 'agent',
+    title: t('features.developer.item5.title'),
+    description: t('features.developer.item5.description'),
+  },
+  {
+    icon: 'chart',
+    title: t('features.developer.item6.title'),
+    description: t('features.developer.item6.description'),
+  },
+];
+
+/* These `curl` bodies are literal API examples — endpoint paths, JSON field
+   names and sample values — left identical in both languages. The content
+   sample's "lang": "en" parameter only makes sense paired with the English
+   sample keyword it demonstrates, so translating just the keyword would make
+   the example self-contradictory. */
+const codePayments = `curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "amount": 25.00,
+    "description": "Order #1042"
+  }'`;
+
+const codeContent = `curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "keyword": "sustainable gardening tips",
+    "lang": "en",
+    "country": "us"
+  }'`;
+
+const codeIndexing = `curl -X POST https://api.1platform.pro/api/v1/posts/indexing/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "url": "https://myblog.com/sustainable-gardening-tips"
+  }'`;
+
+const codeWhitelabel = `curl -X GET https://api.1platform.pro/api/v1/dashboard/bootstrap \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN"`;
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <Hero
+    headline={t('features.hero.headline')}
+    subheadline={t('features.hero.subheadline')}
+    primaryCta={{ label: t('cta.launchStore'), href: 'https://app.1platform.pro/app/?intent=store' }}
+    secondaryCta={{ label: t('features.hero.secondaryCta'), href: 'https://developer.1platform.pro/' }}
+    badge={t('features.hero.badge')}
+  />
+
+  <div class="section crumbs">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('nav.features') },
+      ]} />
+
+      <nav class="contents" aria-label={t('toc.title')}>
+        {contents.map((entry, i) => (
+          <a href={entry.href} class="contents__link">
+            <span class="contents__ord" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            {entry.label}
+          </a>
+        ))}
+      </nav>
+    </div>
+  </div>
+
+  <!-- Ecommerce: the four that carry the money, given the most weight -->
+  <section class="section" id="ecommerce">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('features.section.ecommerce')}</p>
+      </div>
+
+      <div class="opener">
+        <h2 class="opener__lead">{t('features.ecommerce.lead')}</h2>
+        <p class="opener__note">
+          {t('features.ecommerce.note')}
+        </p>
+      </div>
+
+      <div class="lead-grid">
+        {commerce.map((item) => (
+          <Card
+            variant="lead"
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            href={item.href}
+            class="reveal"
+          />
+        ))}
+      </div>
+
+      <div class="demo reveal">
+        <p class="eyebrow demo__label">{t('features.demo.exampleRequest')}</p>
+        <CodeBlock language="bash" title={t('features.demo.payments.title')} code={codePayments} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Content engine: a set of peers, so no surfaces — just a readable field -->
+  <section class="section section--alt" id="content">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('features.section.content')}</p>
+      </div>
+
+      <div class="opener">
+        <h2 class="opener__lead">{t('features.content.lead')}</h2>
+        <p class="opener__note">
+          {t('features.content.note')}
+        </p>
+      </div>
+
+      <div class="bare-grid">
+        {contentEngine.map((item) => (
+          <Card
+            variant="bare"
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+
+      <div class="demo reveal">
+        <p class="eyebrow demo__label">{t('features.demo.exampleRequest')}</p>
+        <CodeBlock language="bash" title={t('features.demo.content.title')} code={codeContent} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Distribution: an ordered sequence, drawn as one -->
+  <section class="section" id="distribution">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('features.section.distribution')}</p>
+      </div>
+
+      <div class="opener">
+        <h2 class="opener__lead">{t('features.distribution.lead')}</h2>
+        <p class="opener__note">
+          {t('features.distribution.note')}
+        </p>
+      </div>
+
+      <ol class="flow">
+        {distribution.map((step, i) => (
+          <li class="flow__item reveal">
+            <span class="flow__ord" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="flow__icon"><Icon name={step.icon} size={20} /></span>
+            <div class="flow__body">
+              <h3 class="flow__title">{step.title}</h3>
+              <p class="flow__desc">{step.description}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div class="demo reveal">
+        <p class="eyebrow demo__label">{t('features.demo.exampleRequest')}</p>
+        <CodeBlock language="bash" title={t('features.demo.indexing.title')} code={codeIndexing} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Developer platform: a reference ledger, name against description -->
+  <section class="section section--alt" id="developer">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('features.section.developer')}</p>
+      </div>
+
+      <div class="opener">
+        <h2 class="opener__lead">{t('features.developer.lead')}</h2>
+        <p class="opener__note">
+          {t('features.developer.note')}
+        </p>
+      </div>
+
+      <dl class="ledger">
+        {developer.map((item) => (
+          <div class="ledger__row reveal">
+            <dt class="ledger__term">
+              <span class="ledger__icon"><Icon name={item.icon} size={18} /></span>
+              {item.title}
+            </dt>
+            <dd class="ledger__desc">{item.description}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div class="demo reveal">
+        <p class="eyebrow demo__label">{t('features.demo.exampleRequest')}</p>
+        <CodeBlock language="bash" title={t('features.demo.whitelabel.title')} code={codeWhitelabel} />
+      </div>
+
+      <p class="ledger__more">
+        <a href={l('/for-developers/')} class="link-cue">
+          {t('features.developer.moreLink')}
+          <Icon name="arrow-right" size={15} />
+        </a>
+      </p>
+    </div>
+  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+</BaseLayout>
+
+<style>
+  /* The breadcrumb strip carries the page index, so it does not need a full
+     section's worth of air. */
+  .crumbs {
+    padding-block: var(--space-8) 0;
+  }
+
+  /* ===== On-this-page index ===== */
+  .contents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .contents__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background: var(--color-bg-alt);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .contents__link {
+      transition: color var(--duration-fast) ease,
+                  border-color var(--duration-fast) ease;
+    }
+  }
+
+  .contents__link:hover {
+    color: var(--color-accent);
+    border-color: var(--color-border-hover);
+  }
+
+  .contents__ord {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  /* ===== Section opener — left-aligned, one column ===== */
+  .opener {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .opener__lead {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .opener__note {
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  /* ===== Commerce: four featured cards ===== */
+  .lead-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+
+  /* ===== Content engine: peers, no surfaces ===== */
+  .bare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-10) var(--space-8);
+  }
+
+  /* ===== Distribution: the ordered flow ===== */
+  .flow {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 54rem;
+  }
+
+  .flow__item {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .flow__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .flow__ord {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    padding-top: 2px;
+  }
+
+  .flow__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    padding-top: 1px;
+  }
+
+  .flow__title {
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .flow__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  /* ===== Developer platform: term against definition ===== */
+  .ledger {
+    margin: 0;
+    max-width: 60rem;
+  }
+
+  .ledger__row {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    gap: var(--space-6);
+    padding-block: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .ledger__row:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .ledger__term {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .ledger__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .ledger__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .ledger__more {
+    margin: var(--space-8) 0 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== The API sample — one device, used the same way in every section =====
+     The sample is the same kind of object each time, so it gets the same
+     treatment; only the capability layouts above it differ. */
+  .demo {
+    max-width: 52rem;
+    min-width: 0;
+    margin-top: var(--space-12);
+  }
+
+  .demo__label {
+    display: block;
+    margin-bottom: var(--space-3);
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1024px) {
+    .bare-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .lead-grid,
+    .bare-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .bare-grid {
+      gap: var(--space-8);
+    }
+
+    .ledger__row {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+
+    .flow__item {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--space-3) var(--space-4);
+    }
+
+    /* The ordinal keeps its own line above the icon on narrow screens. */
+    .flow__ord {
+      grid-column: 1 / -1;
+      padding-top: 0;
+    }
+  }
+</style>

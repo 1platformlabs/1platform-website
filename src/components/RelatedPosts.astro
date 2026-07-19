@@ -1,6 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
 import BlogPostCard from './BlogPostCard.astro';
+import { bareSlug, getLocalized } from '@i18n/collections';
+
+import { useI18n } from '@i18n';
+const { t, locale } = useI18n(Astro.url.pathname);
 
 interface Props {
   currentSlug: string;
@@ -9,9 +12,11 @@ interface Props {
 
 const { currentSlug, currentCategory } = Astro.props;
 
-const allPosts = await getCollection('blog');
+// Same language only: an unfiltered read here would have put English posts
+// under a Spanish article, which is the most visible form of language leak.
+const allPosts = await getLocalized('blog', locale);
 const related = allPosts
-  .filter((p) => p.slug !== currentSlug)
+  .filter((p) => bareSlug(p.slug) !== currentSlug)
   .sort((a, b) => {
     const aMatch = a.data.category === currentCategory ? 1 : 0;
     const bMatch = b.data.category === currentCategory ? 1 : 0;
@@ -24,7 +29,7 @@ const related = allPosts
   <section class="related section section--alt" aria-labelledby="related-heading">
     <div class="container">
       <div class="section__rule">
-        <h2 class="eyebrow" id="related-heading">Keep reading</h2>
+        <h2 class="eyebrow" id="related-heading">{t('related.title')}</h2>
       </div>
 
       <div class="related__grid">
@@ -35,7 +40,7 @@ const related = allPosts
             description={post.data.description}
             pubDate={post.data.pubDate}
             category={post.data.category}
-            slug={post.slug}
+            slug={bareSlug(post.slug)}
             author={post.data.author}
             readingTime={post.data.readingTime}
             class="reveal"

@@ -1,0 +1,433 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('for-developers.title');
+const description = t('for-developers.description');
+
+// "For Developers" is the same phrase in the shared footer (common.ts:
+// footer.link.forDevelopers), reused for the breadcrumb crumb and its
+// JSON-LD name rather than redefined here.
+const forDevelopersLabel = t('footer.link.forDevelopers');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: title,
+    description,
+    url: new URL(l('/for-developers/'), 'https://1platform.pro').toString(),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), 'https://1platform.pro').toString() },
+      { '@type': 'ListItem', position: 2, name: forDevelopersLabel },
+    ],
+  },
+];
+
+const principles: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'code',
+    title: t('for-developers.principles.tokens.title'),
+    description: t('for-developers.principles.tokens.description'),
+  },
+  {
+    icon: 'clock',
+    title: t('for-developers.principles.async.title'),
+    description: t('for-developers.principles.async.description'),
+  },
+  {
+    icon: 'console',
+    title: t('for-developers.principles.envelopes.title'),
+    description: t('for-developers.principles.envelopes.description'),
+  },
+  {
+    icon: 'webhook',
+    title: t('for-developers.principles.webhooks.title'),
+    description: t('for-developers.principles.webhooks.description'),
+  },
+];
+
+/**
+ * The contract, stated once so the samples below don't have to repeat it.
+ * Only the `term` labels are copy; the `value` cells are the literal API
+ * surface (a real base URL, real header names) and stay identical in both
+ * trees — see the note at the top of for-developers.ts.
+ */
+const contract = [
+  { term: t('for-developers.contract.baseUrl.term'), value: 'https://api.1platform.pro/api/v1/' },
+  { term: t('for-developers.contract.appToken.term'), value: 'Authorization: Bearer' },
+  { term: t('for-developers.contract.userToken.term'), value: 'x-user-token' },
+  { term: t('for-developers.contract.envelope.term'), value: '{ success, data, msg }' },
+];
+
+const related: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'dashboard',
+    title: t('nav.solutions.whitelabel'),
+    description: t('for-developers.related.whitelabel.description'),
+    href: l('/solutions/whitelabel/'),
+  },
+  {
+    icon: 'card',
+    title: t('nav.solutions.payments'),
+    description: t('for-developers.related.payments.description'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'content',
+    title: t('for-developers.related.content.title'),
+    description: t('for-developers.related.content.description'),
+    href: l('/solutions/content/'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <div class="container crumbs">
+    <Breadcrumb items={[
+      { label: t('breadcrumb.home'), href: l('/') },
+      { label: forDevelopersLabel },
+    ]} />
+  </div>
+
+  <Hero
+    headline={t('for-developers.hero.headline')}
+    subheadline={t('for-developers.hero.subheadline')}
+    badge={t('for-developers.hero.badge')}
+    primaryCta={{ label: t('for-developers.cta.readApiDocs'), href: 'https://developer.1platform.pro/' }}
+    secondaryCta={{ label: t('for-developers.hero.secondaryCta'), href: l('/solutions/whitelabel/') }}
+  />
+
+  <!-- Design principles -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('for-developers.principles.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('for-developers.principles.lead')}</h2>
+
+      <div class="principles">
+        {principles.map((principle) => (
+          <Card
+            variant="bare"
+            icon={principle.icon}
+            title={principle.title}
+            description={principle.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- The contract, then the samples that follow it -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('for-developers.samples.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('for-developers.samples.lead')}</h2>
+
+      <div class="samples">
+        <div class="samples__contract">
+          <dl class="contract">
+            {contract.map((item) => (
+              <div class="contract__row">
+                <dt>{item.term}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p class="samples__note">{t('for-developers.samples.note')}</p>
+        </div>
+
+        <div class="samples__stack">
+          <CodeBlock
+            language="bash"
+            title={t('for-developers.samples.content.title')}
+            code={`curl -X POST https://api.1platform.pro/api/v1/posts/content/ \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "keyword": "sustainable gardening tips",
+    "lang": "en",
+    "country": "us"
+  }'`}
+          />
+          <CodeBlock
+            language="bash"
+            title={t('for-developers.samples.payment.title')}
+            code={`curl -X POST https://api.1platform.pro/api/v1/users/transactions \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "amount": 25.00,
+    "description": "Order #1042"
+  }'`}
+          />
+          <CodeBlock
+            language="bash"
+            title={t('for-developers.samples.dashboard.title')}
+            code={`curl -X GET https://api.1platform.pro/api/v1/dashboard/bootstrap \\
+  -H "Authorization: Bearer $APP_TOKEN" \\
+  -H "x-user-token: $USER_TOKEN"`}
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reference -->
+  <section class="section">
+    <div class="container">
+      <div class="panel reveal">
+        <div class="panel__copy">
+          <p class="eyebrow">{t('for-developers.reference.eyebrow')}</p>
+          <h2>{t('for-developers.reference.title')}</h2>
+          <p>{t('for-developers.reference.body')}</p>
+        </div>
+        <div class="panel__actions">
+          <a href="https://developer.1platform.pro/" class="btn btn--primary">{t('for-developers.cta.readApiDocs')}</a>
+          <a href="https://developer.1platform.pro/api-docs" class="btn btn--ghost">{t('for-developers.cta.apiReference')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('for-developers.related.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('for-developers.related.lead')}</h2>
+
+      <ul class="related">
+        {related.map((item) => (
+          <li>
+            <a href={item.href} class="related__link">
+              <span class="related__icon"><Icon name={item.icon} size={20} /></span>
+              <span class="related__text">
+                <span class="related__title">{item.title}</span>
+                <span class="related__desc">{item.description}</span>
+              </span>
+              <Icon name="arrow-right" size={16} class="related__arrow" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+</BaseLayout>
+
+<style>
+  /* Breadcrumbs clear the fixed header; the hero then drops its own top
+     offset so the two don't stack into a canyon of whitespace. */
+  .crumbs {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .crumbs + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .section__lead {
+    max-width: 36rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== Principles ===== */
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10) var(--space-12);
+  }
+
+  /* ===== Samples: the contract on a rail, the calls beside it ===== */
+  .samples {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .samples__contract {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .contract {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .contract__row {
+    display: grid;
+    gap: var(--space-1);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    min-width: 0;
+  }
+
+  .contract dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .contract dd {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+  }
+
+  .samples__note {
+    margin-top: var(--space-6);
+    font-size: var(--text-sm);
+  }
+
+  /* Grid children default to min-width:auto, which lets a long code line push
+     the whole page wider than the viewport. */
+  .samples__stack {
+    display: grid;
+    gap: var(--space-6);
+    min-width: 0;
+  }
+
+  /* ===== Reference panel ===== */
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: var(--space-10);
+    align-items: end;
+    padding: var(--space-10);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    background: var(--color-bg-alt);
+  }
+
+  .panel__copy h2 {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-3) var(--space-4);
+  }
+
+  .panel__copy p {
+    max-width: 38rem;
+    margin: 0;
+  }
+
+  .panel__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  /* ===== Related ===== */
+  .related {
+    display: grid;
+    max-width: 52rem;
+  }
+
+  .related li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related li:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .related__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding-block: var(--space-5);
+    color: var(--color-text);
+  }
+
+  .related__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .related__text {
+    display: grid;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .related__title {
+    font-weight: 600;
+  }
+
+  .related__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .related__link :global(.related__arrow) {
+    color: var(--color-text-tertiary);
+  }
+
+  .related__link:hover {
+    color: var(--color-accent);
+  }
+
+  .related__link:hover :global(.related__arrow) {
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .related__link :global(.related__arrow) {
+      transition: transform var(--duration-fast) var(--ease-out-expo),
+                  color var(--duration-fast) ease;
+    }
+
+    .related__link:hover :global(.related__arrow) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .samples {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .samples__contract {
+      position: static;
+    }
+
+    .panel {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: var(--space-8);
+      padding: var(--space-8);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .principles {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+</style>

@@ -5,14 +5,24 @@ interface Props {
   code: string;
 }
 
+import { useI18n } from '@i18n';
+
 const { language = 'bash', title, code } = Astro.props;
+const { t } = useI18n(Astro.url.pathname);
 ---
 
 <div class="code-block">
   <div class="code-block__header">
     <span>{title || language}</span>
-    <button class="code-block__copy" aria-label="Copy code to clipboard" data-code={code}>
-      Copy
+    <button
+      class="code-block__copy"
+      aria-label={t('code.copyAria')}
+      data-code={code}
+      data-idle-label={t('code.copy')}
+      data-copied-label={t('code.copied')}
+      data-failed-label={t('code.copyFailed')}
+    >
+      {t('code.copy')}
     </button>
   </div>
   <div class="code-block__body">
@@ -24,14 +34,19 @@ const { language = 'bash', title, code } = Astro.props;
   document.addEventListener('astro:page-load', () => {
     document.querySelectorAll('.code-block__copy').forEach((btn) => {
       btn.addEventListener('click', async () => {
-        const code = (btn as HTMLElement).dataset.code || '';
+        const el = btn as HTMLElement;
+        const code = el.dataset.code || '';
+        // Labels ride on the element: this script runs in the browser, where
+        // the build-time catalogue does not exist.
+        const idle = el.dataset.idleLabel || '';
+        const restore = () => { setTimeout(() => { btn.textContent = idle; }, 2000); };
         try {
           await navigator.clipboard.writeText(code);
-          btn.textContent = 'Copied!';
-          setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+          btn.textContent = el.dataset.copiedLabel || '';
+          restore();
         } catch {
-          btn.textContent = 'Failed';
-          setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+          btn.textContent = el.dataset.failedLabel || '';
+          restore();
         }
       });
     });

@@ -1,0 +1,480 @@
+---
+/**
+ * Home — the single most important page on the site. Its headline, subhead
+ * and section copy set the voice for the whole Spanish tree.
+ *
+ * `home.hero.headline` is the one string on this page that is NOT translated:
+ * it is the brand slogan ("One Platform. Every Solution."), which stays
+ * English in both trees by the same rule that keeps "1Platform" itself
+ * untranslated — see `common.ts` and the i18n contract's glossary.
+ */
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import CodeBlock from '@components/CodeBlock.astro';
+import { useI18n } from '@i18n';
+import type { IconName } from '@components/icons';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('home.title');
+const description = t('home.description');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: t('home.jsonld.name'),
+    url: new URL(l('/'), Astro.site).toString(),
+    description,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: t('home.jsonld.name'),
+    description,
+    brand: {
+      '@type': 'Brand',
+      name: t('home.jsonld.brandName'),
+    },
+    offers: {
+      '@type': 'Offer',
+      url: new URL(l('/pricing/'), Astro.site).toString(),
+      priceCurrency: 'USD',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        priceType: 'PayPerUse',
+      },
+      availability: 'https://schema.org/InStock',
+    },
+  },
+];
+
+const pillars: { icon: IconName; title: string; description: string }[] = [
+  { icon: 'cart', title: t('home.pillars.sell.title'), description: t('home.pillars.sell.description') },
+  { icon: 'content', title: t('home.pillars.content.title'), description: t('home.pillars.content.description') },
+  { icon: 'dashboard', title: t('home.pillars.dashboard.title'), description: t('home.pillars.dashboard.description') },
+  { icon: 'code', title: t('home.pillars.api.title'), description: t('home.pillars.api.description') },
+];
+
+/** The four outcomes most people arrive for. */
+const featured: { icon: IconName; title: string; description: string; href: string }[] = [
+  {
+    icon: 'cart',
+    title: t('home.featured.store.title'),
+    description: t('home.featured.store.description'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    icon: 'card',
+    title: t('home.featured.payments.title'),
+    description: t('home.featured.payments.description'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'invoice',
+    title: t('home.featured.invoicing.title'),
+    description: t('home.featured.invoicing.description'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'content',
+    title: t('home.featured.content.title'),
+    description: t('home.featured.content.description'),
+    href: l('/solutions/content/'),
+  },
+];
+
+/** Everything else, grouped — an index, not another wall of cards. */
+const capabilityGroups: { group: string; items: { title: string; href: string }[] }[] = [
+  {
+    group: t('home.group.contentSeo.title'),
+    items: [
+      { title: t('home.group.contentSeo.item.aiImage'), href: l('/solutions/content/') },
+      { title: t('home.group.contentSeo.item.aiKeyword'), href: l('/solutions/content/') },
+      { title: t('home.group.contentSeo.item.cms'), href: l('/solutions/content/') },
+      { title: t('home.group.contentSeo.item.indexing'), href: l('/solutions/content/') },
+      { title: t('home.group.contentSeo.item.linkBuilding'), href: l('/solutions/content/') },
+      { title: t('home.group.contentSeo.item.searchConsole'), href: l('/solutions/content/') },
+      { title: t('home.group.contentSeo.item.legalPages'), href: l('/solutions/content/') },
+    ],
+  },
+  {
+    group: t('home.group.storefront.title'),
+    items: [
+      { title: t('home.group.storefront.item.domain'), href: l('/solutions/website/') },
+      { title: t('home.group.storefront.item.whitelabel'), href: l('/solutions/whitelabel/') },
+    ],
+  },
+  {
+    group: t('home.group.developer.title'),
+    items: [
+      { title: t('home.group.developer.item.webhooks'), href: l('/for-developers/') },
+      { title: t('home.group.developer.item.agents'), href: l('/for-developers/') },
+      { title: t('home.group.developer.item.logs'), href: l('/for-developers/') },
+    ],
+  },
+];
+
+const useCases: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'monitor',
+    title: t('home.useCase.smallBusiness.title'),
+    description: t('home.useCase.smallBusiness.description'),
+  },
+  {
+    icon: 'cart',
+    title: t('home.useCase.sellers.title'),
+    description: t('home.useCase.sellers.description'),
+  },
+  {
+    icon: 'message',
+    title: t('home.useCase.services.title'),
+    description: t('home.useCase.services.description'),
+  },
+  {
+    icon: 'users',
+    title: t('home.useCase.agencies.title'),
+    description: t('home.useCase.agencies.description'),
+  },
+  {
+    icon: 'code',
+    title: t('home.useCase.developers.title'),
+    description: t('home.useCase.developers.description'),
+  },
+];
+
+const intentChips = [
+  { label: t('home.chip.sell'), href: l('/solutions/online-store/') },
+  { label: t('home.chip.website'), href: l('/solutions/website/') },
+  { label: t('home.chip.api'), href: l('/for-developers/') },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <Hero
+    headline={t('home.hero.headline')}
+    subheadline={t('home.hero.subheadline')}
+    badge={t('home.hero.badge')}
+    primaryCta={{ label: t('home.hero.cta.primary'), href: 'https://app.1platform.pro/app/?intent=store' }}
+    secondaryCta={{ label: t('home.hero.cta.secondary'), href: 'https://developer.1platform.pro/' }}
+    intentChips={intentChips}
+    motif
+  />
+
+  <!-- What it is: a wide editorial statement, then the four claims -->
+  <section class="section">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('home.section.whatYouGet.eyebrow')}</p>
+        <h2 class="statement__lead">
+          {t('home.section.whatYouGet.lead')}
+        </h2>
+      </div>
+
+      <div class="pillars">
+        {pillars.map((pillar) => (
+          <Card
+            variant="bare"
+            icon={pillar.icon}
+            title={pillar.title}
+            description={pillar.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Capabilities: four featured, the rest as a readable index -->
+  <section class="section section--alt" id="solutions">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('home.section.capabilities.eyebrow')}</p>
+      </div>
+
+      <div class="featured">
+        {featured.map((item) => (
+          <Card
+            variant="lead"
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            href={item.href}
+            class="reveal"
+          />
+        ))}
+      </div>
+
+      <div class="index reveal">
+        {capabilityGroups.map((group) => (
+          <div class="index__group">
+            <h3 class="index__title">{group.group}</h3>
+            <ul class="index__list">
+              {group.items.map((item) => (
+                <li>
+                  <a href={item.href} class="index__link">{item.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <p class="index__all">
+        <a href={l('/solutions/')} class="link-cue">
+          {t('home.section.capabilities.seeAll')}
+          <Icon name="arrow-right" size={15} />
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- How it works: the schematic, unrolled as a sequence -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('home.section.howItWorks.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('home.section.howItWorks.lead')}</h2>
+      <ProcessSpine />
+    </div>
+  </section>
+
+  <!-- Integrate: copy and code, side by side -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('home.section.integrate.eyebrow')}</p>
+          <h2>{t('home.section.integrate.title')}</h2>
+          <p>
+            {t('home.section.integrate.body')}
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            {t('home.section.integrate.cta')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+
+        <div class="split__demo">
+          <CodeBlock
+            language="bash"
+            title={t('home.section.integrate.code.title')}
+            code={t('home.section.integrate.code.snippet')}
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who it's for: an editorial list, not a grid of identical cards -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('home.section.whoFor.eyebrow')}</p>
+      </div>
+
+      <ul class="audience">
+        {useCases.map((useCase) => (
+          <li class="audience__item reveal">
+            <span class="audience__icon"><Icon name={useCase.icon} size={20} /></span>
+            <div>
+              <h3 class="audience__title">{useCase.title}</h3>
+              <p class="audience__desc">{useCase.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Unified vs fragmented -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('home.section.comparison.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('home.section.comparison.lead')}</h2>
+      <ComparisonTable />
+    </div>
+  </section>
+  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+</BaseLayout>
+
+<style>
+  /* ===== Editorial statement ===== */
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  /* ===== Pillars: 2x2, generous, no surfaces ===== */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-10) var(--space-12);
+  }
+
+  /* ===== Featured capabilities ===== */
+  .featured {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-12);
+  }
+
+  /* ===== The index of everything else ===== */
+  .index {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .index__title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+  }
+
+  .index__list {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .index__link {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .index__link:hover {
+    color: var(--color-accent);
+  }
+
+  .index__all {
+    margin-top: var(--space-8);
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  /* ===== Split: copy + code ===== */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Grid children default to min-width:auto, which lets the code block's long
+     lines push the whole page wider than the viewport. */
+  .split__demo {
+    min-width: 0;
+  }
+
+  /* ===== Audience list ===== */
+  .audience {
+    display: grid;
+    gap: 0;
+    max-width: 52rem;
+  }
+
+  .audience__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .audience__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .audience__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+    padding-top: 2px;
+  }
+
+  .audience__title {
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+
+  .audience__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .index {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .pillars,
+    .featured,
+    .index {
+      grid-template-columns: 1fr;
+    }
+
+    .pillars {
+      gap: var(--space-8);
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

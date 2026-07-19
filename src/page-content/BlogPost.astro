@@ -1,0 +1,36 @@
+---
+import BlogLayout from '@layouts/BlogLayout.astro';
+import { localizePath } from '@i18n';
+import { bareSlug, entryAlternates } from '@i18n/collections';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+const slug = bareSlug(post.slug);
+
+/**
+ * Which languages this post exists in.
+ *
+ * Derived from the collection rather than assumed, because a post is the one
+ * kind of page that can legitimately have no twin. When it has none, the map
+ * has a single entry and three things follow at once: no hreflang promises a
+ * translation, the language switcher shows the other language as unavailable,
+ * and the auto-detect script finds nothing to redirect to. One fact, read once.
+ */
+const alternates = await entryAlternates('blog', post.data.translationKey, (locale, entrySlug) =>
+  localizePath(`/blog/${entrySlug}/`, locale),
+);
+---
+
+<BlogLayout
+  frontmatter={post.data}
+  headings={headings}
+  slug={slug}
+  alternates={alternates}
+>
+  <Content />
+</BlogLayout>

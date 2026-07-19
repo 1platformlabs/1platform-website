@@ -2,6 +2,7 @@
 import { ViewTransitions } from 'astro:transitions';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
+import { OG_LOCALES, alternatesForPath, useI18n, type Locale } from '@i18n';
 import '@styles/global.css';
 import '@styles/components.css';
 
@@ -11,6 +12,12 @@ interface Props {
   ogImage?: string;
   noIndex?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /**
+   * Path per locale. Defaults to "the same slug in both languages", which is
+   * true for every marketing page. Content pages whose twin may not exist pass
+   * their own map and omit what is missing.
+   */
+  alternates?: Partial<Record<Locale, string>>;
 }
 
 const {
@@ -19,14 +26,38 @@ const {
   ogImage = '/og/default.png',
   noIndex = false,
   jsonLd,
+  alternates = alternatesForPath(Astro.url.pathname),
 } = Astro.props;
+
+const { locale, t, l } = useI18n(Astro.url.pathname);
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL(ogImage, Astro.site);
+
+// hreflang must be absolute, and reciprocal: if English names Spanish, Spanish
+// has to name English with the identical pair, or Google discards the whole
+// annotation. Emitting both from one map is what guarantees that.
+//
+// The block is rendered BEFORE the detection script, and that order is
+// load-bearing: the script picks where to send a first-time visitor by reading
+// the hreflang="es" link out of this very document. Scripts run as they are
+// parsed, so with the script first these links would not exist yet, the lookup
+// would return null, the guard would bail every time, and auto-detection would
+// silently never fire.
+const alternateLinks = (Object.entries(alternates) as [Locale, string][]).map(
+  ([code, path]) => ({ code, href: new URL(path, Astro.site).toString() }),
+);
+
+// x-default points at the unprefixed English URL: it is the already-indexed
+// canonical, and pointing it at /es/ would have Google serve Spanish to en-AU
+// and en-CA readers — exactly what the language rule says must not happen.
+const xDefault = alternates.en ? new URL(alternates.en, Astro.site).toString() : null;
+
+const rssPath = l('/rss.xml');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -59,6 +90,92 @@ const ogImageURL = new URL(ogImage, Astro.site);
 
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
+    <!-- Language alternates -->
+    {alternateLinks.map(({ code, href }) => (
+      <link rel="alternate" hreflang={code} href={href} />
+    ))}
+    {xDefault && <link rel="alternate" hreflang="x-default" href={xDefault} />}
+
+    <script is:inline>
+      /*
+        First-visit language selection.
+
+        Runs inline and blocking on purpose: deferring it would paint English
+        first and then jump, which is worse than the few hundred bytes it costs.
+
+        Every exit below is a rule, in priority order:
+          1. an explicit choice always wins over a guess;
+          2. a Spanish URL is never redirected — a shared link outranks the
+             browser, and Google renders JS as en-US, so redirecting /es/ would
+             put the whole Spanish tree at risk of deindexing;
+          3. English browsers stay put;
+          4. no translation declared means nowhere to go, so nothing happens.
+      */
+      (function () {
+        if (window.__1pLangChecked) return;
+        window.__1pLangChecked = true;
+
+        var path = location.pathname;
+
+        /*
+          Rule 2 first: a Spanish URL is never redirected, whatever anyone
+          prefers. Lower-cased only for this comparison, because an origin that
+          treats paths case-insensitively can serve the Spanish tree at /ES/,
+          and an English reader landing there must not be stranded in Spanish
+          by a guard that failed to recognise the path.
+        */
+        var lower = path.toLowerCase();
+        if (lower === '/es' || lower.indexOf('/es/') === 0) return;
+
+        /*
+          Rule 1: read the choice, do not merely notice one was made.
+
+          Testing the cookie for presence rather than value inverted this
+          entirely: choosing "Español" wrote 1p_lang=es, which suppressed the
+          redirect, which meant the only way to be shown Spanish was to have
+          expressed no preference at all. Anything that is not one of the two
+          known values is treated as no preference, so a stale or truncated
+          cookie degrades to detection instead of pinning someone to English
+          with no way back except finding the control.
+        */
+        var match = /(?:^|;\s*)1p_lang=([^;]*)/.exec(document.cookie);
+        var choice = match ? decodeURIComponent(match[1]).trim().toLowerCase() : '';
+        if (choice !== 'en' && choice !== 'es') choice = '';
+
+        var wanted;
+        if (choice) {
+          wanted = choice;
+        } else {
+          /*
+            An absent locale is not a language. A headless renderer or a crawler
+            that sets no `navigator.language` is unknown, not "not English", and
+            treating unknown as Spanish pulls every such agent off the English
+            tree — the same deindexing risk rule 2 protects the Spanish tree
+            from, pointed the other way.
+          */
+          var tag = navigator.language || '';
+          if (!tag) return;
+          wanted = tag.toLowerCase().split('-')[0] === 'en' ? 'en' : 'es';
+        }
+
+        if (wanted === 'en') return;
+
+        var alt = document.querySelector('link[rel="alternate"][hreflang="es"]');
+        if (!alt) return;
+
+        /*
+          Navigate by PATH, not by the link's href. The href is absolute against
+          the production origin, so reusing it verbatim would bounce anyone on
+          localhost or a preview host straight to the live site — including the
+          test suite, which would then be asserting against production.
+        */
+        var target = new URL(alt.getAttribute('href'), location.origin);
+        if (target.pathname === path) return;
+
+        location.replace(target.pathname + location.search + location.hash);
+      })();
+    </script>
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -66,6 +183,12 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <meta property="og:image" content={ogImageURL} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:site_name" content="1Platform" />
+    <meta property="og:locale" content={OG_LOCALES[locale]} />
+    {(Object.keys(alternates) as Locale[])
+      .filter((code) => code !== locale)
+      .map((code) => (
+        <meta property="og:locale:alternate" content={OG_LOCALES[code]} />
+      ))}
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -73,7 +196,12 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
 
-    <link rel="alternate" type="application/rss+xml" title="1Platform Blog" href="/rss.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={t('layout.rssTitle')}
+      href={rssPath}
+    />
 
     <ViewTransitions />
 
@@ -92,8 +220,8 @@ const ogImageURL = new URL(ogImage, Astro.site);
     </script>
   </head>
   <body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    <Header />
+    <a href="#main-content" class="skip-link">{t('layout.skipToContent')}</a>
+    <Header alternates={alternates} />
     <main id="main-content">
       <slot />
     </main>

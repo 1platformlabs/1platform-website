@@ -10,36 +10,65 @@
  * no layout shift. Motion is decorative and collapses to a static schematic
  * under prefers-reduced-motion.
  */
+import { useI18n } from '@i18n';
+
 interface Props {
   /** Extra class for the wrapping figure. */
   class?: string;
 }
 
 const { class: className } = Astro.props;
+const { t, locale } = useI18n(Astro.url.pathname);
 
 /* Geometry note: node widths and centres are chosen so the gaps between boxes
    are even (~17px in, ~16px out) across the 90..510 span of the spine. The
    first pass packed the inputs into uneven pairs (4px / 14px / 4px) and left
-   the output boxes overlapping by a pixel. */
+   the output boxes overlapping by a pixel.
+
+   Spanish labels run longer than English ones ("palabras clave" vs
+   "keywords", "facturación" vs "invoicing") and the `cx` positions above are
+   load-bearing — the trace paths below are literal coordinates drawn *to*
+   them, so the centres cannot move without redrawing every trace. Instead the
+   boxes widen for Spanish only (still short of the next box's centre, so the
+   even-gap rhythm holds, just tighter), and `textLength` is a hard backstop
+   on the labels that still wouldn't fit even in the wider box — it forces the
+   glyphs to the given width instead of letting them overflow, regardless of
+   which font actually renders at build time. English never enters either
+   path: at `locale === 'en'` the widths and the text markup are byte-for-byte
+   what they were before this file knew about Spanish. */
+const isEs = locale === 'es';
+const inputWidth = isEs ? 100 : 92;
+const outputWidth = isEs ? 112 : 104;
+const NODE_PADDING = 12;
+const inputTextLength = inputWidth - NODE_PADDING;
+const outputTextLength = outputWidth - NODE_PADDING;
+
+// Thresholds are set below the shortest label of each set that is known to
+// fit its (already-widened) box, so only the genuinely long words compress.
+const fitInput = (label: string) =>
+  isEs && label.length > 8 ? { textLength: inputTextLength, lengthAdjust: 'spacingAndGlyphs' as const } : {};
+const fitOutput = (label: string) =>
+  isEs && label.length > 6 ? { textLength: outputTextLength, lengthAdjust: 'spacingAndGlyphs' as const } : {};
+
 const inputs = [
-  { label: 'keywords', cx: 136, trace: 'M136,92 V130 L170,160 V185' },
-  { label: 'ai content', cx: 245, trace: 'M245,92 V185' },
-  { label: 'images', cx: 354, trace: 'M354,92 V185' },
-  { label: 'indexing', cx: 463, trace: 'M463,92 V130 L429,160 V185' },
-];
+  { label: t('interconnect.input.keywords'), cx: 136, trace: 'M136,92 V130 L170,160 V185' },
+  { label: t('interconnect.input.aiContent'), cx: 245, trace: 'M245,92 V185' },
+  { label: t('interconnect.input.images'), cx: 354, trace: 'M354,92 V185' },
+  { label: t('interconnect.input.indexing'), cx: 463, trace: 'M463,92 V130 L429,160 V185' },
+].map((n) => ({ ...n, textProps: fitInput(n.label) }));
 
 const outputs = [
-  { label: 'storefront', cx: 180, trace: 'M215,215 V240 L180,270 V308' },
-  { label: 'payments', cx: 300, trace: 'M300,215 V308' },
-  { label: 'invoicing', cx: 420, trace: 'M385,215 V240 L420,270 V308' },
-];
+  { label: t('interconnect.output.storefront'), cx: 180, trace: 'M215,215 V240 L180,270 V308' },
+  { label: t('interconnect.output.payments'), cx: 300, trace: 'M300,215 V308' },
+  { label: t('interconnect.output.invoicing'), cx: 420, trace: 'M385,215 V240 L420,270 V308' },
+].map((n) => ({ ...n, textProps: fitOutput(n.label) }));
 ---
 
 <figure class:list={['motif', className]}>
   <svg
     viewBox="0 0 600 400"
     role="img"
-    aria-label="Schematic of the platform: keywords, AI content, images and indexing all resolve through one 1Platform API, which delivers a storefront, payments and invoicing."
+    aria-label={t('interconnect.aria')}
     class="motif__svg"
   >
     <!-- Traces: structure first, so nodes sit above them -->
@@ -58,8 +87,8 @@ const outputs = [
     <!-- Input nodes -->
     {inputs.map((n) => (
       <g class="motif__node">
-        <rect x={n.cx - 46} y="58" width="92" height="34" rx="5" />
-        <text x={n.cx} y="79">{n.label}</text>
+        <rect x={n.cx - inputWidth / 2} y="58" width={inputWidth} height="34" rx="5" />
+        <text x={n.cx} y="79" {...n.textProps}>{n.label}</text>
       </g>
     ))}
 
@@ -73,8 +102,8 @@ const outputs = [
     <!-- Output nodes -->
     {outputs.map((n) => (
       <g class="motif__node motif__node--out">
-        <rect x={n.cx - 52} y="308" width="104" height="34" rx="5" />
-        <text x={n.cx} y="329">{n.label}</text>
+        <rect x={n.cx - outputWidth / 2} y="308" width={outputWidth} height="34" rx="5" />
+        <text x={n.cx} y="329" {...n.textProps}>{n.label}</text>
       </g>
     ))}
   </svg>

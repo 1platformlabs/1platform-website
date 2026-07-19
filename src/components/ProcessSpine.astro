@@ -10,6 +10,8 @@
  *
  * Replaces PipelineAnimation.astro. No JS.
  */
+import { useI18n } from '@i18n';
+
 interface Step {
   label: string;
 }
@@ -20,16 +22,21 @@ interface Props {
   label?: string;
 }
 
+const { t } = useI18n(Astro.url.pathname);
+
+// Only the caller-less usage (the home page's bare `<ProcessSpine />`) ever
+// renders these — every other page passes its own `steps`/`label`, which live
+// in that page's own message module.
 const defaultSteps: Step[] = [
-  { label: 'Create your account' },
-  { label: 'Pick: store or website' },
-  { label: 'Connect your domain' },
-  { label: 'Generate content' },
-  { label: 'Enable payments and invoicing' },
-  { label: 'Go live' },
+  { label: t('processSpine.step.account') },
+  { label: t('processSpine.step.pick') },
+  { label: t('processSpine.step.domain') },
+  { label: t('processSpine.step.content') },
+  { label: t('processSpine.step.payments') },
+  { label: t('processSpine.step.live') },
 ];
 
-const { steps = defaultSteps, label = 'How it works, step by step' } = Astro.props;
+const { steps = defaultSteps, label = t('processSpine.defaultLabel') } = Astro.props;
 ---
 
 <ol class="spine" aria-label={label}>

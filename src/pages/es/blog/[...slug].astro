@@ -1,0 +1,12 @@
+---
+import BlogPost from '@page-content/BlogPost.astro';
+import { postPaths } from '@i18n/collections';
+
+export async function getStaticPaths() {
+  return postPaths('es');
+}
+
+const { post } = Astro.props;
+---
+
+<BlogPost post={post} />

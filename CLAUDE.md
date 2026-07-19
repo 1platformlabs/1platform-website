@@ -195,6 +195,68 @@ Adding/removing/reordering any item in this list requires the same change in `..
 
 **If you add/remove/rename a navbar item or footer column/link on this site, update the developer docs in the same change.**
 
+**Exemption — language controls.** The `EN | ES` control in the header and mobile menu is exempt
+from the rule above, and this is the one case the rule did not anticipate. It is a control over
+how the current page is presented, not an entry in the information architecture: it adds no
+destination, and it appears identically on every page in both trees. The developer docs cannot
+mirror it either — that site is Spanish-only (`docusaurus.config.ts`), so it has no second
+language to offer. The harmony the rule protects is preserved where it matters: both sites serve
+Spanish, and now with the same vocabulary.
+
+**Correction to the footer contract above.** The Spanish counterpart CTA is quoted here as "Deja
+de hacer malabares con herramientas separadas". That is not what the developer docs actually say.
+`../1platform-api-developer/src/theme/Footer/index.tsx:65` reads **"Deja de hacer malabares con 6
+servicios distintos"** — which carries exactly the fabricated number this site was rebuilt to
+remove and which `scripts/check-tells.sh` exists to forbid. This site's Spanish CTA is
+"Deja de hacer malabares con herramientas sueltas" (no number), derived from the English. Fixing
+the sibling is a change to another repo and therefore another PR; until then the two do not
+match, and the sibling is the one that is wrong.
+
+## Internationalisation
+
+The site is bilingual. **English lives at the root and Spanish under `/es/`** — no English URL
+carries a language prefix, because the ~26 English URLs are already indexed and the site has no
+mechanism to redirect them (no `_redirects`, no `_headers`, and the document root's `.htaccess`
+is excluded from the deploy rsync, so it is not ours to edit).
+
+**One source of layout, two sources of text.** A page's markup lives once in
+`src/page-content/<Name>.astro`; its copy lives beside it in `src/i18n/messages/pages/<slug>.ts`
+with English and Spanish in the same file; and `src/pages/<slug>.astro` plus
+`src/pages/es/<slug>.astro` are three-line shells that declare the two routes. Astro does not
+generate the second tree from config — every `/es/` route exists because a file declares it.
+
+- `useI18n(Astro.url.pathname)` returns `{ t, l, locale }`. `t()` translates and **throws** on an
+  unknown key; there is no fallback to English, deliberately, because a silent fallback produces
+  half-translated pages nobody notices. `l()` localises an internal path and passes absolute URLs,
+  `mailto:` and fragments through untouched. **Every internal href goes through `l()`.**
+- Message modules register themselves by existing (`import.meta.glob`), so no shared index file
+  has to be edited to add a page. Two modules defining the same key fails the build.
+- Parity is enforced twice: `defineMessages` types Spanish against English (a compile error), and
+  `assertParity()` in `src/i18n/index.ts` throws during **every build**, because `astro build`
+  does not typecheck and a guarantee that depends on remembering to run `npm run typecheck` is
+  not one.
+- Dates: `formatDate(date, locale)`. Never `toLocaleDateString('en-US')` — the guard rejects a
+  pinned locale tag.
+- Collections carry their locale in the **directory** (`src/content/blog/{en,es}/`), paired by a
+  required `translationKey`. Read them only through `src/i18n/collections.ts`; a bare
+  `getCollection` is unfiltered and will mix languages.
+- **`hreflang` is the single source of truth for "a translation exists".** The same `alternates`
+  map produces the `<head>` block, the language control's destinations, and the target the
+  first-visit script redirects to. A page with no twin simply omits that locale, and all three do
+  the right thing without any of them knowing why.
+- Legal policies are the exception to the catalogue: their prose lives in a partial per language
+  (`src/page-content/legal/*.{en,es}.astro`), because a legal text in two languages is two
+  documents, not one document with substituted labels. Only title and description are catalogued.
+
+Language selection on first visit happens in an inline blocking script in `BaseLayout.astro`,
+emitted **after** the `hreflang` block it reads. Spanish and non-English browsers go to `/es/`;
+English browsers stay; the `1p_lang` cookie always wins; and **`/es/` is never redirected**, which
+protects shared links and keeps Googlebot — which renders JS as en-US — from being bounced out of
+the Spanish tree.
+
+Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm run check`
+(design-system guard plus its 24 self-tests).
+
 ## Accessibility Requirements
 
 - Semantic HTML: `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`

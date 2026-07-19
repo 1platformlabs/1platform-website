@@ -1,0 +1,180 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import BlogPostCard from '@components/BlogPostCard.astro';
+import Icon from '@components/Icon.astro';
+import { useI18n } from '@i18n';
+import { bareSlug, categoryAlternates } from '@i18n/collections';
+import { localizePath } from '@i18n';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+  category: string;
+  siblings: { slug: string; count: number }[];
+}
+
+const { posts, category, siblings } = Astro.props;
+const { t, l } = useI18n(Astro.url.pathname);
+
+// Declared from the categories that actually publish in each language, not
+// assumed from the slug: a category can exist in one tree and not the other.
+const alternates = await categoryAlternates(category, (locale, slug) =>
+  localizePath(`/blog/category/${slug}/`, locale),
+);
+
+const categoryLabel = t(`blog.category.${category}`);
+// The plural used to be baked into a template literal, so it only ever agreed
+// in English. Both forms now live in the catalogue, one per language.
+const countLabel = t.plural(posts.length, 'blog.category.count_one', 'blog.category.count_other');
+---
+
+<BaseLayout
+  title={t('blog.category.title', { category: categoryLabel })}
+  description={t('blog.category.description', { category: categoryLabel })}
+  alternates={alternates}
+>
+  <section class="section">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('blog.h1'), href: l('/blog/') },
+        { label: categoryLabel },
+      ]} />
+
+      <header class="topic-head">
+        <p class="eyebrow">{t('blog.category.eyebrow')}</p>
+        <h1>{categoryLabel}</h1>
+        <p class="topic-head__count">{countLabel}</p>
+      </header>
+
+      <div class="topic-list">
+        {posts.map((post) => (
+          <BlogPostCard
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            category={post.data.category}
+            slug={bareSlug(post.slug)}
+            author={post.data.author}
+            readingTime={post.data.readingTime}
+            headingLevel={2}
+            class="reveal"
+          />
+        ))}
+      </div>
+
+      <nav class="onward" aria-label={t('blog.category.otherAria')}>
+        <div class="section__rule">
+          <h2 class="eyebrow">{t('blog.category.other')}</h2>
+        </div>
+        <ul class="onward__list">
+          {siblings.map((sibling) => (
+            <li>
+              <a href={l(`/blog/category/${sibling.slug}/`)} class="onward__link">
+                <span class="onward__icon"><Icon name="tag" size={16} /></span>
+                {t(`blog.category.${sibling.slug}`)}
+                <span class="onward__count">{sibling.count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href={l('/blog/')} class="onward__all">
+          {t('blog.category.all')}
+          <Icon name="arrow-right" size={15} />
+        </a>
+      </nav>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .topic-head {
+    max-width: 40rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .topic-head h1 {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-3);
+  }
+
+  .topic-head__count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .topic-list {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .onward {
+    margin-top: var(--space-16);
+  }
+
+  .onward__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+  }
+
+  .onward__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .onward__icon {
+    display: inline-flex;
+    color: var(--color-text-tertiary);
+  }
+
+  .onward__link:hover {
+    color: var(--color-accent);
+  }
+
+  .onward__link:hover .onward__icon {
+    color: var(--color-accent);
+  }
+
+  .onward__count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .onward__all {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .onward__all :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .onward__all:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .onward {
+      margin-top: var(--space-10);
+    }
+  }
+</style>

@@ -1,42 +1,68 @@
 ---
 import Logo from '@components/Logo.astro';
+import LanguageSwitcher from '@components/LanguageSwitcher.astro';
+import { useI18n, type Locale } from '@i18n';
 
 type SubItem = { label: string; href: string; divider?: boolean };
 type NavItem = { label: string; href: string; subItems?: SubItem[] };
 
+interface Props {
+  /** Path per locale, forwarded to the language control. Same map that feeds
+   *  the hreflang block, so the control and the crawler agree on what exists. */
+  alternates: Partial<Record<Locale, string>>;
+}
+
+const { alternates } = Astro.props;
+const { t, l } = useI18n(Astro.url.pathname);
+
+// `l()` is applied here, once, so every consumer below compares and renders the
+// same localised href. The Docs entry is an absolute URL and `l()` returns it
+// untouched — that is the case the helper exists to get right.
 const solutionsSubItems: SubItem[] = [
-  { label: 'Online Store', href: '/solutions/online-store/' },
-  { label: 'Website Builder', href: '/solutions/website/' },
-  { label: 'AI Content', href: '/solutions/content/' },
-  { label: 'Whitelabel Dashboard', href: '/solutions/whitelabel/' },
-  { label: 'Payments & Invoicing', href: '/payments-invoicing/' },
+  { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
+  { label: t('nav.solutions.website'), href: l('/solutions/website/') },
+  { label: t('nav.solutions.content'), href: l('/solutions/content/') },
+  { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
+  { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
   { label: '', href: '', divider: true },
-  { label: 'View all solutions', href: '/solutions/' },
+  { label: t('nav.solutions.viewAll'), href: l('/solutions/') },
 ];
 
 const navItems: NavItem[] = [
-  { label: 'Solutions', href: '/solutions/', subItems: solutionsSubItems },
-  { label: 'Features', href: '/features/' },
-  { label: 'Pricing', href: '/pricing/' },
-  { label: 'Docs', href: 'https://developer.1platform.pro/' },
-  { label: 'Blog', href: '/blog/' },
+  { label: t('nav.solutions'), href: l('/solutions/'), subItems: solutionsSubItems },
+  { label: t('nav.features'), href: l('/features/') },
+  { label: t('nav.pricing'), href: l('/pricing/') },
+  { label: t('nav.docs'), href: 'https://developer.1platform.pro/' },
+  { label: t('nav.blog'), href: l('/blog/') },
 ];
 
 const currentPath = Astro.url.pathname;
+
+/**
+ * Whether a nav item points at the page being viewed.
+ *
+ * This used to be `currentPath.startsWith(item.href)` against English root
+ * hrefs, which under /es/ never matched: the active underline disappeared from
+ * every Spanish page. Comparing against the already-localised href fixes it for
+ * both trees. Absolute hrefs are excluded because "startsWith" is meaningless
+ * against another origin — without the guard, `/` would match nothing but a
+ * bare `https://…` href could still slip through on an unusual path.
+ */
+const isActive = (href: string) => href.startsWith('/') && currentPath.startsWith(href);
 ---
 
 <header class="site-header" id="site-header">
   <div class="site-header__inner container">
     <Logo class="site-header__logo" />
 
-    <nav class="site-header__nav" aria-label="Main navigation">
+    <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
       <ul>
         {navItems.map((item, i) => (
           item.subItems ? (
             <li class="has-dropdown" data-nav-dropdown>
               <a
                 href={item.href}
-                class:list={['nav-link', { 'is-active': currentPath.startsWith(item.href) }]}
+                class:list={['nav-link', { 'is-active': isActive(item.href) }]}
               >
                 {item.label}
               </a>
@@ -45,7 +71,7 @@ const currentPath = Astro.url.pathname;
                 class="dropdown-toggle"
                 aria-expanded="false"
                 aria-controls={`nav-dropdown-${i}`}
-                aria-label={`Toggle ${item.label} menu`}
+                aria-label={t('nav.aria.toggleSubmenu', { label: item.label })}
                 data-dropdown-toggle
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -56,7 +82,7 @@ const currentPath = Astro.url.pathname;
                 class="dropdown-panel"
                 id={`nav-dropdown-${i}`}
                 role="menu"
-                aria-label={`${item.label} menu`}
+                aria-label={t('nav.aria.submenu', { label: item.label })}
                 aria-hidden="true"
                 data-dropdown-panel
               >
@@ -77,7 +103,7 @@ const currentPath = Astro.url.pathname;
             <li>
               <a
                 href={item.href}
-                class:list={['nav-link', { 'is-active': currentPath.startsWith(item.href) }]}
+                class:list={['nav-link', { 'is-active': isActive(item.href) }]}
               >
                 {item.label}
               </a>
@@ -88,8 +114,9 @@ const currentPath = Astro.url.pathname;
     </nav>
 
     <div class="site-header__actions">
+      <LanguageSwitcher alternates={alternates} />
       <a href="https://app.1platform.pro/app/" class="btn btn--primary btn--sm">
-        Get Started Free
+        {t('cta.getStarted')}
       </a>
     </div>
 
@@ -97,7 +124,7 @@ const currentPath = Astro.url.pathname;
       class="site-header__menu-toggle"
       aria-expanded="false"
       aria-controls="mobile-menu"
-      aria-label="Toggle navigation menu"
+      aria-label={t('nav.aria.toggleMenu')}
       id="menu-toggle"
     >
       <span class="hamburger" aria-hidden="true">
@@ -110,7 +137,7 @@ const currentPath = Astro.url.pathname;
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <nav aria-label="Mobile navigation">
+    <nav aria-label={t('nav.aria.mobile')}>
       <ul>
         {navItems.map((item) => (
           <li>
@@ -130,8 +157,9 @@ const currentPath = Astro.url.pathname;
         ))}
       </ul>
       <a href="https://app.1platform.pro/app/" class="btn btn--primary btn--full">
-        Get Started Free
+        {t('cta.getStarted')}
       </a>
+      <LanguageSwitcher alternates={alternates} variant="mobile" />
     </nav>
   </div>
 </header>

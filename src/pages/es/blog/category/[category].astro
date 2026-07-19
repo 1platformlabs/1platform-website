@@ -1,0 +1,12 @@
+---
+import BlogCategory from '@page-content/BlogCategory.astro';
+import { categoryPaths } from '@i18n/collections';
+
+export async function getStaticPaths() {
+  return categoryPaths('es');
+}
+
+const { posts, category, siblings } = Astro.props;
+---
+
+<BlogCategory posts={posts} category={category} siblings={siblings} />

@@ -1,4 +1,7 @@
----
+---import { useI18n } from '@i18n';
+const { t } = useI18n(Astro.url.pathname);
+
+
 interface BreadcrumbItem {
   label: string;
   href?: string;
@@ -22,7 +25,7 @@ const jsonLd = {
 };
 ---
 
-<nav aria-label="Breadcrumb" class="breadcrumb">
+<nav aria-label={t('breadcrumb.aria')} class="breadcrumb">
   <ol>
     {items.map((item, i) => (
       <li>
