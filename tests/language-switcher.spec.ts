@@ -90,6 +90,25 @@ test('a language with no translation is offered as unavailable, never as a link'
   await expect(page.locator('.lang--desktop a[data-lang-choice]')).toHaveCount(0);
 });
 
+test('an unavailable language explains itself to the eye, not only to a screen reader', async ({
+  page,
+}) => {
+  // Found by looking at the screenshot rather than by an assertion: the reason
+  // the option is dead lived only in sr-only text, so a sighted reader saw a
+  // greyed "ES" that reads as broken. `cursor: not-allowed` was the sole visual
+  // hint and it requires a pointer, which a touch screen does not have.
+  await page.goto('/404.html');
+
+  const off = page.locator('.lang--desktop [aria-disabled="true"]');
+  const explanation = await off.getAttribute('title');
+
+  expect(explanation, 'the unavailable option carries a visible explanation').toBeTruthy();
+  // Same sentence in both channels: one string, nothing to drift apart.
+  // textContent, not innerText: the sr-only copy is visually clipped and the
+  // assertion is about the two channels carrying the same sentence.
+  expect((await off.textContent())!.replace(/\s+/g, ' ')).toContain(explanation!.replace(/\s+/g, ' '));
+});
+
 test('the control is reachable and operable by keyboard alone', async ({ page }) => {
   await page.goto('/es/pricing/');
 

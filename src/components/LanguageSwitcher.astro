@@ -48,12 +48,16 @@ const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
     }
 
     if (!href) {
+      // The reason this option is dead has to reach the eye too, not only the
+      // screen reader. Dimmed type plus `cursor: not-allowed` reads as "broken"
+      // rather than "not translated", and the cursor never appears at all on a
+      // touch screen. `title` reuses the string the sr-only text already
+      // carries, so no new copy and nothing new to keep in sync.
+      const why = t('lang.unavailable', { language: LOCALE_NAMES[code] });
       return (
-        <span class="lang__item lang__item--off" aria-disabled="true">
+        <span class="lang__item lang__item--off" aria-disabled="true" title={why}>
           <span lang={code}>{SHORT[code]}</span>
-          <span class="sr-only">
-            {` — ${t('lang.unavailable', { language: LOCALE_NAMES[code] })}`}
-          </span>
+          <span class="sr-only">{` — ${why}`}</span>
         </span>
       );
     }
