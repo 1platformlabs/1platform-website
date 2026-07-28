@@ -54,20 +54,23 @@ here and made "deploy" mean "some time in the next hour". The activator exits
 immediately when the version on disk already matches, so the extra runs cost
 nothing.)
 
-The workflow's conclusion still says nothing about activation — but you no longer
-have to check by hand. The publish job ends with a step that polls the **cPanel
-origin** with a forced `Host` (so it works with or without a DNS cutover) until
-the served home page matches the bundle's `index_sha`, and **fails** if the cron
-has not activated within 10 minutes. After the cutover it also asserts the
-**public** URL serves that same build, from LiteSpeed.
+The workflow's conclusion still says nothing about activation. Once this host has
+been cut over, the publish job polls the **public URL** until the served home page
+matches the bundle's `index_sha`, asserts the response came from LiteSpeed, and
+**fails** if the cron has not activated within ten minutes.
+
+Before the cutover it deliberately does nothing but say so: the public URL is
+still answered by the old origin, and the cPanel origin cannot be reached
+verifiably by IP — it presents no certificate for this hostname, so `--resolve`
+on 443 fails validation and port 80 is clear text. The check for that window is
+`f4-cutover.sh` in the epic, run by hand at cutover time.
 
 `index_sha` is the sha256 of the entry document. It is exact and cannot collide,
 which a chunk-name grep cannot promise.
 
 ```bash
-# by hand, if you want it:
-curl -s -k --resolve 1platform.pro:443:66.29.146.21 https://1platform.pro/ | shasum -a 256
 grep -m1 index_sha cpanel-dist/BUNDLE_INFO
+curl -s https://1platform.pro/ | shasum -a 256     # after the cutover
 ```
 
 ## Which job proves what
@@ -76,8 +79,8 @@ Both channels stay alive until PCM-12, and each one verifies **itself**:
 
 | Job | Deploys to | Health check target |
 |---|---|---|
-| `deploy` (rsync) | the legacy origin | the **legacy origin**, pinned with `LEGACY_ORIGIN_IP` once DNS has moved |
-| `publish-cpanel` | the shared cPanel account | the **cPanel origin**, by fingerprint; plus the public URL after the cutover |
+| `deploy` (rsync) | the legacy origin | the **legacy origin**, pinned with `LEGACY_ORIGIN_IP` (TLS verification intact) once DNS has moved |
+| `publish-cpanel` | the shared cPanel account | the **public URL**, by fingerprint + LiteSpeed, once this host has been cut over |
 
 Before this split the rsync job health-checked the public URL — which, after the
 cutover, is served by the *other* channel. That gate would have gone green on a
