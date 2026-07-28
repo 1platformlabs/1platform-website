@@ -2,6 +2,20 @@
 #
 # activate.sh — cPanel cron activator for the static landing channel.
 #
+# ⚠️ ESTE SCRIPT TIENE UN GEMELO. La copia de este archivo en el otro repo del
+# Core —`1platform-dashboard/deploy/cpanel/activate.sh`— es, a propósito, IDÉNTICA en
+# lógica ejecutable: mismo lock, mismo manifest, mismo swap atómico, mismo
+# criterio de health. Sólo divergen los comentarios que hablan del artefacto.
+#
+# Un arreglo en uno que no se porte al otro deja el defecto LATENTE en el que
+# no se tocó, y se manifiesta cuando ese canal estrena un docroot. Pasó el
+# 2026-07-28: el move-aside del primer arranque existía sólo en la copia del
+# dashboard, la landing lo necesitó al publicar en una cuenta cPanel nueva y
+# entró en un bucle de fallos de cinco minutos. Verificar antes de mergear:
+#
+#   diff <(grep -vE '^\s*#|^\s*$' deploy/cpanel/activate.sh) \
+#        <(grep -vE '^\s*#|^\s*$' ../1platform-dashboard/deploy/cpanel/activate.sh)
+##
 # The PROD workflow pushes app.zip + app.zip.sha256 + latest.json over FTPS into
 # .deploy/incoming/. This script, run by cron, is the ONLY thing that mutates
 # what is served: it detects a new version, verifies the zip checksum, extracts
@@ -88,7 +102,7 @@ prune() {
 # disk is the tree CI produced — it catches a partial extraction, a disk-full
 # truncation, and anything that wrote into the release afterwards.
 verify_manifest() {
-  local dest="$1" manifest="$1/MANIFEST.sha256" tree="$1/public"
+  local manifest="$1/MANIFEST.sha256" tree="$1/public"
   local want got path bad=0 count=0
   [ -f "$manifest" ] || { log "no MANIFEST.sha256 in release — corrupt bundle"; return 1; }
   [ -d "$tree" ]     || { log "no public/ in release — corrupt bundle"; return 1; }
