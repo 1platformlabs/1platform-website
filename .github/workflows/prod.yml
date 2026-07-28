@@ -1176,7 +1176,7 @@ jobs:
           V: ${{ steps.pkg.outputs.version }}
         shell: bash
         run: |
-          echo "::notice::Bundle ${V} published to .deploy/incoming. PROD activates on the hourly cron, so a green run here does NOT mean the release is live. Verify by chunk fingerprint (deploy/cpanel/README.md), never by this job's conclusion."
+          echo "::notice::Bundle ${V} published to .deploy/incoming. The activation cron runs every 5 minutes, so a green run here still does not mean the release is live — the step above is what proves it, once this host has been cut over."
 
 # ─────────────────────────────────────────────────────────────────────────────
 # JOB 5: Lighthouse — performance, accessibility, SEO audit (local)
