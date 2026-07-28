@@ -804,22 +804,51 @@ jobs:
           echo "Deploy of v${VERSION} completed — protected dirs untouched"
 
       - name: Health check
+        env:
+          # Flip to 'true' once 1platform.pro's DNS points at the shared cPanel
+          # origin. Before the cutover the host still answers from the old front
+          # door, so asserting LiteSpeed would redden every run for no reason.
+          EXPECT_ORIGIN_LITESPEED: ${{ vars.EXPECT_ORIGIN_LITESPEED }}
         shell: bash
         run: |
           set -euo pipefail
+
+          # A status code is not evidence of anything in this topology. Both
+          # possible origins answer 200 to a Host they do not recognise:
+          #   shared cPanel 66.29.146.21   → 200 ·   163 bytes (default page)
+          #   front door   185.125.168.236 → 200 · 116 KB      (default_server)
+          # So the assertion is on the BODY, and the body markers have to be
+          # things only this site emits.
+          assert_ours() {   # $1 = file holding the response body
+            grep -qF '1Platform' "$1" && grep -qE '<title>[^<]+</title>' "$1"
+          }
+
+          # Chain of control. If the assertion accepts a body that plainly is not
+          # our site, then a green result below proves nothing — the instrument
+          # is broken, not the deploy. Fail here rather than shipping the lie.
+          printf '%s' '<html><body>unrelated default vhost</body></html>' > /tmp/health-control.html
+          if assert_ours /tmp/health-control.html; then
+            echo "::error::health self-test FAILED — the assertion accepts a control body. Fix the instrument before trusting any green run."
+            exit 1
+          fi
+
           echo "Waiting for site to be ready..."
           for i in $(seq 1 10); do
-            RESPONSE=$(curl -sSL -w "\n%{http_code}" --max-time 10 \
-              "https://1platform.pro/" 2>/dev/null || echo -e "\n000")
-            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-            BODY=$(echo "$RESPONSE" | sed '$d')
-
-            # Use a here-string instead of `echo | grep -q` — `grep -q`
+            # Use a here-string / file rather than `echo … | grep -q`: grep -q
             # exits on first match and closes the pipe before echo finishes
-            # writing, producing SIGPIPE that `set -euo pipefail` propagates
-            # as a non-zero exit. Symptom: every retry reports HTTP 200 but
-            # the if-clause never evaluates true. Seen in run 26198698104.
-            if [ "$HTTP_CODE" = "200" ] && grep -q "1Platform" <<< "$BODY"; then
+            # writing, producing SIGPIPE that `set -euo pipefail` propagates as a
+            # non-zero exit. Symptom: every retry reports HTTP 200 but the
+            # if-clause never evaluates true. Seen in run 26198698104.
+            HTTP_CODE=$(curl -sSL -o /tmp/health-body.html -D /tmp/health-headers.txt \
+              -w "%{http_code}" --max-time 10 "https://1platform.pro/" 2>/dev/null || echo "000")
+
+            if [ "$HTTP_CODE" = "200" ] && assert_ours /tmp/health-body.html; then
+              if [ "${EXPECT_ORIGIN_LITESPEED:-false}" = "true" ] \
+                 && ! grep -qi '^x-turbo-charged-by:[[:space:]]*litespeed' /tmp/health-headers.txt; then
+                echo "Attempt ${i}/10: body is ours but the response did not come from the cPanel origin, retrying in 5s..."
+                sleep 5
+                continue
+              fi
               echo "Health check passed (attempt ${i}): HTTP 200, content verified"
               exit 0
             fi
@@ -889,6 +918,195 @@ jobs:
         run: |
           ssh-agent -k 2>/dev/null || true
           rm -f /tmp/rsync-excludes.txt || true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JOB 4b: Publish cPanel bundle — ADDITIVE second channel
+#
+# Runs AFTER the rsync deploy and never in place of it. Until the DNS cutover,
+# 65.109.101.46 is still what serves 1platform.pro, so a failure here reddens
+# this job alone and cannot take production down.
+#
+# Why a zip over FTPS instead of rsync: the shared cPanel account has no SSH
+# (port 21098 is open but authorises no key) and the only shell it gets is the
+# one cron provides. See deploy/cpanel/README.md.
+# ─────────────────────────────────────────────────────────────────────────────
+
+  publish-cpanel:
+    name: Publish cPanel bundle
+    needs: [build, version_bump, release, deploy]
+    if: needs.deploy.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: PROD
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+
+      - name: Download build artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: astro-build-${{ github.run_id }}
+          path: dist/
+
+      # Same artifact, same integrity check, same file removed as the rsync job —
+      # so the tree this channel publishes is byte-for-byte the tree the old
+      # channel deploys. If the two ever diverge, the cutover would silently
+      # change what users get.
+      - name: Verify build checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -f "dist/BUILD_CHECKSUMS.txt" ]; then
+            echo "::error::BUILD_CHECKSUMS.txt not found in artifact"
+            exit 1
+          fi
+          find dist/ -type f ! -name "BUILD_CHECKSUMS.txt" -exec sha256sum {} \; | sort > verify-checksums.txt
+          grep -v "BUILD_CHECKSUMS.txt" dist/BUILD_CHECKSUMS.txt | sort > original-checksums.txt
+          if ! diff original-checksums.txt verify-checksums.txt; then
+            echo "::error::Build artifact checksum mismatch — possible tampering"
+            exit 1
+          fi
+          rm -f dist/BUILD_CHECKSUMS.txt verify-checksums.txt original-checksums.txt
+
+      - name: Assemble bundle
+        env:
+          BUNDLE_VERSION: ${{ needs.version_bump.outputs.new_version }}-${{ github.run_number }}.${{ github.run_attempt }}
+          BUNDLE_COMMIT: ${{ github.sha }}
+        shell: bash
+        run: bash deploy/cpanel/assemble.sh dist cpanel-dist deploy/cpanel/htaccess/landing.htaccess
+
+      - name: Package app.zip + checksum + manifest
+        id: pkg
+        env:
+          # run_number alone is STABLE across a "Re-run", so a re-run would build
+          # a different artefact under the same version and the host's equality
+          # gate would skip it silently. Include run_attempt.
+          BUNDLE_VERSION: ${{ needs.version_bump.outputs.new_version }}-${{ github.run_number }}.${{ github.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ( cd cpanel-dist && zip -qr ../app.zip . )
+          sha256sum app.zip | awk '{print $1}' > app.zip.sha256
+          cat > latest.json <<EOF
+          {
+            "version": "${BUNDLE_VERSION}",
+            "sha256": "$(cat app.zip.sha256)",
+            "commit": "${{ github.sha }}",
+            "built_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          echo "version=${BUNDLE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "app.zip $(du -h app.zip | cut -f1), sha256 $(cat app.zip.sha256)"
+
+      - name: Upload bundle as workflow artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: cpanel-bundle-prod
+          path: |
+            app.zip
+            app.zip.sha256
+            latest.json
+            cpanel-dist/BUNDLE_INFO
+            cpanel-dist/MANIFEST.sha256
+          retention-days: 14
+          if-no-files-found: error
+
+      # Three states, deliberately distinguished:
+      #   none set     → the hosting is not provisioned yet (F2). Skip with a
+      #                  notice; the bundle is still downloadable as an artifact.
+      #   all set      → publish.
+      #   some set     → a misconfiguration. FAIL — never upload half a channel
+      #                  and never report success over it.
+      - name: Detect FTPS config
+        id: ftps
+        env:
+          H: ${{ secrets.CPANEL_FTP_HOST }}
+          U: ${{ secrets.CPANEL_FTP_USER }}
+          P: ${{ secrets.CPANEL_FTP_PASS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SET=0; TOTAL=3
+          [ -n "${H}" ] && SET=$((SET+1)) || true
+          [ -n "${U}" ] && SET=$((SET+1)) || true
+          [ -n "${P}" ] && SET=$((SET+1)) || true
+          if [ "$SET" -eq "$TOTAL" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          elif [ "$SET" -eq 0 ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CPANEL_FTP_* secrets are not set — skipping the FTPS push. The bundle is downloadable as the 'cpanel-bundle-prod' artifact."
+          else
+            echo "::error::CPANEL_FTP_* is partially configured (${SET}/${TOTAL} set). Refusing to publish a half-configured channel."
+            exit 1
+          fi
+
+      - name: Install lftp
+        if: steps.ftps.outputs.configured == 'true'
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Upload via FTPS (atomic)
+        if: steps.ftps.outputs.configured == 'true'
+        env:
+          CPANEL_FTP_HOST: ${{ secrets.CPANEL_FTP_HOST }}
+          CPANEL_FTP_USER: ${{ secrets.CPANEL_FTP_USER }}
+          CPANEL_FTP_PASS: ${{ secrets.CPANEL_FTP_PASS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Explicit FTPS with certificate verification against the SERVER
+          # hostname — its *.web-hosting.com cert matches. FTP cannot traverse
+          # Cloudflare, so this must be the origin host, never 1platform.pro.
+          #
+          # Atomicity: app.zip lands as .part and is renamed; latest.json is
+          # uploaded LAST, because its presence with a matching sha256 is the
+          # host's "ready to activate" signal. The cron must never see a
+          # half-written zip described by a complete manifest.
+          #
+          # A freshly created FTP account can reject the first connection with a
+          # transient 530, so retry rather than redesign. The retry loop is here
+          # (not lftp's net:max-retries) because 530 is an auth failure, which
+          # lftp does not retry.
+          for attempt in 1 2 3; do
+            if lftp -u "$CPANEL_FTP_USER","$CPANEL_FTP_PASS" "$CPANEL_FTP_HOST" <<'FTPEOF'
+          set cmd:fail-exit yes
+          set xfer:clobber on
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate yes
+          set net:max-retries 3
+          set net:timeout 20
+          cd .deploy/incoming
+          put app.zip -o app.zip.part
+          put app.zip.sha256
+          mv app.zip.part app.zip
+          put latest.json -o latest.json.part
+          mv latest.json.part latest.json
+          bye
+          FTPEOF
+            then
+              echo "FTPS upload succeeded on attempt ${attempt}"
+              exit 0
+            fi
+            echo "::warning::FTPS upload attempt ${attempt}/3 failed"
+            [ "$attempt" -lt 3 ] && sleep 15
+          done
+          # Reached only when every attempt failed. Never print an unconditional
+          # success line: an `echo "OK"` over a real failure already happened
+          # once on this hosting.
+          echo "::error::FTPS upload failed after 3 attempts"
+          exit 1
+
+      - name: Note the activation delay
+        if: steps.ftps.outputs.configured == 'true'
+        env:
+          V: ${{ steps.pkg.outputs.version }}
+        shell: bash
+        run: |
+          echo "::notice::Bundle ${V} published to .deploy/incoming. PROD activates on the hourly cron, so a green run here does NOT mean the release is live. Verify by chunk fingerprint (deploy/cpanel/README.md), never by this job's conclusion."
 
 # ─────────────────────────────────────────────────────────────────────────────
 # JOB 5: Lighthouse — performance, accessibility, SEO audit (local)

@@ -1,6 +1,12 @@
 # build output
 dist/
 
+# cPanel publish channel build artefacts (see deploy/cpanel/)
+cpanel-dist/
+app.zip
+app.zip.sha256
+latest.json
+
 # test artefacts
 test-results/
 playwright-report/
