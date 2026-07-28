@@ -1,0 +1,62 @@
+# 1platform.pro — landing serving contract.
+#
+# This file is versioned here and published WITH the release, so a rollback
+# restores the serving behaviour together with the content. It is never edited
+# by hand on the host.
+#
+# The contract below was reconstructed by MEASURING the old origin
+# (65.109.101.46), because that box has no SSH and its .htaccess could not be
+# read. See epics/1platform-cpanel-migration/stories/PCM-03-*.md.
+#
+# ── HARD RULE ────────────────────────────────────────────────────────────────
+# Nothing here may force HTTPS. The Cloudflare zone is in `flexible` mode — the
+# edge connects to this origin over plain HTTP — so an https redirect here is an
+# infinite loop, not a hardening measure. assemble.sh fails the build if one
+# appears.
+
+Options -Indexes +FollowSymLinks
+
+# The docroot is a symlink to the active release; the release tree contains no
+# symlinks of its own. FollowSymLinks (verified served on this host) is what
+# makes the atomic swap work.
+
+DirectoryIndex index.html
+
+# Astro builds with trailingSlash:'always', so /pricing must 301 to /pricing/.
+# On the old origin that redirect came from Apache's DirectorySlash, not from
+# the app — the canonical URLs, the sitemap and every indexed link depend on it.
+DirectorySlash On
+
+# A missing page is a REAL 404. Deliberately no SPA-style fallback: a fallback
+# would turn every dead URL into a soft 200 and poison the index.
+ErrorDocument 404 /404.html
+
+<IfModule mod_headers.c>
+  # Astro emits content-hashed assets under /_astro/ — safe to pin for a year.
+  <FilesMatch "^.*$">
+    Header set X-Content-Type-Options "nosniff"
+  </FilesMatch>
+
+  # Everything the build fingerprints. The name changes when the bytes change,
+  # so an immutable cache can never serve a stale one.
+  <IfModule mod_setenvif.c>
+    SetEnvIf Request_URI "^/_astro/" IMMUTABLE_ASSET=1
+  </IfModule>
+  Header set Cache-Control "public, max-age=31536000, immutable" env=IMMUTABLE_ASSET
+
+  # Un-fingerprinted static files live in public/ (fonts, favicon, og images).
+  # Their names are stable, so a year-long immutable cache would strand a fix in
+  # browsers we cannot purge. A day, revalidated, is the honest ceiling.
+  <FilesMatch "\.(woff2|ico|png|jpg|jpeg|webp|avif|svg)$">
+    Header setifempty Cache-Control "public, max-age=86400"
+  </FilesMatch>
+
+  # HTML, feeds and the sitemap must revalidate or a deploy is invisible.
+  <FilesMatch "\.(html|xml|txt|json)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json image/svg+xml
+</IfModule>
