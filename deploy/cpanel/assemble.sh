@@ -38,9 +38,9 @@ sha256_of() {
 
 die() { echo "::error::assemble: $*" >&2; exit 1; }
 
-[ -d "$SRC" ] || die "${SRC} not found — run 'npm run build' first"
-[ -n "$(ls -A "$SRC" 2>/dev/null)" ] || die "${SRC} is empty"
-[ -f "$HTACCESS" ] || die "${HTACCESS} not found — the serving contract is not optional"
+[[ -d "$SRC" ]] || die "${SRC} not found — run 'npm run build' first"
+[[ -n "$(ls -A "$SRC" 2>/dev/null)" ]] || die "${SRC} is empty"
+[[ -f "$HTACCESS" ]] || die "${HTACCESS} not found — the serving contract is not optional"
 
 # These three files ARE the landing's contract, not incidental output:
 #   index.html          the home
@@ -49,7 +49,7 @@ die() { echo "::error::assemble: $*" >&2; exit 1; }
 # A build that silently drops any of them still produces a plausible-looking
 # dist/, which is exactly the failure a size check does not catch.
 for required in index.html 404.html sitemap-index.xml; do
-  [ -f "${SRC}/${required}" ] || die "${SRC}/${required} missing — refusing to publish an incomplete site"
+  [[ -f "${SRC}/${required}" ]] || die "${SRC}/${required} missing — refusing to publish an incomplete site"
 done
 
 # Start from a clean tree so a re-run never mixes stale files into the bundle.

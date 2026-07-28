@@ -814,6 +814,7 @@ jobs:
           # de F4 es un cambio de DNS, y sólo sirve si el destino tiene el build
           # de hoy.
           LEGACY_ORIGIN_IP: ${{ vars.LEGACY_ORIGIN_IP }}
+          EXPECT_ORIGIN_LITESPEED: ${{ vars.EXPECT_ORIGIN_LITESPEED }}
         shell: bash
         run: |
           set -euo pipefail
@@ -840,14 +841,19 @@ jobs:
           HOST=1platform.pro
           URL="https://${HOST}/"
           RESOLVE=()
-          if [ -n "${LEGACY_ORIGIN_IP:-}" ]; then
-            # Por HTTP, no HTTPS: la zona está en `flexible`, así que el propio
-            # Cloudflare alcanza el origen por HTTP plano. Es el camino real, y
-            # además evita desactivar la verificación del certificado (el origen
-            # no presenta un cert válido para todos estos hostnames).
-            URL="http://${HOST}/"
-            RESOLVE=(--resolve "${HOST}:80:${LEGACY_ORIGIN_IP}")
-            echo "verificando el origen legacy ${LEGACY_ORIGIN_IP} por HTTP, que es lo que este job acaba de desplegar"
+          if [[ -n "${LEGACY_ORIGIN_IP:-}" ]]; then
+            # Clavado al origen que este job acaba de escribir, con verificación
+            # de certificado completa: si el origen legacy no presenta un cert
+            # válido para este host, el chequeo falla — y eso es información, no
+            # ruido: significa que el destino del rollback no es verificable.
+            RESOLVE=(--resolve "${HOST}:443:${LEGACY_ORIGIN_IP}")
+            echo "verificando el origen legacy ${LEGACY_ORIGIN_IP}, que es lo que este job acaba de desplegar"
+          elif [[ "${EXPECT_ORIGIN_LITESPEED:-false}" == "true" ]]; then
+            # El host ya cortó y no hay una IP legacy verificable configurada.
+            # Chequear la URL pública acá mediría el OTRO canal. Declararlo es
+            # honesto; simularlo sería un gate mentiroso.
+            echo "::warning::1platform.pro ya sirve desde cPanel y no hay LEGACY_ORIGIN_IP verificable. El deploy legacy queda SIN verificar por HTTP — lo sostienen el exit code del rsync y el checksum del artefacto."
+            exit 0
           fi
 
           echo "Waiting for site to be ready..."
@@ -1114,61 +1120,54 @@ jobs:
 
       # ── El gate que convierte a este canal en el que realmente despliega ────
       # Un job verde significa «el zip está en incoming». NO significa que el
-      # release esté vivo: lo activa un cron, minutos después. Sin este paso, la
+      # release esté vivo: lo activa un cron, minutos después. Sin este paso la
       # única verificación honesta era manual — y «CI verde ≠ activo» ya costó
       # caro en Atlas.
       #
-      # Se consulta el ORIGEN cPanel con Host forzado, no la URL pública, para
-      # que el gate pruebe que ESTE canal activó, haya o no cutover de DNS. Si ya
-      # lo hubo, además prueba que el público está viendo este build.
+      # Sólo puede correr cuando el host YA cortó, porque hasta entonces la URL
+      # pública la contesta el origen viejo y no hay forma de alcanzar el origen
+      # cPanel de manera verificable: no presenta certificado propio para estos
+      # hostnames, y llegar por --resolve exigiría desactivar TLS o hablar HTTP
+      # en claro. Antes del cutover, el que hace esta comprobación es
+      # `f4-cutover.sh` en su dry-run, y se declara acá en vez de simularse.
       - name: Verify the release actually activated
         if: steps.ftps.outputs.configured == 'true'
         env:
           SITE_URL: https://1platform.pro
-          CPANEL_ORIGIN_IP: ${{ vars.CPANEL_ORIGIN_IP }}
           EXPECT_ORIGIN_LITESPEED: ${{ vars.EXPECT_ORIGIN_LITESPEED }}
           ENTRY_PATH: '/'
         shell: bash
         run: |
           set -euo pipefail
-          if [ -z "${CPANEL_ORIGIN_IP:-}" ]; then
-            echo "::warning::CPANEL_ORIGIN_IP no está seteada — no puedo verificar la activación por fingerprint, sólo que la subida ocurrió."
+          if [[ "${EXPECT_ORIGIN_LITESPEED:-false}" != "true" ]]; then
+            echo "::notice::Este host todavía no tuvo cutover de DNS, así que la URL pública la contesta el origen viejo y este canal no se puede verificar desde acá. El bundle quedó en .deploy/incoming; el cron lo activará. La verificación de activación se hace en el cutover (epics/1platform-cpanel-migration/f4-cutover.sh)."
             exit 0
           fi
-          WANT="$(grep -m1 '^index_sha=' cpanel-dist/BUNDLE_INFO | cut -d= -f2-)"
-          HOST="$(sed -E 's#^https?://##; s#/.*$##' <<<"${SITE_URL}")"
-          echo "esperando el fingerprint ${WANT:0:16}… en http://${HOST}${ENTRY_PATH} vía ${CPANEL_ORIGIN_IP}"
 
-          # El sha256 del documento de entrada es exacto y no colisiona. Un grep
-          # del nombre del chunk sería suficiente casi siempre — y «casi» es
+          WANT="$(grep -m1 '^index_sha=' cpanel-dist/BUNDLE_INFO | cut -d= -f2-)"
+          URL="${SITE_URL%/}${ENTRY_PATH}"
+          echo "esperando el fingerprint ${WANT:0:16}… en ${URL}"
+
+          # El sha256 del documento de entrada es exacto y no puede colisionar.
+          # Un grep del nombre del chunk alcanza casi siempre — y «casi» es
           # justamente lo que produce los falsos verdes.
+          H="$(mktemp)"; B="$(mktemp)"
           DEADLINE=$(( SECONDS + 600 )); GOT=""
-          while [ "$SECONDS" -lt "$DEADLINE" ]; do
-            GOT="$(curl -s --max-time 20 --resolve "${HOST}:80:${CPANEL_ORIGIN_IP}" \
-                     "http://${HOST}${ENTRY_PATH}" | sha256sum | awk '{print $1}')"
-            [ "$GOT" = "$WANT" ] && break
+          while [[ "$SECONDS" -lt "$DEADLINE" ]]; do
+            curl -sSL --max-time 20 -o "$B" -D "$H" "$URL" >/dev/null 2>&1 || true
+            GOT="$(sha256sum "$B" | awk '{print $1}')"
+            [[ "$GOT" == "$WANT" ]] && break
             echo "  … todavía no (servido ${GOT:0:16}…)"
             sleep 20
           done
-          if [ "$GOT" != "$WANT" ]; then
+          if [[ "$GOT" != "$WANT" ]]; then
             echo "::error::el cron no activó este release en 10 min (servido ${GOT:0:16}…, esperado ${WANT:0:16}…). El bundle está en .deploy/incoming; mirá .deploy/logs/activate.log."
             exit 1
           fi
-          echo "activado en el origen cPanel"
-
-          if [ "${EXPECT_ORIGIN_LITESPEED:-false}" != "true" ]; then
-            echo "::notice::${HOST} todavía no tuvo cutover de DNS, así que la URL pública la sigue contestando el origen viejo. Se verificó el canal cPanel únicamente."
-            exit 0
+          if ! grep -qi '^x-turbo-charged-by:[[:space:]]*litespeed' "$H"; then
+            echo "::error::el fingerprint coincide pero la respuesta no salió del origen cPanel"
+            exit 1
           fi
-
-          # Post-cutover: la URL pública ES este canal. Probarlo de punta a punta.
-          H="$(mktemp)"; B="$(mktemp)"
-          curl -sSL --max-time 20 -o "$B" -D "$H" "https://${HOST}${ENTRY_PATH}"
-          PUB="$(sha256sum "$B" | awk '{print $1}')"
-          grep -qi '^x-turbo-charged-by:[[:space:]]*litespeed' "$H" \
-            || { echo "::error::la URL pública no la está contestando el origen cPanel"; exit 1; }
-          [ "$PUB" = "$WANT" ] \
-            || { echo "::error::la URL pública sirve otro build (${PUB:0:16}… vs ${WANT:0:16}…)"; exit 1; }
           echo "el público ve ESTE build, servido por cPanel"
 
       - name: Note the activation delay
