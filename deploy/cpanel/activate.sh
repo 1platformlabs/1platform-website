@@ -222,6 +222,28 @@ if ! verify_manifest "$DEST"; then
   exit 0
 fi
 
+# --- first run only: the document root starts life as a REAL directory ---------
+# cPanel creates it that way when the domain is added, and `mv -T` refuses to
+# replace a directory with a symlink — so without this the very first activation
+# fails and every later one is skipped as "up to date" would never be reached.
+# Move it aside instead of deleting it: whatever cPanel or a human left there
+# stays recoverable, and the operation is reversible with a single mv.
+#
+# This block lived only in the dashboard's copy of this script until 2026-07-28,
+# when publishing the landing to a second cPanel account hit exactly the failure
+# it describes: `mv: cannot overwrite directory '.../public' with non-directory`,
+# on a docroot cPanel had just created. The landing never met it before because
+# its first docroot was already a symlink by the time this channel ran.
+if [ -e "$DOCROOT_LINK" ] && [ ! -L "$DOCROOT_LINK" ]; then
+  ASIDE="$DOCROOT_LINK.pre-cpanel-channel.$(date -u +%Y%m%d%H%M%S)"
+  if ! mv "$DOCROOT_LINK" "$ASIDE"; then
+    log "could not move the existing document root aside — refusing to touch it, skip"
+    rm -rf "$DEST"
+    exit 1
+  fi
+  log "document root was a real directory — moved aside to $ASIDE"
+fi
+
 # --- atomic swap of the docroot symlink ----------------------------------------
 ln -sfn "$DEST/public" "$DOCROOT_LINK.tmp"
 mv -Tf "$DOCROOT_LINK.tmp" "$DOCROOT_LINK"
