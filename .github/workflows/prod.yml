@@ -838,10 +838,16 @@ jobs:
           fi
 
           HOST=1platform.pro
+          URL="https://${HOST}/"
           RESOLVE=()
           if [ -n "${LEGACY_ORIGIN_IP:-}" ]; then
-            RESOLVE=(-k --resolve "${HOST}:443:${LEGACY_ORIGIN_IP}")
-            echo "verificando el origen legacy ${LEGACY_ORIGIN_IP}, que es lo que este job acaba de desplegar"
+            # Por HTTP, no HTTPS: la zona está en `flexible`, así que el propio
+            # Cloudflare alcanza el origen por HTTP plano. Es el camino real, y
+            # además evita desactivar la verificación del certificado (el origen
+            # no presenta un cert válido para todos estos hostnames).
+            URL="http://${HOST}/"
+            RESOLVE=(--resolve "${HOST}:80:${LEGACY_ORIGIN_IP}")
+            echo "verificando el origen legacy ${LEGACY_ORIGIN_IP} por HTTP, que es lo que este job acaba de desplegar"
           fi
 
           echo "Waiting for site to be ready..."
@@ -852,7 +858,7 @@ jobs:
             # non-zero exit. Symptom: every retry reports HTTP 200 but the
             # if-clause never evaluates true. Seen in run 26198698104.
             HTTP_CODE=$(curl -sSL "${RESOLVE[@]}" -o /tmp/health-body.html -D /tmp/health-headers.txt \
-              -w "%{http_code}" --max-time 10 "https://1platform.pro/" 2>/dev/null || echo "000")
+              -w "%{http_code}" --max-time 10 "${URL}" 2>/dev/null || echo "000")
 
             if [ "$HTTP_CODE" = "200" ] && assert_ours /tmp/health-body.html; then
               echo "Health check passed (attempt ${i}): HTTP 200, content verified"
@@ -1131,15 +1137,15 @@ jobs:
           fi
           WANT="$(grep -m1 '^index_sha=' cpanel-dist/BUNDLE_INFO | cut -d= -f2-)"
           HOST="$(sed -E 's#^https?://##; s#/.*$##' <<<"${SITE_URL}")"
-          echo "esperando el fingerprint ${WANT:0:16}… en https://${HOST}${ENTRY_PATH} vía ${CPANEL_ORIGIN_IP}"
+          echo "esperando el fingerprint ${WANT:0:16}… en http://${HOST}${ENTRY_PATH} vía ${CPANEL_ORIGIN_IP}"
 
           # El sha256 del documento de entrada es exacto y no colisiona. Un grep
           # del nombre del chunk sería suficiente casi siempre — y «casi» es
           # justamente lo que produce los falsos verdes.
           DEADLINE=$(( SECONDS + 600 )); GOT=""
           while [ "$SECONDS" -lt "$DEADLINE" ]; do
-            GOT="$(curl -s -k --max-time 20 --resolve "${HOST}:443:${CPANEL_ORIGIN_IP}" \
-                     "https://${HOST}${ENTRY_PATH}" | sha256sum | awk '{print $1}')"
+            GOT="$(curl -s --max-time 20 --resolve "${HOST}:80:${CPANEL_ORIGIN_IP}" \
+                     "http://${HOST}${ENTRY_PATH}" | sha256sum | awk '{print $1}')"
             [ "$GOT" = "$WANT" ] && break
             echo "  … todavía no (servido ${GOT:0:16}…)"
             sleep 20
