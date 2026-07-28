@@ -45,21 +45,47 @@ subdomain whose docroot was a symlink served its content (200, marker present,
 symlink, and **there is no window** where a visitor can get `index.html` from
 one release and `_astro/` chunks from another.
 
-## Green CI does **not** mean live
+## Green CI does **not** mean live — so the job now proves it
 
-The old `rsync` deploy was immediate. This one is **cron-gated**: PROD activates
-on `0 * * * *`, so up to an hour passes between a green run and the new bytes
-being served. **Never** infer activation from the workflow's conclusion. Verify
-by fingerprint:
+The old `rsync` deploy was immediate. This one is **cron-gated**: `*/5`, so up to
+five minutes pass between a green run and the new bytes being served. (It started
+hourly, copied from the Atlas and Bowerbird channels. That was never justified
+here and made "deploy" mean "some time in the next hour". The activator exits
+immediately when the version on disk already matches, so the extra runs cost
+nothing.)
+
+The workflow's conclusion still says nothing about activation — but you no longer
+have to check by hand. The publish job ends with a step that polls the **cPanel
+origin** with a forced `Host` (so it works with or without a DNS cutover) until
+the served home page matches the bundle's `index_sha`, and **fails** if the cron
+has not activated within 10 minutes. After the cutover it also asserts the
+**public** URL serves that same build, from LiteSpeed.
+
+`index_sha` is the sha256 of the entry document. It is exact and cannot collide,
+which a chunk-name grep cannot promise.
 
 ```bash
-# What did CI publish? (from the run's cpanel-bundle artifact)
-grep -m1 version cpanel-dist/BUNDLE_INFO
-
-# What is actually being served?
-curl -s https://1platform.pro/ | grep -o '/_astro/[A-Za-z0-9_.-]*\.js' | head
-curl -sI https://1platform.pro/ | grep -i x-turbo-charged-by   # LiteSpeed ⇒ cPanel
+# by hand, if you want it:
+curl -s -k --resolve 1platform.pro:443:66.29.146.21 https://1platform.pro/ | shasum -a 256
+grep -m1 index_sha cpanel-dist/BUNDLE_INFO
 ```
+
+## Which job proves what
+
+Both channels stay alive until PCM-12, and each one verifies **itself**:
+
+| Job | Deploys to | Health check target |
+|---|---|---|
+| `deploy` (rsync) | the legacy origin | the **legacy origin**, pinned with `LEGACY_ORIGIN_IP` once DNS has moved |
+| `publish-cpanel` | the shared cPanel account | the **cPanel origin**, by fingerprint; plus the public URL after the cutover |
+
+Before this split the rsync job health-checked the public URL — which, after the
+cutover, is served by the *other* channel. That gate would have gone green on a
+failed legacy deploy and red on a good one whose cron had not yet run.
+
+The legacy origin is not vestigial while it lives: the F4 rollback is a DNS
+change, and it only helps if the old docroot still holds **today's** build. That
+is why the rsync job is removed in PCM-12 and not before.
 
 ## Verifying a deploy without fooling yourself
 

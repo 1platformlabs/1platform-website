@@ -805,10 +805,15 @@ jobs:
 
       - name: Health check
         env:
-          # Flip to 'true' once 1platform.pro's DNS points at the shared cPanel
-          # origin. Before the cutover the host still answers from the old front
-          # door, so asserting LiteSpeed would redden every run for no reason.
-          EXPECT_ORIGIN_LITESPEED: ${{ vars.EXPECT_ORIGIN_LITESPEED }}
+          # Este job alimenta el origen LEGACY. Después del cutover de PCM-11 la
+          # URL pública ya no resuelve ahí, así que chequearla acá haría que el
+          # veredicto de este job dependa del OTRO canal. Con LEGACY_ORIGIN_IP
+          # seteada, el chequeo queda clavado a lo que este job acaba de escribir.
+          #
+          # El origen viejo tiene que seguir ACTUALIZADO hasta PCM-12: el rollback
+          # de F4 es un cambio de DNS, y sólo sirve si el destino tiene el build
+          # de hoy.
+          LEGACY_ORIGIN_IP: ${{ vars.LEGACY_ORIGIN_IP }}
         shell: bash
         run: |
           set -euo pipefail
@@ -832,6 +837,13 @@ jobs:
             exit 1
           fi
 
+          HOST=1platform.pro
+          RESOLVE=()
+          if [ -n "${LEGACY_ORIGIN_IP:-}" ]; then
+            RESOLVE=(-k --resolve "${HOST}:443:${LEGACY_ORIGIN_IP}")
+            echo "verificando el origen legacy ${LEGACY_ORIGIN_IP}, que es lo que este job acaba de desplegar"
+          fi
+
           echo "Waiting for site to be ready..."
           for i in $(seq 1 10); do
             # Use a here-string / file rather than `echo … | grep -q`: grep -q
@@ -839,16 +851,10 @@ jobs:
             # writing, producing SIGPIPE that `set -euo pipefail` propagates as a
             # non-zero exit. Symptom: every retry reports HTTP 200 but the
             # if-clause never evaluates true. Seen in run 26198698104.
-            HTTP_CODE=$(curl -sSL -o /tmp/health-body.html -D /tmp/health-headers.txt \
+            HTTP_CODE=$(curl -sSL "${RESOLVE[@]}" -o /tmp/health-body.html -D /tmp/health-headers.txt \
               -w "%{http_code}" --max-time 10 "https://1platform.pro/" 2>/dev/null || echo "000")
 
             if [ "$HTTP_CODE" = "200" ] && assert_ours /tmp/health-body.html; then
-              if [ "${EXPECT_ORIGIN_LITESPEED:-false}" = "true" ] \
-                 && ! grep -qi '^x-turbo-charged-by:[[:space:]]*litespeed' /tmp/health-headers.txt; then
-                echo "Attempt ${i}/10: body is ours but the response did not come from the cPanel origin, retrying in 5s..."
-                sleep 5
-                continue
-              fi
               echo "Health check passed (attempt ${i}): HTTP 200, content verified"
               exit 0
             fi
@@ -1099,6 +1105,65 @@ jobs:
           # once on this hosting.
           echo "::error::FTPS upload failed after 3 attempts"
           exit 1
+
+      # ── El gate que convierte a este canal en el que realmente despliega ────
+      # Un job verde significa «el zip está en incoming». NO significa que el
+      # release esté vivo: lo activa un cron, minutos después. Sin este paso, la
+      # única verificación honesta era manual — y «CI verde ≠ activo» ya costó
+      # caro en Atlas.
+      #
+      # Se consulta el ORIGEN cPanel con Host forzado, no la URL pública, para
+      # que el gate pruebe que ESTE canal activó, haya o no cutover de DNS. Si ya
+      # lo hubo, además prueba que el público está viendo este build.
+      - name: Verify the release actually activated
+        if: steps.ftps.outputs.configured == 'true'
+        env:
+          SITE_URL: https://1platform.pro
+          CPANEL_ORIGIN_IP: ${{ vars.CPANEL_ORIGIN_IP }}
+          EXPECT_ORIGIN_LITESPEED: ${{ vars.EXPECT_ORIGIN_LITESPEED }}
+          ENTRY_PATH: '/'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${CPANEL_ORIGIN_IP:-}" ]; then
+            echo "::warning::CPANEL_ORIGIN_IP no está seteada — no puedo verificar la activación por fingerprint, sólo que la subida ocurrió."
+            exit 0
+          fi
+          WANT="$(grep -m1 '^index_sha=' cpanel-dist/BUNDLE_INFO | cut -d= -f2-)"
+          HOST="$(sed -E 's#^https?://##; s#/.*$##' <<<"${SITE_URL}")"
+          echo "esperando el fingerprint ${WANT:0:16}… en https://${HOST}${ENTRY_PATH} vía ${CPANEL_ORIGIN_IP}"
+
+          # El sha256 del documento de entrada es exacto y no colisiona. Un grep
+          # del nombre del chunk sería suficiente casi siempre — y «casi» es
+          # justamente lo que produce los falsos verdes.
+          DEADLINE=$(( SECONDS + 600 )); GOT=""
+          while [ "$SECONDS" -lt "$DEADLINE" ]; do
+            GOT="$(curl -s -k --max-time 20 --resolve "${HOST}:443:${CPANEL_ORIGIN_IP}" \
+                     "https://${HOST}${ENTRY_PATH}" | sha256sum | awk '{print $1}')"
+            [ "$GOT" = "$WANT" ] && break
+            echo "  … todavía no (servido ${GOT:0:16}…)"
+            sleep 20
+          done
+          if [ "$GOT" != "$WANT" ]; then
+            echo "::error::el cron no activó este release en 10 min (servido ${GOT:0:16}…, esperado ${WANT:0:16}…). El bundle está en .deploy/incoming; mirá .deploy/logs/activate.log."
+            exit 1
+          fi
+          echo "activado en el origen cPanel"
+
+          if [ "${EXPECT_ORIGIN_LITESPEED:-false}" != "true" ]; then
+            echo "::notice::${HOST} todavía no tuvo cutover de DNS, así que la URL pública la sigue contestando el origen viejo. Se verificó el canal cPanel únicamente."
+            exit 0
+          fi
+
+          # Post-cutover: la URL pública ES este canal. Probarlo de punta a punta.
+          H="$(mktemp)"; B="$(mktemp)"
+          curl -sSL --max-time 20 -o "$B" -D "$H" "https://${HOST}${ENTRY_PATH}"
+          PUB="$(sha256sum "$B" | awk '{print $1}')"
+          grep -qi '^x-turbo-charged-by:[[:space:]]*litespeed' "$H" \
+            || { echo "::error::la URL pública no la está contestando el origen cPanel"; exit 1; }
+          [ "$PUB" = "$WANT" ] \
+            || { echo "::error::la URL pública sirve otro build (${PUB:0:16}… vs ${WANT:0:16}…)"; exit 1; }
+          echo "el público ve ESTE build, servido por cPanel"
 
       - name: Note the activation delay
         if: steps.ftps.outputs.configured == 'true'

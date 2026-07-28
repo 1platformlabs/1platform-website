@@ -78,11 +78,17 @@ fi
 
 FILES="$(wc -l < "${OUT}/MANIFEST.sha256" | tr -d ' ')"
 
+# The sha256 of the entry document is the fingerprint the publish job polls for.
+# It is the only honest way to tell whether the cron has ACTIVATED this release:
+# the workflow's own conclusion says nothing, because activation happens later.
+INDEX_SHA="$(sha256_of "${OUT}/public/index.html")"
+
 cat > "${OUT}/BUNDLE_INFO" <<EOF
 version=${BUNDLE_VERSION:-dev}
 commit=${BUNDLE_COMMIT:-unknown}
 built_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 files=${FILES}
+index_sha=${INDEX_SHA}
 EOF
 
 # The destination is a shared cPanel account with a hard 300k inode quota shared
@@ -91,3 +97,4 @@ EOF
 # message. Print it every build so the number stays visible in the job log.
 echo "assemble: bundle ready at ${OUT} ($(du -sh "$OUT" | cut -f1), ${FILES} files)"
 echo "assemble: inode budget → ${FILES} files x 2 retained releases ≈ $((FILES * 2)) inodes"
+echo "assemble: fingerprint (sha256 de index.html) → ${INDEX_SHA}"
