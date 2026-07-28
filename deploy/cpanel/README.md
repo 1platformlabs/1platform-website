@@ -9,11 +9,17 @@ Epic: `epics/1platform-cpanel-migration/` in the workspace monorepo.
 ## Why this channel exists
 
 The landing used to deploy with `rsync -avz --delete` over SSH to a box that
-also hosted three other docroots inside the same `public_html`. **The shared
-cPanel account has no SSH** — port 21098 is open but carries no authorised key,
-and the only shell the account gets is the one **cron** provides. So the channel
-is: build in CI → upload a zip over **FTPS** → a **cron** on the host extracts,
+also hosted three other docroots inside the same `public_html`. **The cPanel
+account has no SSH** — port 21098 is open but carries no authorised key, and the
+only shell the account gets is the one **cron** provides. So the channel is:
+build in CI → upload a zip over **FTPS** → a **cron** on the host extracts,
 verifies and activates it.
+
+**Where it publishes (2026-07-28):** the dedicated account `mascehgw` on
+`business138.web-hosting.com`, origin **66.29.132.45**, docroot
+`/home/mascehgw/1platform.pro`. It shares that account with bowerfans PROD and
+nothing else. It previously published to the shared `anakxipn`
+(premium224, 66.29.146.21), which still hosts `app-qa.1platform.pro`.
 
 ## The shape of a release
 
@@ -96,16 +102,23 @@ Two traps live in this topology, both measured:
 
 | Origin | Answer to an **unknown** `Host` |
 |---|---|
-| shared cPanel `66.29.146.21` | **200 · 163 bytes** |
+| cPanel `66.29.132.45` (`mascehgw`, current) | **200 · 163 bytes** |
+| cPanel `66.29.146.21` (`anakxipn`, previous) | **200 · 163 bytes** |
 | old front door `185.125.168.236` | **200 · 116 KB** (its `default_server`) |
 
 Neither is distinguishable by status code. **Always assert on the body.** For
 the landing the cheap marker is the home `<title>`; the strong one is walking
 the sitemap.
 
+There is a third answer, and it is the one that actually caught someone out: a
+vhost whose docroot exists but is **empty** answers **200 · ~1,364 bytes** with
+cPanel's autoindex page — which has a `<title>` of its own. A gate that looked
+for "a `<title>` tag" passed against a docroot serving `Index of /`. Match the
+site's title, not the presence of the tag.
+
 ```bash
 # Against the cPanel origin, before DNS is touched:
-curl -s -k --resolve 1platform.pro:443:66.29.146.21 https://1platform.pro/ \
+curl -s --resolve 1platform.pro:80:66.29.132.45 http://1platform.pro/ \
   | grep -o '<title>[^<]*</title>'
 ```
 
