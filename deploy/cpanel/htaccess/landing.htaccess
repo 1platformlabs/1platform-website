@@ -9,16 +9,55 @@
 # read. See epics/1platform-cpanel-migration/stories/PCM-03-*.md.
 #
 # ── HARD RULE ────────────────────────────────────────────────────────────────
-# Nothing here may force HTTPS. The Cloudflare zone is in `flexible` mode — the
-# edge connects to this origin over plain HTTP — so an https redirect here is an
-# infinite loop, not a hardening measure. assemble.sh fails the build if one
-# appears.
+# Nothing here may force HTTPS **on the same host**. The Cloudflare zone is in
+# `flexible` mode — the edge connects to this origin over plain HTTP — so a
+# same-host https redirect never terminates: the browser comes back to the edge
+# over HTTPS, the edge still speaks HTTP to this origin, the request is
+# indistinguishable from the first one, and the same rule fires again. That is an
+# infinite loop, not a hardening measure.
+#
+# There is also nothing left for this file to harden. Cloudflare's own "Always
+# Use HTTPS" already does the scheme upgrade at the edge — measured 2026-07-29:
+# `http://1platform.pro/` answers 301 → `https://1platform.pro/` with
+# `server: cloudflare`, before any request reaches here.
+#
+# A redirect that changes the HOST is a different thing and IS allowed: the
+# second request carries a different Host, so it no longer matches the condition
+# that produced it. See the www → apex rule immediately below. assemble.sh
+# enforces exactly this distinction and fails the build on the same-host form.
 
 Options -Indexes +FollowSymLinks
 
 # The docroot is a symlink to the active release; the release tree contains no
 # symlinks of its own. FollowSymLinks (verified served on this host) is what
 # makes the atomic swap work.
+
+# ── Canonical host: www → apex, 301 ──────────────────────────────────────────
+# `www.1platform.pro` and `1platform.pro` are the same vhost on this account, so
+# every page was published twice with nothing canonicalising at the HTTP layer.
+# Measured 2026-07-29, before this rule: both hostnames answered 200 with
+# IDENTICAL bodies (63,119 bytes) and the same <title>, both from LiteSpeed on
+# the cPanel origin 66.29.132.45. The site's canonical URLs, its sitemap and its
+# hreflang set are all apex + HTTPS, so www must 301 to apex.
+#
+# `%{REQUEST_URI}` carries the path; the query string is re-appended by
+# mod_rewrite on its own, because the substitution contains no `?`.
+#
+# This does not violate the hard rule above — it changes the host, so the
+# redirected request stops matching RewriteCond and gets served. The rule is not
+# a guess: the identical block is already live on this same hosting (bowerfans.com
+# PROD, and both docroots of the QA account), where the www names answer 301 and
+# the apex names they point at still answer 200 with their own content.
+#
+# `www/pricing` (no trailing slash) costs two hops — this rule and DirectorySlash
+# below, in whichever order the server runs them; both orders end on
+# `https://1platform.pro/pricing/`. Every link the site emits already carries the
+# trailing slash, so real traffic takes one hop.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+</IfModule>
 
 DirectoryIndex index.html
 

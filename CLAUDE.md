@@ -215,9 +215,20 @@ match, and the sibling is the one that is wrong.
 ## Internationalisation
 
 The site is bilingual. **English lives at the root and Spanish under `/es/`** — no English URL
-carries a language prefix, because the ~26 English URLs are already indexed and the site has no
-mechanism to redirect them (no `_redirects`, no `_headers`, and the document root's `.htaccess`
-is excluded from the deploy rsync, so it is not ours to edit).
+carries a language prefix, because the ~26 English URLs are already indexed and re-prefixing them
+would spend that history for nothing.
+
+**Correction (2026-07-29) to the reason, not the layout.** The reason recorded here used to be that
+the site "has no mechanism to redirect them (no `_redirects`, no `_headers`, and the document root's
+`.htaccess` is excluded from the deploy rsync, so it is not ours to edit)". That stopped being true
+when the cPanel channel replaced the rsync deploy: **`deploy/cpanel/htaccess/landing.htaccess` is
+versioned in this repo and published as the document root's `.htaccess` with every release** — it is
+where `DirectorySlash`, the real 404 and the `www` → apex 301 live, and it is never edited by hand on
+the host. The URL layout above still stands, but on its own merits. Anything redirect- or
+header-shaped now belongs in that file, under the hard rule documented in
+`deploy/cpanel/README.md`: **it may not force HTTPS on the same host** (the Cloudflare zone is
+`flexible`, so that loops); changing the host is fine, and `deploy/cpanel/assemble.sh` fails the
+build on the difference.
 
 **One source of layout, two sources of text.** A page's markup lives once in
 `src/page-content/<Name>.astro`; its copy lives beside it in `src/i18n/messages/pages/<slug>.ts`

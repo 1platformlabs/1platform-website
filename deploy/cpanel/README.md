@@ -129,15 +129,63 @@ release, so a rollback restores behaviour and content together. It carries:
 
 - `DirectorySlash On` — the 301 `/pricing` → `/pricing/` that Astro's
   `trailingSlash: 'always'` and every canonical URL depend on.
+- The **301 `www` → apex**, added 2026-07-29. Until then both hostnames answered
+  **200 with identical bodies** (63,119 bytes, same `<title>`) off this same
+  docroot, so every page was published twice and nothing canonicalised at the
+  HTTP layer, while the site's canonical URLs, sitemap and `hreflang` all name
+  the apex.
 - A **real 404** via `ErrorDocument 404 /404.html`. There is deliberately **no**
   SPA-style fallback here: a fallback turns every dead URL into a soft 200.
 - `Options -Indexes` — the old origin exposed a navigable directory listing.
 - Immutable caching for `/_astro/` (content-hashed) and a modest, revalidated
   TTL for un-fingerprinted files in `public/`.
 
-> **Hard rule: nothing may force HTTPS.** The Cloudflare zone is in `flexible`
-> mode, so the edge speaks plain HTTP to this origin. An https redirect here is
-> an infinite loop, not hardening. `assemble.sh` fails the build if one appears.
+### The hard rule, and the distinction it turns on
+
+> **Nothing may force HTTPS on the *same host*.** The Cloudflare zone is in
+> `flexible` mode, so the edge speaks plain HTTP to this origin. A same-host
+> https redirect never terminates: the browser returns to the edge over HTTPS,
+> the edge still speaks HTTP to us, the request is indistinguishable from the
+> first, and the same rule fires again.
+
+**A redirect that changes the host is not the same thing and is allowed.** The
+second request carries a different `Host`, so it no longer matches the condition
+that produced it — it gets served. That is measured, not argued: the identical
+`www` → apex rule is already live on this hosting (bowerfans.com PROD and both
+docroots of the QA account), where the `www` names answer 301 and the apex names
+they point at still answer 200 with their own content.
+
+There is also nothing left for this file to harden. Cloudflare's **Always Use
+HTTPS** already does the scheme upgrade at the edge — measured 2026-07-29,
+`http://1platform.pro/` answers `301 → https://1platform.pro/` from
+`server: cloudflare`, before any request reaches this origin.
+
+`assemble.sh` enforces exactly that distinction. Its first version grepped for
+`https://` anywhere in a `RewriteRule` or `Redirect`, which is blind — it cannot
+tell a scheme force from a host canonicalisation, and it fired on this contract's
+own `www` rule. It now checks three things, each failing **closed**:
+
+| # | Rule | Why |
+|---|---|---|
+| A | an `https://` redirect target may take its host only from a `%1`…`%9` backreference | the one construct that provably yields a host *different* from the request's. `%{HTTP_HOST}`, `%{SERVER_NAME}` and any literal host are rejected — and `Redirect` cannot transform a host at all, so every `Redirect … https://` is same-host by construction |
+| B | such a target requires a match on `%{HTTP_HOST}` | that is what makes "`%1` is a hostname" true instead of a fragment captured from some other variable |
+| C | no `RewriteCond` may branch on the client scheme (`%{HTTPS}`, `%{SERVER_PORT}`, `X-Forwarded-Proto`) | at this origin that premise is always false, so the rule is wrong here whatever it does next — and it closes the one hole A leaves: a scheme force whose target captures the whole host |
+
+The guard proves only that no redirect can **loop** against this origin. It does
+not claim they are correct. Lines whose first non-blank character is `#` are
+stripped first, so the contract can quote a forbidden pattern in prose without
+tripping the guard that forbids it.
+
+### Verifying the canonical host after a deploy
+
+`www` must answer 301 and the apex must keep answering 200 — check both, because
+a rule that redirected *everything* would also make the first assertion pass:
+
+```bash
+curl -sSI https://www.1platform.pro/pricing/ | grep -iE '^(HTTP/|location:)'
+# HTTP/2 301 · location: https://1platform.pro/pricing/
+curl -sS -o /dev/null -w '%{http_code}\n' https://1platform.pro/pricing/   # 200
+```
 
 ## Rollback
 
