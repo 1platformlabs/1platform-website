@@ -59,12 +59,99 @@ mkdir -p "$OUT/public"
 cp -R "${SRC}/." "${OUT}/public/"
 cp "$HTACCESS" "${OUT}/public/.htaccess"
 
-# The Cloudflare zone for 1platform.pro is in `flexible` mode, which means the
-# edge speaks plain HTTP to this origin. An https redirect in .htaccess would
-# therefore bounce every request forever. Catch it here, in CI, rather than
-# discovering it as a production redirect loop.
-if grep -qiE 'RewriteRule[^#]*https://|Redirect[[:space:]]+(301|permanent)[^#]*https://' "${OUT}/public/.htaccess"; then
-  die ".htaccess appears to force HTTPS — that is an infinite loop under Cloudflare 'flexible'"
+# ── The https-loop guard ─────────────────────────────────────────────────────
+#
+# WHY it exists: the Cloudflare zone for 1platform.pro is in `flexible` mode, so
+# the edge speaks plain HTTP to this origin and this origin can never observe a
+# client that "already has HTTPS". A redirect to https:// on the SAME host
+# therefore never terminates — the browser returns to the edge over HTTPS, the
+# edge speaks HTTP to us again, the request is indistinguishable from the first,
+# and the same rule fires. Catch that in CI, not as a production redirect loop.
+#
+# WHY the check is shaped the way it is: the first version of this guard grepped
+# for `https://` anywhere in a RewriteRule or Redirect. That is blind — it cannot
+# tell a SCHEME force (a loop) from a HOST canonicalisation (not a loop), and it
+# fired on the contract's own www → apex 301. A host-changing redirect cannot
+# loop: the second request arrives with a different Host, so it no longer
+# satisfies `RewriteCond %{HTTP_HOST} ^www\.` and is served. That is measured,
+# not reasoned — the identical rule is live on this same hosting (bowerfans.com
+# PROD and both QA docroots), where www answers 301 and the apex it points at
+# still answers 200.
+#
+# So the guard now enforces the invariant the prose always meant. Three parts,
+# each failing CLOSED — anything not provably host-changing is rejected:
+#
+#   (A) An https:// redirect target may take its host ONLY from a backreference
+#       (%1..%9). That is the one construct that provably yields a host
+#       different from the one the request carried. Rejected:
+#         https://%{HTTP_HOST}…    echoes the request host          → loop
+#         https://%{SERVER_NAME}…  same                             → loop
+#         Redirect 301 / https://1platform.pro/   same host, and `Redirect`
+#           cannot transform a host at all, so every `Redirect … https://`
+#           is a same-host redirect by construction                 → loop
+#
+#   (B) If such a backreference target exists, it must be THE ONE REVIEWED
+#       host-shrinking rule, matched literally — condition and rule both.
+#
+#       Merely matching on %{HTTP_HOST} somewhere is NOT enough, and an earlier
+#       version of this guard that only required that was weaker than the blunt
+#       guard it replaced. Counter-example it let through:
+#         RewriteCond %{HTTP_HOST} ^(.+)$ [NC]
+#         RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+#       `^(.+)$` captures the WHOLE host, so %1 echoes it back and this is a
+#       same-host scheme force — a real loop here — yet it satisfies (A) (the
+#       target is a %N), satisfies "matches on %{HTTP_HOST}", and never branches
+#       on the scheme so (C) misses it too.
+#
+#       What actually makes the redirect safe is that the condition anchors on a
+#       LITERAL prefix the capture excludes: `^www\.(.+)$` can only ever yield a
+#       host strictly shorter than the request's, hence a different one. Proving
+#       that property for an arbitrary pattern is not something grep can do, so
+#       this is an allowlist of the reviewed pair instead of a classifier.
+#       Widening it is a deliberate review step, not a formatting accident.
+#
+#   (C) No RewriteCond may branch on the client's scheme (%{HTTPS},
+#       %{SERVER_PORT}, X-Forwarded-Proto). At this origin that premise is
+#       always false, so such a rule is wrong here whatever it does next. This
+#       closes the one hole (A) leaves: a same-host scheme force whose target
+#       happens to capture the whole host into %1.
+#
+# What the guard does NOT claim: that the redirects are correct, or that they
+# point anywhere useful. Only that none of them can loop against this origin.
+HT="${OUT}/public/.htaccess"
+
+# Apache treats a line as a comment only when its first non-blank character is
+# `#`. Dropping exactly those lines is what lets the contract explain a
+# forbidden pattern, in prose, without tripping the guard that forbids it.
+htaccess_directives="$(grep -vE '^[[:space:]]*#' "$HT" || true)"
+
+# (A) an https:// target whose host is not a %1..%9 backreference
+if printf '%s\n' "$htaccess_directives" | grep -qiE \
+  '^[[:space:]]*(RewriteRule|Redirect|RedirectMatch|RedirectPermanent|RedirectTemp)[[:space:]].*https://([^%]|%\{|%[^1-9])'; then
+  die ".htaccess redirects to https:// without changing the host — infinite loop under Cloudflare 'flexible'. Only a host-changing redirect is allowed, and its target host must come from a %1..%9 backreference."
+fi
+
+# (B) a %N target is allowed only as the one reviewed, provably host-shrinking
+#     rule. Whitespace is squeezed first so indentation/alignment is not part of
+#     the contract, but the directives themselves must match literally.
+if printf '%s\n' "$htaccess_directives" | grep -qiE 'https://%[1-9]'; then
+  htaccess_norm="$(printf '%s\n' "$htaccess_directives" \
+    | tr -s '[:blank:]' ' ' | sed -E 's/^ //; s/ $//')"
+
+  printf '%s\n' "$htaccess_norm" \
+    | grep -qxF 'RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]' \
+    || die ".htaccess redirects to https://%N but has no 'RewriteCond %{HTTP_HOST} ^www\\.(.+)\$ [NC]' — only that condition proves the target host differs from the request host. A pattern that can capture the whole host (e.g. ^(.+)\$) is a same-host scheme force, i.e. an infinite loop under Cloudflare 'flexible'."
+
+  if printf '%s\n' "$htaccess_norm" | grep -iE 'https://%[1-9]' \
+    | grep -qvxF 'RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]'; then
+    die ".htaccess has an https://%N redirect that is not the reviewed canonical-host rule ('RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]'). Add it to this allowlist only after checking it cannot loop against this origin."
+  fi
+fi
+
+# (C) nothing may branch on the client scheme; here it is always plain HTTP
+if printf '%s\n' "$htaccess_directives" | grep -qiE \
+  '^[[:space:]]*RewriteCond[[:space:]].*(%\{HTTPS\}|%\{SERVER_PORT\}|X-Forwarded-Proto)'; then
+  die ".htaccess branches on the client scheme (HTTPS / SERVER_PORT / X-Forwarded-Proto) — behind Cloudflare 'flexible' this origin always sees plain HTTP, so that condition cannot be evaluated here"
 fi
 
 # Manifest over the served tree. Paths are relative to public/ and the list is
