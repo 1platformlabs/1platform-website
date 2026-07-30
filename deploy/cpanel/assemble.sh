@@ -90,9 +90,25 @@ cp "$HTACCESS" "${OUT}/public/.htaccess"
 #           cannot transform a host at all, so every `Redirect … https://`
 #           is a same-host redirect by construction                 → loop
 #
-#   (B) If such a backreference target exists, the file must also match on
-#       %{HTTP_HOST} somewhere. That is what makes "%1 is a hostname" true
-#       instead of a fragment captured from some unrelated variable.
+#   (B) If such a backreference target exists, it must be THE ONE REVIEWED
+#       host-shrinking rule, matched literally — condition and rule both.
+#
+#       Merely matching on %{HTTP_HOST} somewhere is NOT enough, and an earlier
+#       version of this guard that only required that was weaker than the blunt
+#       guard it replaced. Counter-example it let through:
+#         RewriteCond %{HTTP_HOST} ^(.+)$ [NC]
+#         RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+#       `^(.+)$` captures the WHOLE host, so %1 echoes it back and this is a
+#       same-host scheme force — a real loop here — yet it satisfies (A) (the
+#       target is a %N), satisfies "matches on %{HTTP_HOST}", and never branches
+#       on the scheme so (C) misses it too.
+#
+#       What actually makes the redirect safe is that the condition anchors on a
+#       LITERAL prefix the capture excludes: `^www\.(.+)$` can only ever yield a
+#       host strictly shorter than the request's, hence a different one. Proving
+#       that property for an arbitrary pattern is not something grep can do, so
+#       this is an allowlist of the reviewed pair instead of a classifier.
+#       Widening it is a deliberate review step, not a formatting accident.
 #
 #   (C) No RewriteCond may branch on the client's scheme (%{HTTPS},
 #       %{SERVER_PORT}, X-Forwarded-Proto). At this origin that premise is
@@ -115,10 +131,21 @@ if printf '%s\n' "$htaccess_directives" | grep -qiE \
   die ".htaccess redirects to https:// without changing the host — infinite loop under Cloudflare 'flexible'. Only a host-changing redirect is allowed, and its target host must come from a %1..%9 backreference."
 fi
 
-# (B) a %N host is only meaningful if %N was captured from the host
+# (B) a %N target is allowed only as the one reviewed, provably host-shrinking
+#     rule. Whitespace is squeezed first so indentation/alignment is not part of
+#     the contract, but the directives themselves must match literally.
 if printf '%s\n' "$htaccess_directives" | grep -qiE 'https://%[1-9]'; then
-  printf '%s\n' "$htaccess_directives" | grep -qiE '^[[:space:]]*RewriteCond[[:space:]]+%\{HTTP_HOST\}' \
-    || die ".htaccess redirects to https://%N but never matches on %{HTTP_HOST} — %N is not provably a hostname, so the redirect is not provably host-changing"
+  htaccess_norm="$(printf '%s\n' "$htaccess_directives" \
+    | tr -s '[:blank:]' ' ' | sed -E 's/^ //; s/ $//')"
+
+  printf '%s\n' "$htaccess_norm" \
+    | grep -qxF 'RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]' \
+    || die ".htaccess redirects to https://%N but has no 'RewriteCond %{HTTP_HOST} ^www\\.(.+)\$ [NC]' — only that condition proves the target host differs from the request host. A pattern that can capture the whole host (e.g. ^(.+)\$) is a same-host scheme force, i.e. an infinite loop under Cloudflare 'flexible'."
+
+  if printf '%s\n' "$htaccess_norm" | grep -iE 'https://%[1-9]' \
+    | grep -qvxF 'RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]'; then
+    die ".htaccess has an https://%N redirect that is not the reviewed canonical-host rule ('RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]'). Add it to this allowlist only after checking it cannot loop against this origin."
+  fi
 fi
 
 # (C) nothing may branch on the client scheme; here it is always plain HTTP
