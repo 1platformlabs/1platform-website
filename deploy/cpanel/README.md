@@ -81,20 +81,23 @@ curl -s https://1platform.pro/ | shasum -a 256     # after the cutover
 
 ## Which job proves what
 
-Both channels stay alive until PCM-12, and each one verifies **itself**:
+Since PCM-12 there is one channel, and it verifies **itself**:
 
 | Job | Deploys to | Health check target |
 |---|---|---|
-| `deploy` (rsync) | the legacy origin | the **legacy origin**, pinned with `LEGACY_ORIGIN_IP` (TLS verification intact) once DNS has moved |
-| `publish-cpanel` | the shared cPanel account | the **public URL**, by fingerprint + LiteSpeed, once this host has been cut over |
+| `publish-cpanel` | the cPanel account | the **public URL**, by fingerprint + LiteSpeed |
 
-Before this split the rsync job health-checked the public URL — which, after the
-cutover, is served by the *other* channel. That gate would have gone green on a
-failed legacy deploy and red on a good one whose cron had not yet run.
+There used to be a second job, `deploy`, that rsynced to the legacy origin and
+health-checked it through `LEGACY_ORIGIN_IP`. Both are gone, and so is that
+variable: the box (`65.109.101.46`) stopped answering on 2026-08-02 — no ICMP,
+no port at all. Because the cPanel publish was gated on that job, a dead
+rollback target was blocking every deploy of a live one.
 
-The legacy origin is not vestigial while it lives: the F4 rollback is a DNS
-change, and it only helps if the old docroot still holds **today's** build. That
-is why the rsync job is removed in PCM-12 and not before.
+Its `--exclude` list and its protected-path guard went with it, deliberately. On
+the legacy box they protected real neighbours, the four docroots sharing one
+`public_html`. Against the cPanel destination those paths do not exist, so the
+guard would walk a list, match nothing, and report green forever — a gate that
+looks like protection and is not.
 
 ## Verifying a deploy without fooling yourself
 
