@@ -643,306 +643,11 @@ jobs:
         run: rm -f release_notes.txt final_release_notes.txt 1platform-website.zip || true
 
 # ─────────────────────────────────────────────────────────────────────────────
-# JOB 4: Deploy — rsync selective to shared public_html on Hetzner
-# ─────────────────────────────────────────────────────────────────────────────
-
-  deploy:
-    name: Deploy to Hetzner
-    needs: [build, version_bump, release]
-    if: needs.release.result == 'success'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: PROD
-    permissions:
-      contents: read
-
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          name: astro-build-${{ github.run_id }}
-          path: dist/
-
-      - name: Verify build checksum
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ ! -f "dist/BUILD_CHECKSUMS.txt" ]; then
-            echo "::error::BUILD_CHECKSUMS.txt not found in artifact"
-            exit 1
-          fi
-
-          find dist/ -type f ! -name "BUILD_CHECKSUMS.txt" -exec sha256sum {} \; | sort > verify-checksums.txt
-          grep -v "BUILD_CHECKSUMS.txt" dist/BUILD_CHECKSUMS.txt | sort > original-checksums.txt
-
-          if ! diff original-checksums.txt verify-checksums.txt; then
-            echo "::error::Build artifact checksum mismatch — possible tampering"
-            exit 1
-          fi
-
-          echo "Artifact integrity verified"
-          rm -f dist/BUILD_CHECKSUMS.txt verify-checksums.txt original-checksums.txt
-
-      - name: Setup SSH agent
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.HETZNER_SSH_KEY }}
-          SSH_HOST: ${{ secrets.HETZNER_HOST }}
-          SSH_PORT: ${{ secrets.HETZNER_PORT }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          eval "$(ssh-agent -s)"
-          echo "$SSH_PRIVATE_KEY" | ssh-add -
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
-          mkdir -p ~/.ssh
-          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-
-      - name: Create rsync exclude file
-        shell: bash
-        run: |
-          cat > /tmp/rsync-excludes.txt << 'EOF'
-          developer.1platform.pro/
-          app.1platform.pro/
-          app-qa.1platform.pro/
-          .well-known/
-          .htaccess
-          .cpanel/
-          .htpasswds/
-          .koality/
-          .spamassassin/
-          .subaccounts/
-          EOF
-
-      - name: Backup website files on server
-        env:
-          DEPLOY_PATH: ${{ secrets.HETZNER_DEPLOY_PATH }}
-          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
-          HETZNER_USER: ${{ secrets.HETZNER_USER }}
-          HETZNER_PORT: ${{ secrets.HETZNER_PORT }}
-          VERSION: ${{ needs.version_bump.outputs.new_version }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          BACKUP_DIR="${DEPLOY_PATH}/../_website_backups/pre-v${VERSION}"
-          SSH_OPTS="-p ${HETZNER_PORT} -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
-
-          ssh $SSH_OPTS "${HETZNER_USER}@${HETZNER_HOST}" << REMOTE_SCRIPT
-            set -euo pipefail
-
-            AVAIL_KB=\$(df -k "${DEPLOY_PATH}" | tail -1 | awk '{print \$4}')
-            if [ "\$AVAIL_KB" -lt 512000 ]; then
-              echo "::error::Insufficient disk space for backup (\${AVAIL_KB}KB available, need 512000KB)"
-              exit 1
-            fi
-
-            mkdir -p "${BACKUP_DIR}"
-
-            rsync -a \
-              --exclude='developer.1platform.pro/' \
-              --exclude='app.1platform.pro/' \
-              --exclude='app-qa.1platform.pro/' \
-              --exclude='.well-known/' \
-              --exclude='.htaccess' \
-              --exclude='.cpanel/' \
-              --exclude='.htpasswds/' \
-              --exclude='.koality/' \
-              --exclude='.spamassassin/' \
-              --exclude='.subaccounts/' \
-              "${DEPLOY_PATH}/" "${BACKUP_DIR}/"
-
-            echo "Backup created at ${BACKUP_DIR}"
-          REMOTE_SCRIPT
-
-      - name: Dry-run rsync (safety validation)
-        env:
-          DEPLOY_PATH: ${{ secrets.HETZNER_DEPLOY_PATH }}
-          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
-          HETZNER_USER: ${{ secrets.HETZNER_USER }}
-          HETZNER_PORT: ${{ secrets.HETZNER_PORT }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          SSH_OPTS="-p ${HETZNER_PORT} -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
-
-          DRY_OUTPUT=$(rsync -avz --delete --dry-run \
-            --exclude-from=/tmp/rsync-excludes.txt \
-            --chown=platform:platform \
-            -e "ssh $SSH_OPTS" \
-            dist/ \
-            "${HETZNER_USER}@${HETZNER_HOST}:${DEPLOY_PATH}/" 2>&1)
-
-          PROTECTED_PATTERNS="developer.1platform.pro app.1platform.pro app-qa.1platform.pro .well-known .htaccess .cpanel .htpasswds"
-          for pattern in $PROTECTED_PATTERNS; do
-            if echo "$DRY_OUTPUT" | grep -i "deleting.*${pattern}"; then
-              echo "::error::ABORT — rsync dry-run would delete protected path: ${pattern}"
-              exit 1
-            fi
-          done
-
-          echo "Dry-run passed — no protected paths affected"
-
-      - name: Deploy via rsync selective
-        env:
-          DEPLOY_PATH: ${{ secrets.HETZNER_DEPLOY_PATH }}
-          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
-          HETZNER_USER: ${{ secrets.HETZNER_USER }}
-          HETZNER_PORT: ${{ secrets.HETZNER_PORT }}
-          VERSION: ${{ needs.version_bump.outputs.new_version }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          SSH_OPTS="-p ${HETZNER_PORT} -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
-
-          rsync -avz --delete \
-            --exclude-from=/tmp/rsync-excludes.txt \
-            --chown=platform:platform \
-            -e "ssh $SSH_OPTS" \
-            dist/ \
-            "${HETZNER_USER}@${HETZNER_HOST}:${DEPLOY_PATH}/"
-
-          echo "Deploy of v${VERSION} completed — protected dirs untouched"
-
-      - name: Health check
-        env:
-          # Este job alimenta el origen LEGACY. Después del cutover de PCM-11 la
-          # URL pública ya no resuelve ahí, así que chequearla acá haría que el
-          # veredicto de este job dependa del OTRO canal. Con LEGACY_ORIGIN_IP
-          # seteada, el chequeo queda clavado a lo que este job acaba de escribir.
-          #
-          # El origen viejo tiene que seguir ACTUALIZADO hasta PCM-12: el rollback
-          # de F4 es un cambio de DNS, y sólo sirve si el destino tiene el build
-          # de hoy.
-          LEGACY_ORIGIN_IP: ${{ vars.LEGACY_ORIGIN_IP }}
-          EXPECT_ORIGIN_LITESPEED: ${{ vars.EXPECT_ORIGIN_LITESPEED }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          # A status code is not evidence of anything in this topology. Both
-          # possible origins answer 200 to a Host they do not recognise:
-          #   shared cPanel 66.29.146.21   → 200 ·   163 bytes (default page)
-          #   front door   185.125.168.236 → 200 · 116 KB      (default_server)
-          # So the assertion is on the BODY, and the body markers have to be
-          # things only this site emits.
-          assert_ours() {   # $1 = file holding the response body
-            grep -qF '1Platform' "$1" && grep -qE '<title>[^<]+</title>' "$1"
-          }
-
-          # Chain of control. If the assertion accepts a body that plainly is not
-          # our site, then a green result below proves nothing — the instrument
-          # is broken, not the deploy. Fail here rather than shipping the lie.
-          printf '%s' '<html><body>unrelated default vhost</body></html>' > /tmp/health-control.html
-          if assert_ours /tmp/health-control.html; then
-            echo "::error::health self-test FAILED — the assertion accepts a control body. Fix the instrument before trusting any green run."
-            exit 1
-          fi
-
-          HOST=1platform.pro
-          URL="https://${HOST}/"
-          RESOLVE=()
-          if [[ -n "${LEGACY_ORIGIN_IP:-}" ]]; then
-            # Clavado al origen que este job acaba de escribir, con verificación
-            # de certificado completa: si el origen legacy no presenta un cert
-            # válido para este host, el chequeo falla — y eso es información, no
-            # ruido: significa que el destino del rollback no es verificable.
-            RESOLVE=(--resolve "${HOST}:443:${LEGACY_ORIGIN_IP}")
-            echo "verificando el origen legacy ${LEGACY_ORIGIN_IP}, que es lo que este job acaba de desplegar"
-          elif [[ "${EXPECT_ORIGIN_LITESPEED:-false}" == "true" ]]; then
-            # El host ya cortó y no hay una IP legacy verificable configurada.
-            # Chequear la URL pública acá mediría el OTRO canal. Declararlo es
-            # honesto; simularlo sería un gate mentiroso.
-            echo "::warning::1platform.pro ya sirve desde cPanel y no hay LEGACY_ORIGIN_IP verificable. El deploy legacy queda SIN verificar por HTTP — lo sostienen el exit code del rsync y el checksum del artefacto."
-            exit 0
-          fi
-
-          echo "Waiting for site to be ready..."
-          for i in $(seq 1 10); do
-            # Use a here-string / file rather than `echo … | grep -q`: grep -q
-            # exits on first match and closes the pipe before echo finishes
-            # writing, producing SIGPIPE that `set -euo pipefail` propagates as a
-            # non-zero exit. Symptom: every retry reports HTTP 200 but the
-            # if-clause never evaluates true. Seen in run 26198698104.
-            HTTP_CODE=$(curl -sSL "${RESOLVE[@]}" -o /tmp/health-body.html -D /tmp/health-headers.txt \
-              -w "%{http_code}" --max-time 10 "${URL}" 2>/dev/null || echo "000")
-
-            if [ "$HTTP_CODE" = "200" ] && assert_ours /tmp/health-body.html; then
-              echo "Health check passed (attempt ${i}): HTTP 200, content verified"
-              exit 0
-            fi
-            echo "Attempt ${i}/10: HTTP ${HTTP_CODE}, retrying in 5s..."
-            sleep 5
-          done
-          echo "::error::Health check failed after 10 attempts"
-          exit 1
-
-      - name: Rollback on health check failure
-        if: failure()
-        env:
-          DEPLOY_PATH: ${{ secrets.HETZNER_DEPLOY_PATH }}
-          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
-          HETZNER_USER: ${{ secrets.HETZNER_USER }}
-          HETZNER_PORT: ${{ secrets.HETZNER_PORT }}
-          VERSION: ${{ needs.version_bump.outputs.new_version }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          BACKUP_DIR="${DEPLOY_PATH}/../_website_backups/pre-v${VERSION}"
-          SSH_OPTS="-p ${HETZNER_PORT} -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
-
-          ssh $SSH_OPTS "${HETZNER_USER}@${HETZNER_HOST}" << REMOTE_SCRIPT
-            set -euo pipefail
-
-            if [ ! -d "${BACKUP_DIR}" ]; then
-              echo "No backup available at ${BACKUP_DIR} for rollback"
-              exit 1
-            fi
-
-            rsync -av --delete \
-              --exclude='developer.1platform.pro/' \
-              --exclude='app.1platform.pro/' \
-              --exclude='app-qa.1platform.pro/' \
-              --exclude='.well-known/' \
-              --exclude='.htaccess' \
-              --exclude='.cpanel/' \
-              --exclude='.htpasswds/' \
-              --exclude='.koality/' \
-              --exclude='.spamassassin/' \
-              --exclude='.subaccounts/' \
-              "${BACKUP_DIR}/" "${DEPLOY_PATH}/"
-
-            echo "Rollback to pre-v${VERSION} completed"
-          REMOTE_SCRIPT
-
-          echo "::warning::Deploy rolled back due to health check failure"
-
-      - name: Cleanup backup after successful health check
-        if: success()
-        env:
-          DEPLOY_PATH: ${{ secrets.HETZNER_DEPLOY_PATH }}
-          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
-          HETZNER_USER: ${{ secrets.HETZNER_USER }}
-          HETZNER_PORT: ${{ secrets.HETZNER_PORT }}
-        shell: bash
-        run: |
-          SSH_OPTS="-p ${HETZNER_PORT} -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=3"
-          ssh $SSH_OPTS "${HETZNER_USER}@${HETZNER_HOST}" \
-            "BACKUP_BASE='${DEPLOY_PATH}/../_website_backups' && \
-             ls -1dt \"\$BACKUP_BASE\"/pre-v* 2>/dev/null | tail -n +4 | xargs rm -rf || true"
-
-      - name: Cleanup SSH agent and exclude file
-        if: always()
-        shell: bash
-        run: |
-          ssh-agent -k 2>/dev/null || true
-          rm -f /tmp/rsync-excludes.txt || true
-
-# ─────────────────────────────────────────────────────────────────────────────
-# JOB 4b: Publish cPanel bundle — ADDITIVE second channel
+# JOB 4: Publish cPanel bundle — EL canal de deploy
 #
-# Runs AFTER the rsync deploy and never in place of it. Until the DNS cutover,
-# 65.109.101.46 is still what serves 1platform.pro, so a failure here reddens
-# this job alone and cannot take production down.
+# Desde PCM-12 éste es el único canal: el origen viejo (65.109.101.46) dejó de
+# servir 1platform.pro en el cutover de PCM-11 y ya no recibe builds, así que un
+# fallo acá es un fallo de deploy, no de un canal secundario.
 #
 # Why a zip over FTPS instead of rsync: the shared cPanel account has no SSH
 # (port 21098 is open but authorises no key) and the only shell it gets is the
@@ -951,8 +656,8 @@ jobs:
 
   publish-cpanel:
     name: Publish cPanel bundle
-    needs: [build, version_bump, release, deploy]
-    if: needs.deploy.result == 'success'
+    needs: [build, version_bump, release]
+    if: needs.release.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: PROD
@@ -969,10 +674,9 @@ jobs:
           name: astro-build-${{ github.run_id }}
           path: dist/
 
-      # Same artifact, same integrity check, same file removed as the rsync job —
-      # so the tree this channel publishes is byte-for-byte the tree the old
-      # channel deploys. If the two ever diverge, the cutover would silently
-      # change what users get.
+      # El artefacto se verifica antes de empaquetarlo: lo que se publica es
+      # byte por byte lo que produjo el job de build, y no algo que se tocó en
+      # el camino.
       - name: Verify build checksum
         shell: bash
         run: |
@@ -1269,7 +973,7 @@ jobs:
 
   notify:
     name: Slack Notification
-    needs: [build, version_bump, release, deploy, lighthouse]
+    needs: [build, version_bump, release, publish-cpanel, lighthouse]
     if: always() && needs.build.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -1404,8 +1108,10 @@ jobs:
               -d @slack_payload.json "${SLACK_WEBHOOK}"
           fi
 
+      # `publish-cpanel` lleva guión, así que en una expresión hay que
+      # indexarlo: `needs.publish-cpanel` se parsea como una resta.
       - name: Notify Slack — Deploy failed
-        if: needs.deploy.result == 'failure'
+        if: needs['publish-cpanel'].result == 'failure'
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_ALERTS }}
           COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
@@ -1485,7 +1191,7 @@ jobs:
           fi
 
       - name: Notify Slack — Release & deploy success
-        if: needs.release.result == 'success' && needs.deploy.result == 'success'
+        if: needs.release.result == 'success' && needs['publish-cpanel'].result == 'success'
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_DEPLOYS }}
           COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
