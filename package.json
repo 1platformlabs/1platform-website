@@ -17,7 +17,8 @@
     "test:ui": "playwright test --ui",
     "check": "./scripts/check-tells.sh && ./scripts/check-tells-self-test.sh",
     "typecheck": "astro check",
-    "test:deploy": "bash deploy/cpanel/activate-graft.test.sh"
+    "test:deploy": "bash deploy/cpanel/activate-graft.test.sh",
+    "test:deploy:activator": "bash deploy/cpanel/publish-activator.test.sh"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.15",
