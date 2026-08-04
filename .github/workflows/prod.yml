@@ -219,10 +219,6 @@ jobs:
             echo "trivial=false" >> "$GITHUB_OUTPUT"
           fi
 
-          # The bump level is read from the merge commit message. It goes to
-          # RUNNER_TEMP on purpose: `Validate version bump diff` below fails the
-          # job if anything other than package.json shows up in the work tree.
-          git log -1 --pretty=%B > "${RUNNER_TEMP}/bump_metadata.txt"
 
       - name: Compute version bump
         id: bump
@@ -242,11 +238,20 @@ jobs:
             # Conventional-commit markers only, so the level is reproducible from
             # the repository alone. Anything unmarked is a patch — the same
             # default the pipeline has always fallen back to.
-            META_FILE="${RUNNER_TEMP}/bump_metadata.txt"
-            if grep -qE 'BREAKING[ -]CHANGE' "$META_FILE" \
-              || grep -qE '^[[:space:]]*[a-z]+(\([^)]*\))?!:' "$META_FILE"; then
+            # El SUBJECT lleva la clasificación del autor (este repo mergea
+            # por squash); el trailer de ruptura vive en el CUERPO y va anclado
+            # a inicio de línea CON dos puntos, como manda Conventional
+            # Commits. Buscar la frase suelta en todo el mensaje es el defecto
+            # que hizo que `1platform-api-developer` publicara un `major` por
+            # DOCUMENTAR esta misma regla en el cuerpo de un PR (2026-08-04).
+            SUBJECT="$(git log -1 --pretty=%s)"
+            BODY_FILE="${RUNNER_TEMP}/bump_body.txt"
+            git log -1 --pretty=%b > "$BODY_FILE"
+
+            if printf '%s\n' "$SUBJECT" | grep -qE '^[a-z][a-z0-9]*(\([^)]*\))?!:' \
+              || grep -qE '^[[:space:]]*BREAKING[ -]CHANGE:' "$BODY_FILE"; then
               BUMP_TYPE="major"
-            elif grep -qE '^[[:space:]]*feat(\([^)]*\))?:' "$META_FILE"; then
+            elif printf '%s\n' "$SUBJECT" | grep -qE '^feat(\([^)]*\))?:'; then
               BUMP_TYPE="minor"
             else
               BUMP_TYPE="patch"
@@ -369,7 +374,7 @@ jobs:
       - name: Cleanup
         if: always()
         shell: bash
-        run: rm -f "${RUNNER_TEMP}/bump_metadata.txt" || true
+        run: rm -f "${RUNNER_TEMP}/bump_body.txt" || true
 
 # ─────────────────────────────────────────────────────────────────────────────
 # JOB 3: Release — tag, changelog, GitHub Release
