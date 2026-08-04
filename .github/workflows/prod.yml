@@ -699,6 +699,21 @@ jobs:
         shell: bash
         run: sudo apt-get update && sudo apt-get install -y lftp
 
+      - name: Publish the activator (keeps the host's activate.sh in sync)
+        if: steps.ftps.outputs.configured == 'true'
+        env:
+          CPANEL_FTP_HOST: ${{ secrets.CPANEL_FTP_HOST }}
+          CPANEL_FTP_USER: ${{ secrets.CPANEL_FTP_USER }}
+          CPANEL_FTP_PASS: ${{ secrets.CPANEL_FTP_PASS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The guard runs first and is not a formality: it proves the mode check
+          # still rejects the 644 that a bare `put` leaves, before that check is
+          # trusted to decide whether to replace the script this host executes.
+          bash deploy/cpanel/publish-activator.sh --self-test
+          bash deploy/cpanel/publish-activator.sh deploy/cpanel/activate.sh
+
       - name: Upload via FTPS (atomic)
         if: steps.ftps.outputs.configured == 'true'
         env:
