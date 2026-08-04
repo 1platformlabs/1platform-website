@@ -65,6 +65,9 @@ HEALTH_FILE="$ROOT/.health_url"
 MARKER_FILE="$ROOT/.health_marker"
 
 KEEP="${CPANEL_KEEP_RELEASES:-2}"
+# Subtrees whose filenames are content hashes, and are therefore safe to carry
+# forward across a release. See graft_previous_assets.
+GRAFT_DIRS="${CPANEL_GRAFT_DIRS:-assets _astro}"
 HEALTH_RETRIES="${CPANEL_HEALTH_RETRIES:-6}"
 HEALTH_SLEEP="${CPANEL_HEALTH_SLEEP:-5}"
 
@@ -95,6 +98,73 @@ prune() {
     log "pruning old release: $old"
     rm -rf "$old"
   done
+}
+
+# Carry the PREVIOUS release's fingerprinted assets into this one.
+#
+# THE PROBLEM. Every asset under /assets/ is content-hashed, cached `immutable`,
+# and — deliberately — answered with a real 404 when missing rather than the app
+# shell. The docroot swap below is atomic, which means a browser tab that loaded
+# the previous release's entry chunk goes from "all its chunks exist" to "none of
+# them do" between one request and the next. Every route that tab had not visited
+# yet dies with `Failed to fetch dynamically imported module`. Measured in prod on
+# 2026-08-04: a tab six minutes old, on the login route, showed React Router's raw
+# error screen. Nobody's session should end because we shipped.
+#
+# THE FIX. Hardlink forward the assets the previous release declared, for names
+# this release does not already have. Hardlinks, not copies: same inode, so the
+# grace window costs no extra bytes and no extra inode against the account's
+# shared quota. Pruning the old release later drops its directory entry but not
+# the data, because this release still points at it.
+#
+# WHY THE PREVIOUS MANIFEST AND NOT `find`. MANIFEST.sha256 is written by CI, from
+# CI's own dist/, BEFORE any grafting — so it lists exactly one build's files.
+# Reading it is what bounds the window: release N carries its own assets plus one
+# generation, never a chain that grows by one release forever. `find` over the
+# previous public/ would re-carry whatever IT was given and compound each time.
+#
+# WHERE IT SITS. After verify_manifest (which must judge the tree CI produced, not
+# one we added to) and before the swap (so the docroot never points at a tree
+# mid-graft). Both are load-bearing; moving this call breaks one of them.
+#
+# WHICH SUBTREES. Only content-hashed ones: carrying a name that a build can
+# REUSE with different bytes would serve the old file forever. Vite writes
+# assets/, Astro writes _astro/ — naming both is what lets this function stay
+# byte-identical to its twin in 1platform-website (see the header) while each
+# host only ever has one of the two on disk.
+graft_previous_assets() {
+  local prev_public="$1" dest_public="$2"
+  local prev_manifest grafted=0 path dir keep
+  prev_manifest="$(dirname "$prev_public")/MANIFEST.sha256"
+
+  if [ ! -f "$prev_manifest" ]; then
+    # Pre-dates this mechanism, or was hand-placed. Skipping is the safe answer:
+    # without the manifest there is no bound, and an unbounded graft is worse
+    # than a missing grace window.
+    log "graft: no MANIFEST.sha256 for the previous release — skipping (unbounded graft refused)"
+    return 0
+  fi
+
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    path="${line#*  }"
+    keep=0
+    for dir in $GRAFT_DIRS; do
+      case "$path" in "$dir"/*) keep=1; break ;; esac
+    done
+    [ "$keep" = "1" ] || continue
+    # Already in this build (same hash = same bytes), or already grafted.
+    [ -e "$dest_public/$path" ] && continue
+    [ -f "$prev_public/$path" ] || continue
+    mkdir -p "$(dirname "$dest_public/$path")"
+    if ln "$prev_public/$path" "$dest_public/$path" 2>/dev/null \
+      || cp -p "$prev_public/$path" "$dest_public/$path" 2>/dev/null; then
+      grafted=$((grafted + 1))
+    fi
+  done < "$prev_manifest"
+
+  log "graft: carried $grafted asset(s) from $(basename "$(dirname "$prev_public")") into this release"
+  return 0
 }
 
 # Verify every file in the extracted tree against the manifest the build wrote.
@@ -235,6 +305,13 @@ if ! verify_manifest "$DEST"; then
   rm -rf "$DEST"
   exit 0
 fi
+# Asset grace window for tabs still running the previous release. Runs AFTER the
+# manifest check so that check keeps judging CI's tree, and BEFORE the swap so
+# the docroot never publishes a half-grafted release.
+if [ -n "$PREV" ] && [ -d "$PREV" ]; then
+  graft_previous_assets "$PREV" "$DEST/public"
+fi
+
 
 # --- first run only: the document root starts life as a REAL directory ---------
 # cPanel creates it that way when the domain is added, and `mv -T` refuses to

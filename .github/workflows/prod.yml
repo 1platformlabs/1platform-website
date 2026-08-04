@@ -117,6 +117,17 @@ jobs:
           set -euo pipefail
           npm run build
 
+      - name: Deploy channel gate (asset grace window)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # activate.sh is the only thing that decides what a browser is served.
+          # This runs the real script against real bundles, and its two negative
+          # controls are the point: a corrupt bundle must still be rejected, and
+          # an unbounded graft must be refused. Needs GNU mv, which the runner has
+          # and macOS does not.
+          bash deploy/cpanel/activate-graft.test.sh
+
       - name: Validate build output
         if: steps.skip_check.outputs.skip != 'true'
         shell: bash
