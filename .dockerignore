@@ -1,0 +1,14 @@
+# Lo que NO entra al contexto de build. `node_modules` sobre todo: el build usa
+# `npm ci` dentro de la imagen, y copiar el del host haría el contexto de varios
+# cientos de MB y podría meter binarios compilados para otra arquitectura.
+node_modules
+dist
+.git
+.github
+tests
+test-results
+playwright-report
+.env
+.env.*
+*.log
+.DS_Store

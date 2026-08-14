@@ -19,7 +19,11 @@ on:
       - 'README.md'
       - 'CLAUDE.md'
       - 'CHANGELOG.md'
-      - '.github/**'
+      # `.github/**` SALIÓ de esta lista a propósito (épica core-hetzner-cutover,
+      # D-29). Con él acá, arreglar un job de CI no volvía a desplegar: cada
+      # iteración sobre el propio pipeline exigía un `workflow_dispatch` a mano.
+      # El deploy a Hetzner vive en este archivo, así que un cambio en él SÍ
+      # tiene que disparar el pipeline.
 
 permissions: {}
 
@@ -425,8 +429,14 @@ jobs:
 
           TAG="v${VERSION}"
           if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "::warning::Tag ${TAG} already exists — skipping"
-            exit 0
+            # `exit 1`, NO `exit 0` (épica core-hetzner-cutover, D-24). El deploy
+            # de abajo hace `git reset --hard "$TAG"` en el host: si este job
+            # termina VERDE sin haber creado el tag de esta release, el deploy
+            # resetea a un tag viejo y publica la release ANTERIOR con todo el
+            # pipeline en verde. Un tag que ya existe es un estado inconsistente
+            # que hay que mirar, no una condición benigna que se saltea.
+            echo "::error::Tag ${TAG} ya existe — abortando para no desplegar una release vieja"
+            exit 1
           fi
 
           git config user.name  "github-actions[bot]"
@@ -572,11 +582,161 @@ jobs:
         run: rm -f release_notes.txt final_release_notes.txt 1platform-website.zip || true
 
 # ─────────────────────────────────────────────────────────────────────────────
-# JOB 4: Publish cPanel bundle — EL canal de deploy
+# JOB 4: Deploy al dedicado de Hetzner — EL canal de deploy desde 2026-08-14
 #
-# Desde PCM-12 éste es el único canal: el origen viejo (65.109.101.46) dejó de
-# servir 1platform.pro en el cutover de PCM-11 y ya no recibe builds, así que un
-# fallo acá es un fallo de deploy, no de un canal secundario.
+# Épica `core-hetzner-cutover`. El hosting compartido de cPanel se cayó dos veces
+# (el box 65 en agosto, y el apagón del 13-ago que se llevó 8 hosts >12 h), así
+# que 1platform.pro vuelve a infraestructura propia: un contenedor nginx en el
+# dedicado 144.76.163.230, servido al público por el front door 185.125.168.236.
+#
+# El job se llama `deploy_hetzner` y no `deploy` a propósito: los repos hermanos
+# de esta épica ya tienen un job con la clave `deploy` (el de cPanel) y dos jobs
+# con la misma clave es YAML inválido — el workflow no arranca. El nombre se
+# mantiene igual en los 4 repos para que el patrón sea reconocible.
+# ─────────────────────────────────────────────────────────────────────────────
+
+  deploy_hetzner:
+    name: Deploy al dedicado (PROD)
+    needs: [build, version_bump, release]
+    if: needs.release.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # El environment es el de ESTE repo (`PROD`), no el del molde (`prod`). Los
+    # secrets son environment-scoped: declarar el nombre equivocado instancia un
+    # environment vacío y TODO resuelve a cadena vacía sin error de sintaxis —
+    # `actionlint` en verde y el deploy fallando en runtime por credenciales
+    # vacías.
+    environment: PROD
+    # Acotado y explícito: este workflow declara `contents: write` a nivel de
+    # `release` porque ese job pushea el tag. El deploy sólo LEE (clone, fetch,
+    # reset --hard al tag), así que se le baja el permiso acá.
+    permissions:
+      contents: read
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          # El token de la corrida, con alcance a ESTE repo y a ESTA corrida:
+          # más acotado que cualquier PAT de organización. Es lo que ya hace
+          # `1platform-atlas-dashboard/.github/workflows/prod.yml:52`.
+          DEPLOY_GH_TOKEN: ${{ github.token }}
+          # `v` + la versión: este repo expone `new_version` SIN la `v` y crea el
+          # tag en el job `release`. El molde exponía `version` ya con `v` —
+          # clonarlo literal daría `git reset --hard ""`.
+          VERSION: v${{ needs.version_bump.outputs.new_version }}
+        with:
+          host: ${{ secrets.HETZNER_SSH_HOST }}
+          username: ${{ secrets.HETZNER_SSH_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: ${{ vars.HETZNER_SSH_PORT }}
+          envs: DEPLOY_GH_TOKEN,VERSION
+          script: |
+            set -euo pipefail
+            APP_DIR="/home/apps/1platform-website"
+            CLEAN_URL="https://github.com/1platformlabs/1platform-website.git"
+
+            # `git remote set-url` PERSISTE la credencial en `.git/config`, con
+            # modo 644, en un host compartido. El scrub corre también si el
+            # deploy aborta por `set -e`. El git del host es viejo: no soporta
+            # `-C`, sí `--git-dir=`. Se instala ANTES del `set-url`.
+            scrub_credencial() {
+              git --git-dir="$APP_DIR/.git" remote set-url origin "$CLEAN_URL" >/dev/null 2>&1 || true
+              # El chmod va DENTRO del scrub: git no preserva el modo al
+              # reescribir `.git/config`, lo recrea con la umask del proceso, y
+              # el camino de aborto corre con la umask heredada (0022).
+              chmod 600 "$APP_DIR/.git/config" >/dev/null 2>&1 || true
+            }
+            trap scrub_credencial EXIT
+
+            # Primer deploy sobre host virgen: el directorio no existe todavía.
+            # Sin esto, el estreno de este canal exigiría un `git clone` a mano,
+            # que es exactamente lo que la épica decidió no hacer.
+            if [ ! -d "$APP_DIR/.git" ]; then
+              mkdir -p /home/apps
+              git clone "https://x-access-token:${DEPLOY_GH_TOKEN}@github.com/1platformlabs/1platform-website.git" "$APP_DIR"
+              chmod 600 "$APP_DIR/.git/config"
+            fi
+
+            cd "$APP_DIR"/
+            git remote set-url origin "https://x-access-token:${DEPLOY_GH_TOKEN}@github.com/1platformlabs/1platform-website.git"
+            chmod 600 .git/config
+            git fetch --prune --force --all --tags
+            git reset --hard "${VERSION}"
+
+            # `deploy.sh` aborta si falta `.env.prod`, antes de construir. La
+            # landing es un estático sin secretos de runtime, pero el archivo
+            # tiene que existir igual porque el contrato del helper lo exige.
+            umask 077
+            : > .env.prod
+            chmod 600 .env.prod
+
+            ./deploy.sh prod build
+            ./deploy.sh prod stop || true
+            ./deploy.sh prod start
+
+            # ── Verificar EL CONTENEDOR QUE ESTE PASO ACABA DE LEVANTAR ──────
+            # Contra `127.0.0.1:<puerto>`, NO contra la URL pública. En el
+            # estreno de este canal el DNS todavía apunta al cPanel, así que
+            # sondear el dominio mediría OTRO servidor: daría rojo con el
+            # contenedor sano (y, peor, verde sin que este deploy esté vivo).
+            # El precedente está medido en el molde: 12 intentos en 415 contra
+            # el dominio público con el deploy en success.
+            PORT="$(awk '/^[[:space:]]*ports:/{f=1;next} f&&/"[0-9]+:[0-9]+"/{gsub(/[^0-9:]/,"");split($0,a,":");print a[1];exit}' docker-compose.prod.yml)"
+            if [ -z "${PORT}" ]; then
+              echo "::error::no pude derivar el puerto publicado de docker-compose.prod.yml"
+              exit 1
+            fi
+            HOST_HDR="1platform.pro"
+            echo "verificando 1platform-website-prod en 127.0.0.1:${PORT} con Host: ${HOST_HDR}"
+
+            probe() {
+              path="$1"; tries="$2"; expected="$3"; code=000
+              i=1
+              while [ "$i" -le "$tries" ]; do
+                # `|| code=000` y no `$(… || echo 000)`: en el segundo curl ya
+                # imprimió su propio `000` y la variable termina en "000000".
+                code="$(curl -s -o /dev/null -w '%{http_code}' \
+                  -H "Host: ${HOST_HDR}" \
+                  "http://127.0.0.1:${PORT}${path}" --max-time 10 2>/dev/null)" || code=000
+                if [ "$code" = "$expected" ]; then
+                  echo "  ${path} → ${code} (intento ${i}/${tries})"
+                  return 0
+                fi
+                i=$((i + 1))
+                sleep 5
+              done
+              echo "::error::${path} nunca devolvió ${expected} en ${tries} intentos (último código: ${code})"
+              return 1
+            }
+
+            probe / 12 200
+            # Control negativo EN LA MISMA CORRIDA: si una ruta inexistente
+            # también diera 200, el probe de arriba no probaría nada — estaría
+            # midiendo "el puerto responde", no "el sitio se sirve".
+            probe /__ruta-que-no-existe__ 1 404
+
+            # T-28: este deploy no puede haber tocado el contenedor de
+            # `bowerfans.com`, que vive en el mismo host. El molde del que sale
+            # `deploy.sh` hardcodeaba ese nombre y le hacía `docker rm -f`.
+            if docker ps --format '{{.Names}}' | grep -Fxq 'bower-dashboard-prod'; then
+              echo "  bower-dashboard-prod sigue corriendo ✓"
+            else
+              echo "::error::bower-dashboard-prod NO está corriendo tras este deploy"
+              exit 1
+            fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JOB 5: Publish cPanel bundle — GATEADO, no borrado
+#
+# Fue el único canal entre PCM-12 y el 2026-08-14. La épica `core-hetzner-cutover`
+# lo apaga con `if: false` y deja el job entero en su lugar: es la ruta de vuelta
+# si el dedicado falla. Borrarlo es lo que obligó a reescribir el rsync cuando
+# hubo que volver atrás la vez anterior — el commit que lo borró
+# (`b9dba78`, PCM-12) es justamente por qué esta épica no pudo revertir el DNS.
+#
+# Para reactivarlo: cambiar `if: false` por la condición original, que queda
+# escrita abajo, y volver a apuntar el DNS al cPanel.
 #
 # Why a zip over FTPS instead of rsync: the shared cPanel account has no SSH
 # (port 21098 is open but authorises no key) and the only shell it gets is the
@@ -586,7 +746,9 @@ jobs:
   publish-cpanel:
     name: Publish cPanel bundle
     needs: [build, version_bump, release]
-    if: needs.release.result == 'success'
+    # GATEADO por core-hetzner-cutover (2026-08-14).
+    # Condición original: needs.release.result == 'success'
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: PROD
@@ -917,7 +1079,7 @@ jobs:
 
   notify:
     name: Slack Notification
-    needs: [build, version_bump, release, publish-cpanel, lighthouse]
+    needs: [build, version_bump, release, deploy_hetzner, publish-cpanel, lighthouse]
     if: always() && needs.build.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -1052,10 +1214,12 @@ jobs:
               -d @slack_payload.json "${SLACK_WEBHOOK}"
           fi
 
-      # `publish-cpanel` lleva guión, así que en una expresión hay que
-      # indexarlo: `needs.publish-cpanel` se parsea como una resta.
+      # Apunta a `deploy_hetzner`, no a `publish-cpanel`: desde el cutover ese
+      # job está gateado con `if: false`, así que su `result` es SIEMPRE
+      # `skipped` y esta alerta no volvería a dispararse nunca — un fallo real
+      # del deploy saldría en silencio.
       - name: Notify Slack — Deploy failed
-        if: needs['publish-cpanel'].result == 'failure'
+        if: needs.deploy_hetzner.result == 'failure'
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_ALERTS }}
           COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
@@ -1134,8 +1298,12 @@ jobs:
               -d @slack_payload.json "${SLACK_WEBHOOK}"
           fi
 
+      # Idem: con `publish-cpanel` gateado su `result` es `skipped`, así que
+      # esta condición nunca volvería a ser verdadera y el aviso de deploy
+      # exitoso desaparecería para siempre — el modo de fallo silencioso más
+      # fácil de no notar, porque nada se pone rojo.
       - name: Notify Slack — Release & deploy success
-        if: needs.release.result == 'success' && needs['publish-cpanel'].result == 'success'
+        if: needs.release.result == 'success' && needs.deploy_hetzner.result == 'success'
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_DEPLOYS }}
           COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}

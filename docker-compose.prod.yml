@@ -1,0 +1,34 @@
+# 1platform.pro — PROD en el dedicado 144.76.163.230.
+#
+# El front door (185.125.168.236) es el ÚNICO que debe alcanzar este puerto: la
+# regla de `DOCKER-USER` en el host restringe 3040 a esa IP de origen. Docker
+# publica con DNAT y saltea el `-P INPUT DROP` del host, así que sin esa regla
+# el puerto queda abierto a internet y el borde de Cloudflare se puede saltear.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Nombre derivado del repo. Ver el comentario de `deploy.sh`: el molde
+    # hardcodeaba `bower-dashboard-prod` y lo borraba en cada corrida.
+    container_name: 1platform-website-prod
+    restart: unless-stopped
+    ports:
+      # ⚠️ ENTRECOMILLADO a propósito: el verificador del pipeline deriva el
+      # puerto de este archivo con un `awk` que busca `"NNNN:NN"` entre comillas.
+      # Sin comillas YAML lo lee como sexagesimal y el awk no matchea: el deploy
+      # aborta con «no pude derivar el puerto publicado».
+      - "3040:80"
+    healthcheck:
+      # `wget`, NO `curl`: `nginx:alpine` no trae curl (ver Dockerfile).
+      #
+      # La cabecera `Host` es OBLIGATORIA: el nginx de la imagen tiene un
+      # `default_server` que devuelve 444 a cualquier Host ajeno, y `wget` a
+      # `127.0.0.1` manda `Host: 127.0.0.1`. Sin esta cabecera el contenedor
+      # quedaría `unhealthy` para siempre con el sitio sirviendo perfecto.
+      test: ["CMD", "wget", "-qO-", "--header=Host: 1platform.pro", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
