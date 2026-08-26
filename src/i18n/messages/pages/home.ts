@@ -62,8 +62,14 @@ export default defineMessages({
     'home.featured.content.description':
       'Generate full SEO-optimized articles, descriptions, and landing copy from a single keyword.',
 
+    'home.featured.deliveries.title': 'Delivery Management',
+    'home.featured.deliveries.description':
+      'Register, dispatch and track every shipment — with your own staff or a courier, and a tracking link your buyer opens without an account.',
+    'home.featured.advertising.title': 'Advertising Campaigns',
+    'home.featured.advertising.description':
+      'Build a paid campaign, fund it from your workspace balance, and get back whatever was not spent once it settles.',
+
     'home.group.sellGetPaid.title': 'Sell & get paid',
-    'home.group.sellGetPaid.item.deliveries': 'Delivery Management',
     'home.group.sellGetPaid.item.paymentLinks': 'Payment Links',
     'home.group.sellGetPaid.item.cardPresent': 'Card-Present Payments',
     'home.group.sellGetPaid.item.merchantSubscriptions': 'Customer Subscriptions',
@@ -76,7 +82,6 @@ export default defineMessages({
     'home.group.contentSeo.item.linkBuilding': 'Link Building',
     'home.group.contentSeo.item.searchConsole': 'Search Console',
     'home.group.contentSeo.item.legalPages': 'Legal Page Generation',
-    'home.group.contentSeo.item.advertising': 'Advertising Campaigns',
 
     'home.group.storefront.title': 'Storefront & brand',
     'home.group.storefront.item.domain': 'Custom Domain',
@@ -184,8 +189,14 @@ export default defineMessages({
     'home.featured.content.description':
       'Genera artículos completos optimizados para SEO, descripciones y textos de landing a partir de una sola palabra clave.',
 
+    'home.featured.deliveries.title': 'Gestión de envíos',
+    'home.featured.deliveries.description':
+      'Registra, despacha y sigue cada envío — con tu propio personal o con mensajería, y un enlace de seguimiento que tu comprador abre sin cuenta.',
+    'home.featured.advertising.title': 'Campañas publicitarias',
+    'home.featured.advertising.description':
+      'Arma una campaña pagada, fondéala con el saldo de tu espacio de trabajo y recupera lo que no se gastó cuando concilia.',
+
     'home.group.sellGetPaid.title': 'Vende y cobra',
-    'home.group.sellGetPaid.item.deliveries': 'Gestión de envíos',
     'home.group.sellGetPaid.item.paymentLinks': 'Enlaces de cobro',
     'home.group.sellGetPaid.item.cardPresent': 'Cobro con tarjeta presente',
     'home.group.sellGetPaid.item.merchantSubscriptions': 'Suscripciones de tus clientes',
@@ -198,7 +209,6 @@ export default defineMessages({
     'home.group.contentSeo.item.linkBuilding': 'Construcción de enlaces',
     'home.group.contentSeo.item.searchConsole': 'Search Console',
     'home.group.contentSeo.item.legalPages': 'Generación de páginas legales',
-    'home.group.contentSeo.item.advertising': 'Campañas publicitarias',
 
     'home.group.storefront.title': 'Tienda y marca',
     'home.group.storefront.item.domain': 'Dominio propio',
