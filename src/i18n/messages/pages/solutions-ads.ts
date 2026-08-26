@@ -73,6 +73,8 @@ export default defineMessages({
     'solutions-ads.availability.title': 'Switched on per workspace',
     'solutions-ads.availability.desc':
       'Advertising does not arrive turned on with a new account. Our team enables it for a workspace, which is why you will not find it in the dashboard until it has been. If you want it, ask and we will turn it on.',
+    'solutions-ads.availability.note':
+      'Enabling is per workspace, not per account. If you run more than one, switching it on for one leaves the others as they were.',
 
     'solutions-ads.whatItReplaces.eyebrow': 'What it replaces',
     'solutions-ads.whatItReplaces.lead': 'The detour advertising usually takes.',
@@ -156,15 +158,17 @@ export default defineMessages({
     'solutions-ads.vsRevenue.desc':
       'La plataforma ya ofrece seguimiento de ingresos publicitarios, y de lejos los dos se parecen: los dos conectan una cuenta y te muestran números. La diferencia es qué necesita cada uno antes de poder hacer nada.',
     'solutions-ads.vsRevenue.thisOne':
-      'Las campañas necesitan saldo para gastar y que nuestro equipo habilite la capacidad para tu espacio de trabajo. Se contrata, y el dinero sale.',
+      'Las campañas necesitan saldo para gastar y que nuestro equipo habilite la capacidad para tu espacio de trabajo. Es a pedido, y el dinero sale.',
     'solutions-ads.vsRevenue.otherOne':
-      'El seguimiento de ingresos necesita un sitio que ya diste de alta en la plataforma, e informa lo que ese sitio ganó. No se gasta nada y no hay nada que contratar.',
+      'El seguimiento de ingresos necesita un sitio que ya diste de alta en la plataforma, e informa lo que ese sitio ganó. No se gasta nada y no hay nada que pedir.',
     'solutions-ads.vsRevenue.linkCue': 'Ver seguimiento de ingresos publicitarios',
 
     'solutions-ads.availability.eyebrow': 'Disponibilidad',
     'solutions-ads.availability.title': 'Se habilita por espacio de trabajo',
     'solutions-ads.availability.desc':
       'La publicidad no llega encendida con una cuenta nueva. Nuestro equipo la habilita para un espacio de trabajo, y por eso no la encontrarás en el panel hasta que lo haya hecho. Si la quieres, pídela y la encendemos.',
+    'solutions-ads.availability.note':
+      'La habilitación es por espacio de trabajo, no por cuenta. Si manejas más de uno, encenderla en uno deja a los demás como estaban.',
 
     'solutions-ads.whatItReplaces.eyebrow': 'Qué reemplaza',
     'solutions-ads.whatItReplaces.lead': 'El rodeo que suele dar la publicidad.',

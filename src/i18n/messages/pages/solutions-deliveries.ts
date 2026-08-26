@@ -39,7 +39,7 @@ export default defineMessages({
 
     'solutions-deliveries.feature.register.title': 'Register the shipment',
     'solutions-deliveries.feature.register.desc':
-      'Create a delivery against a branch and it picks up that branch as its pickup point. Change the branch address tomorrow and yesterday shipment keeps the address it actually left from.',
+      "Create a delivery against a branch and it picks up that branch as its pickup point. Change the branch address tomorrow and yesterday's shipment keeps the address it actually left from.",
     'solutions-deliveries.feature.dispatch.title': 'Dispatch it',
     'solutions-deliveries.feature.dispatch.desc':
       'Send it out with your own staff, or hand it to a courier service if your workspace has one configured. The same shipment, the same record, either way.',
