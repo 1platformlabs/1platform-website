@@ -239,6 +239,8 @@ test('the English tree kept every page it had before the epic', () => {
     'solutions/website/',
     'solutions/whitelabel/',
     'solutions/content/',
+    'solutions/deliveries/',
+    'solutions/ads/',
     'payments-invoicing/',
     'for-agencies/',
     'for-developers/',
