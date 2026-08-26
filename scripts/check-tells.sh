@@ -175,11 +175,25 @@ report "fonts are self-hosted and preloaded" \
 # module and a Spanish shell. Pinning the old path would have exempted a file
 # with nothing in it while policing the five that actually carry the text.
 #
+# The advertising family is written NARROWLY on purpose. `\bmeta\b` was the
+# obvious spelling and it is unusable: a word boundary does not protect against
+# `<meta charset>`, because `<` is itself a non-word character. Measured against
+# this rule's exact surface on an untouched tree it produced 24 findings (18 from
+# BaseLayout.astro, 4 from the `meta?` prop of Card.astro -- the primitive every
+# page is told to reuse -- plus `import.meta.glob` and the Spanish noun "meta"
+# in a post), put 34 of 34 Spanish pages red in the HTML gate, and felled 7 of
+# the 30 self-tests. The qualified form below measures 0 on the same surface
+# while still catching the brand in every shape copy would write it.
+#
+# Courier brands are deliberately absent. The delivery layer maps no brand at
+# all (`none`/`mock`/`courier_a`/`courier_b`) and a partner's own names arrive at
+# runtime and are dropped, so a blacklist invented here could only ever be
+# proved against an equally invented tell -- a control that tests itself.
 # The `.en`/`.es` branch is not optional and is the reason this list is written
 # out: an earlier version of this rule matched only `privacy.astro|privacy.ts`,
 # which silently excluded nothing that mattered and turned the legally-required
 # processor disclosure into a permanent red.
-m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b' $SRC $PROSE \
+m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b' $SRC $PROSE \
   | grep -viE '(^|/)privacy(\.(en|es))?\.(astro|ts):' | strip_comments)
 report "no external provider names outside the privacy policy" \
        "capabilities are presented as native product features" "$m"

@@ -130,6 +130,21 @@ assert_green "provider in privacy partial (en)" \
 assert_green "provider in privacy catalogue" \
   "src/i18n/messages/pages/privacy.ts" "  'x.seeded': 'Usamos Stripe para los pagos.',"
 
+# The advertising family this epic brings to the site. The narrow spelling has
+# to be proved in BOTH directions or it is worth nothing: red on the brand as
+# copy would actually write it, and green on the two things that made the bare
+# word unusable -- the `<meta>` element and the ordinary Spanish noun.
+assert_red "ad network in an ordinary page" "external provider names" "$PAGE" \
+  '<p>Publicamos tus campanas en Meta Ads.</p>'
+assert_red "ad network, hyphenated"         "external provider names" "$PAGE" \
+  '<p>Conecta tu cuenta de Meta-Business.</p>'
+assert_red "ad network, second brand"       "external provider names" "$CATALOG" \
+  "  'x.seeded': 'Publica en Facebook e Instagram.',"
+assert_green "meta element is not a brand" "$PAGE" \
+  '<meta name="seeded" content="x" />'
+assert_green "Spanish noun meta is not a brand" "$CATALOG" \
+  "  'x.seeded': 'Alcanza tu meta de ventas del trimestre.',"
+
 printf '\n%sThe content collections%s\n' "$DIM" "$RESET"
 # ~17,500 words of client-facing prose that no rule looked at until now. A
 # provider name in a blog post reached production with this script green.
