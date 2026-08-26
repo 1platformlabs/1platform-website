@@ -46,7 +46,13 @@ export type IconName =
   | 'mail'
   | 'clipboard'
   | 'home'
-  | 'layers';
+  | 'layers'
+  | 'truck'
+  | 'megaphone'
+  | 'paylink'
+  | 'terminal'
+  | 'repeat'
+  | 'store';
 
 export const iconPaths: Record<IconName, string> = {
   cart: '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
@@ -89,4 +95,19 @@ export const iconPaths: Record<IconName, string> = {
   clipboard: '<rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 4H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>',
   home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
   layers: '<path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
+
+  // Deliveries. Nothing in the set carried transport: `launch` is a rocket and
+  // `share` is a graph, so both would have meant something else.
+  truck: '<path d="M1 6h11v11H1z"/><path d="M12 9h4.5l3.5 3.5V17h-8z"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/>',
+  // Advertising. `chart` and `trend` are already analytics and revenue.
+  megaphone: '<path d="M3 10v4a1 1 0 0 0 1 1h3l7 4V5L7 9H4a1 1 0 0 0-1 1z"/><path d="M18 9a4 4 0 0 1 0 6"/>',
+  // A link that collects money. `link` already means link building.
+  paylink: '<path d="M10 13a4 4 0 0 0 5.66 0l2.5-2.5a4 4 0 0 0-5.66-5.66L11 6.34"/><path d="M14 11a4 4 0 0 0-5.66 0l-2.5 2.5a4 4 0 0 0 5.66 5.66L13 17.66"/>',
+  // Card present. `card` is already the card-on-file payment.
+  terminal: '<rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/>',
+  // Recurring billing the merchant runs. `wallet` is the merchant's own
+  // balance and `clock` is elapsed time.
+  repeat: '<polyline points="17 2 21 6 17 10"/><path d="M3 12V10a4 4 0 0 1 4-4h14"/><polyline points="7 22 3 18 7 14"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/>',
+  // Businesses and branches. `home` is the breadcrumb root.
+  store: '<path d="M3 9 4.5 4h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 11v9h14v-9"/><path d="M10 20v-5h4v5"/>',
 };

@@ -1,0 +1,464 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('solutions-ads.title');
+const description = t('solutions-ads.description');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: t('nav.solutions.ads'),
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: new URL(l('/solutions/ads/'), Astro.site).toString(),
+    areaServed: t('solutions-ads.jsonld.areaServed'),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 3, name: t('nav.solutions.ads') },
+    ],
+  },
+];
+
+const features: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'megaphone',
+    title: t('solutions-ads.feature.connect.title'),
+    description: t('solutions-ads.feature.connect.desc'),
+  },
+  {
+    icon: 'content',
+    title: t('solutions-ads.feature.build.title'),
+    description: t('solutions-ads.feature.build.desc'),
+  },
+  {
+    icon: 'wallet',
+    title: t('solutions-ads.feature.fund.title'),
+    description: t('solutions-ads.feature.fund.desc'),
+  },
+  {
+    icon: 'chart',
+    title: t('solutions-ads.feature.results.title'),
+    description: t('solutions-ads.feature.results.desc'),
+  },
+];
+
+const campaignSteps = [
+  { label: t('solutions-ads.step.connect') },
+  { label: t('solutions-ads.step.draft') },
+  { label: t('solutions-ads.step.fund') },
+  { label: t('solutions-ads.step.publish') },
+  { label: t('solutions-ads.step.close') },
+];
+
+const comparisonRows = [
+  { without: t('solutions-ads.compare.billing.without'), with_: t('solutions-ads.compare.billing.with') },
+  { without: t('solutions-ads.compare.retry.without'), with_: t('solutions-ads.compare.retry.with') },
+  { without: t('solutions-ads.compare.leftover.without'), with_: t('solutions-ads.compare.leftover.with') },
+  { without: t('solutions-ads.compare.reporting.without'), with_: t('solutions-ads.compare.reporting.with') },
+];
+
+const related: { title: string; description: string; href: string }[] = [
+  {
+    title: t('solutions-ads.related.content.title'),
+    description: t('solutions-ads.related.content.desc'),
+    href: l('/solutions/content/'),
+  },
+  {
+    title: t('nav.solutions.payments'),
+    description: t('solutions-ads.related.payments.desc'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    title: t('solutions-ads.related.developers.title'),
+    description: t('solutions-ads.related.developers.desc'),
+    href: l('/for-developers/'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} ogImage="/og/solution-ads.png" jsonLd={jsonLd}>
+  <div class="page-top">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('nav.solutions'), href: l('/solutions/') },
+        { label: t('nav.solutions.ads') },
+      ]} />
+    </div>
+  </div>
+
+  <Hero
+    headline={t('solutions-ads.hero.headline')}
+    subheadline={t('solutions-ads.hero.subheadline')}
+    badge={t('solutions-ads.hero.badge')}
+    primaryCta={{ label: t('cta.getStarted'), href: 'https://app.1platform.pro/app/?intent=ads' }}
+    secondaryCta={{ label: t('solutions-ads.hero.cta.secondary'), href: l('/pricing/') }}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('solutions-ads.whatYouGet.eyebrow')}</p>
+        <h2 class="statement__lead">
+          {t('solutions-ads.whatYouGet.lead')}
+        </h2>
+      </div>
+
+      <div class="features">
+        {features.map((feature) => (
+          <Card
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-ads.howItWorks.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-ads.howItWorks.lead')}</h2>
+      <ProcessSpine steps={campaignSteps} label={t('solutions-ads.howItWorks.aria')} />
+    </div>
+  </section>
+
+  <!-- Where the money comes from, and — the part that is easy to overclaim —
+       when it comes back. Settlement is not the same instant as closing. -->
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-ads.balance.eyebrow')}</p>
+          <h2>{t('solutions-ads.balance.title')}</h2>
+          <p>{t('solutions-ads.balance.desc')}</p>
+        </div>
+        <div class="caveats">
+          <div class="note reveal">
+            <Icon name="clock" size={20} />
+            <p>{t('solutions-ads.balance.settlement')}</p>
+          </div>
+          <div class="note reveal">
+            <Icon name="settings" size={20} />
+            <p>{t('solutions-ads.balance.limits')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The distinction from ad revenue tracking, drawn on prerequisites. The
+       two are near-identical as surfaces; what separates them is what each
+       one needs before it can do anything. -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-ads.vsRevenue.eyebrow')}</p>
+          <h2>{t('solutions-ads.vsRevenue.title')}</h2>
+          <p>{t('solutions-ads.vsRevenue.desc')}</p>
+          <a href={l('/solutions/')} class="link-cue">
+            {t('solutions-ads.vsRevenue.linkCue')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+        <div class="caveats">
+          <div class="note reveal">
+            <Icon name="megaphone" size={20} />
+            <p>{t('solutions-ads.vsRevenue.thisOne')}</p>
+          </div>
+          <div class="note reveal">
+            <Icon name="trend" size={20} />
+            <p>{t('solutions-ads.vsRevenue.otherOne')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-ads.availability.eyebrow')}</p>
+          <h2>{t('solutions-ads.availability.title')}</h2>
+          <p>{t('solutions-ads.availability.desc')}</p>
+        </div>
+        <div class="caveats">
+          <div class="note reveal">
+            <Icon name="shield" size={20} />
+            <p>{t('solutions-ads.next.desc')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-ads.whatItReplaces.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-ads.whatItReplaces.lead')}</h2>
+      <ComparisonTable rows={comparisonRows} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-ads.related.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-ads.related.lead')}</h2>
+
+      <ul class="index">
+        {related.map((item) => (
+          <li class="index__item">
+            <h3 class="index__title">
+              <a href={item.href} class="index__link">{item.title}</a>
+            </h3>
+            <p class="index__desc">{item.description}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">{t('solutions-ads.next.eyebrow')}</p>
+          <h2 class="next__title">{t('solutions-ads.next.title')}</h2>
+          <p class="next__desc">
+            {t('solutions-ads.next.desc')}
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            {t('solutions-ads.next.linkCue')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+        <div class="next__actions">
+          <a href={l('/contact/')} class="btn btn--primary">{t('solutions-ads.next.actions.contact')}</a>
+          <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions-ads.hero.cta.secondary')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The hero carries its own header offset, so it is neutralised below the
+     breadcrumb strip to avoid stacking two header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin: 0;
+  }
+
+  .included {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3) var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .included__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* A qualification set beside the claim, not beneath it in small print. */
+  .caveats {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    color: var(--color-text-secondary);
+  }
+
+  .note :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--color-accent);
+  }
+
+  .note p {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .index {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 52rem;
+  }
+
+  .index__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .index__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .index__title {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+  }
+
+  .index__link {
+    color: var(--color-text);
+  }
+
+  .index__link:hover {
+    color: var(--color-accent);
+  }
+
+  .index__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .features {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .included {
+      grid-template-columns: 1fr;
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>
