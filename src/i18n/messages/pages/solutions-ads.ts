@@ -35,7 +35,7 @@ export default defineMessages({
 
     'solutions-ads.whatYouGet.eyebrow': 'What you get',
     'solutions-ads.whatYouGet.lead':
-      'Four steps between deciding to advertise and seeing what it did.',
+      'Everything between deciding to advertise and seeing what it did.',
 
     'solutions-ads.feature.connect.title': 'Connect your brand',
     'solutions-ads.feature.connect.desc':
@@ -129,7 +129,7 @@ export default defineMessages({
 
     'solutions-ads.whatYouGet.eyebrow': 'Qué obtienes',
     'solutions-ads.whatYouGet.lead':
-      'Cuatro pasos entre decidir anunciarte y ver qué resultó.',
+      'Todo lo que hay entre decidir anunciarte y ver qué resultó.',
 
     'solutions-ads.feature.connect.title': 'Conecta tu marca',
     'solutions-ads.feature.connect.desc':
