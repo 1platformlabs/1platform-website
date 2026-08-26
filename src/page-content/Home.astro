@@ -91,6 +91,18 @@ const featured: { icon: IconName; title: string; description: string; href: stri
 /** Everything else, grouped — an index, not another wall of cards. */
 const capabilityGroups: { group: string; items: { title: string; href: string }[] }[] = [
   {
+    // El núcleo de monetización va primero: es lo que el visitante vino a
+    // resolver. Las cuatro entradas existían en /solutions/ y en /features/ y
+    // no estaban acá, así que la página más vista del sitio no las nombraba.
+    group: t('home.group.sellGetPaid.title'),
+    items: [
+      { title: t('home.group.sellGetPaid.item.deliveries'), href: l('/solutions/deliveries/') },
+      { title: t('home.group.sellGetPaid.item.paymentLinks'), href: l('/payments-invoicing/') },
+      { title: t('home.group.sellGetPaid.item.cardPresent'), href: l('/payments-invoicing/') },
+      { title: t('home.group.sellGetPaid.item.merchantSubscriptions'), href: l('/payments-invoicing/') },
+    ],
+  },
+  {
     group: t('home.group.contentSeo.title'),
     items: [
       { title: t('home.group.contentSeo.item.aiImage'), href: l('/solutions/content/') },
@@ -100,6 +112,7 @@ const capabilityGroups: { group: string; items: { title: string; href: string }[
       { title: t('home.group.contentSeo.item.linkBuilding'), href: l('/solutions/content/') },
       { title: t('home.group.contentSeo.item.searchConsole'), href: l('/solutions/content/') },
       { title: t('home.group.contentSeo.item.legalPages'), href: l('/solutions/content/') },
+      { title: t('home.group.contentSeo.item.advertising'), href: l('/solutions/ads/') },
     ],
   },
   {
@@ -340,7 +353,10 @@ const intentChips = [
   /* ===== The index of everything else ===== */
   .index {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* Cuatro columnas, una por grupo. Con tres el cuarto grupo caía solo a una
+       segunda fila, separado por el alto de la columna más larga (8 ítems), y
+       se leía como un bloque olvidado en vez de como parte del índice. */
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--space-8);
     padding-top: var(--space-8);
     border-top: 1px solid var(--color-border);
@@ -354,6 +370,10 @@ const intentChips = [
     text-transform: uppercase;
     color: var(--color-text-tertiary);
     margin-bottom: var(--space-4);
+    /* Reserva dos líneas para que las cuatro columnas arranquen sus ítems a la
+       misma altura: en español «PLATAFORMA PARA DESARROLLADORES» envuelve y en
+       inglés no, así que sin esto el desalineado aparece sólo en un idioma. */
+    min-height: calc(2 * 1.5 * var(--text-xs));
   }
 
   .index__list {
@@ -457,6 +477,12 @@ const intentChips = [
       gap: var(--space-8);
     }
 
+  }
+
+  /* Cuatro columnas necesitan más aire que tres: el español ya se apretaba a
+     1024px (títulos y un ítem envolviendo), así que el paso a dos columnas
+     ocurre antes que el del resto del layout. */
+  @media (max-width: 1100px) {
     .index {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -467,6 +493,12 @@ const intentChips = [
     .featured,
     .index {
       grid-template-columns: 1fr;
+    }
+
+    /* Con una sola columna no hay nada con qué alinear: la segunda línea
+       reservada para el título deja aire de más y nada más. */
+    .index__title {
+      min-height: 0;
     }
 
     .pillars {

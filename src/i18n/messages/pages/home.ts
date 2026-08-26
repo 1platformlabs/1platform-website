@@ -62,7 +62,13 @@ export default defineMessages({
     'home.featured.content.description':
       'Generate full SEO-optimized articles, descriptions, and landing copy from a single keyword.',
 
-    'home.group.contentSeo.title': 'Content & SEO',
+    'home.group.sellGetPaid.title': 'Sell & get paid',
+    'home.group.sellGetPaid.item.deliveries': 'Delivery Management',
+    'home.group.sellGetPaid.item.paymentLinks': 'Payment Links',
+    'home.group.sellGetPaid.item.cardPresent': 'Card-Present Payments',
+    'home.group.sellGetPaid.item.merchantSubscriptions': 'Customer Subscriptions',
+
+    'home.group.contentSeo.title': 'Content, SEO & reach',
     'home.group.contentSeo.item.aiImage': 'AI Image Generation',
     'home.group.contentSeo.item.aiKeyword': 'AI Keyword Extraction',
     'home.group.contentSeo.item.cms': 'CMS Publishing',
@@ -70,6 +76,7 @@ export default defineMessages({
     'home.group.contentSeo.item.linkBuilding': 'Link Building',
     'home.group.contentSeo.item.searchConsole': 'Search Console',
     'home.group.contentSeo.item.legalPages': 'Legal Page Generation',
+    'home.group.contentSeo.item.advertising': 'Advertising Campaigns',
 
     'home.group.storefront.title': 'Storefront & brand',
     'home.group.storefront.item.domain': 'Custom Domain',
@@ -177,7 +184,13 @@ export default defineMessages({
     'home.featured.content.description':
       'Genera artículos completos optimizados para SEO, descripciones y textos de landing a partir de una sola palabra clave.',
 
-    'home.group.contentSeo.title': 'Contenido y SEO',
+    'home.group.sellGetPaid.title': 'Vende y cobra',
+    'home.group.sellGetPaid.item.deliveries': 'Gestión de envíos',
+    'home.group.sellGetPaid.item.paymentLinks': 'Enlaces de cobro',
+    'home.group.sellGetPaid.item.cardPresent': 'Cobro con tarjeta presente',
+    'home.group.sellGetPaid.item.merchantSubscriptions': 'Suscripciones de tus clientes',
+
+    'home.group.contentSeo.title': 'Contenido, SEO y alcance',
     'home.group.contentSeo.item.aiImage': 'Generación de imágenes con IA',
     'home.group.contentSeo.item.aiKeyword': 'Extracción de palabras clave con IA',
     'home.group.contentSeo.item.cms': 'Publicación en CMS',
@@ -185,6 +198,7 @@ export default defineMessages({
     'home.group.contentSeo.item.linkBuilding': 'Construcción de enlaces',
     'home.group.contentSeo.item.searchConsole': 'Search Console',
     'home.group.contentSeo.item.legalPages': 'Generación de páginas legales',
+    'home.group.contentSeo.item.advertising': 'Campañas publicitarias',
 
     'home.group.storefront.title': 'Tienda y marca',
     'home.group.storefront.item.domain': 'Dominio propio',
