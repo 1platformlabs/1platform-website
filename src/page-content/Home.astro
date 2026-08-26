@@ -86,6 +86,18 @@ const featured: { icon: IconName; title: string; description: string; href: stri
     description: t('home.featured.content.description'),
     href: l('/solutions/content/'),
   },
+  {
+    icon: 'truck',
+    title: t('home.featured.deliveries.title'),
+    description: t('home.featured.deliveries.description'),
+    href: l('/solutions/deliveries/'),
+  },
+  {
+    icon: 'megaphone',
+    title: t('home.featured.advertising.title'),
+    description: t('home.featured.advertising.description'),
+    href: l('/solutions/ads/'),
+  },
 ];
 
 /** Everything else, grouped — an index, not another wall of cards. */
@@ -96,7 +108,6 @@ const capabilityGroups: { group: string; items: { title: string; href: string }[
     // no estaban acá, así que la página más vista del sitio no las nombraba.
     group: t('home.group.sellGetPaid.title'),
     items: [
-      { title: t('home.group.sellGetPaid.item.deliveries'), href: l('/solutions/deliveries/') },
       { title: t('home.group.sellGetPaid.item.paymentLinks'), href: l('/payments-invoicing/') },
       { title: t('home.group.sellGetPaid.item.cardPresent'), href: l('/payments-invoicing/') },
       { title: t('home.group.sellGetPaid.item.merchantSubscriptions'), href: l('/payments-invoicing/') },
@@ -112,7 +123,6 @@ const capabilityGroups: { group: string; items: { title: string; href: string }[
       { title: t('home.group.contentSeo.item.linkBuilding'), href: l('/solutions/content/') },
       { title: t('home.group.contentSeo.item.searchConsole'), href: l('/solutions/content/') },
       { title: t('home.group.contentSeo.item.legalPages'), href: l('/solutions/content/') },
-      { title: t('home.group.contentSeo.item.advertising'), href: l('/solutions/ads/') },
     ],
   },
   {
@@ -345,7 +355,9 @@ const intentChips = [
   /* ===== Featured capabilities ===== */
   .featured {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    /* Seis tarjetas: 3×2. Con dos columnas serían tres filas y la sección se
+       estiraba el doble empujando el índice y el resto de la página. */
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-6);
     margin-bottom: var(--space-12);
   }
@@ -484,6 +496,13 @@ const intentChips = [
      ocurre antes que el del resto del layout. */
   @media (max-width: 1100px) {
     .index {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Tres tarjetas por fila aguantan hasta acá: a 1024px los títulos ya se
+       partían en dos líneas y las descripciones en cuatro. Dos columnas son
+       tres filas, que a esta anchura sobra espacio para tener. */
+    .featured {
       grid-template-columns: repeat(2, 1fr);
     }
   }
