@@ -90,6 +90,38 @@ const capabilities: { icon: IconName; title: string; description: string }[] = [
 ];
 
 /**
+ * The three other ways money reaches a merchant, in the order they discover
+ * them: the link is one call, the terminal is an application that can be
+ * rejected, and merchant subscriptions need a plan catalogue and customers
+ * first.
+ *
+ * `note` is not small print. Each one is the qualification that keeps the
+ * claim above it true — most of all the terminal's, whose application is
+ * refused with a 409 listing what is missing unless the business already has
+ * a tax id and working electronic invoicing.
+ */
+const waysToCharge: { icon: IconName; title: string; description: string; note: string }[] = [
+  {
+    icon: 'paylink',
+    title: t('paymentsInvoicing.charge.link.title'),
+    description: t('paymentsInvoicing.charge.link.description'),
+    note: t('paymentsInvoicing.charge.link.note'),
+  },
+  {
+    icon: 'terminal',
+    title: t('paymentsInvoicing.charge.terminal.title'),
+    description: t('paymentsInvoicing.charge.terminal.description'),
+    note: t('paymentsInvoicing.charge.terminal.prerequisite'),
+  },
+  {
+    icon: 'repeat',
+    title: t('paymentsInvoicing.charge.subscriptions.title'),
+    description: t('paymentsInvoicing.charge.subscriptions.description'),
+    note: t('paymentsInvoicing.charge.subscriptions.note'),
+  },
+];
+
+/**
  * The states a transaction can report back, as the webhook emits them.
  *
  * Left untranslated in both languages on purpose: these are literal values
@@ -156,6 +188,29 @@ const related: { icon: IconName; title: string; description: string; href: strin
           />
         ))}
       </div>
+    </div>
+  </section>
+
+  <!-- Three ways to charge -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('paymentsInvoicing.waysToCharge.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('paymentsInvoicing.waysToCharge.lead')}</h2>
+
+      <ul class="ways">
+        {waysToCharge.map((way) => (
+          <li class="way reveal">
+            <div class="way__head">
+              <Icon name={way.icon} size={22} />
+              <h3 class="way__title">{way.title}</h3>
+            </div>
+            <p class="way__desc">{way.description}</p>
+            <p class="way__note">{way.note}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
@@ -248,6 +303,64 @@ const related: { icon: IconName; title: string; description: string; href: strin
 </BaseLayout>
 
 <style>
+  /* ===== Three ways to charge ===== */
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .way {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    min-width: 0;
+  }
+
+  .way__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .way__head :global(svg) {
+    flex: none;
+    color: var(--color-accent);
+  }
+
+  .way__title {
+    font-size: var(--text-lg);
+    margin: 0;
+  }
+
+  .way__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  /* The qualification, set apart but not shrunk: it is what keeps the claim
+     above it true, so it reads at the same size as the claim. */
+  .way__note {
+    margin: 0;
+    margin-top: auto;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  @media (max-width: 900px) {
+    .ways {
+      grid-template-columns: 1fr;
+    }
+  }
+
   /* Breadcrumbs clear the fixed header; the hero then drops its own top
      offset so the two don't stack into a canyon of whitespace. */
   .crumbs {
