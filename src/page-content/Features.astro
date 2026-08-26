@@ -65,6 +65,20 @@ const commerce: { icon: IconName; title: string; description: string; href: stri
     description: t('features.commerce.domain.description'),
     href: l('/solutions/website/'),
   },
+  {
+    icon: 'truck',
+    title: t('features.commerce.deliveries.title'),
+    description: t('features.commerce.deliveries.description'),
+    href: l('/solutions/deliveries/'),
+  },
+  // The minor capability that survived the audit. It has no page of its own —
+  // it is how invoicing already works — so it points at the page that carries it.
+  {
+    icon: 'store',
+    title: t('features.commerce.branches.title'),
+    description: t('features.commerce.branches.description'),
+    href: l('/payments-invoicing/'),
+  },
 ];
 
 const contentEngine: { icon: IconName; title: string; description: string }[] = [
@@ -119,6 +133,11 @@ const distribution: { icon: IconName; title: string; description: string }[] = [
     icon: 'link',
     title: t('features.distribution.item4.title'),
     description: t('features.distribution.item4.description'),
+  },
+  {
+    icon: 'megaphone',
+    title: t('features.distribution.item5.title'),
+    description: t('features.distribution.item5.description'),
   },
 ];
 

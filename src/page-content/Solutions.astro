@@ -101,6 +101,39 @@ const sellAndGetPaid: Solution[] = [
     replaces: t('solutions.group.intelligence.item.subscriptionsBilling.replaces'),
     href: l('/pricing/'),
   },
+  // The three ways to charge live on /payments-invoicing/ rather than on three
+  // thin pages of their own: they would have competed for one intent, and 16 of
+  // the items here already share a destination.
+  {
+    icon: 'paylink',
+    title: t('solutions.group.intelligence.item.paymentLinks.title'),
+    description: t('solutions.group.intelligence.item.paymentLinks.desc'),
+    replaces: t('solutions.group.intelligence.item.paymentLinks.replaces'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'terminal',
+    title: t('solutions.group.intelligence.item.cardPresent.title'),
+    description: t('solutions.group.intelligence.item.cardPresent.desc'),
+    replaces: t('solutions.group.intelligence.item.cardPresent.replaces'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'repeat',
+    title: t('solutions.group.intelligence.item.merchantSubscriptions.title'),
+    description: t('solutions.group.intelligence.item.merchantSubscriptions.desc'),
+    replaces: t('solutions.group.intelligence.item.merchantSubscriptions.replaces'),
+    href: l('/payments-invoicing/'),
+  },
+  // A shipment is the physical counterpart of the sale, so it belongs beside
+  // the sale. In "build your site" it would read as a construction piece.
+  {
+    icon: 'truck',
+    title: t('solutions.group.intelligence.item.deliveries.title'),
+    description: t('solutions.group.intelligence.item.deliveries.desc'),
+    replaces: t('solutions.group.intelligence.item.deliveries.replaces'),
+    href: l('/solutions/deliveries/'),
+  },
 ];
 
 /* Build your site — everything a storefront or site is made of. */
@@ -192,6 +225,13 @@ const growAndReach: Solution[] = [
     description: t('solutions.group.distribution.item.adRevenueTracking.desc'),
     replaces: t('solutions.group.distribution.item.adRevenueTracking.replaces'),
     href: l('/for-developers/'),
+  },
+  {
+    icon: 'megaphone',
+    title: t('solutions.group.distribution.item.advertising.title'),
+    description: t('solutions.group.distribution.item.advertising.desc'),
+    replaces: t('solutions.group.distribution.item.advertising.replaces'),
+    href: l('/solutions/ads/'),
   },
 ];
 
