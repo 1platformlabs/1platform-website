@@ -1,0 +1,471 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Check from '@components/Check.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import ComparisonTable from '@components/ComparisonTable.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+
+const { t, l } = useI18n(Astro.url.pathname);
+
+const title = t('solutions-deliveries.title');
+const description = t('solutions-deliveries.description');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: t('nav.solutions.deliveries'),
+    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    description,
+    url: new URL(l('/solutions/deliveries/'), Astro.site).toString(),
+    areaServed: t('solutions-deliveries.jsonld.areaServed'),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 3, name: t('nav.solutions.deliveries') },
+    ],
+  },
+];
+
+/**
+ * Three capabilities, not four. Quoting is deliberately absent from this row:
+ * it exists only in courier mode, requires coordinates at both ends, and the
+ * `quoted` state is unreachable with your own fleet — so presenting it beside
+ * the three that always work would misdescribe what a new merchant gets.
+ * It has its own section below, framed as the opt-in it is.
+ */
+const features: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'clipboard',
+    title: t('solutions-deliveries.feature.register.title'),
+    description: t('solutions-deliveries.feature.register.desc'),
+  },
+  {
+    icon: 'truck',
+    title: t('solutions-deliveries.feature.dispatch.title'),
+    description: t('solutions-deliveries.feature.dispatch.desc'),
+  },
+  {
+    icon: 'monitor',
+    title: t('solutions-deliveries.feature.track.title'),
+    description: t('solutions-deliveries.feature.track.desc'),
+  },
+];
+
+const included = [
+  t('solutions-deliveries.included.create'),
+  t('solutions-deliveries.included.pickup'),
+  t('solutions-deliveries.included.edit'),
+  t('solutions-deliveries.included.dispatch'),
+  t('solutions-deliveries.included.list'),
+  t('solutions-deliveries.included.tracking'),
+  t('solutions-deliveries.included.roles'),
+  t('solutions-deliveries.included.webhook'),
+];
+
+const deliverySteps = [
+  { label: t('solutions-deliveries.step.create') },
+  { label: t('solutions-deliveries.step.dispatch') },
+  { label: t('solutions-deliveries.step.track') },
+  { label: t('solutions-deliveries.step.delivered') },
+];
+
+const comparisonRows = [
+  { without: t('solutions-deliveries.compare.record.without'), with_: t('solutions-deliveries.compare.record.with') },
+  { without: t('solutions-deliveries.compare.buyer.without'), with_: t('solutions-deliveries.compare.buyer.with') },
+  { without: t('solutions-deliveries.compare.address.without'), with_: t('solutions-deliveries.compare.address.with') },
+  { without: t('solutions-deliveries.compare.courier.without'), with_: t('solutions-deliveries.compare.courier.with') },
+];
+
+const related: { title: string; description: string; href: string }[] = [
+  {
+    title: t('solutions-deliveries.related.store.title'),
+    description: t('solutions-deliveries.related.store.desc'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    title: t('nav.solutions.payments'),
+    description: t('solutions-deliveries.related.payments.desc'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    title: t('solutions-deliveries.related.developers.title'),
+    description: t('solutions-deliveries.related.developers.desc'),
+    href: l('/for-developers/'),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} ogImage="/og/solution-deliveries.png" jsonLd={jsonLd}>
+  <div class="page-top">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('nav.solutions'), href: l('/solutions/') },
+        { label: t('nav.solutions.deliveries') },
+      ]} />
+    </div>
+  </div>
+
+  <Hero
+    headline={t('solutions-deliveries.hero.headline')}
+    subheadline={t('solutions-deliveries.hero.subheadline')}
+    badge={t('solutions-deliveries.hero.badge')}
+    primaryCta={{ label: t('cta.getStarted'), href: 'https://app.1platform.pro/app/?intent=deliveries' }}
+    secondaryCta={{ label: t('solutions-deliveries.hero.cta.secondary'), href: l('/pricing/') }}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('solutions-deliveries.whatYouGet.eyebrow')}</p>
+        <h2 class="statement__lead">
+          {t('solutions-deliveries.whatYouGet.lead')}
+        </h2>
+      </div>
+
+      <div class="features">
+        {features.map((feature) => (
+          <Card
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            class="reveal"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-deliveries.inTheBox.eyebrow')}</p>
+          <h2>{t('solutions-deliveries.inTheBox.title')}</h2>
+          <p>
+            {t('solutions-deliveries.inTheBox.desc')}
+          </p>
+        </div>
+
+        <ul class="included">
+          {included.map((item) => (
+            <li class="included__item">
+              <Check yes label={t('solutions-deliveries.inTheBox.includedLabel')} />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-deliveries.howItWorks.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-deliveries.howItWorks.lead')}</h2>
+      <ProcessSpine steps={deliverySteps} label={t('solutions-deliveries.howItWorks.aria')} />
+    </div>
+  </section>
+
+  <!-- Public tracking. The restraint is the point, so it is stated in full
+       rather than summarised as "privacy-friendly". -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-deliveries.tracking.eyebrow')}</p>
+          <h2>{t('solutions-deliveries.tracking.title')}</h2>
+          <p>{t('solutions-deliveries.tracking.desc')}</p>
+        </div>
+        <div class="note reveal">
+          <Icon name="shield" size={20} />
+          <p>{t('solutions-deliveries.tracking.privacy')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Courier dispatch: an opt-in seam, with the caveat beside the offer
+       rather than under it. -->
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-deliveries.courier.eyebrow')}</p>
+          <h2>{t('solutions-deliveries.courier.title')}</h2>
+          <p>{t('solutions-deliveries.courier.desc')}</p>
+        </div>
+        <div class="caveats">
+          <div class="note reveal">
+            <Icon name="settings" size={20} />
+            <p>{t('solutions-deliveries.courier.caveat')}</p>
+          </div>
+          <div class="note reveal">
+            <Icon name="wallet" size={20} />
+            <p>{t('solutions-deliveries.courier.fee')}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-deliveries.whatItReplaces.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-deliveries.whatItReplaces.lead')}</h2>
+      <ComparisonTable rows={comparisonRows} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-deliveries.related.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-deliveries.related.lead')}</h2>
+
+      <ul class="index">
+        {related.map((item) => (
+          <li class="index__item">
+            <h3 class="index__title">
+              <a href={item.href} class="index__link">{item.title}</a>
+            </h3>
+            <p class="index__desc">{item.description}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">{t('solutions-deliveries.next.eyebrow')}</p>
+          <h2 class="next__title">{t('solutions-deliveries.next.title')}</h2>
+          <p class="next__desc">
+            {t('solutions-deliveries.next.desc')}
+          </p>
+          <a href="https://developer.1platform.pro/" class="link-cue">
+            {t('solutions-deliveries.next.linkCue')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        </div>
+        <div class="next__actions">
+          <a href="https://app.1platform.pro/app/?intent=deliveries" class="btn btn--primary">{t('cta.getStarted')}</a>
+          <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions-deliveries.next.actions.viewPricing')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The hero carries its own header offset, so it is neutralised below the
+     breadcrumb strip to avoid stacking two header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-height) + var(--space-8));
+  }
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin: 0;
+  }
+
+  .included {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3) var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .included__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* A qualification set beside the claim, not beneath it in small print. */
+  .caveats {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    color: var(--color-text-secondary);
+  }
+
+  .note :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--color-accent);
+  }
+
+  .note p {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .index {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 52rem;
+  }
+
+  .index__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .index__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .index__title {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+  }
+
+  .index__link {
+    color: var(--color-text);
+  }
+
+  .index__link:hover {
+    color: var(--color-accent);
+  }
+
+  .index__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .features {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .included {
+      grid-template-columns: 1fr;
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

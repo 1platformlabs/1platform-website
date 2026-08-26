@@ -47,10 +47,30 @@ export default defineMessages({
     'solutions.group.intelligence.item.domainManagement.desc':
       'Register, transfer, and renew domains. Manage DNS records and nameservers — all programmatically.',
     'solutions.group.intelligence.item.domainManagement.replaces': 'A separate registrar dashboard',
-    'solutions.group.intelligence.item.subscriptionsBilling.title': 'Subscriptions & Billing',
+    'solutions.group.intelligence.item.subscriptionsBilling.title': 'Balance & Usage',
     'solutions.group.intelligence.item.subscriptionsBilling.desc':
-      'Track balance, manage usage, and bill customers — credits-based, pay-per-use, transparent.',
-    'solutions.group.intelligence.item.subscriptionsBilling.replaces': 'Custom billing infrastructure',
+      'Your own account with 1Platform: watch the balance, see what each operation consumed, and top it up. Credits-based, pay-per-use, transparent.',
+    'solutions.group.intelligence.item.subscriptionsBilling.replaces': 'Guessing what a platform bill will say',
+
+    'solutions.group.intelligence.item.paymentLinks.title': 'Payment Links',
+    'solutions.group.intelligence.item.paymentLinks.desc':
+      'Send a link to charge someone who is not a 1Platform user. They pay without an account and without signing in.',
+    'solutions.group.intelligence.item.paymentLinks.replaces': 'Chasing a bank transfer by message',
+
+    'solutions.group.intelligence.item.cardPresent.title': 'Card-Present Payments',
+    'solutions.group.intelligence.item.cardPresent.desc':
+      'Apply for a card terminal, attach the documents, and follow the application through to its answer.',
+    'solutions.group.intelligence.item.cardPresent.replaces': 'A separate acquirer relationship',
+
+    'solutions.group.intelligence.item.merchantSubscriptions.title': 'Customer Subscriptions',
+    'solutions.group.intelligence.item.merchantSubscriptions.desc':
+      'Publish your own plans, enrol your customers, and charge them on a schedule. Your plans, not your balance with us.',
+    'solutions.group.intelligence.item.merchantSubscriptions.replaces': 'A separate subscription billing tool',
+
+    'solutions.group.intelligence.item.deliveries.title': 'Delivery Management',
+    'solutions.group.intelligence.item.deliveries.desc':
+      'Register a shipment, dispatch it with your own staff or a courier service, and give your buyer a link to follow it.',
+    'solutions.group.intelligence.item.deliveries.replaces': 'A spreadsheet beside the orders',
 
     // — Group: build your site ———————————————————————————————————
     'solutions.group.content.eyebrow': 'Build your site',
@@ -84,7 +104,7 @@ export default defineMessages({
     'solutions.group.distribution.eyebrow': 'Grow and reach',
     'solutions.group.distribution.title': 'The distribution layer',
     'solutions.group.distribution.desc':
-      'Keyword intelligence, indexing, link building, analytics, and ad revenue — the work that happens after the site is live.',
+      'Keyword intelligence, indexing, link building, analytics, paid campaigns, and ad revenue — the work that happens after the site is live.',
     'solutions.group.distribution.item.seoIntelligence.title': 'SEO Intelligence',
     'solutions.group.distribution.item.seoIntelligence.desc':
       'Extract keywords with volume, intent, and difficulty from any URL or topic.',
@@ -107,8 +127,13 @@ export default defineMessages({
     'solutions.group.distribution.item.analytics.replaces': 'Manual analytics setup across separate dashboards',
     'solutions.group.distribution.item.adRevenueTracking.title': 'Ad Revenue Tracking',
     'solutions.group.distribution.item.adRevenueTracking.desc':
-      'Connect ad accounts, monitor earnings, track policy issues, and generate custom revenue reports.',
+      'Connect ad accounts, monitor earnings, track policy issues, and generate custom revenue reports. This is the money coming in; running paid campaigns is Advertising, the other way round.',
     'solutions.group.distribution.item.adRevenueTracking.replaces': 'Ad platform dashboards and manual tracking',
+
+    'solutions.group.distribution.item.advertising.title': 'Advertising Campaigns',
+    'solutions.group.distribution.item.advertising.desc':
+      'Build a paid campaign, fund it from your workspace balance, and get back whatever was not spent once it settles.',
+    'solutions.group.distribution.item.advertising.replaces': 'A second billing relationship to advertise',
 
     // — Group: developer platform ———————————————————————————————
     'solutions.group.payments.eyebrow': 'Developer platform',
@@ -192,10 +217,30 @@ export default defineMessages({
     'solutions.group.intelligence.item.domainManagement.desc':
       'Registra, transfiere y renueva dominios. Gestiona registros DNS y nameservers — todo de forma programática.',
     'solutions.group.intelligence.item.domainManagement.replaces': 'Un panel de registrador aparte',
-    'solutions.group.intelligence.item.subscriptionsBilling.title': 'Suscripciones y facturación',
+    'solutions.group.intelligence.item.subscriptionsBilling.title': 'Saldo y consumo',
     'solutions.group.intelligence.item.subscriptionsBilling.desc':
-      'Controla el saldo, gestiona el uso y factura a tus clientes — por créditos, por uso y de forma transparente.',
-    'solutions.group.intelligence.item.subscriptionsBilling.replaces': 'Infraestructura de facturación hecha a medida',
+      'Tu propia cuenta con 1Platform: mira el saldo, ve qué consumió cada operación y recárgalo. Por créditos, por uso y de forma transparente.',
+    'solutions.group.intelligence.item.subscriptionsBilling.replaces': 'Adivinar qué va a decir la factura de la plataforma',
+
+    'solutions.group.intelligence.item.paymentLinks.title': 'Enlaces de cobro',
+    'solutions.group.intelligence.item.paymentLinks.desc':
+      'Manda un enlace para cobrarle a alguien que no es usuario de 1Platform. Paga sin cuenta y sin iniciar sesión.',
+    'solutions.group.intelligence.item.paymentLinks.replaces': 'Perseguir una transferencia por mensaje',
+
+    'solutions.group.intelligence.item.cardPresent.title': 'Cobro con tarjeta presente',
+    'solutions.group.intelligence.item.cardPresent.desc':
+      'Solicita una terminal, adjunta los documentos y sigue la solicitud hasta su respuesta.',
+    'solutions.group.intelligence.item.cardPresent.replaces': 'Una relación aparte con un adquirente',
+
+    'solutions.group.intelligence.item.merchantSubscriptions.title': 'Suscripciones de tus clientes',
+    'solutions.group.intelligence.item.merchantSubscriptions.desc':
+      'Publica tus propios planes, da de alta a tus clientes y cóbrales de forma periódica. Tus planes, no tu saldo con nosotros.',
+    'solutions.group.intelligence.item.merchantSubscriptions.replaces': 'Una herramienta aparte de cobros recurrentes',
+
+    'solutions.group.intelligence.item.deliveries.title': 'Gestión de envíos',
+    'solutions.group.intelligence.item.deliveries.desc':
+      'Registra un envío, despáchalo con tu propio personal o con una mensajería, y dale a tu comprador un enlace para seguirlo.',
+    'solutions.group.intelligence.item.deliveries.replaces': 'Una hoja de cálculo al lado de los pedidos',
 
     // — Grupo: crea tu sitio —————————————————————————————————————
     'solutions.group.content.eyebrow': 'Crea tu sitio',
@@ -229,7 +274,7 @@ export default defineMessages({
     'solutions.group.distribution.eyebrow': 'Crece y alcanza',
     'solutions.group.distribution.title': 'La capa de distribución',
     'solutions.group.distribution.desc':
-      'Inteligencia de palabras clave, indexación, link building, analítica e ingresos publicitarios — el trabajo que empieza cuando el sitio ya está en vivo.',
+      'Inteligencia de palabras clave, indexación, link building, analítica, campañas pagadas e ingresos publicitarios — el trabajo que empieza cuando el sitio ya está en vivo.',
     'solutions.group.distribution.item.seoIntelligence.title': 'Inteligencia SEO',
     'solutions.group.distribution.item.seoIntelligence.desc':
       'Extrae palabras clave con volumen, intención y dificultad a partir de cualquier URL o tema.',
@@ -252,8 +297,13 @@ export default defineMessages({
     'solutions.group.distribution.item.analytics.replaces': 'Configuración manual de analítica en paneles separados',
     'solutions.group.distribution.item.adRevenueTracking.title': 'Seguimiento de ingresos publicitarios',
     'solutions.group.distribution.item.adRevenueTracking.desc':
-      'Conecta cuentas publicitarias, monitorea ganancias, da seguimiento a incidencias de política y genera reportes de ingresos personalizados.',
+      'Conecta cuentas publicitarias, monitorea ganancias, da seguimiento a incidencias de política y genera reportes de ingresos personalizados. Este es el dinero que entra; lanzar campañas pagadas es Publicidad, la dirección contraria.',
     'solutions.group.distribution.item.adRevenueTracking.replaces': 'Paneles de plataformas publicitarias y seguimiento manual',
+
+    'solutions.group.distribution.item.advertising.title': 'Campañas publicitarias',
+    'solutions.group.distribution.item.advertising.desc':
+      'Arma una campaña pagada, fondéala con el saldo de tu espacio de trabajo y recupera lo que no se gastó cuando concilia.',
+    'solutions.group.distribution.item.advertising.replaces': 'Una segunda relación de cobro para anunciarte',
 
     // — Grupo: plataforma para desarrolladores ————————————————————
     'solutions.group.payments.eyebrow': 'Plataforma para desarrolladores',

@@ -32,6 +32,28 @@ export default defineMessages({
     'paymentsInvoicing.capability.issueInvoices.title': 'Issue invoices',
     'paymentsInvoicing.capability.issueInvoices.description':
       'Compliant electronic invoices generated automatically. PDF + XML output, multi-item lines, automatic tax calculation.',
+    'paymentsInvoicing.waysToCharge.eyebrow': 'Three ways to charge',
+    'paymentsInvoicing.waysToCharge.lead':
+      'Not every sale arrives through your checkout. These are the other ways money reaches you.',
+
+    'paymentsInvoicing.charge.link.title': 'Send a payment link',
+    'paymentsInvoicing.charge.link.description':
+      'Emit a link and send it to whoever owes you. The person paying does not need a 1Platform account and never signs in: the link opens straight into a hosted checkout. You can list your links, look one up, and cancel one that should no longer be paid.',
+    'paymentsInvoicing.charge.link.note':
+      'A link that has already been paid, cancelled or expired shows a short status page instead of taking money again.',
+
+    'paymentsInvoicing.charge.terminal.title': 'Take cards in person',
+    'paymentsInvoicing.charge.terminal.description':
+      'Apply for a card terminal for a business, attach the documents it asks for, send the application, and follow where it is. If something needs fixing you can correct it, and you can withdraw it while it is still open.',
+    'paymentsInvoicing.charge.terminal.prerequisite':
+      'It is an application, not an instant activation. Before you can open one, the business needs its tax identification and electronic invoicing already working, or the request comes back listing exactly what is missing. Only a branch administrator can file it, and the answer can be a rejection.',
+
+    'paymentsInvoicing.charge.subscriptions.title': 'Charge your own customers monthly',
+    'paymentsInvoicing.charge.subscriptions.description':
+      'Build your own plans, publish them, and enrol your customers on them. Keep the customer records, read the subscriptions back, and cancel one when someone leaves. Your plans, your customers, your recurring revenue.',
+    'paymentsInvoicing.charge.subscriptions.note':
+      'An invitation enrols one customer once. To bring in someone else, or the same person again after theirs is used, issue another. This is separate from the balance you hold with 1Platform.',
+
     'paymentsInvoicing.capability.trackEverything.title': 'Track everything',
     'paymentsInvoicing.capability.trackEverything.description':
       'HMAC-signed webhooks for every lifecycle event. Activity logs with method, endpoint, status and latency.',
@@ -91,6 +113,28 @@ export default defineMessages({
     'paymentsInvoicing.capability.issueInvoices.title': 'Emite facturas',
     'paymentsInvoicing.capability.issueInvoices.description':
       'Facturas electrónicas conformes, generadas automáticamente. Salida en PDF y XML, múltiples líneas por factura y cálculo automático de impuestos.',
+    'paymentsInvoicing.waysToCharge.eyebrow': 'Tres formas de cobrar',
+    'paymentsInvoicing.waysToCharge.lead':
+      'No toda venta entra por tu checkout. Estas son las otras formas en que el dinero te llega.',
+
+    'paymentsInvoicing.charge.link.title': 'Manda un enlace de cobro',
+    'paymentsInvoicing.charge.link.description':
+      'Emite un enlace y mándaselo a quien te debe. Quien paga no necesita una cuenta de 1Platform y nunca inicia sesión: el enlace abre directo en un checkout alojado. Puedes listar tus enlaces, consultar uno y cancelar el que ya no deba pagarse.',
+    'paymentsInvoicing.charge.link.note':
+      'Un enlace ya pagado, cancelado o vencido muestra una página de estado breve en lugar de volver a cobrar.',
+
+    'paymentsInvoicing.charge.terminal.title': 'Cobra con tarjeta presente',
+    'paymentsInvoicing.charge.terminal.description':
+      'Solicita una terminal para un comercio, adjunta los documentos que pide, envía la solicitud y sigue en qué punto está. Si algo hay que corregir puedes hacerlo, y puedes retirarla mientras siga abierta.',
+    'paymentsInvoicing.charge.terminal.prerequisite':
+      'Es una solicitud, no un alta inmediata. Antes de poder abrirla, el comercio necesita su identificación tributaria y la facturación electrónica ya funcionando, o la solicitud vuelve enumerando exactamente lo que falta. Sólo un administrador de sucursal puede presentarla, y la respuesta puede ser un rechazo.',
+
+    'paymentsInvoicing.charge.subscriptions.title': 'Cóbrale cada mes a tus clientes',
+    'paymentsInvoicing.charge.subscriptions.description':
+      'Arma tus propios planes, publícalos y da de alta en ellos a tus clientes. Guarda las fichas de cliente, consulta las suscripciones y cancela una cuando alguien se va. Tus planes, tus clientes, tus ingresos recurrentes.',
+    'paymentsInvoicing.charge.subscriptions.note':
+      'Una invitación da de alta a un cliente una vez. Para sumar a otra persona, o a la misma después de que use la suya, emite otra. Esto es distinto del saldo que tú tienes con 1Platform.',
+
     'paymentsInvoicing.capability.trackEverything.title': 'Registra todo',
     'paymentsInvoicing.capability.trackEverything.description':
       'Webhooks firmados con HMAC para cada evento del ciclo de vida. Registros de actividad con método, endpoint, estado y latencia.',

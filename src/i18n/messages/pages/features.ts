@@ -39,6 +39,13 @@ export default defineMessages({
     'features.commerce.invoicing.title': 'Electronic Invoicing',
     'features.commerce.invoicing.description':
       'Generate compliant electronic invoices automatically from every transaction. PDF + XML output.',
+    'features.commerce.deliveries.title': 'Delivery Management',
+    'features.commerce.deliveries.description':
+      'Register a shipment, dispatch it with your own staff or a courier service, advance its status, and hand your buyer a tracking link that needs no account.',
+    'features.commerce.branches.title': 'Businesses & Branches',
+    'features.commerce.branches.description':
+      'A workspace can hold several businesses, and each branch issues its invoices independently — its own address, its own numbering, its own record.',
+
     'features.commerce.domain.title': 'Domain Management',
     'features.commerce.domain.description':
       'Register, transfer, renew. Manage DNS records and nameservers — all programmatically.',
@@ -84,6 +91,9 @@ export default defineMessages({
     'features.distribution.item4.description':
       'Integrated marketplace for guest posts and backlinks — build authority programmatically.',
     'features.demo.indexing.title': 'Submit a URL for indexing',
+    'features.distribution.item5.title': 'Advertising Campaigns',
+    'features.distribution.item5.description':
+      'Build a paid campaign, fund it from the workspace balance, and get back whatever was not spent once the reported spend settles. Enabled per workspace.',
 
     // — Developer platform ————————————————————————————————————
     'features.developer.lead': 'The operational layer',
@@ -139,6 +149,13 @@ export default defineMessages({
     'features.commerce.invoicing.title': 'Facturación electrónica',
     'features.commerce.invoicing.description':
       'Genera facturas electrónicas conformes a la ley automáticamente por cada transacción. Salida en PDF y XML.',
+    'features.commerce.deliveries.title': 'Gestión de envíos',
+    'features.commerce.deliveries.description':
+      'Registra un envío, despáchalo con tu propio personal o con una mensajería, avanza su estado y dale a tu comprador un enlace de seguimiento que no necesita cuenta.',
+    'features.commerce.branches.title': 'Comercios y sucursales',
+    'features.commerce.branches.description':
+      'Un espacio de trabajo puede tener varios comercios, y cada sucursal emite sus facturas de forma independiente: su dirección, su numeración y su registro propios.',
+
     'features.commerce.domain.title': 'Gestión de dominios',
     'features.commerce.domain.description':
       'Registra, transfiere, renueva. Administra registros DNS y servidores de nombres — todo mediante API.',
@@ -184,6 +201,9 @@ export default defineMessages({
     'features.distribution.item4.description':
       'Marketplace integrado para guest posts y backlinks — construye autoridad de forma programática.',
     'features.demo.indexing.title': 'Enviar una URL para indexación',
+    'features.distribution.item5.title': 'Campañas publicitarias',
+    'features.distribution.item5.description':
+      'Arma una campaña pagada, fondéala con el saldo del espacio de trabajo y recupera lo que no se gastó cuando el gasto reportado concilia. Se habilita por espacio de trabajo.',
 
     // — Plataforma para desarrolladores ——————————————————————————
     'features.developer.lead': 'La capa operativa',

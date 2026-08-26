@@ -4,8 +4,8 @@ Generate per-page Open Graph images for 1platform.pro Tier 1 surfaces.
 
 Output: public/og/{solution-*,blog-*}.png — 1200×630 PNGs, ≤200 KB each.
 
-Tier 1 surfaces (from issue #32):
-  - 5 solution sub-pages
+Tier 1 surfaces (from issue #32, plus the two verticals this epic publishes):
+  - 7 solution sub-pages
   - 3 new refocus blog posts
 
 Reuses the brand tokens + aurora background from generate-og-default.py so
@@ -223,6 +223,18 @@ CARDS = [
         kind="Solution",
         title="Payments & Electronic Invoicing",
         subline="Accept online card payments and issue compliant electronic invoices automatically. Webhook-driven, audit-ready.",
+    ),
+    Card(
+        out_name="solution-deliveries.png",
+        kind="Solution",
+        title="Delivery Management",
+        subline="Register, dispatch and track every shipment. Own-fleet works end to end, and your buyer tracks it without an account.",
+    ),
+    Card(
+        out_name="solution-ads.png",
+        kind="Solution",
+        title="Advertising Campaigns",
+        subline="Build a campaign, fund it from your workspace balance, and get back whatever was not spent when it closes.",
     ),
     # 3 new refocus blog posts
     Card(

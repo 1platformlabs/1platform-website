@@ -175,7 +175,7 @@ test('neither RSS feed carries the other language', () => {
 
 test('no provider name appears under /es/ outside the privacy policy', () => {
   const banned =
-    /openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b/i;
+    /openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b/i;
 
   const leaks = spanishPages()
     .filter((p) => !relative(DIST, p).startsWith('es/privacy/'))
@@ -239,6 +239,8 @@ test('the English tree kept every page it had before the epic', () => {
     'solutions/website/',
     'solutions/whitelabel/',
     'solutions/content/',
+    'solutions/deliveries/',
+    'solutions/ads/',
     'payments-invoicing/',
     'for-agencies/',
     'for-developers/',
