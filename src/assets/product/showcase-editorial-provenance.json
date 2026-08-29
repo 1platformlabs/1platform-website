@@ -1,0 +1,47 @@
+{
+  "revision": "2026-08-29-v2",
+  "generator": "workspace image-generation tool",
+  "shared_direction": "Photoreal editorial business moment in a warm paper, charcoal, cobalt, coral and amber palette. Keep the human action in the left third and the right 42 percent quiet for the product-node overlay. Natural materials, subtle grain, no readable text, logos, trademarks, watermarks, dashboards, UI, icons, split screens or collages.",
+  "transform": {
+    "fit": "cover",
+    "position": "centre",
+    "width": 2880,
+    "height": 1800,
+    "format": "webp",
+    "quality": 80,
+    "effort": 6
+  },
+  "assets": {
+    "store": {
+      "generation_ids": ["43d402ce-ead9-4e5c-a7c9-f8f41f39b2d5"],
+      "canonical_prompt": "Independent shop owner wrapping a product into a cobalt parcel in a warm tactile studio; shelves, paper and ceramics support the scene; generous quiet wall to the right."
+    },
+    "payments": {
+      "generation_ids": [
+        "b44afe9a-c5ee-41e0-8301-1fbe508f196b",
+        "74b59f75-a035-47ff-883d-717842ae24fc",
+        "1c625b5e-85d2-498a-bda5-c492b31588e4"
+      ],
+      "canonical_prompt": "Customer presenting a completely blank cobalt card to an independent merchant holding a neutral card terminal at a warm stone counter; no card markings or device branding."
+    },
+    "content": {
+      "generation_ids": [
+        "6dc4fc40-93c4-4d9b-96cf-1db56ecd91cf",
+        "e9e2da51-1270-491a-bf78-7e7ed5e39f1f",
+        "a8174942-f5c1-4fa8-b254-817497497e5a"
+      ],
+      "canonical_prompt": "Creator arranging blank pages and photographic prints around a cobalt folio in a warm studio; clean tabletop with no camera, words, emblems or branded objects."
+    },
+    "deliveries": {
+      "generation_ids": [
+        "56d22087-4eee-4d48-9ad2-7bb1ccd79082",
+        "12c429ba-fbab-4926-9397-6cb08aefd366"
+      ],
+      "canonical_prompt": "Shop owner handing a cobalt parcel with a completely blank white label to a local courier beside a cargo bicycle and plant-filled doorway."
+    },
+    "ads": {
+      "generation_ids": ["5c97b88c-3073-4a42-ba2c-118dab3ae346"],
+      "canonical_prompt": "Small creative team reviewing an abstract coral, cobalt and stone outdoor set at golden hour, with a camera tripod and blank sculptural billboard surfaces."
+    }
+  }
+}

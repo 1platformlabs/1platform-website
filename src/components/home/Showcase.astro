@@ -8,9 +8,10 @@ import ShowcasePanel from './ShowcasePanel.astro';
 import { SHOWCASE } from './showcase-content';
 
 /**
- * The scroll-pinned showcase (LMW-05): a full-bleed background that stays put
- * while five panels of connected nodes scroll past it, and a floating pill
- * whose sliding tablist names the solution on screen.
+ * The scroll-pinned showcase (LMW-05): an editorial business moment stays put
+ * behind each solution while its connected product nodes scroll past it, and
+ * a floating pill names the solution on screen. Backgrounds tell the human
+ * outcome; node cards remain the evidence of the real product workflow.
  *
  * Geometry measured on the reference: section 3 419 px at 1440 (padding
  * 216/0/344, five 559 px panels with a 16 px gap), pill 353 × 114 at x 243,
@@ -34,15 +35,39 @@ const solutions = SHOWCASE.map((solution) => ({
   <div class="showcase__pin" aria-hidden="true">
     <div class="showcase__bg">
       {solutions.map((solution, i) => (
-        <div class:list={['showcase__bgimg', i === 0 && 'is-active']} data-bg={solution.slug}>
+        <div
+          class:list={['showcase__bgimg', i === 0 && 'is-active']}
+          data-bg={solution.slug}
+          style={`--showcase-bg-x:${solution.bgFocalX}%;`}
+        >
           {solution.bg.image ? (
-            <Image
-              src={solution.bg.image}
-              width={solution.bg.slot.width}
-              height={solution.bg.slot.height}
-              alt=""
-              loading={i === 0 ? 'eager' : 'lazy'}
-            />
+            i === 0 ? (
+              <Image
+                src={solution.bg.image}
+                width={solution.bg.slot.width}
+                height={solution.bg.slot.height}
+                widths={[390, 780, 1024, 1440, 1920, 2048, 2880]}
+                sizes="100vw"
+                layout="full-width"
+                alt=""
+                loading="lazy"
+                fetchpriority="low"
+              />
+            ) : (
+              <template data-bg-template>
+                <Image
+                  src={solution.bg.image}
+                  width={solution.bg.slot.width}
+                  height={solution.bg.slot.height}
+                  widths={[390, 780, 1024, 1440, 1920, 2048, 2880]}
+                  sizes="100vw"
+                  layout="full-width"
+                  alt=""
+                  loading="lazy"
+                  fetchpriority="low"
+                />
+              </template>
+            )
           ) : (
             <SlotPlaceholder spec={solution.bg.slot} />
           )}
@@ -63,7 +88,7 @@ const solutions = SHOWCASE.map((solution) => ({
               class:list={['showcase__tab', 'ref-body-s', i === 0 && 'is-active']}
               aria-selected={i === 0 ? 'true' : 'false'}
               aria-controls={`canvas-showcase-${solution.slug}`}
-              tabindex={i === 0 ? 0 : -1}
+              tabindex={0}
               data-tab={solution.slug}
             >
               {solution.label}
@@ -99,7 +124,7 @@ const solutions = SHOWCASE.map((solution) => ({
 
 <script>
   /**
-   * ≤ 1 KB of progressive behaviour (D-10): the scroll picks the active
+   * Progressive behaviour (D-10): the scroll picks the active
    * solution; a tab click scrolls to its panel; arrows move the selection.
    * Lenis owns smooth anchor scrolling when it is running — this only takes
    * over when it is not (reduced motion), where a plain jump is correct.
@@ -111,12 +136,45 @@ const solutions = SHOWCASE.map((solution) => ({
 
     const tabs = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-tab]'));
     const strip = root.querySelector<HTMLElement>('[data-tabs]');
+    const backgrounds = Array.from(root.querySelectorAll<HTMLElement>('[data-bg]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-showcase-panel]'));
     const reduced = globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let backgroundRequest = 0;
+
+    async function ensureBackground(background: HTMLElement): Promise<boolean> {
+      let image = background.querySelector<HTMLImageElement>('img');
+      if (!image && background.querySelector('[data-placeholder]')) return true;
+      if (!image) {
+        const template = background.querySelector<HTMLTemplateElement>('[data-bg-template]');
+        if (!template) return false;
+        background.append(template.content.cloneNode(true));
+        template.remove();
+        image = background.querySelector<HTMLImageElement>('img');
+      }
+      if (!image) return false;
+      if (image.complete) return image.naturalWidth > 0;
+      try {
+        await image.decode();
+        return image.naturalWidth > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function selectBackground(slug: string) {
+      const request = ++backgroundRequest;
+      const background = backgrounds.find((candidate) => candidate.dataset.bg === slug);
+      if (!background) return;
+      void ensureBackground(background).then((ready) => {
+        if (!ready || request !== backgroundRequest) return;
+        for (const candidate of backgrounds) {
+          candidate.classList.toggle('is-active', candidate === background);
+        }
+      });
+    }
 
     function activate(slug: string) {
-      for (const el of root!.querySelectorAll<HTMLElement>('[data-bg]')) {
-        el.classList.toggle('is-active', el.dataset.bg === slug);
-      }
+      selectBackground(slug);
       for (const el of root!.querySelectorAll<HTMLElement>('[data-entry]')) {
         el.classList.toggle('is-active', el.dataset.entry === slug);
       }
@@ -135,30 +193,62 @@ const solutions = SHOWCASE.map((solution) => ({
       }
     }
 
+    function scrollToPanel(slug: string) {
+      const panel = panels.find((candidate) => candidate.dataset.showcasePanel === slug);
+      if (!panel) return;
+      const offset = -Math.max(0, (globalThis.innerHeight - panel.offsetHeight) / 2);
+      const lenis = (globalThis as {
+        __lenis?: { scrollTo: (target: HTMLElement, options?: { offset?: number }) => void };
+      }).__lenis;
+      if (!reduced && lenis) {
+        lenis.scrollTo(panel, { offset });
+        return;
+      }
+      const top = globalThis.scrollY + panel.getBoundingClientRect().top + offset;
+      globalThis.scrollTo({ top, behavior: 'instant' });
+    }
+
+    const visibility = new Map(panels.map((panel) => [panel, 0]));
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const slug = (entry.target as HTMLElement).dataset.showcasePanel;
-          if (slug) activate(slug);
+          visibility.set(entry.target as HTMLElement, entry.isIntersecting ? entry.intersectionRatio : 0);
         }
+        const active = panels
+          .filter((panel) => (visibility.get(panel) ?? 0) > 0)
+          .sort((a, b) => {
+            const ratio = (visibility.get(b) ?? 0) - (visibility.get(a) ?? 0);
+            if (Math.abs(ratio) > 0.01) return ratio;
+            const centre = globalThis.innerHeight / 2;
+            const aBox = a.getBoundingClientRect();
+            const bBox = b.getBoundingClientRect();
+            return (
+              Math.abs(aBox.top + aBox.height / 2 - centre) -
+              Math.abs(bBox.top + bBox.height / 2 - centre)
+            );
+          })[0];
+        const slug = active?.dataset.showcasePanel;
+        if (slug) activate(slug);
       },
-      { threshold: 0.5 },
+      { threshold: [0, 0.5, 1] },
     );
-    for (const panel of root.querySelectorAll('[data-showcase-panel]')) observer.observe(panel);
+    for (const panel of panels) observer.observe(panel);
 
     for (const [i, tab] of tabs.entries()) {
-      tab.addEventListener('click', (e) => {
-        const slug = tab.dataset.tab!;
-        activate(slug);
-        // Lenis intercepts same-page anchors while it runs; under reduced
-        // motion it is not running and its handler swallows the click, so the
-        // jump has to happen here.
-        if (reduced) {
+      tab.addEventListener(
+        'click',
+        (e) => {
+          const slug = tab.dataset.tab!;
           e.preventDefault();
-          document.getElementById(`canvas-showcase-${slug}`)?.scrollIntoView({ behavior: 'auto' });
-        }
-      });
+          e.stopImmediatePropagation();
+          activate(slug);
+          if (globalThis.location.hash !== tab.hash) {
+            globalThis.history.pushState(null, '', tab.hash);
+          }
+          scrollToPanel(slug);
+        },
+        { capture: true },
+      );
       tab.addEventListener('keydown', (e) => {
         if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
         e.preventDefault();
@@ -166,6 +256,26 @@ const solutions = SHOWCASE.map((solution) => ({
         next.focus();
         next.click();
       });
+    }
+
+    function restoreRequestedPanel(): boolean {
+      const requested = tabs.find((tab) => tab.hash === globalThis.location.hash);
+      const requestedSlug = requested?.dataset.tab;
+      if (!requestedSlug) return false;
+      activate(requestedSlug);
+      globalThis.requestAnimationFrame(() => scrollToPanel(requestedSlug));
+      return true;
+    }
+
+    globalThis.addEventListener('popstate', restoreRequestedPanel);
+    document.addEventListener(
+      'astro:before-swap',
+      () => globalThis.removeEventListener('popstate', restoreRequestedPanel),
+      { once: true },
+    );
+    if (!restoreRequestedPanel()) {
+      const firstSlug = tabs[0]?.dataset.tab;
+      if (firstSlug) activate(firstSlug);
     }
   }
 
@@ -214,6 +324,7 @@ const solutions = SHOWCASE.map((solution) => ({
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: var(--showcase-bg-x) center;
   }
 
   /* The floating pill: sticky with the section, 353 wide, at x 243 / y 216. */

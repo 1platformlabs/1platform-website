@@ -65,6 +65,11 @@ on merge; this entry documents the change set.
   measured half of it), zero for everything else.
 
 ### Fixed
+- **El Showcase ahora representa cada solución con una escena editorial propia**
+  — comercio, cobro, creación, entrega y publicidad — en lugar de ampliar
+  pantallas del dashboard y estados vacíos como fondo. Las pantallas reales se
+  conservan en los nodos como evidencia del flujo; cada fondo tiene un recorte
+  focal específico y los cuatro inactivos no se descargan hasta necesitarlos.
 - **The hero and module slogans now preserve the measured composition**: two
   lines at desktop, three hero lines at mobile, 56/56 px in both cases. The
   hero keeps the exact 860/804 px reference baselines while adapting to other

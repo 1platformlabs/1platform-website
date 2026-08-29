@@ -2,14 +2,15 @@
  * Every image hole on the home page, by id and size.
  *
  * This is the contract between three things that otherwise drift apart: the
- * components that render a hole, the capture script that fills it with a real
- * product screen (`scripts/capture-product-media.mjs`), and the test that says
+ * components that render a hole, the media pipeline that fills it with a real
+ * product screen or an original editorial background
+ * (`scripts/capture-product-media.mjs`), and the test that says
  * which holes are still placeholders (`tests/media-complete.spec.ts`). A hole
  * that is not declared here cannot be filled, and a file that names no hole is
  * not used — both are reported, neither is silent.
  *
  * Sizes are CSS pixels at 1x, measured on the reference (epic
- * home-landing-redesign, §6.1). The capture script produces 2x for retina.
+ * home-landing-redesign, §6.1). Produced assets are stored at 2x for retina.
  *
  * Alt text lives in the i18n catalogue under `home.media.<slot>` — one key per
  * hole, so a screenshot is described by what it shows, not by its file name.
@@ -22,6 +23,9 @@ const slot = (id: string, width: number, height: number): MediaSlot => ({ id, wi
 /** The showcase's five solutions, in scroll order. Slugs are URL-safe and stable. */
 export const SHOWCASE_SLUGS = ['store', 'payments', 'content', 'deliveries', 'ads'] as const;
 export type ShowcaseSlug = (typeof SHOWCASE_SLUGS)[number];
+
+/** Original editorial backgrounds: these are never replaced by the product-screen capture run. */
+export const SHOWCASE_BACKGROUND_IDS = SHOWCASE_SLUGS.map((slug) => `showcase-${slug}-bg` as const);
 
 /** Nodes per showcase panel. The count is the number of node cards that panel draws. */
 export const SHOWCASE_NODE_COUNT: Record<ShowcaseSlug, number> = {
@@ -74,7 +78,7 @@ const HERO_PAIRS = HERO_PAIR_SIZES.flatMap(([w, h], i) => [
 export const MEDIA_SLOTS: readonly MediaSlot[] = [
   ...HERO_STRIP,
   ...HERO_PAIRS,
-  ...SHOWCASE_SLUGS.map((s) => slot(`showcase-${s}-bg`, 1440, 900)),
+  ...SHOWCASE_BACKGROUND_IDS.map((id) => slot(id, 1440, 900)),
   ...SHOWCASE_SLUGS.flatMap((s) =>
     Array.from({ length: SHOWCASE_NODE_COUNT[s] }, (_, i) => slot(`showcase-${s}-node-${i + 1}`, 280, 280)),
   ),
