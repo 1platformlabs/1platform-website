@@ -15,6 +15,8 @@ import ProcessSpine from '@components/ProcessSpine.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import HeroFan from '@components/home/HeroFan.astro';
+import ModuleCarousel from '@components/home/ModuleCarousel.astro';
+import PersonaStack from '@components/home/PersonaStack.astro';
 import Showcase from '@components/home/Showcase.astro';
 import { useI18n } from '@i18n';
 import type { IconName } from '@components/icons';
@@ -143,39 +145,13 @@ const capabilityGroups: { group: string; items: { title: string; href: string }[
   },
 ];
 
-const useCases: { icon: IconName; title: string; description: string }[] = [
-  {
-    icon: 'monitor',
-    title: t('home.useCase.smallBusiness.title'),
-    description: t('home.useCase.smallBusiness.description'),
-  },
-  {
-    icon: 'cart',
-    title: t('home.useCase.sellers.title'),
-    description: t('home.useCase.sellers.description'),
-  },
-  {
-    icon: 'message',
-    title: t('home.useCase.services.title'),
-    description: t('home.useCase.services.description'),
-  },
-  {
-    icon: 'users',
-    title: t('home.useCase.agencies.title'),
-    description: t('home.useCase.agencies.description'),
-  },
-  {
-    icon: 'code',
-    title: t('home.useCase.developers.title'),
-    description: t('home.useCase.developers.description'),
-  },
-];
-
 ---
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd}>
   <HeroFan />
   <Showcase />
+  <PersonaStack />
+  <ModuleCarousel />
 
   <!-- The sections below are the PREVIOUS home, kept temporarily so the page
        is never broken between phases (§14.3): F3 replaces the middle with
@@ -284,27 +260,6 @@ const useCases: { icon: IconName; title: string; description: string }[] = [
           />
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Who it's for: an editorial list, not a grid of identical cards -->
-  <section class="section">
-    <div class="container">
-      <div class="section__rule">
-        <p class="eyebrow">{t('home.section.whoFor.eyebrow')}</p>
-      </div>
-
-      <ul class="audience">
-        {useCases.map((useCase) => (
-          <li class="audience__item reveal">
-            <span class="audience__icon"><Icon name={useCase.icon} size={20} /></span>
-            <div>
-              <h3 class="audience__title">{useCase.title}</h3>
-              <p class="audience__desc">{useCase.description}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   </section>
 

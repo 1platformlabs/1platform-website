@@ -1,0 +1,73 @@
+---
+/**
+ * The segmented control under the persona stack (LMW-06 CA-4): a white pill,
+ * one button per audience, the active one on the AA-safe orange. Rendered as
+ * anchors so that without JavaScript it still reaches every card; the script
+ * turns it into a real tablist with roving focus.
+ */
+interface Props {
+  tabs: { slug: string; label: string }[];
+  ariaLabel: string;
+  /** `#<hrefPrefix><slug>` is where each anchor points. */
+  hrefPrefix: string;
+  /** Attribute the page script uses to find and drive this control. */
+  dataAttr: string;
+}
+
+const { tabs, ariaLabel, hrefPrefix, dataAttr } = Astro.props;
+---
+
+<div class="seg" role="tablist" aria-label={ariaLabel} {...{ [dataAttr]: '' }}>
+  {tabs.map((tab, i) => (
+    <a
+      href={`#${hrefPrefix}${tab.slug}`}
+      role="tab"
+      class:list={['seg__tab', 'ref-body-s', i === 0 && 'is-active']}
+      aria-selected={i === 0 ? 'true' : 'false'}
+      tabindex={i === 0 ? 0 : -1}
+      data-seg-tab={tab.slug}
+    >
+      {tab.label}
+    </a>
+  ))}
+</div>
+
+<style>
+  /* Measured: 559 × 47, white, r8, 8 px padding; active button 84 × 31 on the
+     orange, r6. Width follows the labels (Spanish runs longer than English). */
+  .seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: var(--ref-white);
+    border-radius: var(--ref-radius-m);
+  }
+
+  .seg__tab {
+    display: inline-flex;
+    align-items: center;
+    min-height: 31px;
+    padding: 8px 16px;
+    border-radius: var(--ref-radius-s);
+    color: var(--ref-ink);
+    white-space: nowrap;
+  }
+
+  .seg__tab.is-active {
+    background: var(--ref-orange-cta);
+    color: var(--ref-white);
+  }
+
+  .seg__tab:focus-visible {
+    outline: 2px solid var(--ref-orange);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 768px) {
+    .seg {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  }
+</style>

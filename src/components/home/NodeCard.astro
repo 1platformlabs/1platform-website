@@ -3,7 +3,7 @@ import { useI18n } from '@i18n';
 import { Image } from 'astro:assets';
 import SlotPlaceholder from './SlotPlaceholder.astro';
 import { productMedia } from './media';
-import { NODE_PADDING, nodeHeight, type ShowcaseNode } from './showcase-content';
+import { nodeHeight, type ShowcaseNode } from './showcase-content';
 
 /**
  * One node of a showcase panel: a labelled card with a product capture and a
@@ -24,7 +24,6 @@ const { t } = useI18n(Astro.url.pathname);
 const label = t(`home.showcase.${slug}.node.${node.n}.label`);
 const chip = t(`home.showcase.${slug}.node.${node.n}.chip`);
 const media = productMedia(`showcase-${slug}-node-${node.n}`);
-const mediaSize = node.w - 2 * NODE_PADDING;
 
 const Tag = node.href ? 'a' : 'article';
 ---

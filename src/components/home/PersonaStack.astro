@@ -1,0 +1,374 @@
+---
+import { useI18n } from '@i18n';
+import { Image } from 'astro:assets';
+import SlotPlaceholder from './SlotPlaceholder.astro';
+import { productMedia } from './media';
+import SegmentedTabs from './SegmentedTabs.astro';
+import { PERSONAS, SATELLITE_POSITIONS, STACK_POSITIONS } from './personas-content';
+
+/**
+ * The persona stack (LMW-06): five audience cards fanned behind each other —
+ * front card 400 × 525, each one behind stepping X +29/+21/+17/+13 and rising
+ * Y −45/−33/−26/−21 (measured, RT2-3) — four satellite cards with yellow
+ * capability labels around the active audience, and a segmented control that
+ * brings an audience to the front.
+ *
+ * Copy: zero new strings (CA-2) — the five `home.useCase.*` pairs. All five
+ * cards are in the DOM in order; the script only re-deals `data-pos` and
+ * hides the non-front ones from assistive tech (CA-6). Without JavaScript the
+ * stack lays out as a column, everything visible, and the control is anchors.
+ */
+const { t, l } = useI18n(Astro.url.pathname);
+
+const personas = PERSONAS.map((persona) => ({
+  ...persona,
+  title: t(`home.useCase.${persona.copyKey}.title`),
+  description: t(`home.useCase.${persona.copyKey}.description`),
+  media: productMedia(`persona-${persona.slug}`),
+}));
+---
+
+<section id="personas" class="personas ref-dot-grid" aria-labelledby="personas-title">
+  <h2 id="personas-title" class="sr-only">{t('home.personas.title')}</h2>
+
+  <div class="personas__frame" data-persona-root>
+    <div class="personas__stack">
+      {personas.map((persona, i) => (
+        <article
+          id={`persona-${persona.slug}`}
+          class="pcard"
+          data-persona-card={persona.slug}
+          data-pos={i}
+        >
+          <div class="pcard__media">
+            {persona.media.image ? (
+              <Image
+                src={persona.media.image}
+                width={persona.media.slot.width}
+                height={persona.media.slot.height}
+                alt={t(`home.media.persona-${persona.slug}`)}
+                loading="lazy"
+              />
+            ) : (
+              <SlotPlaceholder spec={persona.media.slot} />
+            )}
+            <span class="pcard__tag" aria-hidden="true">{t('home.personas.brandTag')}</span>
+          </div>
+          <h3 class="pcard__title ref-h-card">
+            <a href={l(persona.href)} aria-label={t('home.personas.open', { title: persona.title })}>
+              {persona.title}
+            </a>
+          </h3>
+          <p class="pcard__desc ref-body-s">{persona.description}</p>
+        </article>
+      ))}
+    </div>
+
+    {personas.map((persona, pi) =>
+      persona.satellites.map((satelliteKey, si) => {
+        const media = productMedia(`persona-${persona.slug}-sat-${si + 1}`);
+        const pos = SATELLITE_POSITIONS[si];
+        return (
+          <div
+            class="psat"
+            data-persona-sat={persona.slug}
+            hidden={pi === 0 ? undefined : true}
+            style={`--px:${pos.x}px; --py:${pos.y}px; --ps:${pos.size}px; --si:${si};`}
+          >
+            <span class="psat__label ref-body-s">{t(satelliteKey)}</span>
+            <span class="psat__media">
+              {media.image ? (
+                <Image
+                  src={media.image}
+                  width={media.slot.width}
+                  height={media.slot.height}
+                  alt={t(`home.media.persona-${persona.slug}-sat-${si + 1}`)}
+                  loading="lazy"
+                />
+              ) : (
+                <SlotPlaceholder spec={media.slot} />
+              )}
+            </span>
+          </div>
+        );
+      }),
+    )}
+  </div>
+
+  <div class="personas__control">
+    <SegmentedTabs
+      tabs={personas.map((p) => ({ slug: p.slug, label: t(`home.personas.tab.${p.slug}`) }))}
+      ariaLabel={t('home.personas.tabsAria')}
+      hrefPrefix="persona-"
+      dataAttr="data-persona-tabs"
+    />
+  </div>
+</section>
+
+<script>
+  /**
+   * ≤ 1 KB (D-10): the control re-deals the stack. Position k of card i for
+   * active audience a is (i − a) mod 5; satellites follow the front card;
+   * non-front cards leave the accessibility tree while stacked (CA-6).
+   */
+  function initPersonas() {
+    const root = document.querySelector<HTMLElement>('[data-persona-root]');
+    const tablist = document.querySelector<HTMLElement>('[data-persona-tabs]');
+    if (!root || !tablist || root.dataset.wired) return;
+    root.dataset.wired = 'true';
+
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-persona-card]'));
+    const tabs = Array.from(tablist.querySelectorAll<HTMLAnchorElement>('[data-seg-tab]'));
+    const slugs = cards.map((c) => c.dataset.personaCard!);
+
+    function deal(active: string) {
+      const a = slugs.indexOf(active);
+      if (a < 0) return;
+      cards.forEach((card, i) => {
+        const pos = (i - a + cards.length) % cards.length;
+        card.dataset.pos = String(pos);
+        if (pos === 0) card.removeAttribute('aria-hidden');
+        else card.setAttribute('aria-hidden', 'true');
+      });
+      for (const sat of root!.querySelectorAll<HTMLElement>('[data-persona-sat]')) {
+        sat.hidden = sat.dataset.personaSat !== active;
+      }
+      for (const tab of tabs) {
+        const isActive = tab.dataset.segTab === active;
+        tab.classList.toggle('is-active', isActive);
+        tab.setAttribute('aria-selected', String(isActive));
+        tab.tabIndex = isActive ? 0 : -1;
+      }
+    }
+
+    deal(slugs[0]);
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', (e) => {
+        // With the stack dealt, the card is already on screen: switching is
+        // the action, not scrolling (the anchors are the no-JS path).
+        e.preventDefault();
+        deal(tab.dataset.segTab!);
+      });
+      tab.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        e.preventDefault();
+        const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+        next.focus();
+        next.click();
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initPersonas);
+</script>
+
+<style>
+  /* Measured: 933 tall — 224 padding, 525 front card, control at y 789, 96
+     below. */
+  .personas {
+    padding: 224px 32px 96px;
+    color: var(--ref-ink);
+  }
+
+  .personas__frame {
+    position: relative;
+    max-width: 1440px;
+    height: 525px;
+    margin: 0 auto;
+  }
+
+  .personas__stack {
+    position: relative;
+    height: 100%;
+  }
+
+  .pcard {
+    position: absolute;
+    left: calc(50% - 200px + var(--sdx));
+    top: var(--sy);
+    width: var(--sw);
+    padding: 12px 12px 16px;
+    background: var(--ref-white);
+    border-radius: var(--ref-radius-m);
+    box-shadow: var(--shadow-md);
+  }
+
+  .pcard[data-pos='0'] { --sdx: 0px; --sy: 0px; --sw: 400px; min-height: 525px; z-index: 5; }
+  .pcard[data-pos='1'] { --sdx: 29px; --sy: -45px; --sw: 343px; z-index: 4; }
+  .pcard[data-pos='2'] { --sdx: 50px; --sy: -78px; --sw: 300px; z-index: 3; }
+  .pcard[data-pos='3'] { --sdx: 67px; --sy: -104px; --sw: 267px; z-index: 2; }
+  .pcard[data-pos='4'] { --sdx: 80px; --sy: -125px; --sw: 240px; z-index: 1; }
+
+  .pcard__media {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--ref-radius-m);
+    overflow: hidden;
+  }
+
+  .pcard__media :global(img),
+  .pcard__media :global(svg) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* The vertical brand tag on the media's left edge (10 px, measured). */
+  .pcard__tag {
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: rotate(180deg) translateY(50%);
+    writing-mode: vertical-rl;
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--ref-ink);
+  }
+
+  .pcard__title {
+    margin: 8px 24px 0 8px;
+  }
+
+  .pcard__title a {
+    color: var(--ref-ink);
+  }
+
+  .pcard__title a:hover,
+  .pcard__title a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .pcard__desc {
+    margin: 8px 24px 0 8px;
+    color: var(--ref-ink);
+  }
+
+  /* Cards behind the front one show only their top edge; their text is
+     covered, and aria-hidden (set by the script) matches what is visible. */
+
+  .psat {
+    position: absolute;
+    left: var(--px);
+    top: var(--py);
+    width: var(--ps);
+  }
+
+  .psat__label {
+    position: absolute;
+    top: -10px;
+    right: -12px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 2px 10px;
+    background: var(--ref-yellow);
+    color: var(--ref-ink);
+    border-radius: var(--ref-radius-s);
+    white-space: nowrap;
+  }
+
+  .psat__media {
+    display: block;
+    aspect-ratio: 1;
+    padding: 4px;
+    background: var(--ref-white);
+    border-radius: var(--ref-radius-m);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .psat__media :global(img),
+  .psat__media :global(svg) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--ref-radius-s);
+  }
+
+  .personas__control {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+  }
+
+  /* Between phone and the full 1440 frame the satellite corners fall outside
+     the visible band; the stack and the control carry the section alone. */
+  @media (min-width: 769px) and (max-width: 1199px) {
+    .psat {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .personas {
+      padding: 96px 20px 64px;
+    }
+
+    .personas__frame {
+      height: auto;
+    }
+
+    .pcard {
+      position: static;
+      width: 100%;
+      display: none;
+    }
+
+    .pcard[data-pos='0'] {
+      display: block;
+    }
+
+    /* On the reference's phone layout the satellites collapse to their yellow
+       labels, pinned to the card's top-right corner. */
+    .psat {
+      position: absolute;
+      left: auto;
+      right: 8px;
+      top: calc(20px + var(--si) * 34px);
+      width: auto;
+      z-index: 6;
+    }
+
+    .psat__media {
+      display: none;
+    }
+
+    .psat__label {
+      position: static;
+    }
+
+    .personas__control {
+      margin-top: 24px;
+    }
+  }
+
+  /* Without JavaScript nothing can re-deal the stack: it unrolls into a
+     column with every audience visible (CA-4) and the control's anchors jump
+     to each card. Declared LAST so it wins over the phone layout's
+     single-card rule at any width. */
+  @media (scripting: none) {
+    .personas__frame {
+      height: auto;
+    }
+
+    .personas__stack {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .pcard {
+      position: static;
+      display: block;
+      width: min(400px, 100%);
+    }
+
+    .psat {
+      display: none;
+    }
+  }
+</style>

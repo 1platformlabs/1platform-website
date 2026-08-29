@@ -136,6 +136,32 @@ export default defineMessages({
     'home.group.developer.item.agents': 'AI Agents',
     'home.group.developer.item.logs': 'Activity Logs',
 
+
+    // — Personas (LMW-06) — titles/descriptions reuse home.useCase.* ————
+    'home.personas.title': 'Made for how you work',
+    'home.personas.tabsAria': 'Choose your kind of business',
+    'home.personas.open': 'See how {title} use 1Platform',
+    // The vertical tag on each card's media is the brand name, identical in
+    // both trees — brand, not copy.
+    'home.personas.brandTag': '1PLATFORM',
+    // Short names for the segmented control only — the cards keep the full
+    // home.useCase.* copy. The reference's control is 559 px wide; the full
+    // titles measured ~1,000 and overlapped the satellites (deviation noted
+    // in the PROGRESO).
+    'home.personas.tab.small-business': 'Small business',
+    'home.personas.tab.sellers': 'Sellers & creators',
+    'home.personas.tab.services': 'Services',
+    'home.personas.tab.agencies': 'Agencies',
+    'home.personas.tab.developers': 'Developers',
+
+    // — Module carousel (LMW-07, D-11) ————————————————————————————
+    // The heading is the brand line, English in both trees like the H1.
+    'home.modules.title': 'One platform. Every solution.',
+    'home.modules.carouselAria': 'Every module of the platform',
+    'home.modules.prev': 'Previous modules',
+    'home.modules.next': 'Next modules',
+    'home.modules.position': '{current} of {total}: {label}',
+
     // — How it works —————————————————————————————————————————————
     'home.section.howItWorks.eyebrow': 'How it works',
     'home.section.howItWorks.lead': 'From account to live store, in one platform.',
@@ -158,8 +184,7 @@ export default defineMessages({
     "description": "Order #1042"
   }'`,
 
-    // — Who it's for ——————————————————————————————————————————————
-    'home.section.whoFor.eyebrow': "Who it's for",
+    // — Who it's for (rendered by the persona stack since F3) ————————
     'home.useCase.smallBusiness.title': 'Small business owners',
     'home.useCase.smallBusiness.description':
       'Launch your store or website in days, not months — payments, invoicing, and content handled for you.',
@@ -307,6 +332,25 @@ export default defineMessages({
     'home.group.developer.item.agents': 'Agentes de IA',
     'home.group.developer.item.logs': 'Registro de actividad',
 
+
+    // — Personas (LMW-06) ————————————————————————————————————————
+    'home.personas.title': 'Hecho para tu forma de trabajar',
+    'home.personas.tabsAria': 'Elige tu tipo de negocio',
+    'home.personas.open': 'Mira cómo usan 1Platform: {title}',
+    'home.personas.brandTag': '1PLATFORM',
+    'home.personas.tab.small-business': 'Negocios pequeños',
+    'home.personas.tab.sellers': 'Vendedores y creadores',
+    'home.personas.tab.services': 'Servicios',
+    'home.personas.tab.agencies': 'Agencias',
+    'home.personas.tab.developers': 'Desarrolladores',
+
+    // — Carrusel de módulos (LMW-07, D-11) ———————————————————————
+    'home.modules.title': 'One platform. Every solution.',
+    'home.modules.carouselAria': 'Todos los módulos de la plataforma',
+    'home.modules.prev': 'Módulos anteriores',
+    'home.modules.next': 'Módulos siguientes',
+    'home.modules.position': '{current} de {total}: {label}',
+
     // — Cómo funciona ————————————————————————————————————————————
     'home.section.howItWorks.eyebrow': 'Cómo funciona',
     'home.section.howItWorks.lead': 'De la cuenta a la tienda en vivo, en una sola plataforma.',
@@ -327,8 +371,7 @@ export default defineMessages({
     "description": "Order #1042"
   }'`,
 
-    // — A quién va dirigido ——————————————————————————————————————
-    'home.section.whoFor.eyebrow': 'Para quién es',
+    // — A quién va dirigido (lo dibuja la pila de personas desde F3) —
     'home.useCase.smallBusiness.title': 'Pequeños negocios',
     'home.useCase.smallBusiness.description':
       'Lanza tu tienda o sitio en días, no en meses — con pagos, facturación y contenido ya resueltos.',
