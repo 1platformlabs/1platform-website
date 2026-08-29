@@ -2,7 +2,8 @@ import type { ImageMetadata } from 'astro';
 import { mediaSlot, type MediaSlot } from './media-slots';
 
 /**
- * Resolve a media slot to the real product capture, if one has been produced.
+ * Resolve a media slot to its produced asset: a real product capture for the
+ * product surfaces, or an original editorial image for a showcase background.
  *
  * Files live in `src/assets/product/<slot>.webp` (the capture script writes
  * them, see scripts/capture-product-media.mjs) and go through `astro:assets`
@@ -27,4 +28,3 @@ export function productMedia(id: string): ResolvedMedia {
   const slot = mediaSlot(id);
   return { slot, image: byStem.get(id) ?? null };
 }
-

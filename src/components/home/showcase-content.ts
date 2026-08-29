@@ -36,6 +36,8 @@ export type ShowcaseSolution = {
   labelKey: string;
   href: string;
   icon: IconName;
+  /** Horizontal focal point kept visible when the 16:10 editorial crops on mobile. */
+  bgFocalX: number;
   nodes: ShowcaseNode[];
   /** Pairs of node indices (1-based) a connector joins, source → target. */
   wires: [number, number][];
@@ -47,6 +49,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
     labelKey: i18nKey('nav.solutions.onlineStore'),
     href: '/solutions/online-store/',
     icon: 'cart',
+    bgFocalX: 32,
     nodes: [
       { n: 1, x: 36, y: 60, w: 236 },
       { n: 2, x: 320, y: 36, w: 196 },
@@ -66,6 +69,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
     labelKey: i18nKey('nav.solutions.payments'),
     href: '/payments-invoicing/',
     icon: 'card',
+    bgFocalX: 30,
     nodes: [
       { n: 1, x: 40, y: 48, w: 220 },
       { n: 2, x: 40, y: 318, w: 196 },
@@ -83,6 +87,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
     labelKey: i18nKey('nav.solutions.content'),
     href: '/solutions/content/',
     icon: 'content',
+    bgFocalX: 32,
     nodes: [
       { n: 1, x: 36, y: 200, w: 170 },
       { n: 2, x: 250, y: 40, w: 236 },
@@ -102,6 +107,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
     labelKey: i18nKey('nav.solutions.deliveries'),
     href: '/solutions/deliveries/',
     icon: 'truck',
+    bgFocalX: 30,
     nodes: [
       { n: 1, x: 60, y: 120, w: 236 },
       { n: 2, x: 340, y: 240, w: 196 },
@@ -117,6 +123,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
     labelKey: i18nKey('nav.solutions.ads'),
     href: '/solutions/ads/',
     icon: 'megaphone',
+    bgFocalX: 36,
     nodes: [
       { n: 1, x: 40, y: 80, w: 260 },
       { n: 2, x: 360, y: 200, w: 196 },

@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 /**
- * capture-product-media.mjs — fills the home's media slots with real product
- * screens, and checks that what was captured is safe to publish.
+ * capture-product-media.mjs — fills the home's product-media slots with real
+ * screens, preserves its original editorial showcase backgrounds, and checks
+ * every resulting image for text that is unsafe to publish.
  *
  *     node scripts/capture-product-media.mjs            # capture every slot with a route
  *     node scripts/capture-product-media.mjs --only hero-01,module-ads
  *     node scripts/capture-product-media.mjs --check    # manifest vs slots + OCR scan
  *
- * Why this exists: every image on the home is a capture of the product (D-8),
- * never stock, never a person, never an illustration pretending to be the app.
- * The reference's ~33 photographs become ~75 screens of the dashboard, the
- * storefront, a payment link, an invoice, a shipment's tracking page.
+ * Why this exists: product evidence must be genuine rather than an illustration
+ * pretending to be the app. The hero, nodes, personas and modules therefore use
+ * real screens. The showcase backgrounds are the deliberate exception: five
+ * original editorial photographs communicate the human outcome while the node
+ * cards on top retain the verifiable product workflow.
  *
  * ── Credentials ─────────────────────────────────────────────────────────────
  * The dashboard signs in with a magic link, so there is no password to type.
@@ -29,8 +31,8 @@
  *
  * ── Output ──────────────────────────────────────────────────────────────────
  * `src/assets/product/<slot>.webp` at 2x the slot's CSS size, plus
- * `src/assets/product/media-manifest.json` with origin URL, timestamp and
- * sha256 per piece — so a reviewer can tell WHERE each screen came from.
+ * `src/assets/product/media-manifest.json` with origin/provenance, timestamp
+ * and sha256 per piece — so a reviewer can tell where each asset came from.
  *
  * ── --check (the gate) ──────────────────────────────────────────────────────
  * 1. every declared slot has a file, or is listed as still a placeholder;
@@ -53,6 +55,7 @@ const OUT_DIR = join(ROOT, 'src/assets/product');
 const MANIFEST = join(OUT_DIR, 'media-manifest.json');
 const SLOTS_MODULE = join(ROOT, 'src/components/home/media-slots.ts');
 const GUARD = join(ROOT, 'scripts/check-tells.sh');
+const OCR_CACHE = join(ROOT, 'node_modules/.cache/tesseract');
 
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
@@ -67,7 +70,7 @@ loadDotEnvLocal();
    The slot list is TypeScript. Rather than duplicate it here (and let it
    drift), the module is transpiled on the fly with the TypeScript that is
    already a devDependency, then imported. */
-async function loadSlots() {
+async function loadMediaContract() {
   const ts = await import('typescript');
   const source = readFileSync(SLOTS_MODULE, 'utf8');
   const js = ts.default.transpileModule(source, {
@@ -76,14 +79,15 @@ async function loadSlots() {
   const tmp = join(ROOT, 'node_modules/.cache/media-slots.mjs');
   mkdirSync(join(ROOT, 'node_modules/.cache'), { recursive: true });
   writeFileSync(tmp, js);
-  return (await import(pathToFileURL(tmp).href)).MEDIA_SLOTS;
+  return import(pathToFileURL(tmp).href);
 }
 
 /* ── Routes ─────────────────────────────────────────────────────────────────
    Which QA screen fills which slot. `url` is a template over the env hosts;
    `clip` is a CSS selector to crop to (whole viewport when absent). A slot with
    no route is skipped and reported — the placeholder stays until someone
-   decides what that hole should show. */
+   decides what that hole should show. Editorial slots are preserved in place
+   and never overwritten by a full capture run. */
 const APP = process.env.APP_QA_URL ?? '';
 const STORE = process.env.STORE_QA_URL ?? '';
 const ATLAS = process.env.ATLAS_QA_URL ?? '';
@@ -120,12 +124,6 @@ const ROUTES = {
   'hero-12': { url: `${ATLAS}/`, clip: 'main' },
   'hero-13': { url: `${APP}/app/main/agents`, clip: 'main' },
   'hero-14': { url: `${APP}/app/main/settings`, clip: 'main' },
-  // Showcase backgrounds — full screens
-  'showcase-store-bg': { url: `${STORE}/` },
-  'showcase-payments-bg': { url: `${APP}/app/main/billing` },
-  'showcase-content-bg': { url: `${APP}/app/main/websites` },
-  'showcase-deliveries-bg': { url: `${APP}/app/main/deliveries` },
-  'showcase-ads-bg': { url: `${APP}/app/main/ads` },
   // Showcase node cards — each matches its i18n label (home.showcase.<slug>.node.<n>.label)
   'showcase-store-node-1': { url: `${STORE}/products`, clip: 'main' }, // Product catalog
   'showcase-store-node-2': { url: `${STORE}/cart`, clip: 'main' }, // Checkout page
@@ -208,14 +206,14 @@ const PII = [
 ];
 
 async function main() {
-  const slots = await loadSlots();
+  const { MEDIA_SLOTS: slots, SHOWCASE_BACKGROUND_IDS: editorialIds } = await loadMediaContract();
   const ids = new Set(slots.map((s) => s.id));
 
   if (flag('--check')) return check(slots, ids);
-  return capture(slots, ids);
+  return capture(slots, new Set(editorialIds));
 }
 
-async function capture(slots, ids) {
+async function capture(slots, editorialSlots) {
   const only = opt('--only')?.split(',').filter(Boolean);
   const { chromium } = await import('@playwright/test');
   const sharp = (await import('sharp')).default;
@@ -232,9 +230,14 @@ async function capture(slots, ids) {
   const page = await context.newPage();
 
   const skipped = [];
+  const preserved = [];
   let done = 0;
   for (const slot of slots) {
     if (only && !only.includes(slot.id)) continue;
+    if (editorialSlots.has(slot.id)) {
+      preserved.push(slot.id);
+      continue;
+    }
     const route = ROUTES[slot.id];
     if (!route || /^\/|^https?:\/\/?$/.test(route.url) || route.url.startsWith('/')) {
       skipped.push(slot.id);
@@ -268,7 +271,10 @@ async function capture(slots, ids) {
   }
   await browser.close();
   writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
-  console.log(`\n${done} captured, ${skipped.length} slots without a route: ${skipped.join(', ') || '—'}`);
+  console.log(
+    `\n${done} captured, ${preserved.length} editorial assets preserved, ` +
+      `${skipped.length} slots without a route: ${skipped.join(', ') || '—'}`,
+  );
 }
 
 async function check(slots, ids) {
@@ -286,16 +292,17 @@ async function check(slots, ids) {
   // use; that is acceptable for an operator's gate and never runs in the build.
   if (produced.size) {
     const { createWorker } = await import('tesseract.js');
-    const worker = await createWorker('eng');
+    mkdirSync(OCR_CACHE, { recursive: true });
+    const worker = await createWorker('eng', 1, { cachePath: OCR_CACHE });
     const providers = providerPattern();
     for (const f of files) {
       const { data } = await worker.recognize(join(OUT_DIR, f));
       const text = data.text.replace(/\s+/g, ' ');
       const p = text.match(providers);
-      if (p) findings.push(`${f}: provider name visible in the capture ("${p[0]}")`);
+      if (p) findings.push(`${f}: provider name visible in the capture`);
       for (const { name, re } of PII) {
         const m = text.match(re);
-        if (m) findings.push(`${f}: ${name} visible in the capture ("${m[0]}")`);
+        if (m) findings.push(`${f}: ${name} visible in the capture`);
       }
     }
     await worker.terminate();

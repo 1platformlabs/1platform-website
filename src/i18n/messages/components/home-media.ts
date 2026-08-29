@@ -1,9 +1,11 @@
 import { defineMessages } from '@i18n/ui';
 
 /**
- * Alt text for the home's product captures, one key per media slot
- * (`src/components/home/media-slots.ts`). A screenshot is described by what it
- * shows — the panel, the storefront, the invoice — never by its file name.
+ * Alt text for the home's media, one key per slot
+ * (`src/components/home/media-slots.ts`). Product screenshots are described by
+ * what they show; the five decorative showcase backgrounds also carry a
+ * catalogue description even though their rendered `alt` is intentionally
+ * empty because the adjacent panel already names the workflow.
  *
  * The placeholder key is the one string shown while a slot has no capture yet;
  * it names the slot so a reviewer can tell which hole is still empty.
@@ -27,11 +29,11 @@ export default defineMessages({
     'home.media.hero-12': 'A content library home rendered for a tenant',
     'home.media.hero-13': 'Balance and billing history',
     'home.media.hero-14': 'Workspace settings and branding',
-    'home.media.showcase-store-bg': 'An online store, full screen',
-    'home.media.showcase-payments-bg': 'Payments and invoices, full screen',
-    'home.media.showcase-content-bg': 'AI content workspace, full screen',
-    'home.media.showcase-deliveries-bg': 'Deliveries board, full screen',
-    'home.media.showcase-ads-bg': 'Advertising campaigns, full screen',
+    'home.media.showcase-store-bg': 'A shop owner preparing an online order in her studio',
+    'home.media.showcase-payments-bg': 'A customer paying an independent merchant by card',
+    'home.media.showcase-content-bg': 'A creator assembling photographs and pages for publication',
+    'home.media.showcase-deliveries-bg': 'A shop owner handing a parcel to a local courier',
+    'home.media.showcase-ads-bg': 'A creative team reviewing an outdoor advertising set',
     'home.media.showcase-store-node-1': 'Product catalog in the store dashboard',
     'home.media.showcase-store-node-2': 'Checkout page with the order summary',
     'home.media.showcase-store-node-3': 'Card payment confirmed',
@@ -111,11 +113,11 @@ export default defineMessages({
     'home.media.hero-12': 'Portada de una biblioteca de contenido de un inquilino',
     'home.media.hero-13': 'Saldo e historial de facturación',
     'home.media.hero-14': 'Configuración del espacio de trabajo y su marca',
-    'home.media.showcase-store-bg': 'Una tienda online, a pantalla completa',
-    'home.media.showcase-payments-bg': 'Pagos y facturas, a pantalla completa',
-    'home.media.showcase-content-bg': 'Espacio de contenido con IA, a pantalla completa',
-    'home.media.showcase-deliveries-bg': 'Tablero de envíos, a pantalla completa',
-    'home.media.showcase-ads-bg': 'Campañas publicitarias, a pantalla completa',
+    'home.media.showcase-store-bg': 'Una comerciante preparando un pedido online en su estudio',
+    'home.media.showcase-payments-bg': 'Una clienta pagando con tarjeta en un comercio independiente',
+    'home.media.showcase-content-bg': 'Una creadora organizando fotografías y páginas para publicar',
+    'home.media.showcase-deliveries-bg': 'Una comerciante entregando un paquete a un mensajero local',
+    'home.media.showcase-ads-bg': 'Un equipo creativo revisando un montaje publicitario exterior',
     'home.media.showcase-store-node-1': 'Catálogo de productos en el panel de la tienda',
     'home.media.showcase-store-node-2': 'Página de checkout con el resumen del pedido',
     'home.media.showcase-store-node-3': 'Pago con tarjeta confirmado',
