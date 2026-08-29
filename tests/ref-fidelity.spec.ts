@@ -107,8 +107,20 @@ for (const [viewport, size] of [
       await page.evaluate(() => document.fonts.ready);
 
       const table = TABLE[viewport] as ViewportTable;
-      // Floor: a table that lost its rows would assert nothing and pass.
-      expect(Object.keys(table.sections).length).toBeGreaterThanOrEqual(8);
+      // Floor: assert the named surfaces rather than only their count. Removing
+      // one row and duplicating another must never preserve a green gate.
+      expect(Object.keys(table.sections).sort()).toEqual(
+        [
+          '.announcement',
+          '#hero',
+          '#canvas',
+          '#personas',
+          '#modules',
+          '#pricing',
+          '#faq',
+          'footer.site-footer',
+        ].sort(),
+      );
 
       const failures = await measure(page, table, path.startsWith('/es'));
       expect(failures, failures.join('\n')).toEqual([]);

@@ -36,8 +36,7 @@ for (const path of PAGES) {
     const header = await rect(page, 'header.site-header');
     expect(header.position).toBe('fixed');
     expect(header.height).toBe(74);
-    // Under the announcement bar (40 px) when there is one; at the top otherwise.
-    expect([0, 40]).toContain(header.y);
+    expect(header.y).toBe(40);
 
     const pill = await rect(page, '.brand-pill');
     expect(pill.width).toBe(230);

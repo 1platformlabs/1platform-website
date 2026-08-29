@@ -33,7 +33,8 @@
         "lineHeight": "56px",
         "letterSpacing": "-1.12px",
         "fontWeight": "400",
-        "pageY": 181
+        "pageY": 181,
+        "height": 112
       },
       {
         "sel": ".hero-search",
@@ -57,7 +58,8 @@
       {
         "sel": "#modules h2",
         "fontSize": "56px",
-        "lineHeight": "56px"
+        "lineHeight": "56px",
+        "height": 112
       },
       {
         "sel": ".price-card--lead",
@@ -97,8 +99,27 @@
     },
     "elements": [
       {
+        "sel": ".announcement",
+        "top": 0
+      },
+      {
+        "sel": "header.site-header",
+        "height": 74,
+        "top": 40
+      },
+      {
         "sel": "#hero h1",
-        "fontSize": "56px"
+        "fontSize": "56px",
+        "lineHeight": "56px",
+        "letterSpacing": "-1.12px",
+        "pageY": 136,
+        "height": 168
+      },
+      {
+        "sel": "#modules h2",
+        "fontSize": "56px",
+        "lineHeight": "56px",
+        "height": 112
       },
       {
         "sel": ".showcase-panel",

@@ -62,7 +62,31 @@ export async function mountScene(
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
 
-  const extraDispose = definition.setup(ctx) ?? undefined;
+  let extraDispose: (() => void) | undefined;
+  const disposeResources = () => {
+    extraDispose?.();
+    scene.traverse((obj) => {
+      const mesh = obj as {
+        geometry?: { dispose(): void };
+        material?: { map?: { dispose(): void }; dispose(): void };
+      };
+      mesh.geometry?.dispose();
+      if (mesh.material) {
+        mesh.material.map?.dispose();
+        mesh.material.dispose();
+      }
+    });
+    renderer.dispose();
+    renderer.forceContextLoss();
+  };
+
+  try {
+    extraDispose = definition.setup(ctx) ?? undefined;
+  } catch (error) {
+    ro.disconnect();
+    disposeResources();
+    throw error;
+  }
 
   let raf = 0;
   let running = false;
@@ -106,17 +130,7 @@ export async function mountScene(
     io.disconnect();
     ro.disconnect();
     document.removeEventListener('visibilitychange', onVisibility);
-    extraDispose?.();
-    scene.traverse((obj) => {
-      const mesh = obj as { geometry?: { dispose(): void }; material?: { map?: { dispose(): void }; dispose(): void } };
-      mesh.geometry?.dispose();
-      if (mesh.material) {
-        mesh.material.map?.dispose();
-        mesh.material.dispose();
-      }
-    });
-    renderer.dispose();
-    renderer.forceContextLoss();
+    disposeResources();
   };
 }
 

@@ -27,7 +27,7 @@ const modules = MODULES.map((module) => ({
 ---
 
 <section id="modules" class="mods ref-dot-grid--dark">
-  <h2 class="ref-h-display mods__title">{t('home.modules.title')}</h2>
+  <h2 class="ref-h-display mods__title" translate="no">{t('home.modules.title')}</h2>
 
   <div
     class="mods__viewport"
@@ -161,6 +161,7 @@ const modules = MODULES.map((module) => ({
     margin: 0 auto;
     text-align: center;
     color: var(--ref-white);
+    white-space: pre-line;
   }
 
   .mods__viewport {

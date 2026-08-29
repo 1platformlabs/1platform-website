@@ -21,6 +21,9 @@ export default defineMessages({
 
     // — Hero ——————————————————————————————————————————————————
     'home.hero.headline': 'One Platform. Every Solution.',
+    'home.hero.headline.line1': 'One Platform.',
+    'home.hero.headline.line2Lead': 'Every',
+    'home.hero.headline.line2Tail': 'Solution.',
     'home.hero.lead':
       'Sell online, get paid, invoice and publish from a single account — in the dashboard or through one REST API. Every module already talks to the others.',
     'home.hero.fan.aria': 'Screens of the product, fanned out in perspective',
@@ -118,7 +121,7 @@ export default defineMessages({
 
     // — Module carousel (LMW-07, D-11) ————————————————————————————
     // The heading is the brand line, English in both trees like the H1.
-    'home.modules.title': 'One platform. Every solution.',
+    'home.modules.title': 'One platform.\nEvery solution.',
     'home.modules.carouselAria': 'Every module of the platform',
     'home.modules.prev': 'Previous modules',
     'home.modules.next': 'Next modules',
@@ -208,6 +211,9 @@ export default defineMessages({
     // — Hero ——————————————————————————————————————————————————
     // Brand slogan — stays in English in both trees, see the module docblock.
     'home.hero.headline': 'One Platform. Every Solution.',
+    'home.hero.headline.line1': 'One Platform.',
+    'home.hero.headline.line2Lead': 'Every',
+    'home.hero.headline.line2Tail': 'Solution.',
     'home.hero.lead':
       'Vende por internet, cobra, factura y publica desde una sola cuenta — en el panel o con una sola API REST. Cada módulo ya habla con los demás.',
     'home.hero.fan.aria': 'Pantallas del producto, desplegadas en perspectiva',
@@ -298,7 +304,7 @@ export default defineMessages({
     'home.personas.tab.developers': 'Desarrolladores',
 
     // — Carrusel de módulos (LMW-07, D-11) ———————————————————————
-    'home.modules.title': 'One platform. Every solution.',
+    'home.modules.title': 'One platform.\nEvery solution.',
     'home.modules.carouselAria': 'Todos los módulos de la plataforma',
     'home.modules.prev': 'Módulos anteriores',
     'home.modules.next': 'Módulos siguientes',
