@@ -92,6 +92,13 @@ assert_red "retired card component" "retired card/kit components" "$PAGE" \
   "<FeatureCard title='x' />"
 assert_red "retired template kit"   "retired template kit"        "$PAGE" \
   '<div class="gradient-text">x</div>'
+# The home's dot texture is exempt BY NAME ONLY (rule 7, D-7). A dot grid under
+# any other name is still the retired kit; the exempt name itself must stay
+# quiet or the home's own class would turn the guard red.
+assert_red "dot grid under another name" "retired template kit"        "$PAGE" \
+  '<div class="hero dot-grid">x</div>'
+assert_green "the home dot grid class is exempt" "$PAGE" \
+  '<section class="ref-dot-grid">x</section>'
 assert_red "decorative gradient"    "decorative gradients"        "$PAGE" \
   '<style>.x { background: linear-gradient(90deg, red, blue); }</style>'
 

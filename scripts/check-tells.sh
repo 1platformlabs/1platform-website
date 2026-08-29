@@ -146,7 +146,13 @@ report "no var(--token, #fallback) colour fallbacks" \
        "a fallback hex means the page renders off-system when a token is renamed" "$m"
 
 # 7. The retired template kit.
-m=$(grep -rnE 'gradient-text|dot-grid|hero__blob|hero__aurora|marquee|transition: *all' $SRC | strip_comments)
+# `ref-dot-grid` is exempt by literal name (epic home-landing-redesign, D-7):
+# the home's dot texture is a measured part of the reference geometry, and the
+# pattern matches it as a substring. The exemption is the class name, nothing
+# looser — a `dot-grid` under any other name is still a finding, and the
+# self-test seeds one to prove it.
+m=$(grep -rnE 'gradient-text|dot-grid|hero__blob|hero__aurora|marquee|transition: *all' $SRC \
+  | grep -v 'ref-dot-grid' | strip_comments)
 report "no retired template kit" \
        "gradient text, dot grids, aurora blobs, marquees and transition:all" "$m"
 
