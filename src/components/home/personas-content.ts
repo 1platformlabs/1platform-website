@@ -1,3 +1,4 @@
+import { i18nKey } from '@i18n/key';
 import { PERSONA_SLUGS, type PersonaSlug } from './media-slots';
 
 /**
@@ -30,10 +31,10 @@ export const PERSONAS: Persona[] = [
     copyKey: 'smallBusiness',
     href: '/solutions/online-store/',
     satellites: [
-      'home.featured.store.title',
-      'home.featured.invoicing.title',
-      'home.group.storefront.item.domain',
-      'home.featured.deliveries.title',
+      i18nKey('home.featured.store.title'),
+      i18nKey('home.featured.invoicing.title'),
+      i18nKey('home.group.storefront.item.domain'),
+      i18nKey('home.featured.deliveries.title'),
     ],
   },
   {
@@ -41,10 +42,10 @@ export const PERSONAS: Persona[] = [
     copyKey: 'sellers',
     href: '/solutions/online-store/',
     satellites: [
-      'home.group.sellGetPaid.item.paymentLinks',
-      'home.featured.payments.title',
-      'home.group.sellGetPaid.item.cardPresent',
-      'home.group.sellGetPaid.item.merchantSubscriptions',
+      i18nKey('home.group.sellGetPaid.item.paymentLinks'),
+      i18nKey('home.featured.payments.title'),
+      i18nKey('home.group.sellGetPaid.item.cardPresent'),
+      i18nKey('home.group.sellGetPaid.item.merchantSubscriptions'),
     ],
   },
   {
@@ -52,10 +53,10 @@ export const PERSONAS: Persona[] = [
     copyKey: 'services',
     href: '/payments-invoicing/',
     satellites: [
-      'home.featured.invoicing.title',
-      'home.group.sellGetPaid.item.paymentLinks',
-      'home.featured.advertising.title',
-      'home.group.contentSeo.item.legalPages',
+      i18nKey('home.featured.invoicing.title'),
+      i18nKey('home.group.sellGetPaid.item.paymentLinks'),
+      i18nKey('home.featured.advertising.title'),
+      i18nKey('home.group.contentSeo.item.legalPages'),
     ],
   },
   {
@@ -63,10 +64,10 @@ export const PERSONAS: Persona[] = [
     copyKey: 'agencies',
     href: '/for-agencies/',
     satellites: [
-      'home.group.storefront.item.whitelabel',
-      'home.featured.content.title',
-      'home.group.contentSeo.item.searchConsole',
-      'home.group.contentSeo.item.linkBuilding',
+      i18nKey('home.group.storefront.item.whitelabel'),
+      i18nKey('home.featured.content.title'),
+      i18nKey('home.group.contentSeo.item.searchConsole'),
+      i18nKey('home.group.contentSeo.item.linkBuilding'),
     ],
   },
   {
@@ -74,10 +75,10 @@ export const PERSONAS: Persona[] = [
     copyKey: 'developers',
     href: '/for-developers/',
     satellites: [
-      'home.group.developer.item.webhooks',
-      'home.group.developer.item.agents',
-      'home.group.developer.item.logs',
-      'home.group.contentSeo.item.indexing',
+      i18nKey('home.group.developer.item.webhooks'),
+      i18nKey('home.group.developer.item.agents'),
+      i18nKey('home.group.developer.item.logs'),
+      i18nKey('home.group.contentSeo.item.indexing'),
     ],
   },
 ];

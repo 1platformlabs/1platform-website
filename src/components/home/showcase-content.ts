@@ -1,4 +1,5 @@
 import type { IconName } from '@components/icons';
+import { i18nKey } from '@i18n/key';
 import { SHOWCASE_NODE_COUNT, type ShowcaseSlug } from './media-slots';
 
 /**
@@ -43,7 +44,7 @@ export type ShowcaseSolution = {
 export const SHOWCASE: ShowcaseSolution[] = [
   {
     slug: 'store',
-    labelKey: 'nav.solutions.onlineStore',
+    labelKey: i18nKey('nav.solutions.onlineStore'),
     href: '/solutions/online-store/',
     icon: 'cart',
     nodes: [
@@ -62,7 +63,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
   },
   {
     slug: 'payments',
-    labelKey: 'nav.solutions.payments',
+    labelKey: i18nKey('nav.solutions.payments'),
     href: '/payments-invoicing/',
     icon: 'card',
     nodes: [
@@ -79,7 +80,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
   },
   {
     slug: 'content',
-    labelKey: 'nav.solutions.content',
+    labelKey: i18nKey('nav.solutions.content'),
     href: '/solutions/content/',
     icon: 'content',
     nodes: [
@@ -98,7 +99,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
   },
   {
     slug: 'deliveries',
-    labelKey: 'nav.solutions.deliveries',
+    labelKey: i18nKey('nav.solutions.deliveries'),
     href: '/solutions/deliveries/',
     icon: 'truck',
     nodes: [
@@ -113,7 +114,7 @@ export const SHOWCASE: ShowcaseSolution[] = [
   },
   {
     slug: 'ads',
-    labelKey: 'nav.solutions.ads',
+    labelKey: i18nKey('nav.solutions.ads'),
     href: '/solutions/ads/',
     icon: 'megaphone',
     nodes: [

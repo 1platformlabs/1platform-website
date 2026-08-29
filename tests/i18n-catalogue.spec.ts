@@ -79,6 +79,10 @@ function referencedKeys(): { literal: Set<string>; prefixes: string[] } {
     // `t(`blog.category.${slug}`)` — the prefix is known, the suffix is not,
     // so every key under that prefix counts as reachable.
     for (const [, prefix] of body.matchAll(/\bt\(\s*`([\w.-]+)\$\{/g)) prefixes.push(prefix);
+    // Keys that travel through content tables are declared with `i18nKey('…')`
+    // (src/i18n/key.ts) — counted as prefixes, since a table entry may be the
+    // key itself or the stem of `.question`/`.answer`-style children.
+    for (const [, prefix] of body.matchAll(/\bi18nKey\(\s*'([\w.-]+)'/g)) prefixes.push(prefix);
   }
 
   return { literal, prefixes };

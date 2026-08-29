@@ -1,3 +1,4 @@
+import { i18nKey } from '@i18n/key';
 import type { IconName } from '@components/icons';
 import { MODULE_SLUGS, type ModuleSlug } from './media-slots';
 
@@ -15,20 +16,20 @@ export type ModuleCard = {
 };
 
 export const MODULES: ModuleCard[] = [
-  { slug: 'online-store', labelKey: 'nav.solutions.onlineStore', href: '/solutions/online-store/', icon: 'cart' },
-  { slug: 'payments', labelKey: 'nav.solutions.payments', href: '/payments-invoicing/', icon: 'card' },
-  { slug: 'content', labelKey: 'nav.solutions.content', href: '/solutions/content/', icon: 'content' },
-  { slug: 'website', labelKey: 'nav.solutions.website', href: '/solutions/website/', icon: 'globe' },
-  { slug: 'deliveries', labelKey: 'nav.solutions.deliveries', href: '/solutions/deliveries/', icon: 'truck' },
-  { slug: 'ads', labelKey: 'nav.solutions.ads', href: '/solutions/ads/', icon: 'megaphone' },
-  { slug: 'whitelabel', labelKey: 'nav.solutions.whitelabel', href: '/solutions/whitelabel/', icon: 'dashboard' },
-  { slug: 'payment-links', labelKey: 'home.group.sellGetPaid.item.paymentLinks', href: '/payments-invoicing/', icon: 'paylink' },
-  { slug: 'card-present', labelKey: 'home.group.sellGetPaid.item.cardPresent', href: '/payments-invoicing/', icon: 'terminal' },
-  { slug: 'webhooks', labelKey: 'home.group.developer.item.webhooks', href: '/for-developers/', icon: 'webhook' },
-  { slug: 'agents', labelKey: 'home.group.developer.item.agents', href: '/for-developers/', icon: 'agent' },
-  { slug: 'domain', labelKey: 'home.group.storefront.item.domain', href: '/solutions/website/', icon: 'domain' },
-  { slug: 'ai-image', labelKey: 'home.group.contentSeo.item.aiImage', href: '/solutions/content/', icon: 'image' },
-  { slug: 'search-console', labelKey: 'home.group.contentSeo.item.searchConsole', href: '/solutions/content/', icon: 'chart' },
+  { slug: 'online-store', labelKey: i18nKey('nav.solutions.onlineStore'), href: '/solutions/online-store/', icon: 'cart' },
+  { slug: 'payments', labelKey: i18nKey('nav.solutions.payments'), href: '/payments-invoicing/', icon: 'card' },
+  { slug: 'content', labelKey: i18nKey('nav.solutions.content'), href: '/solutions/content/', icon: 'content' },
+  { slug: 'website', labelKey: i18nKey('nav.solutions.website'), href: '/solutions/website/', icon: 'globe' },
+  { slug: 'deliveries', labelKey: i18nKey('nav.solutions.deliveries'), href: '/solutions/deliveries/', icon: 'truck' },
+  { slug: 'ads', labelKey: i18nKey('nav.solutions.ads'), href: '/solutions/ads/', icon: 'megaphone' },
+  { slug: 'whitelabel', labelKey: i18nKey('nav.solutions.whitelabel'), href: '/solutions/whitelabel/', icon: 'dashboard' },
+  { slug: 'payment-links', labelKey: i18nKey('home.group.sellGetPaid.item.paymentLinks'), href: '/payments-invoicing/', icon: 'paylink' },
+  { slug: 'card-present', labelKey: i18nKey('home.group.sellGetPaid.item.cardPresent'), href: '/payments-invoicing/', icon: 'terminal' },
+  { slug: 'webhooks', labelKey: i18nKey('home.group.developer.item.webhooks'), href: '/for-developers/', icon: 'webhook' },
+  { slug: 'agents', labelKey: i18nKey('home.group.developer.item.agents'), href: '/for-developers/', icon: 'agent' },
+  { slug: 'domain', labelKey: i18nKey('home.group.storefront.item.domain'), href: '/solutions/website/', icon: 'domain' },
+  { slug: 'ai-image', labelKey: i18nKey('home.group.contentSeo.item.aiImage'), href: '/solutions/content/', icon: 'image' },
+  { slug: 'search-console', labelKey: i18nKey('home.group.contentSeo.item.searchConsole'), href: '/solutions/content/', icon: 'chart' },
 ];
 
 /** Card pitch on the rail, measured on the reference's monitors (270 centres). */
