@@ -106,7 +106,19 @@ const destinations = [
   <canvas class="hero-ref__canvas" data-scene="fan" hidden></canvas>
 
   <div class="hero-ref__copy">
-    <h1 class="ref-h-display hero-ref__headline">{t('home.hero.headline')}</h1>
+    <h1
+      class="ref-h-display hero-ref__headline"
+      aria-label={t('home.hero.headline')}
+      translate="no"
+    >
+      <span class="hero-ref__headline-line" aria-hidden="true">
+        {t('home.hero.headline.line1')}
+      </span>
+      <span class="hero-ref__headline-line hero-ref__headline-line--second" aria-hidden="true">
+        <span class="hero-ref__headline-word">{t('home.hero.headline.line2Lead')}</span>
+        <span class="hero-ref__headline-word">{t('home.hero.headline.line2Tail')}</span>
+      </span>
+    </h1>
     <div class="hero-ref__foot">
       <p class="hero-ref__lead">{t('home.hero.lead')}</p>
       <form class="hero-search" method="get" action={l('/solutions/')} data-solution-search>
@@ -171,15 +183,14 @@ const destinations = [
 </script>
 
 <style>
-  /* Measured: 860 tall at 1440 (the section starts under the 40 px bar), H1
-     at y 141 within it, lead 480 wide at 557, pill 320 × 57 at 665, and a
-     four-colour rule on the bottom edge. At 390 the H1 takes three lines and
-     the section DROPS to 804 (the paddings shrink). */
+  /* Measured: the section begins below the 40 px announcement and fills the
+     rest of the viewport — 860 px at 1440 × 900 and 804 px at 390 × 844.
+     The 720 px floor keeps the copy usable on short landscape viewports. */
   .hero-ref {
     position: relative;
-    height: 860px;
-    /* The fixed chrome is out of flow; the section starts under the
-       announcement bar so the H1 lands at the measured y = 181. */
+    height: calc(100vh - var(--header-top));
+    height: calc(100svh - var(--header-top));
+    min-height: 720px;
     margin-top: var(--header-top);
     overflow: hidden;
   }
@@ -217,6 +228,17 @@ const destinations = [
     margin-left: calc(var(--w) / -2);
     margin-top: calc(var(--h) / -2);
     transform: rotateY(var(--angle)) translateZ(calc(var(--fan-radius) * -1));
+  }
+
+  /* Real product captures are intentionally unretouched. Most are light work
+     surfaces, so a neutral system keyline is what separates them from the
+     light canvas without recolouring or obscuring their pixels. */
+  .fan__plane:not(.fan__plane--strip) {
+    overflow: hidden;
+    border-radius: var(--ref-radius-s);
+    box-shadow:
+      0 0 0 2px var(--hairline-strong),
+      var(--shadow-lg);
   }
 
   .fan__plane :global(img),
@@ -274,6 +296,18 @@ const destinations = [
   .hero-ref__headline {
     max-width: 533px;
     color: var(--ref-ink);
+  }
+
+  .hero-ref__headline-line {
+    display: block;
+  }
+
+  .hero-ref__headline-word {
+    display: inline;
+  }
+
+  .hero-ref__headline-word + .hero-ref__headline-word::before {
+    content: ' ';
   }
 
   .hero-ref__foot {
@@ -382,8 +416,12 @@ const destinations = [
   }
 
   @media (max-width: 768px) {
-    .hero-ref {
-      height: 804px;
+    .hero-ref__headline-word {
+      display: block;
+    }
+
+    .hero-ref__headline-word + .hero-ref__headline-word::before {
+      content: none;
     }
 
     .hero-ref__copy {

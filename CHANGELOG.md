@@ -64,6 +64,22 @@ on merge; this entry documents the change set.
   gzip WHOLE — module.min + the core.min it imports; the epic's plan had
   measured half of it), zero for everything else.
 
+### Fixed
+- **The hero and module slogans now preserve the measured composition**: two
+  lines at desktop, three hero lines at mobile, 56/56 px in both cases. The
+  hero keeps the exact 860/804 px reference baselines while adapting to other
+  viewport heights with a short-screen floor.
+- **The WebGL fan now renders all fourteen product captures.** Its central
+  strip previously stretched only its first image across one plane even though
+  the CSS fallback contained four. The upgrade now mirrors the four-image
+  strip, applies the same centred cover crop as the CSS fallback, waits for its
+  textures, and releases partial WebGL resources if loading, mounting, or
+  navigation interrupts the upgrade.
+- **The visual regression baselines now contain the real product media** that
+  replaced the original placeholders, in English and Spanish at 1440 and 390
+  px. A neutral keyline separates light product surfaces without recolouring
+  the captures.
+
 ### Security / a11y
 - All CTAs ≥ 44 px; AA-corrected tints where the reference fails contrast
   (`#C63A12` under light text, `#9A9A9A` on the footer card); the watermark is

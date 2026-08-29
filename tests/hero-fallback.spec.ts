@@ -41,4 +41,44 @@ test.describe('without JavaScript', () => {
     // The form's no-JS fallback is a GET to the solutions catalogue.
     await expect(page.locator('[data-solution-search]')).toHaveAttribute('action', '/solutions/');
   });
+
+  for (const { width, height } of [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+    { width: 768, height: 900 },
+    { width: 1024, height: 900 },
+    { width: 1440, height: 900 },
+  ]) {
+    test(`the editorial hero reflows cleanly at ${width} × ${height}`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto('/');
+      await page.evaluate(() => document.fonts.ready);
+
+      const layout = await page.evaluate(() => {
+        const hero = document.getElementById('hero')!.getBoundingClientRect();
+        const headline = document.querySelector('.hero-ref__headline')!;
+        const headlineRect = headline.getBoundingClientRect();
+        const foot = document.querySelector('.hero-ref__foot')!.getBoundingClientRect();
+        const lineHeight = Number.parseFloat(getComputedStyle(headline).lineHeight);
+        return {
+          heroHeight: hero.height,
+          lineCount: Math.round(headlineRect.height / lineHeight),
+          headlineBottom: headlineRect.bottom,
+          footTop: foot.top,
+          scrollWidth: document.documentElement.scrollWidth,
+          clientWidth: document.documentElement.clientWidth,
+        };
+      });
+
+      expect(layout.heroHeight).toBe(Math.max(height - 40, 720));
+      expect(layout.lineCount).toBe(width <= 768 ? 3 : 2);
+      expect(layout.headlineBottom).toBeLessThan(layout.footTop);
+      expect(layout.scrollWidth).toBe(layout.clientWidth);
+      await expect(page.locator('#hero h1')).toHaveAccessibleName('One Platform. Every Solution.');
+
+      const input = page.locator('#hero-search-input');
+      await input.focus();
+      await expect(input).toBeFocused();
+    });
+  }
 });
