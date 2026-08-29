@@ -87,6 +87,13 @@ async function loadSlots() {
 const APP = process.env.APP_QA_URL ?? '';
 const STORE = process.env.STORE_QA_URL ?? '';
 const ATLAS = process.env.ATLAS_QA_URL ?? '';
+// Two more real product surfaces (both public, no session):
+// the developer portal (QA build of the epic's own branch) and the live
+// marketing site's content pages (blog articles ARE the content product's
+// output; the redesign does not change them).
+const DEV = process.env.DEV_QA_URL ?? '';
+const SITE = process.env.SITE_PROD_URL ?? '';
+const CREATOR = process.env.CREATOR_QA_URL ?? '';
 
 const ROUTES = {
   // Hero fan — product surfaces at a glance.
@@ -102,34 +109,85 @@ const ROUTES = {
   'hero-01': { url: `${APP}/app/main/dashboard`, clip: 'main' },
   'hero-02': { url: `${STORE}/`, clip: 'main' },
   'hero-03': { url: `${APP}/app/main/billing`, clip: 'main' }, // transactions live in billing ("Recent transactions")
-  // 'hero-04' (invoices): QA mounts no invoices surface — placeholder until it does
+  'hero-04': { url: `${APP}/app/main/businesses`, clip: 'main' }, // invoicing's canonical surface (manifest: /main/businesses)
   'hero-05': { url: `${STORE}/products`, clip: 'main' },
-  // 'hero-06' (content): the QA app's DashboardConfig does not enable the content module
-  // 'hero-07' (payment-links): not mounted on QA
+  'hero-06': { url: `${DEV}/docs/saas/1platform-api/journeys/generar-contenido`, clip: 'main' },
+  'hero-07': { url: `${APP}/app/main/billing`, clip: 'main table' },
   'hero-08': { url: `${APP}/app/main/deliveries`, clip: 'main' },
-  // 'hero-09' (ads): QA does not enable the ads vertical (prod does)
+  'hero-09': { url: `${APP}/app/main/ads`, clip: 'main' }, // renders "Advertising" (the collapsed-group census missed it)
   'hero-10': { url: `${APP}/app/main/domains`, clip: 'main' },
   'hero-11': { url: `${APP}/app/main/websites`, clip: 'main' },
   'hero-12': { url: `${ATLAS}/`, clip: 'main' },
-  'hero-13': { url: `${APP}/app/main/businesses`, clip: 'main' }, // billing already fills hero-03; keep the fan varied
+  'hero-13': { url: `${APP}/app/main/agents`, clip: 'main' },
   'hero-14': { url: `${APP}/app/main/settings`, clip: 'main' },
   // Showcase backgrounds — full screens
   'showcase-store-bg': { url: `${STORE}/` },
   'showcase-payments-bg': { url: `${APP}/app/main/billing` },
-  // 'showcase-content-bg': content module not on QA — placeholder
+  'showcase-content-bg': { url: `${APP}/app/main/websites` },
   'showcase-deliveries-bg': { url: `${APP}/app/main/deliveries` },
-  // 'showcase-ads-bg': ads vertical not on QA — placeholder
+  'showcase-ads-bg': { url: `${APP}/app/main/ads` },
+  // Showcase node cards — each matches its i18n label (home.showcase.<slug>.node.<n>.label)
+  'showcase-store-node-1': { url: `${STORE}/products`, clip: 'main' }, // Product catalog
+  'showcase-store-node-2': { url: `${STORE}/cart`, clip: 'main' }, // Checkout page
+  'showcase-store-node-3': { url: `${APP}/app/main/billing`, clip: 'main' }, // Card payment
+  'showcase-store-node-4': { url: `${APP}/app/main/businesses`, clip: 'main' }, // Electronic invoice
+  'showcase-store-node-5': { url: `${APP}/app/main/domains`, clip: 'main' }, // Your own domain
+  'showcase-payments-node-1': { url: `${APP}/app/main/billing`, clip: 'main' }, // Payment link
+  'showcase-payments-node-2': { url: `${DEV}/docs/saas/1platform-api/journeys/cobros-y-saldo`, clip: 'main' }, // Card-present sale
+  'showcase-payments-node-3': { url: `${APP}/app/main/businesses`, clip: 'main' }, // Invoice, PDF and XML
+  'showcase-payments-node-4': { url: `${APP}/app/main/dashboard`, clip: 'main' }, // Customer subscription (balance & credits)
+  'showcase-content-node-1': { url: `${SITE}/blog/automate-seo-pipeline/`, clip: 'main' }, // Keyword research
+  'showcase-content-node-2': { url: `${SITE}/blog/ai-content-best-practices/`, clip: 'main' }, // Generated article
+  'showcase-content-node-3': { url: `${SITE}/blog/`, clip: 'main' }, // Generated image
+  'showcase-content-node-4': { url: `${APP}/app/main/websites`, clip: 'main' }, // Published and indexed
+  'showcase-content-node-5': { url: `${CREATOR}/`, clip: 'main' }, // Dashboard under your brand (whitelabeled surface)
+  'showcase-deliveries-node-1': { url: `${APP}/app/main/deliveries`, clip: 'main' }, // Shipping quote
+  'showcase-deliveries-node-2': { url: `${APP}/app/main/deliveries`, clip: 'main' }, // Shipping label
+  'showcase-deliveries-node-3': { url: `${APP}/app/main/deliveries`, clip: 'main' }, // Tracking page
+  'showcase-ads-node-1': { url: `${APP}/app/main/ads`, clip: 'main' }, // Campaign setup
+  'showcase-ads-node-2': { url: `${APP}/app/main/ads`, clip: 'main' }, // Creative
+  'showcase-ads-node-3': { url: `${APP}/app/main/billing`, clip: 'main' }, // Spend report
+  // Personas — the front card's media, one per audience
+  'persona-small-business': { url: `${APP}/app/main/dashboard`, clip: 'main' },
+  'persona-sellers': { url: `${STORE}/products`, clip: 'main' },
+  'persona-services': { url: `${APP}/app/main/businesses`, clip: 'main' },
+  'persona-agencies': { url: `${APP}/app/main/websites`, clip: 'main' },
+  'persona-developers': { url: `${DEV}/api-reference/1platform-api`, clip: 'body' },
+  // Personas — satellites, matching personas-content.ts satellite labels in order
+  'persona-small-business-sat-1': { url: `${STORE}/`, clip: 'main' }, // Online Store
+  'persona-small-business-sat-2': { url: `${APP}/app/main/businesses`, clip: 'main' }, // Electronic Invoicing
+  'persona-small-business-sat-3': { url: `${APP}/app/main/domains`, clip: 'main' }, // Custom Domain
+  'persona-small-business-sat-4': { url: `${APP}/app/main/deliveries`, clip: 'main' }, // Delivery Management
+  'persona-sellers-sat-1': { url: `${APP}/app/main/billing`, clip: 'main' }, // Payment Links
+  'persona-sellers-sat-2': { url: `${STORE}/cart`, clip: 'main' }, // Payment Processing
+  'persona-sellers-sat-3': { url: `${DEV}/docs/saas/1platform-api/journeys/cobros-y-saldo`, clip: 'main' }, // Card Present
+  'persona-sellers-sat-4': { url: `${APP}/app/main/dashboard`, clip: 'main' }, // Merchant Subscriptions
+  'persona-services-sat-1': { url: `${APP}/app/main/businesses`, clip: 'main' }, // Electronic Invoicing
+  'persona-services-sat-2': { url: `${APP}/app/main/billing`, clip: 'main' }, // Payment Links
+  'persona-services-sat-3': { url: `${APP}/app/main/ads`, clip: 'main' }, // Advertising
+  'persona-services-sat-4': { url: `${SITE}/privacy/`, clip: 'main' }, // Legal Pages
+  'persona-agencies-sat-1': { url: `${CREATOR}/`, clip: 'main' }, // Whitelabel Dashboard
+  'persona-agencies-sat-2': { url: `${DEV}/docs/saas/1platform-api/journeys/generar-contenido`, clip: 'main' }, // AI Content
+  'persona-agencies-sat-3': { url: `${APP}/app/main/websites`, clip: 'main' }, // Search Console
+  'persona-agencies-sat-4': { url: `${DEV}/docs/saas/1platform-api/capacidades`, clip: 'main' }, // Link Building
+  'persona-developers-sat-1': { url: `${DEV}/docs/saas/1platform-api/journeys/webhooks`, clip: 'main' }, // Webhooks
+  'persona-developers-sat-2': { url: `${APP}/app/main/agents`, clip: 'main' }, // AI Agents
+  'persona-developers-sat-3': { url: `${DEV}/docs/saas/1platform-api/reference/error-codes`, clip: 'main' }, // Logs
+  'persona-developers-sat-4': { url: `${DEV}/docs/saas/1platform-api/reference/testing`, clip: 'main' }, // Indexing
   // Module cards
   'module-online-store': { url: `${STORE}/`, clip: 'main' },
   'module-website': { url: `${APP}/app/main/websites`, clip: 'main' },
-  // 'module-content', 'module-ai-image': content module not on QA
+  'module-content': { url: `${DEV}/docs/saas/1platform-api/journeys/generar-contenido`, clip: 'main' },
   'module-deliveries': { url: `${APP}/app/main/deliveries`, clip: 'main' },
-  // 'module-ads': ads vertical not on QA
-  // 'module-whitelabel': `/settings/branding` is not a QA route (settings shows Profile only)
+  'module-ads': { url: `${APP}/app/main/ads`, clip: 'main' },
+  'module-whitelabel': { url: `${CREATOR}/`, clip: 'main' },
   'module-payments': { url: `${APP}/app/main/billing`, clip: 'main' },
-  // 'module-payment-links', 'module-card-present', 'module-webhooks': not mounted on QA
+  'module-payment-links': { url: `${APP}/app/main/billing`, clip: 'main table' },
+  'module-card-present': { url: `${DEV}/docs/saas/1platform-api/journeys/cobros-y-saldo`, clip: 'main' },
+  'module-webhooks': { url: `${APP}/app/main/api`, clip: 'main' }, // "API access" — core-mounted at /main/api
   'module-agents': { url: `${APP}/app/main/agents`, clip: 'main' },
   'module-domain': { url: `${APP}/app/main/domains`, clip: 'main' },
+  'module-ai-image': { url: `${SITE}/blog/ai-content-best-practices/`, clip: 'main' },
   'module-search-console': { url: `${APP}/app/main/websites`, clip: 'main' },
 };
 
