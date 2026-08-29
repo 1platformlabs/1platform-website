@@ -103,12 +103,15 @@ on warm paper, **one** accent, and **one** signal colour reserved for a single m
   code-block headers sit. Measuring only on paper is what hid it.
 - **Typography — self-hosted, latin subsets, in `public/fonts/` (SIL OFL):**
   **Space Grotesk** display (500/700) for headings and the logo · **Inter** text
-  (400/500/600) · **JetBrains Mono** (400) for labels, data and code.
-  `@font-face` with `font-display: swap` in `global.css`; display 700 + text 400 are
-  preloaded in `BaseLayout.astro`. Three families, weights deliberately limited.
+  (400/500/600) · **JetBrains Mono** (400) for labels, data and code ·
+  **Instrument Serif** (400) — the home system's display serif (56 px openers,
+  the footer card's heading), added by the home redesign. `@font-face` with
+  `font-display: swap` in `global.css`; display 700, text 400 and the serif are
+  preloaded in `BaseLayout.astro`. Four families, weights deliberately limited
+  — the serif ships exactly one.
 - **Structural devices:** `.eyebrow` (mono, uppercase, tracked) names a section;
   `.section__rule` puts that label against a hairline. Section openers are **left-aligned**
-  — the centred header + subhead + grid cadence was removed. Headings use sentence case,
+  (the home is the one exception — see "The home system"). Headings use sentence case,
   except the brand line "One Platform. Every Solution."
 - **Signature motif:** `InterconnectDiagram.astro` — the platform drawn as a schematic.
   Real capabilities enter from the top, resolve through one API spine, and leave as
@@ -118,8 +121,29 @@ on warm paper, **one** accent, and **one** signal colour reserved for a single m
 - **Logo:** the "1" is set as a node — the same cobalt rounded square the schematic uses.
 - `text-wrap: balance` on headings, `text-wrap: pretty` on body copy.
 
+### The home system (epic home-landing-redesign)
+
+The home (`/`, `/es/`) and the site chrome (announcement bar, header, footer)
+draw with a SECOND palette that coexists with ink & signal (D-2): the `--ref-*`
+tokens in `global.css`, measured on a reference landing whose geometry the home
+replicates with 1Platform's content. Dark surfaces (`--ref-dark`,
+`--ref-dark-2`, `--ref-pill`, `--ref-card-dark`), a light canvas
+(`--ref-canvas`), radii 6 px (buttons/chips) and 8 px (cards/panels), a dot
+texture (`.ref-dot-grid`, 15 px pitch — exempt from the guard's dot-grid rule
+BY THAT NAME ONLY), and two tints that deliberately diverge from the measured
+reference because AA wins over parity (D-6): `--ref-orange-cta #C63A12` under
+light text (the exact `--ref-orange #F04E23` is for surfaces that carry none)
+and `--ref-fg-dim #9A9A9A` for links on the footer card.
+`tests/contrast.spec.ts` pins the arithmetic; `tests/ref-fidelity.spec.ts`
+measures the geometry against `tests/ref-fidelity.table.json` on every run.
+**The home centres its openers** — the deliberate exception to the left-aligned
+rule below; every other page keeps it. The reference site itself is never
+named anywhere in this repo (guard rule 15 scans for it as a hashed token);
+its measurements live with the epic, outside this tree.
+
 **Anti-patterns — do not reintroduce** (`scripts/check-tells.sh` enforces these):
-aurora blobs, dot-grid textures, clipped gradient text, 135deg gradient icon tiles,
+aurora blobs, dot-grid textures (the home's `ref-dot-grid` is the ONE named
+exemption), clipped gradient text, 135deg gradient icon tiles,
 marquees of capability pills, animated vanity counters, per-index reveal cascades,
 `transition: all`, emoji or entity glyphs as icons, hardcoded brand hexes,
 `var(--token, #fallback)`, competitor brand names, fabricated prices or metrics.
@@ -138,6 +162,12 @@ Restrained by design — over-animation was one of the tells this site was rebui
 - **Primary easing:** `cubic-bezier(0.16, 1, 0.3, 1)` (ease-out-expo).
 - **ALL animation** sits inside `@media (prefers-reduced-motion: no-preference)`, with a
   static fallback — including the motif, which collapses to a plain schematic.
+- **The home's two WebGL scenes** (hero fan, module carousel) are UPGRADES over
+  CSS 3D layers that are the page: they mount after `astro:page-load` +
+  `requestIdleCallback`, only ≥ 769 px with WebGL2 and no reduced-motion, read
+  their geometry from the CSS layer's data attributes, take scroll from Lenis
+  (`globalThis.__lenis`, the single scroll source) and dispose fully in
+  `astro:before-swap`. A failed upgrade never costs the page.
 
 ## SEO Essentials
 
@@ -155,62 +185,64 @@ Restrained by design — over-animation was one of the tells this site was rebui
 
 The website **navbar AND footer** must stay in sync with the developer docs counterparts — users should perceive `1platform.pro` and `developer.1platform.pro` as one product.
 
-**The two sides now share the design system itself, not just the link lists.**
-The developer docs ship the same "ink & signal" tokens, the same three self-hosted
-typefaces (Space Grotesk / Inter / JetBrains Mono) and the same cobalt-node logo,
-ported from this repo. This repo is the **upstream** for all of it: a token value,
-a `@font-face`, or the logo geometry changes here first, and
-`../1platform-api-developer/src/css/custom.css` follows. The icon registry
-(`src/components/icons.ts`) is likewise upstream of
-`../1platform-api-developer/src/components/Icon/icons.ts` — copy paths across so a
-concept keeps the same drawing on both domains, rather than redrawing it.
+**The two sides share the design system itself, not just the link lists.**
+Both chromes draw with the `--ref-*` tokens (this repo is upstream:
+`src/styles/global.css` first, `../1platform-api-developer/src/css/custom.css`
+follows), the four self-hosted typefaces and the cobalt-node logo. The icon
+registry (`src/components/icons.ts`) is likewise upstream of
+`../1platform-api-developer/src/components/Icon/icons.ts`.
 
 **Language is the one deliberate difference:** this site is English, the developer
 portal is Spanish. The harmony contract is about **order, destinations and
-structure**, never about the literal strings. Unifying the language is an open
-product decision, not a bug to fix in passing.
+structure**, never about the literal strings.
 
 **Source of truth on each side:**
 - Website — `src/components/Header.astro` (navbar), `src/components/Footer.astro` (footer),
-  `src/components/Logo.astro` (mark), `src/styles/global.css` (tokens), `src/components/icons.ts` (icons)
+  `src/components/AnnouncementBar.astro` (bar), `src/components/Logo.astro` (mark),
+  `src/styles/global.css` (tokens), `src/components/icons.ts` (icons)
 - Developer docs — `../1platform-api-developer/docusaurus.config.ts` (navbar),
-  `.../src/theme/Footer/` (footer), `.../src/theme/Logo/` (mark),
-  `.../src/css/custom.css` (tokens), `.../src/components/Icon/icons.ts` (icons)
+  `.../src/theme/Footer/` (footer), `.../src/theme/Navbar/MobileSidebar/` (panel),
+  `.../src/theme/Logo/` (mark), `.../src/css/custom.css` (tokens)
 
-**Navbar contract:** Solutions, Features, Pricing, Docs, Blog + Get Started Free CTA. On the developer site, Solutions/Features/Pricing/Blog are absolute URLs back to this site; "Docs" points to `https://developer.1platform.pro/`. The CTA carries a `min-height: 44px` target floor on both sides.
+**Navbar contract (since the home redesign):** a 74 px transparent fixed bar
+carrying exactly two things — a 230 × 42 dark pill (logo + menu button) on the
+left, and two 44 px CTAs on the right ("Sign In" on `--ref-yellow`,
+"Get Started Free" on `--ref-orange-cta`). **No navigation link is visible in
+the bar at any width.** The navigation — Solutions with its seven destinations,
+Features, Pricing, Docs, Blog, the CTA and `EN | ES` — lives in the panel the
+menu button opens (`#mobile-menu` here; the theme's mobile sidebar, rendered at
+every width by a wrap swizzle, on the docs side). Without JavaScript the panel
+renders open under the pill (`@media (scripting: none)`) — navigation that only
+exists behind a script is not navigation. The docs side keeps its search box in
+the bar: a documentation portal without search is not a portal.
 
-**Solutions dropdown (source of truth — keep in sync with `docusaurus.config.ts` on the developer docs):** the "Solutions" item is a hybrid label-link + chevron-button. The label navigates to `/solutions/`; the chevron toggles a panel with these items in this exact order:
+**Solutions destinations (order matters, mirror in `docusaurus.config.ts`):**
+Online Store → `/solutions/online-store/` · Website Builder →
+`/solutions/website/` · AI Content → `/solutions/content/` · Deliveries →
+`/solutions/deliveries/` · Advertising → `/solutions/ads/` · Whitelabel
+Dashboard → `/solutions/whitelabel/` · Payments & Invoicing →
+`/payments-invoicing/` · then a divider and "View all solutions" →
+`/solutions/`.
 
-1. **Online Store** → `/solutions/online-store/`
-2. **Website Builder** → `/solutions/website/`
-3. **AI Content** → `/solutions/content/`
-4. **Whitelabel Dashboard** → `/solutions/whitelabel/`
-5. **Payments & Invoicing** → `/payments-invoicing/`
-6. _(divider)_
-7. **View all solutions** → `/solutions/`
-
-Adding/removing/reordering any item in this list requires the same change in `../1platform-api-developer/docusaurus.config.ts` (the `type: 'dropdown'` items array under "Solutions") in the same commit. Keyboard a11y on the website side: `Enter`/`Space` toggle the panel from the chevron; `Escape` closes; `ArrowDown`/`ArrowUp` cycle items; `Tab` exits. Mobile: the panel renders as an indented inline sub-list inside the existing mobile menu — no overlay.
-
-**Footer contract:** closing CTA ("Stop juggling separate tools" — deliberately carries **no number**; the site used to claim 4 / 5 / 6 / 19+ / 13+ in different places) + brand column + Solutions / Resources / Company / Legal columns + copyright bottom row. Same labels, same link targets, same ordering. The developer-docs footer is the Spanish counterpart of this same CTA ("Deja de hacer malabares con herramientas separadas") — if the wording changes here, change it there in the same commit.
+**Footer contract (since the home redesign):** a `--ref-dark` band with the
+brand watermark (an SVG drawing, deliberately not HTML text — axe's
+color-contrast applies to glyphs sighted readers see) behind one
+`--ref-card-dark` card: an e-mail sign-up on the left (composes a `mailto:` in
+the browser — there is NO list backend; without JS it goes to the contact
+page), three columns — PRODUCT (the seven solutions + All Solutions), COMPANY
+(About · Pricing · For Agencies · For Developers · Blog), RESOURCES
+(Documentation · API Reference · Code Examples · Changelog) — and a legal row
+(copyright · Terms · Privacy · Cookie preferences). **There is no closing CTA
+and no "Status" claim** — the reference has none and there is no status page to
+back one. `tests/footer-ref.spec.ts` pins the exact link set.
 
 **If you add/remove/rename a navbar item or footer column/link on this site, update the developer docs in the same change.**
 
-**Exemption — language controls.** The `EN | ES` control in the header and mobile menu is exempt
-from the rule above, and this is the one case the rule did not anticipate. It is a control over
-how the current page is presented, not an entry in the information architecture: it adds no
-destination, and it appears identically on every page in both trees. The developer docs cannot
-mirror it either — that site is Spanish-only (`docusaurus.config.ts`), so it has no second
-language to offer. The harmony the rule protects is preserved where it matters: both sites serve
-Spanish, and now with the same vocabulary.
-
-**Correction to the footer contract above.** The Spanish counterpart CTA is quoted here as "Deja
-de hacer malabares con herramientas separadas". That is not what the developer docs actually say.
-`../1platform-api-developer/src/theme/Footer/index.tsx:65` reads **"Deja de hacer malabares con 6
-servicios distintos"** — which carries exactly the fabricated number this site was rebuilt to
-remove and which `scripts/check-tells.sh` exists to forbid. This site's Spanish CTA is
-"Deja de hacer malabares con herramientas sueltas" (no number), derived from the English. Fixing
-the sibling is a change to another repo and therefore another PR; until then the two do not
-match, and the sibling is the one that is wrong.
+**Exemption — language controls.** The `EN | ES` control in the menu panel is exempt
+from the rule above. It is a control over how the current page is presented, not an
+entry in the information architecture, and the developer docs cannot mirror it —
+that site is Spanish-only (`docusaurus.config.ts`), so it has no second language
+to offer.
 
 ## Internationalisation
 
@@ -242,6 +274,10 @@ generate the second tree from config — every `/es/` route exists because a fil
   `mailto:` and fragments through untouched. **Every internal href goes through `l()`.**
 - Message modules register themselves by existing (`import.meta.glob`), so no shared index file
   has to be edited to add a page. Two modules defining the same key fails the build.
+- A key consumed through a CONTENT TABLE (the home's personas/modules/pricing/FAQ
+  tables) is declared with `i18nKey('…')` from `src/i18n/key.ts` — the explicit
+  marker `tests/i18n-catalogue.spec.ts` counts as a reference, since the
+  extractor cannot follow a variable into `t()`.
 - Parity is enforced twice: `defineMessages` types Spanish against English (a compile error), and
   `assertParity()` in `src/i18n/index.ts` throws during **every build**, because `astro build`
   does not typecheck and a guarantee that depends on remembering to run `npm run typecheck` is
@@ -283,7 +319,14 @@ Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm r
 
 - Images: Use Astro's `<Image />` component from `astro:assets` (auto WebP, srcset, lazy loading)
 - Fonts: self-host WOFF2 in `public/fonts/`, preload the critical two in `BaseLayout.astro`, `font-display: swap`, **3 families max** (display / text / mono), latin subsets, weights kept to what is actually used
-- JS: zero by default — only `client:visible`/`client:load` islands ship JS. Never add `client:*` to presentational components
+- JS: zero by default on every page but the home — never add `client:*` to
+  presentational components (the guard rejects it). The HOME carries a measured
+  budget instead: **210 KB gzip** for everything it loads (guard rule 14
+  statically, `tests/js-budget.spec.ts` over the network). The number is
+  arithmetic, not taste: three 0.185 is ~188 KB gzip WHOLE — `module.min`
+  86.8 + the `core.min` it imports, 101.5; measuring only the first file is
+  how budgets get invented — plus ~17 KB of our own and ~2% headroom. There is
+  no room for a second dependency, which is the point
 - CSS: scoped `<style>` per component + global CSS. Astro bundles and minifies automatically
 - Animations: only `transform`/`opacity`, never `transition: all`
 
@@ -301,13 +344,14 @@ Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm r
 
 - **Core message:** "One platform. Every solution."
 - **Pillars:** Unified Platform, AI-Powered Pipeline, End-to-End Ecosystem, Scalable by Design, Interconnected Services
-- **Pattern:** Comparison framed as unified vs fragmented — by capability and experience, never by invented competitor pricing. The closing CTA lives once, in the footer, on every page
+- **Pattern:** Comparison framed as unified vs fragmented — by capability and experience, never by invented competitor pricing. Since the home redesign the footer carries no closing CTA: the header's two CTAs and the pricing section do that work
 - **"Replaces" positioning:** Each solution names generic tool categories it replaces (never competitor brand names)
 - **Interconnection narrative:** Emphasize that all services work together (keywords → content → images → publish → index → backlinks → payments → invoicing)
 
 ## Restrictions (NEVER)
 
-- Never use `client:*` on presentational components — goal: < 10KB total JS
+- Never use `client:*` on presentational components; the home's JS budget is
+  210 KB gzip (rule 14) and every other page stays effectively zero
 - Never expose provider names on client-facing pages (only in Privacy Policy)
 - Never `outline: none` without replacement focus indicator
 - Never `user-scalable=no` or `maximum-scale=1`
@@ -325,11 +369,13 @@ Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm r
 must be run before opening a PR**:
 
 ```bash
-npm run build            # Must succeed, zero errors
-./scripts/check-tells.sh # Design-system guard — see "Anti-patterns" above
-npm run preview          # Visual review, including at 390px wide
-# Lighthouse (local): Performance 95+, Accessibility 100, SEO 100
-# Validate JSON-LD with Google Rich Results Test
+npm run build            # Must succeed, zero errors — BEFORE check (rule 14 measures dist/)
+npm run check            # Design-system guard (15 rules) + its 43 self-tests
+npm test                 # 100+ Playwright tests against the real dist/
+npm run typecheck        # astro check
+npm run test:visual      # visual baseline, compared in the Playwright container
+# Lighthouse (local): Performance 90+ on the home (95+ elsewhere), A11y 100, SEO 100
+# Media: node scripts/capture-product-media.mjs --check (OCR gate; MEDIA_REQUIRED=1 pre-merge)
 # Test keyboard nav: Tab, Enter, Escape on all pages
 # Test prefers-reduced-motion: all animation has a static fallback
 ```

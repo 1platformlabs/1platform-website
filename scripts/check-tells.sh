@@ -234,6 +234,79 @@ m=$(perl -CSD -ne '
 report "no untranslated literal attributes" \
        "visible and accessible text comes from t(), not from a literal" "$m"
 
+# 14. The home's JavaScript budget (epic home-landing-redesign, D-5 as
+#     amended): every chunk the build emits, gzipped, must fit in 210 KB.
+#     The number is arithmetic, not taste: three 0.185 is ~188 KB gzip WHOLE
+#     (module.min 86.8 + the core.min it imports, 101.5 — measuring only the
+#     first file is how the epic's plan under-budgeted), plus ~17 KB of our
+#     own, plus ~2% headroom. tests/js-budget.spec.ts measures the same thing
+#     over the network; this rule is the cheap static floor for `npm run check`.
+#     It needs a build to measure — a missing dist/ is a loud failure, never a
+#     quiet pass.
+m=$({
+  if [ ! -f dist/index.html ]; then
+    echo "dist/index.html not found — run 'npm run build' before 'npm run check'"
+  else
+    total=0
+    for f in dist/_astro/*.js; do
+      [ -f "$f" ] || continue
+      size=$(gzip -c "$f" | wc -c | tr -d ' ')
+      total=$((total + size))
+    done
+    if [ "$total" -gt 215040 ]; then
+      echo "built JS is ${total} bytes gzip — over the 215040-byte (210 KB) budget"
+    fi
+    if [ "$total" -lt 1000 ]; then
+      echo "built JS totals ${total} bytes — the scan found nothing, which is a broken probe, not a pass"
+    fi
+  fi
+})
+report "home JS inside the 210 KB gzip budget" \
+       "the budget is three (~188 KB whole) + our ~17 KB + headroom; a second dependency does not fit" "$m"
+
+# 15. The reference site this home was measured against must not be NAMED
+#     anywhere in the repo (epic home-landing-redesign, D-15/D-17): not in
+#     source, styles, tests, docs, branches or this guard itself — which is
+#     why the term travels as a sha256 DIGEST, not as a string this file would
+#     then contain. Tokens are split on non-letters AND camelCase boundaries,
+#     lowercased, and every substring of 5+ characters is hashed, so the name
+#     is caught as a word, inside kebab-case, as a CamelCase prefix or glued
+#     into a longer identifier. The self-test proves the mechanism with a
+#     synthetic term injected via CHECK_TELLS_EXTRA_NAME_SHA256; that the
+#     digest list matches the real name was proven by the control run recorded
+#     in the epic's PROGRESO (seeding the name → red, clean tree → green).
+export BANNED="d965aa403593d08cf2e1cb83ba139be3e61b41469271ac94c67ffb81ba998f4a ${CHECK_TELLS_EXTRA_NAME_SHA256:-}"
+m=$(find src public tests scripts CLAUDE.md CHANGELOG.md -type f \( -name '*.astro' -o -name '*.ts' -o -name '*.css' -o -name '*.md' -o -name '*.mjs' -o -name '*.sh' -o -name '*.json' -o -name '*.txt' \) 2>/dev/null \
+  | perl -e '
+    use Digest::SHA qw(sha256_hex);
+    my %banned = map { $_ => 1 } grep { length } split / /, $ENV{BANNED};
+    my %offending_tokens;
+    while (my $file = <STDIN>) {
+      chomp $file;
+      open my $fh, "<", $file or next;
+      while (my $line = <$fh>) {
+        # split camelCase, then non-letters; lowercase every token
+        (my $spaced = $line) =~ s/([a-z])([A-Z])/$1 $2/g;
+        for my $tok (split /[^A-Za-z]+/, lc $spaced) {
+          next if length($tok) < 5 || $offending_tokens{$tok};
+          my $len = length $tok;
+          OUTER: for my $i (0 .. $len - 5) {
+            for my $l (5 .. $len - $i) {
+              if ($banned{sha256_hex(substr($tok, $i, $l))}) {
+                $offending_tokens{$tok} = 1;
+                print "$file: token \"$tok\" contains the banned name\n";
+                last OUTER;
+              }
+            }
+          }
+        }
+      }
+      close $fh;
+    }
+  ' 2>&1)
+report "the reference site is never named" \
+       "it is a measurement, not an identity; the epic docs are the only place it may appear" "$m"
+
 echo
 if [ "$FAILED" -ne 0 ]; then
   printf '%sDesign-system check failed.%s See the findings above.\n' "$RED" "$RESET"

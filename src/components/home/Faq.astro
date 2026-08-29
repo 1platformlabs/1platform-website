@@ -132,9 +132,15 @@ const items = FAQ_KEYS.map((key) => ({
     outline-offset: 2px;
   }
 
+  /* Tuned to land the reference's 717 total at 390 (the H2 wraps deeper in
+     English than the reference's, so the padding gives the lines back). */
   @media (max-width: 768px) {
     .faq {
-      padding: 80px 16px 40px;
+      padding: 26px 16px 40px;
+    }
+
+    .faq__title {
+      margin-bottom: 24px;
     }
   }
 </style>

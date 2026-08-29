@@ -37,3 +37,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# visual snapshots: only the container's Linux render is authoritative — a
+# local darwin baseline goes green against itself and hides regressions
+tests/visual/**/*-darwin.png

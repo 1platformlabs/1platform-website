@@ -76,11 +76,15 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="site-footer__inner">
     <!-- The brand as a watermark: the same mark and wordmark as the logo, at
-         1037 × 186, light at 20 %. Decorative — the logo in the header is the
-         one that speaks. -->
-    <div class="watermark" aria-hidden="true">
-      <span class="watermark__mark">1</span><span class="watermark__text">Platform</span>
-    </div>
+         1037 × 186, light at 20 %. SVG, not HTML text, deliberately: sighted
+         readers see it however it is hidden from AT, so axe's color-contrast
+         applies to HTML glyphs — and a 20 % watermark is a texture, not text
+         anyone reads. As SVG it is what it claims to be: a drawing. -->
+    <svg class="watermark" viewBox="0 0 1037 186" aria-hidden="true" focusable="false">
+      <rect x="0" y="0" width="186" height="186" rx="34" class="watermark__node" />
+      <text x="93" y="100" text-anchor="middle" dominant-baseline="central" class="watermark__one">1</text>
+      <text x="210" y="100" dominant-baseline="central" class="watermark__word">Platform</text>
+    </svg>
 
     <div class="footer-card">
       <div class="footer-card__top">
@@ -203,33 +207,29 @@ const year = new Date().getFullYear();
     position: absolute;
     left: 122px; /* 202 in the 1440 frame, minus the 80 the card is inset */
     top: -154px; /* 46 from the band's top edge */
-    display: flex;
-    align-items: center;
-    gap: 0.12em;
+    width: 1037px;
     height: 186px;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 212px;
-    line-height: 1;
-    letter-spacing: -0.03em;
-    color: var(--ref-white);
     opacity: 0.2;
-    white-space: nowrap;
     user-select: none;
   }
 
-  .watermark__mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 0.93em;
-    height: 0.93em;
-    border-radius: 0.18em;
-    background: var(--ref-white);
-    color: var(--ref-dark);
-    font-size: 0.82em;
-    line-height: 1;
-    padding-right: 0.04em;
+  .watermark__node {
+    fill: var(--ref-white);
+  }
+
+  .watermark__one {
+    fill: var(--ref-dark);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 150px;
+  }
+
+  .watermark__word {
+    fill: var(--ref-white);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 190px;
+    letter-spacing: -0.03em;
   }
 
   .footer-card {
@@ -429,16 +429,17 @@ const year = new Date().getFullYear();
 
   /* Phones: 665 tall on the reference, card edge to edge minus 16 px, the
      columns folded into tappable headings, the watermark shrunk to fit. */
+  /* Top padding tuned so the band's total lands on the reference's 665. */
   @media (max-width: 768px) {
     .site-footer {
-      padding: 120px 16px 40px;
+      padding: 63px 16px 40px;
     }
 
     .watermark {
       left: 0;
       top: -100px;
+      width: 502px;
       height: 90px;
-      font-size: 96px;
     }
 
     .footer-card {

@@ -5,6 +5,71 @@ All notable changes to the 1Platform Website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — Home landing redesign (epic home-landing-redesign)
+
+The home (`/`, `/es/`) and the site chrome, rebuilt to the measured geometry of
+a reference landing with 1Platform's own content. `prod.yml` bumps the version
+on merge; this entry documents the change set.
+
+### Added
+- **Announcement bar** (40 px, fixed): the newest changelog entry of the page's
+  language; renders nothing when the collection is empty.
+- **Hero**: the brand line in Instrument Serif 56/56 over an 11-plane fan of
+  product screens — a CSS 3D layer that IS the page (LCP, no-JS, reduced
+  motion), upgraded to WebGL (three.js) on capable desktops; a solutions
+  search pill (320 × 57, r16) over the seven destinations.
+- **Showcase** (3 419 px): five scroll-pinned panels of connected "nodes" — one
+  per solution — over a sticky full-bleed background, with a floating tablist
+  pill that follows and drives the scroll.
+- **Personas** (933 px): the five audiences as a fanned card stack with four
+  capability satellites each and a segmented control; copy is the existing
+  `home.useCase.*` catalogue, unchanged.
+- **Module carousel** (860 px): fourteen modules as tilted monitors under
+  "One platform. Every solution." — WebGL ring with a raycast click-through,
+  DOM arrows, progress bar, live region and a keyboard "open" link.
+- **Pricing** (1 428 px): the reference's geometry with the real model — a
+  metered/quoted switch (CSS only), three 387 × 794 cards per mode grouping
+  the pricing page's own catalogue, the 1 200 × 274 whitelabel/enterprise
+  card. Not one figure.
+- **FAQ** (821 px): eight native `<details>` rows — six answers shared with
+  the pricing page's catalogue, two new — plus a `FAQPage` JSON-LD from the
+  same list.
+- **Footer**: dark band, SVG brand watermark, one card with an e-mail
+  `mailto:` sign-up (no list backend), PRODUCT/COMPANY/RESOURCES columns and a
+  legal row. The link set is exactly the previous footer's, pinned by test.
+- **Header**: 74 px transparent bar with a 230 × 42 brand pill and two 44 px
+  CTAs; the full navigation lives in the pill's panel at every width, and
+  renders open without JavaScript.
+- **Instrument Serif** as the fourth self-hosted family (OFL, one weight).
+- **Media pipeline**: 78 declared product-capture slots with labelled SVG
+  placeholders, `scripts/capture-product-media.mjs` (Playwright → sharp →
+  manifest, OCR gate against the provider list and PII), `MEDIA_REQUIRED=1`
+  for the pre-merge run.
+- **Gates**: `tests/ref-fidelity.spec.ts` against a versioned measurement
+  table (with a self-proving control); `tests/js-budget.spec.ts` (210 KB gzip,
+  measured over the network); axe with color-contrast on, zero violations;
+  token-contrast, provider-name and media-completeness specs; guard rules #14
+  (JS budget) and #15 (the reference site is never named — scanned as hashed
+  tokens) with six new self-tests; a Linux visual baseline compared in the
+  Playwright container.
+
+### Changed
+- The previous home's sections (pillars, capability index, process, integrate,
+  comparison) left the page; their components live on in `/features/`,
+  `/pricing/` and `/compare/*`.
+- `--header-height` is 74 px and every under-the-chrome offset reads
+  `--header-offset` (chrome + announcement bar).
+- The language switcher is one variant inside the menu panel.
+- The JS budget is **210 KB gzip for the home** (three 0.185 measures ~188 KB
+  gzip WHOLE — module.min + the core.min it imports; the epic's plan had
+  measured half of it), zero for everything else.
+
+### Security / a11y
+- All CTAs ≥ 44 px; AA-corrected tints where the reference fails contrast
+  (`#C63A12` under light text, `#9A9A9A` on the footer card); the watermark is
+  an SVG drawing, not HTML text; hidden persona cards are `inert`; the whole
+  page passes axe (WCAG A/AA) with the menu open and closed.
+
 ## [Unreleased]
 
 ### Added

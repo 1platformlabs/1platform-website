@@ -281,9 +281,34 @@ const quoted = QUOTED_CARDS.map((spec) => card(spec, 'quoted'));
     }
   }
 
+  /* Tuned to land the reference's 2 290 total at 390: four stacked cards at
+     460 minimum with 24 px gaps. */
   @media (max-width: 768px) {
     .pricing {
       padding: 7px 16px 40px;
+    }
+
+    .pricing__grid {
+      gap: 24px;
+    }
+
+    .price-card {
+      min-height: 400px;
+    }
+
+    /* The desktop card breathes into 794 px; stacked on a phone the air
+       between blocks compresses, as the reference's cards do. */
+    .price-card__eyebrow {
+      margin-top: 20px;
+    }
+
+    .price-card__detail,
+    .price-card__label {
+      margin-top: 14px;
+    }
+
+    .price-card__cta {
+      margin-top: 20px;
     }
   }
 </style>
