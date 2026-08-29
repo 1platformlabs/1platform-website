@@ -25,7 +25,7 @@ export type ShowcaseSlug = (typeof SHOWCASE_SLUGS)[number];
 
 /** Nodes per showcase panel. The count is the number of node cards that panel draws. */
 export const SHOWCASE_NODE_COUNT: Record<ShowcaseSlug, number> = {
-  store: 4,
+  store: 5,
   payments: 4,
   content: 5,
   deliveries: 3,

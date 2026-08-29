@@ -9,12 +9,13 @@
  * untranslated — see `common.ts` and the i18n contract's glossary.
  */
 import BaseLayout from '@layouts/BaseLayout.astro';
-import Hero from '@components/Hero.astro';
 import Card from '@components/Card.astro';
 import Icon from '@components/Icon.astro';
 import ProcessSpine from '@components/ProcessSpine.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 import CodeBlock from '@components/CodeBlock.astro';
+import HeroFan from '@components/home/HeroFan.astro';
+import Showcase from '@components/home/Showcase.astro';
 import { useI18n } from '@i18n';
 import type { IconName } from '@components/icons';
 
@@ -170,23 +171,15 @@ const useCases: { icon: IconName; title: string; description: string }[] = [
   },
 ];
 
-const intentChips = [
-  { label: t('home.chip.sell'), href: l('/solutions/online-store/') },
-  { label: t('home.chip.website'), href: l('/solutions/website/') },
-  { label: t('home.chip.api'), href: l('/for-developers/') },
-];
 ---
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd}>
-  <Hero
-    headline={t('home.hero.headline')}
-    subheadline={t('home.hero.subheadline')}
-    badge={t('home.hero.badge')}
-    primaryCta={{ label: t('home.hero.cta.primary'), href: 'https://app.1platform.pro/app/?intent=store' }}
-    secondaryCta={{ label: t('home.hero.cta.secondary'), href: 'https://developer.1platform.pro/' }}
-    intentChips={intentChips}
-    motif
-  />
+  <HeroFan />
+  <Showcase />
+
+  <!-- The sections below are the PREVIOUS home, kept temporarily so the page
+       is never broken between phases (§14.3): F3 replaces the middle with
+       personas + the module carousel, F4 adds pricing + FAQ and retires these. -->
 
   <!-- What it is: a wide editorial statement, then the four claims -->
   <section class="section">
@@ -326,6 +319,12 @@ const intentChips = [
     </div>
   </section>
   <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+
+  <script>
+    // The WebGL upgrade path for the fan and the module carousel (D-5). Wired
+    // here — the page that owns the scenes — so no other page ships it.
+    import '@scripts/three-boot';
+  </script>
 </BaseLayout>
 
 <style>

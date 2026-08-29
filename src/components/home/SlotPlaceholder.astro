@@ -13,13 +13,14 @@ import type { MediaSlot } from './media-slots';
  * `tests/media-complete.spec.ts` counts.
  */
 interface Props {
-  slot: MediaSlot;
+  /** Named `spec`, not `slot`: `slot` is Astro's reserved slotting prop. */
+  spec: MediaSlot;
   class?: string;
 }
 
-const { slot, class: className } = Astro.props;
+const { spec, class: className } = Astro.props;
 const { t } = useI18n(Astro.url.pathname);
-const { width, height } = slot;
+const { width, height } = spec;
 const pitch = 24;
 const nodeW = Math.min(width * 0.42, 160);
 const nodeH = Math.min(height * 0.18, 44);
@@ -33,19 +34,19 @@ const nodeY = height * 0.38;
   width={width}
   height={height}
   role="img"
-  aria-label={t('home.media.placeholderAria', { slot: slot.id })}
-  data-placeholder={slot.id}
+  aria-label={t('home.media.placeholderAria', { slot: spec.id })}
+  data-placeholder={spec.id}
 >
   <defs>
-    <pattern id={`ph-grid-${slot.id}`} width={pitch} height={pitch} patternUnits="userSpaceOnUse">
+    <pattern id={`ph-grid-${spec.id}`} width={pitch} height={pitch} patternUnits="userSpaceOnUse">
       <path d={`M ${pitch} 0 L 0 0 0 ${pitch}`} fill="none" class="slot-ph__grid" />
     </pattern>
   </defs>
   <rect width={width} height={height} class="slot-ph__bg" />
-  <rect width={width} height={height} fill={`url(#ph-grid-${slot.id})`} />
+  <rect width={width} height={height} fill={`url(#ph-grid-${spec.id})`} />
   <path d={`M ${width / 2} ${nodeY + nodeH} V ${height * 0.78}`} class="slot-ph__trace" />
   <rect x={nodeX} y={nodeY} width={nodeW} height={nodeH} rx="6" class="slot-ph__node" />
-  <text x={width / 2} y={height * 0.78 + 18} text-anchor="middle" class="slot-ph__label">{slot.id}</text>
+  <text x={width / 2} y={height * 0.78 + 18} text-anchor="middle" class="slot-ph__label">{spec.id}</text>
 </svg>
 
 <style>
