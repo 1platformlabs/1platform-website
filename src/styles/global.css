@@ -266,6 +266,13 @@ html {
   color-scheme: light;
 }
 
+/* Set by BaseLayout when the announcement bar renders. On the root element on
+   purpose: `--header-offset` is computed there, so a value set on <body>
+   would never reach it. */
+html.has-announcement {
+  --header-top: 40px;
+}
+
 body {
   font-family: var(--font-sans);
   font-size: var(--text-base);

@@ -1,12 +1,35 @@
 ---
-import Logo from '@components/Logo.astro';
+import Icon from '@components/Icon.astro';
 import { useI18n } from '@i18n';
 
+/**
+ * The footer, redrawn to the reference geometry (LMW-10, D-14/D-18).
+ *
+ * A dark band, 680 px tall, with the brand set as a giant watermark behind one
+ * card that holds everything: an e-mail sign-up on the left, three columns of
+ * links on the right, and a legal row under a hairline. The closing CTA that
+ * used to live here is gone — the reference has none.
+ *
+ * The columns re-distribute EXACTLY the links the previous footer had (the
+ * test asserts set equality): PRODUCT is the seven solutions plus the
+ * catch-all; COMPANY is the company pages, Pricing and the blog; RESOURCES is
+ * the developer surface and the changelog; the legal three sit in the bottom
+ * row. The reference's third column is "Community" with four social networks —
+ * 1Platform publishes none, and inventing them is exactly the kind of claim
+ * this site was rebuilt to stop making.
+ *
+ * The e-mail form has no backend: submitting composes a `mailto:` in the
+ * browser (the pattern `Contact.astro` already uses), and without JavaScript
+ * it takes the reader to the contact page. A mailing list is a v2 decision.
+ */
 const { t, l } = useI18n(Astro.url.pathname);
 
-const columns = [
+type Column = { key: string; title: string; links: { label: string; href: string }[] };
+
+const columns: Column[] = [
   {
-    title: t('footer.col.solutions'),
+    key: 'product',
+    title: t('footer.col.product'),
     links: [
       { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
       { label: t('nav.solutions.website'), href: l('/solutions/website/') },
@@ -15,176 +38,462 @@ const columns = [
       { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
       { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
       { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
-      { label: t('footer.link.forAgencies'), href: l('/for-agencies/') },
-      { label: t('footer.link.forDevelopers'), href: l('/for-developers/') },
       { label: t('footer.link.allSolutions'), href: l('/solutions/') },
     ],
   },
   {
+    key: 'company',
+    title: t('footer.col.company'),
+    links: [
+      { label: t('footer.link.about'), href: l('/about/') },
+      { label: t('nav.pricing'), href: l('/pricing/') },
+      { label: t('footer.link.forAgencies'), href: l('/for-agencies/') },
+      { label: t('footer.link.forDevelopers'), href: l('/for-developers/') },
+      { label: t('nav.blog'), href: l('/blog/') },
+    ],
+  },
+  {
+    key: 'resources',
     title: t('footer.col.resources'),
     links: [
       { label: t('footer.link.documentation'), href: 'https://developer.1platform.pro/' },
       { label: t('footer.link.apiReference'), href: 'https://developer.1platform.pro/api-docs' },
       { label: t('footer.link.codeExamples'), href: 'https://developer.1platform.pro/' },
-      { label: t('nav.blog'), href: l('/blog/') },
       { label: t('footer.link.changelog'), href: l('/changelog/') },
     ],
   },
-  {
-    title: t('footer.col.company'),
-    links: [
-      { label: t('footer.link.about'), href: l('/about/') },
-      { label: t('footer.link.forDevelopers'), href: l('/for-developers/') },
-      { label: t('nav.pricing'), href: l('/pricing/') },
-    ],
-  },
-  {
-    title: t('footer.col.legal'),
-    links: [
-      { label: t('footer.link.terms'), href: l('/terms/') },
-      { label: t('footer.link.privacy'), href: l('/privacy/') },
-      { label: t('footer.link.cookies'), href: l('/cookies/') },
-    ],
-  },
+];
+
+const legal = [
+  { label: t('footer.link.terms'), href: l('/terms/') },
+  { label: t('footer.link.privacy'), href: l('/privacy/') },
+  { label: t('footer.link.cookiePreferences'), href: l('/cookies/') },
 ];
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div class="container">
-    <!-- Closing CTA -->
-    <div class="footer-cta">
-      <h2>{t('footer.cta.title')}</h2>
-      <p>{t('footer.cta.body')}</p>
-      <div class="footer-cta__actions">
-        <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--primary">{t('cta.launchStore')}</a>
-        <a href="https://developer.1platform.pro/" class="btn btn--ghost">{t('cta.viewDocs')}</a>
-      </div>
+  <div class="site-footer__inner">
+    <!-- The brand as a watermark: the same mark and wordmark as the logo, at
+         1037 × 186, light at 20 %. Decorative — the logo in the header is the
+         one that speaks. -->
+    <div class="watermark" aria-hidden="true">
+      <span class="watermark__mark">1</span><span class="watermark__text">Platform</span>
     </div>
 
-    <hr class="divider" />
-
-    <!-- Links -->
-    <div class="footer-links">
-      <div class="footer-brand">
-        <Logo class="footer-logo" />
-        <p>{t('brand.slogan')}</p>
-      </div>
-
-      {columns.map((col) => (
-        <div class="footer-col">
-          <h3>{col.title}</h3>
-          <ul>
-            {col.links.map((link) => (
-              <li><a href={link.href}>{link.label}</a></li>
-            ))}
-          </ul>
+    <div class="footer-card">
+      <div class="footer-card__top">
+        <div class="signup">
+          <h3 class="signup__title ref-h-footer">{t('footer.signup.title')}</h3>
+          <p class="signup__body ref-body-s">{t('footer.signup.body')}</p>
+          <form
+            class="signup__form"
+            method="get"
+            action={l('/contact/')}
+            data-signup
+            data-user="sales"
+            data-domain="1platform.pro"
+            data-subject={t('footer.signup.subject')}
+            data-status={t('footer.signup.status')}
+          >
+            <label for="footer-email" class="sr-only">{t('footer.signup.label')}</label>
+            <input
+              id="footer-email"
+              class="signup__input"
+              type="email"
+              name="email"
+              required
+              autocomplete="email"
+              placeholder={t('footer.signup.placeholder')}
+            />
+            <button type="submit" class="signup__submit" aria-label={t('footer.signup.submit')}>
+              <Icon name="arrow-right" size={20} />
+            </button>
+          </form>
+          <p class="signup__status ref-body-s" aria-live="polite" data-signup-status></p>
         </div>
-      ))}
-    </div>
 
-    <hr class="divider" />
+        <div class="footer-cols">
+          {columns.map((col) => (
+            <details class="footer-col" open data-footer-col>
+              <summary class="footer-col__title ref-body-s">
+                <span>{col.title}</span>
+                <span class="footer-col__plus" aria-hidden="true"></span>
+              </summary>
+              <ul class="footer-col__list">
+                {col.links.map((link) => (
+                  <li><a href={link.href}>{link.label}</a></li>
+                ))}
+              </ul>
+            </details>
+          ))}
+        </div>
+      </div>
 
-    <!-- Bottom -->
-    <div class="footer-bottom">
-      <p>{t('footer.copyright', { year })}</p>
+      <div class="footer-card__bottom">
+        <p class="footer-card__copyright">{t('footer.copyright', { year })}</p>
+        <ul class="footer-card__legal">
+          {legal.map((link) => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
     </div>
   </div>
 </footer>
 
-<style>
-  .site-footer {
-    background: var(--color-bg);
-    border-top: 1px solid var(--color-border);
-    padding-top: var(--space-16);
-    padding-bottom: var(--space-8);
-  }
-
-  /* Left-aligned, like every other opener in the system. */
-  .footer-cta {
-    max-width: 40rem;
-    padding-bottom: var(--space-16);
-  }
-
-  .footer-cta h2 {
-    font-size: var(--text-4xl);
-    margin-bottom: var(--space-4);
-  }
-
-  .footer-cta p {
-    font-size: var(--text-lg);
-    margin-bottom: var(--space-8);
-  }
-
-  .footer-cta__actions {
-    display: flex;
-    gap: var(--space-3);
-    flex-wrap: wrap;
-  }
-
-  .footer-links {
-    display: grid;
-    grid-template-columns: 1.5fr repeat(4, 1fr);
-    gap: var(--space-8);
-    padding-block: var(--space-12);
-  }
-
-  .footer-brand {
-    padding-right: var(--space-8);
-  }
-
-  .footer-logo {
-    margin-bottom: var(--space-3);
-  }
-
-  .footer-brand p {
-    font-size: var(--text-sm);
-  }
-
-  .footer-col h3 {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--space-4);
-  }
-
-  .footer-col ul {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .footer-col a {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-  }
-
-  .footer-col a:hover {
-    color: var(--color-text);
-  }
-
-  .footer-bottom {
-    padding-top: var(--space-8);
-    text-align: center;
-  }
-
-  .footer-bottom p {
-    font-size: var(--text-xs);
-    color: var(--color-text-tertiary);
-  }
-
-  @media (max-width: 768px) {
-    .footer-links {
-      grid-template-columns: repeat(2, 1fr);
+<script>
+  /**
+   * Two small progressive touches, both inert without JavaScript.
+   *
+   * 1. The sign-up composes a mailto: rather than posting anywhere — there is
+   *    no list backend (D-14). The address is assembled from data attributes,
+   *    the way the contact page does it, so it is not a scrapeable literal.
+   * 2. On phones the three link columns collapse to headings you tap open,
+   *    as on the reference. They are rendered OPEN so a browser without JS
+   *    shows every link; the script only closes them below 769 px.
+   */
+  function wireFooter() {
+    const form = document.querySelector<HTMLFormElement>('[data-signup]');
+    const status = document.querySelector<HTMLElement>('[data-signup-status]');
+    if (form && !form.dataset.wired) {
+      form.dataset.wired = 'true';
+      form.addEventListener('submit', (e) => {
+        const user = form.dataset.user ?? '';
+        const domain = form.dataset.domain ?? '';
+        if (!user || !domain) return;
+        e.preventDefault();
+        const input = form.querySelector<HTMLInputElement>('input[type="email"]');
+        const from = input?.value ?? '';
+        const subject = encodeURIComponent(form.dataset.subject ?? '');
+        const body = encodeURIComponent(from);
+        if (status) status.textContent = form.dataset.status ?? '';
+        globalThis.location.href = `mailto:${user}@${domain}?subject=${subject}&body=${body}`;
+      });
     }
 
-    .footer-brand {
-      grid-column: 1 / -1;
-      padding-right: 0;
+    const narrow = globalThis.matchMedia('(max-width: 768px)').matches;
+    document.querySelectorAll<HTMLDetailsElement>('[data-footer-col]').forEach((d) => {
+      d.open = !narrow;
+    });
+  }
+
+  document.addEventListener('astro:page-load', wireFooter);
+</script>
+
+<style>
+  /* Measured: 680 tall, padding 200/72/72; the card is 1280 × 408 centred,
+     r8, padding 32/36; the watermark sits at x 202 / y 46 in a 1440 frame. */
+  .site-footer {
+    background: var(--ref-dark);
+    color: var(--ref-white);
+    padding: 200px 72px 72px;
+    overflow: hidden;
+  }
+
+  .site-footer__inner {
+    position: relative;
+    width: 1280px;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .watermark {
+    position: absolute;
+    left: 122px; /* 202 in the 1440 frame, minus the 80 the card is inset */
+    top: -154px; /* 46 from the band's top edge */
+    display: flex;
+    align-items: center;
+    gap: 0.12em;
+    height: 186px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 212px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--ref-white);
+    opacity: 0.2;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .watermark__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.93em;
+    height: 0.93em;
+    border-radius: 0.18em;
+    background: var(--ref-white);
+    color: var(--ref-dark);
+    font-size: 0.82em;
+    line-height: 1;
+    padding-right: 0.04em;
+  }
+
+  .footer-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 408px;
+    padding: 32px 36px;
+    background: var(--ref-card-dark);
+    border-radius: var(--ref-radius-m);
+  }
+
+  .footer-card__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 60px;
+    flex: 1;
+  }
+
+  /* Sign-up: 360 wide; heading serif 27.2, body 12.8, input 360 × 44 r6. */
+  .signup {
+    width: 360px;
+    max-width: 100%;
+    flex-shrink: 0;
+  }
+
+  .signup__title {
+    color: var(--ref-white);
+    margin-bottom: 8px;
+  }
+
+  .signup__body {
+    color: var(--ref-fg-dim);
+    margin-bottom: 20px;
+  }
+
+  .signup__form {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    background: var(--ref-white);
+    border-radius: var(--ref-radius-s);
+    overflow: hidden;
+  }
+
+  .signup__input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0 16px;
+    border: 0;
+    background: transparent;
+    color: var(--ref-ink);
+    font-size: var(--text-sm);
+  }
+
+  .signup__input::placeholder {
+    color: var(--subtle);
+  }
+
+  .signup__input:focus-visible {
+    outline: none;
+  }
+
+  .signup__form:focus-within {
+    outline: 2px solid var(--ref-orange);
+    outline-offset: 2px;
+  }
+
+  .signup__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: var(--ref-ink);
+    cursor: pointer;
+  }
+
+  .signup__status {
+    min-height: 15.36px;
+    margin-top: 8px;
+    color: var(--ref-fg-dim);
+  }
+
+  /* Three columns, 772 wide, gap 76. */
+  .footer-cols {
+    display: flex;
+    gap: 76px;
+    width: 772px;
+    max-width: 100%;
+    padding-top: 20px;
+  }
+
+  .footer-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .footer-col__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--ref-white);
+    margin-bottom: 16px;
+    cursor: default;
+  }
+
+  .footer-col__title::-webkit-details-marker {
+    display: none;
+  }
+
+  .footer-col__plus {
+    display: none;
+  }
+
+  /* The reference lists 7 links per column at a 32 px pitch; PRODUCT here has
+     8 (the seven solutions plus the catch-all), so the pitch is 28 to keep the
+     column — and the card — at the measured height. */
+  .footer-col__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* `display: flex` on the anchor AND a fixed line-height on the item: an
+     inline-flex link inside a block <li> inherits the body's 1.6 line-height
+     on the li and every row grows by 6 px — the whole card ended 50 px tall. */
+  .footer-col__list li,
+  .footer-card__legal li {
+    display: flex;
+    line-height: 20px;
+  }
+
+  .footer-col__list a,
+  .footer-card__legal a {
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+    font-size: var(--text-sm);
+    line-height: 20px;
+    color: var(--ref-fg-dim);
+  }
+
+  .footer-col__list a:hover,
+  .footer-card__legal a:hover {
+    color: var(--ref-white);
+  }
+
+  /* Legal row: hairline above, 20 px of air, copyright left, three links right. */
+  .footer-card__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--ref-hairline-dark);
+  }
+
+  .footer-card__copyright {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 20px;
+    color: var(--ref-fg-dim);
+  }
+
+  .footer-card__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+
+  .site-footer :focus-visible {
+    outline-color: var(--ref-white);
+  }
+
+  @media (max-width: 1100px) {
+    .site-footer {
+      padding-inline: 32px;
+    }
+
+    .footer-card__top {
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .footer-cols {
+      width: 100%;
+    }
+  }
+
+  /* Phones: 665 tall on the reference, card edge to edge minus 16 px, the
+     columns folded into tappable headings, the watermark shrunk to fit. */
+  @media (max-width: 768px) {
+    .site-footer {
+      padding: 120px 16px 40px;
+    }
+
+    .watermark {
+      left: 0;
+      top: -100px;
+      height: 90px;
+      font-size: 96px;
+    }
+
+    .footer-card {
+      padding: 32px 20px;
+    }
+
+    .footer-cols {
+      flex-direction: column;
+      gap: 0;
+      padding-top: 0;
+    }
+
+    .footer-col {
+      border-bottom: 1px solid var(--ref-hairline-dark);
+    }
+
+    .footer-col__title {
+      min-height: 56px;
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+
+    .footer-col__plus {
+      display: block;
+      position: relative;
+      width: 12px;
+      height: 12px;
+    }
+
+    .footer-col__plus::before,
+    .footer-col__plus::after {
+      content: '';
+      position: absolute;
+      background: var(--ref-white);
+      left: 0;
+      top: 5.5px;
+      width: 12px;
+      height: 1px;
+    }
+
+    .footer-col__plus::after {
+      transform: rotate(90deg);
+    }
+
+    .footer-col[open] .footer-col__plus::after {
+      transform: rotate(0deg);
+    }
+
+    .footer-col__list {
+      padding-bottom: 16px;
+    }
+
+    .footer-card__bottom {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 </style>

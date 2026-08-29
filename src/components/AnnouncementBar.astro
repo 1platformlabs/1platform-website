@@ -1,0 +1,87 @@
+---
+import Icon from '@components/Icon.astro';
+import { useI18n } from '@i18n';
+import type { AnnouncementEntry } from '@components/announcement';
+
+/**
+ * The 40 px fixed strip above the header (LMW-02).
+ *
+ * The text is the title of the newest changelog entry in the page's language,
+ * chosen by `BaseLayout` (which also sets `--header-top` so the header and
+ * every "start below the chrome" offset move down by the bar's height). No
+ * entry → `BaseLayout` renders nothing and the header sits at the top.
+ */
+interface Props {
+  entry: AnnouncementEntry;
+}
+
+const { entry } = Astro.props;
+const { t, l } = useI18n(Astro.url.pathname);
+---
+
+<aside class="announcement" role="note" aria-label={t('announcement.aria')}>
+  <p class="announcement__text ref-body-s">
+    <span class="announcement__title">{entry.title}</span>
+    <a href={l('/changelog/')} class="announcement__link">
+      {t('announcement.cta')}
+      <Icon name="arrow-right" size={12} />
+    </a>
+  </p>
+</aside>
+
+<style>
+  /* Measured: 40 px tall, inset 8 px from both edges, 1 px hairline, bottom
+     corners rounded to the card radius, text 12.8 centred, link in the CTA
+     orange (the AA-safe tint, D-6) with an arrow icon — never an arrow glyph. */
+  .announcement {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    right: 8px;
+    z-index: 101;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ref-dark-2);
+    color: var(--ref-white);
+    border: 1px solid var(--ref-hairline-dark);
+    border-top: 0;
+    border-radius: 0 0 var(--ref-radius-m) var(--ref-radius-m);
+  }
+
+  .announcement__text {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0 var(--space-4);
+    color: var(--ref-white);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .announcement__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .announcement__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    /* The dark bar carries light text; the orange link must clear AA on it.
+       The exact orange measures 5.4:1 on this bar, so it is allowed here. */
+    color: var(--ref-orange);
+    min-height: 40px;
+  }
+
+  .announcement__link:hover {
+    text-decoration: underline;
+  }
+
+  .announcement :focus-visible {
+    outline-color: var(--ref-white);
+  }
+</style>

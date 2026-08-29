@@ -9,11 +9,10 @@ import { defineMessages } from '@i18n/ui';
  * soluciones. Where that site and this one name the same thing, they now name
  * it with the same word.
  *
- * Two things deliberately stay in English in both trees because they are brand,
- * not copy: the product name "1Platform" and the slogan "One platform. Every
- * solution." — the sibling site keeps the slogan in English on its Spanish
- * pages (src/theme/Footer/index.tsx:87), and a brand line that changes per
- * language is no longer a brand line.
+ * One thing deliberately stays in English in both trees because it is brand,
+ * not copy: the product name "1Platform". The slogan ("One platform. Every
+ * solution.") lives with the home copy (`pages/home.ts`), where the section
+ * that carries it is.
  */
 export default defineMessages({
   en: {
@@ -24,10 +23,7 @@ export default defineMessages({
     'nav.docs': 'Docs',
     'nav.blog': 'Blog',
     'nav.aria.main': 'Main navigation',
-    'nav.aria.mobile': 'Mobile navigation',
-    'nav.aria.toggleMenu': 'Toggle navigation menu',
-    'nav.aria.toggleSubmenu': 'Toggle {label} menu',
-    'nav.aria.submenu': '{label} menu',
+    'nav.aria.toggleMenu': 'Open or close the menu',
 
     'nav.solutions.onlineStore': 'Online Store',
     'nav.solutions.website': 'Website Builder',
@@ -39,17 +35,29 @@ export default defineMessages({
     'nav.solutions.viewAll': 'View all solutions',
 
     'cta.getStarted': 'Get Started Free',
+    'cta.signIn': 'Sign In',
     'cta.launchStore': 'Launch Your Store',
     'cta.viewDocs': 'View Documentation',
 
+    // — Announcement bar ————————————————————————————————————————
+    'announcement.aria': 'Latest update',
+    'announcement.cta': 'See what changed',
+
     // — Footer ————————————————————————————————————————————————
-    'footer.cta.title': 'Stop juggling separate tools',
+    // `footer.cta.body` is still read by /solutions/; the footer itself no
+    // longer carries a closing CTA (LMW-10).
     'footer.cta.body':
       'Start with one platform. Sell online, issue invoices, and publish content — from one dashboard, one API, one bill.',
-    'footer.col.solutions': 'Solutions',
+    'footer.col.product': 'Product',
     'footer.col.resources': 'Resources',
     'footer.col.company': 'Company',
-    'footer.col.legal': 'Legal',
+    'footer.signup.title': 'Don’t miss out',
+    'footer.signup.body': 'Enter your email for news and updates',
+    'footer.signup.label': 'Email address',
+    'footer.signup.placeholder': 'Enter your email',
+    'footer.signup.submit': 'Send',
+    'footer.signup.subject': 'Keep me posted about 1Platform',
+    'footer.signup.status': 'Opening your email app…',
     'footer.link.forAgencies': 'For Agencies',
     'footer.link.forDevelopers': 'For Developers',
     'footer.link.allSolutions': 'All Solutions',
@@ -60,14 +68,8 @@ export default defineMessages({
     'footer.link.about': 'About',
     'footer.link.terms': 'Terms of Service',
     'footer.link.privacy': 'Privacy Policy',
-    'footer.link.cookies': 'Cookie Policy',
+    'footer.link.cookiePreferences': 'Cookie preferences',
     'footer.copyright': '© {year} 1Platform Labs. All rights reserved.',
-
-    // The slogan is brand, not copy: it reads the same in both trees, and the
-    // Spanish-only sibling site keeps it in English too. It lives here rather
-    // than as a literal so the decision is visible instead of looking like a
-    // string somebody forgot.
-    'brand.slogan': 'One platform. Every solution.',
 
     // — Layout chrome —————————————————————————————————————————
     'layout.skipToContent': 'Skip to main content',
@@ -119,10 +121,7 @@ export default defineMessages({
     'nav.docs': 'Docs',
     'nav.blog': 'Blog',
     'nav.aria.main': 'Navegación principal',
-    'nav.aria.mobile': 'Navegación móvil',
-    'nav.aria.toggleMenu': 'Abrir o cerrar el menú de navegación',
-    'nav.aria.toggleSubmenu': 'Abrir o cerrar el menú {label}',
-    'nav.aria.submenu': 'Menú {label}',
+    'nav.aria.toggleMenu': 'Abrir o cerrar el menú',
 
     'nav.solutions.onlineStore': 'Tienda online',
     'nav.solutions.website': 'Creador de sitios web',
@@ -134,17 +133,27 @@ export default defineMessages({
     'nav.solutions.viewAll': 'Ver todas las soluciones',
 
     'cta.getStarted': 'Empieza gratis',
+    'cta.signIn': 'Iniciar sesión',
     'cta.launchStore': 'Lanza tu tienda',
     'cta.viewDocs': 'Ver la documentación',
 
+    // — Barra de novedades ————————————————————————————————————
+    'announcement.aria': 'Última novedad',
+    'announcement.cta': 'Ver qué cambió',
+
     // — Pie de página —————————————————————————————————————————
-    'footer.cta.title': 'Deja de hacer malabares con herramientas sueltas',
     'footer.cta.body':
       'Empieza con una sola plataforma. Vende por internet, emite facturas y publica contenido — desde un panel, una API y una sola factura.',
-    'footer.col.solutions': 'Soluciones',
+    'footer.col.product': 'Producto',
     'footer.col.resources': 'Recursos',
     'footer.col.company': 'Empresa',
-    'footer.col.legal': 'Legal',
+    'footer.signup.title': 'No te lo pierdas',
+    'footer.signup.body': 'Deja tu correo para recibir novedades',
+    'footer.signup.label': 'Correo electrónico',
+    'footer.signup.placeholder': 'Escribe tu correo',
+    'footer.signup.submit': 'Enviar',
+    'footer.signup.subject': 'Quiero recibir las novedades de 1Platform',
+    'footer.signup.status': 'Abriendo tu aplicación de correo…',
     'footer.link.forAgencies': 'Para agencias',
     'footer.link.forDevelopers': 'Para desarrolladores',
     'footer.link.allSolutions': 'Todas las soluciones',
@@ -155,10 +164,8 @@ export default defineMessages({
     'footer.link.about': 'Nosotros',
     'footer.link.terms': 'Términos del servicio',
     'footer.link.privacy': 'Política de privacidad',
-    'footer.link.cookies': 'Política de cookies',
+    'footer.link.cookiePreferences': 'Preferencias de cookies',
     'footer.copyright': '© {year} 1Platform Labs. Todos los derechos reservados.',
-
-    'brand.slogan': 'One platform. Every solution.',
 
     // — Estructura de la página ———————————————————————————————
     'layout.skipToContent': 'Saltar al contenido principal',

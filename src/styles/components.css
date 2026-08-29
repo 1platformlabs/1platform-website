@@ -72,6 +72,64 @@
   margin-top: var(--space-6);
 }
 
+/* ===== Home-system buttons =====
+   Reference geometry: r6, 12.8/15.36 −0.384, weight 400, 14 px side padding.
+   The reference draws them 40 px tall; these are 44, the target-size floor
+   this site mandates on both sides (D-6). Tints are the AA-safe ones. */
+.ref-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--ref-radius-s);
+  font-family: var(--font-sans);
+  font-size: 12.8px;
+  line-height: 15.36px;
+  letter-spacing: -0.384px;
+  font-weight: 400;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ref-btn--yellow {
+  background: var(--ref-yellow);
+  color: var(--ref-ink);
+}
+
+.ref-btn--orange {
+  background: var(--ref-orange-cta);
+  color: var(--ref-white);
+}
+
+.ref-btn--ink {
+  background: var(--ref-ink);
+  color: var(--ref-white);
+}
+
+.ref-btn--full {
+  width: 100%;
+}
+
+.ref-btn:focus-visible {
+  outline: 2px solid var(--ref-orange);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ref-btn {
+    transition: filter var(--duration-fast) ease;
+  }
+}
+
+.ref-btn:hover {
+  filter: brightness(0.94);
+}
+
 /* ===== Card Base ===== */
 .card {
   background: var(--color-bg-alt);

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /**
  * The language control.
@@ -6,10 +6,27 @@ import { expect, test } from '@playwright/test';
  * It is what makes the automatic choice a default rather than a cage, so the
  * properties that matter are: it keeps you on the page you were reading, it
  * remembers, and it never offers a language that does not exist.
+ *
+ * Since the home redesign (epic home-landing-redesign, LMW-03 / D-4) the header
+ * row carries no navigation at any width: the control lives inside the panel
+ * the pill's menu button opens, and there is one variant of it rather than a
+ * `.lang` / `.lang--mobile` pair. Every interaction below therefore
+ * opens the menu first. The properties asserted did not change; where they
+ * were asserted did.
  */
+
+/** Open the header menu so the language control is on screen and clickable. */
+async function openMenu(page: Page) {
+  const toggle = page.locator('#menu-toggle');
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+    await toggle.click();
+    await expect(page.locator('#mobile-menu')).toBeVisible();
+  }
+}
 
 test('switching to English keeps the page and sets the cookie', async ({ context, page }) => {
   await page.goto('/es/pricing/');
+  await openMenu(page);
 
   await page.locator('a[data-lang-choice="en"]').first().click();
   await expect(page).toHaveURL(/\/pricing\/$/);
@@ -21,12 +38,14 @@ test('switching to English keeps the page and sets the cookie', async ({ context
 
 test('switching to Spanish keeps the page', async ({ page }) => {
   await page.goto('/pricing/');
+  await openMenu(page);
   await page.locator('a[data-lang-choice="es"]').first().click();
   await expect(page).toHaveURL(/\/es\/pricing\/$/);
 });
 
 test('a blog post switches to its own translation, not the index', async ({ page }) => {
   await page.goto('/blog/getting-started-5-minutes/');
+  await openMenu(page);
   await page.locator('a[data-lang-choice="es"]').first().click();
   await expect(page).toHaveURL(/\/es\/blog\/getting-started-5-minutes\/$/);
 });
@@ -40,6 +59,7 @@ test('the cookie is written before the client router swaps the document', async 
   // be lost, and the automatic redirect would undo the user's choice on their
   // next visit — which would make the control useless.
   await page.goto('/es/');
+  await openMenu(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
   await expect(page).toHaveURL(/localhost:4321\/$/);
 
@@ -57,6 +77,7 @@ test('the choice survives a new page load', async ({ browser }) => {
   const page = await context.newPage();
 
   await page.goto('/es/');
+  await openMenu(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
   await expect(page).toHaveURL(/localhost:4321\/$/);
 
@@ -70,13 +91,14 @@ test('the choice survives a new page load', async ({ browser }) => {
 
 test('the current language is marked, not linked', async ({ page }) => {
   await page.goto('/es/pricing/');
+  await openMenu(page);
 
-  const current = page.locator('.lang--desktop [aria-current="true"]');
+  const current = page.locator('.lang [aria-current="true"]');
   await expect(current).toHaveText(/ES/);
   await expect(current).toHaveAttribute('lang', 'es');
 
   // The current language must not be a link to itself.
-  await expect(page.locator('.lang--desktop a[data-lang-choice="es"]')).toHaveCount(0);
+  await expect(page.locator('.lang a[data-lang-choice="es"]')).toHaveCount(0);
 });
 
 test('a language with no translation is offered as unavailable, never as a link', async ({
@@ -85,9 +107,10 @@ test('a language with no translation is offered as unavailable, never as a link'
   // The 404 declares no alternates at all, so neither language is navigable
   // from it and the control must say so rather than link somewhere broken.
   await page.goto('/404.html');
+  await openMenu(page);
 
-  await expect(page.locator('.lang--desktop [aria-disabled="true"]')).toHaveCount(1);
-  await expect(page.locator('.lang--desktop a[data-lang-choice]')).toHaveCount(0);
+  await expect(page.locator('.lang [aria-disabled="true"]')).toHaveCount(1);
+  await expect(page.locator('.lang a[data-lang-choice]')).toHaveCount(0);
 });
 
 test('an unavailable language explains itself to the eye, not only to a screen reader', async ({
@@ -98,8 +121,9 @@ test('an unavailable language explains itself to the eye, not only to a screen r
   // greyed "ES" that reads as broken. `cursor: not-allowed` was the sole visual
   // hint and it requires a pointer, which a touch screen does not have.
   await page.goto('/404.html');
+  await openMenu(page);
 
-  const off = page.locator('.lang--desktop [aria-disabled="true"]');
+  const off = page.locator('.lang [aria-disabled="true"]');
   const explanation = await off.getAttribute('title');
 
   expect(explanation, 'the unavailable option carries a visible explanation').toBeTruthy();
@@ -111,8 +135,9 @@ test('an unavailable language explains itself to the eye, not only to a screen r
 
 test('the control is reachable and operable by keyboard alone', async ({ page }) => {
   await page.goto('/es/pricing/');
+  await openMenu(page);
 
-  const link = page.locator('.lang--desktop a[data-lang-choice="en"]');
+  const link = page.locator('.lang a[data-lang-choice="en"]');
   await link.focus();
   await expect(link).toBeFocused();
 
@@ -123,7 +148,8 @@ test('the control is reachable and operable by keyboard alone', async ({ page })
 test('each option names its language in that language', async ({ page }) => {
   for (const path of ['/pricing/', '/es/pricing/']) {
     await page.goto(path);
-    const group = page.locator('.lang--desktop');
+    await openMenu(page);
+    const group = page.locator('.lang');
     await expect(group.locator('[lang="en"]')).toHaveCount(1);
     await expect(group.locator('[lang="es"]')).toHaveCount(1);
     // The accessible name carries the endonym even though the visible label is
@@ -161,6 +187,7 @@ test('a modifier click does not record a preference in this tab', async ({ conte
   // reader never switched it to — and because the preference outranks
   // detection, it would keep doing so on every later visit.
   await page.goto('/pricing/');
+  await openMenu(page);
   await page.locator('a[data-lang-choice="es"]').first().click({ modifiers: ['Meta'] });
 
   await expect(page).toHaveURL(/\/pricing\/$/);
@@ -172,7 +199,8 @@ test('the language code carries lang, the accessible name does not', async ({ pa
   // whole anchor as the OTHER language made a screen reader read an English
   // sentence with Spanish phonemes.
   await page.goto('/pricing/');
-  const link = page.locator('.lang--desktop a[data-lang-choice="es"]');
+  await openMenu(page);
+  const link = page.locator('.lang a[data-lang-choice="es"]');
 
   await expect(link).toHaveAttribute('hreflang', 'es');
   await expect(link).not.toHaveAttribute('lang', /.*/);
