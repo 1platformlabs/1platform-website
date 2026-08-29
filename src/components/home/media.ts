@@ -28,7 +28,3 @@ export function productMedia(id: string): ResolvedMedia {
   return { slot, image: byStem.get(id) ?? null };
 }
 
-/** For the completeness test and the capture script's `--check`. */
-export function producedSlotIds(): string[] {
-  return [...byStem.keys()];
-}

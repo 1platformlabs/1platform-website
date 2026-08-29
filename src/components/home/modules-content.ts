@@ -32,8 +32,8 @@ export const MODULES: ModuleCard[] = [
   { slug: 'search-console', labelKey: i18nKey('home.group.contentSeo.item.searchConsole'), href: '/solutions/content/', icon: 'chart' },
 ];
 
-/** Card pitch on the rail, measured on the reference's monitors (270 centres). */
-export const CARD_SIZE = 226;
+/** Card pitch on the rail, measured on the reference's monitors (270 centres;
+ *  the cards themselves are 226², pinned in ModuleCarousel's CSS). */
 export const CARD_PITCH = 270;
 /** The card the page opens on (centre of the first five). */
 export const INITIAL_INDEX = 2;

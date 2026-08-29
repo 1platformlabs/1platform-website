@@ -131,8 +131,8 @@ export const SHOWCASE: ShowcaseSolution[] = [
 
 /* A node card is its media (a square, the card's width minus 16 px of padding)
    under a 32 px label row; the chip overlaps the media's top-left corner. */
-export const NODE_LABEL_ROW = 32;
-export const NODE_PADDING = 8;
+const NODE_LABEL_ROW = 32;
+const NODE_PADDING = 8;
 export function nodeHeight(w: number): number {
   return NODE_LABEL_ROW + (w - 2 * NODE_PADDING) + NODE_PADDING;
 }

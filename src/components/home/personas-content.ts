@@ -83,16 +83,9 @@ export const PERSONAS: Persona[] = [
   },
 ];
 
-/** Stack geometry per depth position (0 = front), measured on the reference. */
-export const STACK_POSITIONS = [
-  { dx: 0, y: 224, w: 400, media: 376 },
-  { dx: 29, y: 179, w: 343, media: 322 },
-  { dx: 50, y: 146, w: 300, media: 282 },
-  { dx: 67, y: 120, w: 267, media: 251 },
-  { dx: 80, y: 99, w: 240, media: 226 },
-] as const;
-
-/** Satellite frames, measured: two top corners, two bottom corners. */
+/** Satellite frames, measured: two top corners, two bottom corners. (The
+ *  card stack's depth geometry lives as the `data-pos` rules in
+ *  PersonaStack's CSS, value by value with the measurements beside them.) */
 export const SATELLITE_POSITIONS = [
   { x: 185, y: 132, size: 160 },
   { x: 1028, y: 125, size: 200 },
