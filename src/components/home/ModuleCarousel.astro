@@ -1,0 +1,347 @@
+---
+import { useI18n } from '@i18n';
+import { Image } from 'astro:assets';
+import Icon from '@components/Icon.astro';
+import SlotPlaceholder from './SlotPlaceholder.astro';
+import { productMedia } from './media';
+import { INITIAL_INDEX, MODULES } from './modules-content';
+
+/**
+ * The module carousel (LMW-07, D-11): the reference's row of tilted monitors,
+ * carrying the fourteen modules of 1Platform instead of anyone's logos. The
+ * heading is the brand line — the sentence this whole page argues.
+ *
+ * The rail of linked cards IS the carousel (CSS 3D, static without JS);
+ * `carousel-scene.ts` upgrades it to WebGL on capable desktops, sharing
+ * `three` with the hero. Arrows and the live region are DOM either way, and a
+ * visually-hidden "open" link always points at the centred module so the
+ * keyboard never depends on a raycast.
+ */
+const { t, l } = useI18n(Astro.url.pathname);
+
+const modules = MODULES.map((module) => ({
+  ...module,
+  label: t(module.labelKey),
+  media: productMedia(`module-${module.slug}`),
+}));
+---
+
+<section id="modules" class="mods ref-dot-grid--dark">
+  <h2 class="ref-h-display mods__title">{t('home.modules.title')}</h2>
+
+  <div
+    class="mods__viewport"
+    role="group"
+    aria-label={t('home.modules.carouselAria')}
+    data-mods
+    data-initial={INITIAL_INDEX}
+    data-live-template={t('home.modules.position', { current: '_C_', total: '_T_', label: '_L_' })}
+  >
+    <div class="mods__rail" data-mods-rail style={`--active:${INITIAL_INDEX};`}>
+      {modules.map((module, i) => (
+        <a
+          class="mod-card"
+          href={l(module.href)}
+          data-mod-card={i}
+          data-mod-label={module.label}
+          style={`--off:${i - INITIAL_INDEX};`}
+        >
+          <span class="mod-card__dot" aria-hidden="true"></span>
+          <span class="mod-card__media">
+            {module.media.image ? (
+              <Image
+                src={module.media.image}
+                width={module.media.slot.width}
+                height={module.media.slot.height}
+                alt={t(`home.media.module-${module.slug}`)}
+                loading="lazy"
+              />
+            ) : (
+              <SlotPlaceholder spec={module.media.slot} />
+            )}
+          </span>
+          <span class="mod-card__name ref-body-s">
+            <Icon name={module.icon} size={14} />
+            {module.label}
+          </span>
+        </a>
+      ))}
+    </div>
+    <canvas class="mods__canvas" data-scene="carousel" hidden></canvas>
+  </div>
+
+  <div class="mods__nav">
+    <button type="button" class="mods__arrow" data-mods-prev aria-label={t('home.modules.prev')}>
+      <Icon name="arrow-right" size={18} class="mods__arrow-flip" />
+    </button>
+    <span class="mods__progress" aria-hidden="true">
+      <span class="mods__progress-fill" data-mods-progress></span>
+    </span>
+    <button type="button" class="mods__arrow" data-mods-next aria-label={t('home.modules.next')}>
+      <Icon name="arrow-right" size={18} />
+    </button>
+    <span class="sr-only" aria-live="polite" data-mods-live></span>
+    <a class="sr-only mods__open" href={l(modules[INITIAL_INDEX].href)} data-mods-open>
+      {modules[INITIAL_INDEX].label}
+    </a>
+  </div>
+</section>
+
+<script>
+  /**
+   * The DOM is the single controller (≤ 1 KB, D-10): it moves the CSS rail,
+   * fills the progress bar, updates the live region and the keyboard "open"
+   * link, and broadcasts the index for the WebGL scene to follow.
+   */
+  function initModules() {
+    const viewport = document.querySelector<HTMLElement>('[data-mods]');
+    if (!viewport || viewport.dataset.wired) return;
+    viewport.dataset.wired = 'true';
+
+    const rail = viewport.querySelector<HTMLElement>('[data-mods-rail]')!;
+    const cards = Array.from(viewport.querySelectorAll<HTMLAnchorElement>('[data-mod-card]'));
+    const progress = document.querySelector<HTMLElement>('[data-mods-progress]');
+    const live = document.querySelector<HTMLElement>('[data-mods-live]');
+    const open = document.querySelector<HTMLAnchorElement>('[data-mods-open]');
+    const template = viewport.dataset.liveTemplate ?? '';
+    let index = Number(viewport.dataset.initial ?? 0);
+
+    function update(announce = true) {
+      rail.style.setProperty('--active', String(index));
+      for (const card of cards) {
+        const i = Number(card.dataset.modCard);
+        card.style.setProperty('--off', String(i - index));
+      }
+      if (progress) progress.style.width = `${((index + 1) / cards.length) * 100}%`;
+      const label = cards[index]?.dataset.modLabel ?? '';
+      if (open) {
+        // getAttribute, not .href: the property is absolutised and the scene
+        // and tests compare the site-relative path the card declares.
+        const href = cards[index]?.getAttribute('href');
+        if (href) open.setAttribute('href', href);
+        open.textContent = label;
+      }
+      if (live && announce) {
+        live.textContent = template
+          .replace('_C_', String(index + 1))
+          .replace('_T_', String(cards.length))
+          .replace('_L_', label);
+      }
+      viewport!.dispatchEvent(new CustomEvent('mods:index', { detail: { index }, bubbles: true }));
+    }
+
+    document.querySelector('[data-mods-prev]')?.addEventListener('click', () => {
+      index = (index - 1 + cards.length) % cards.length;
+      update();
+    });
+    document.querySelector('[data-mods-next]')?.addEventListener('click', () => {
+      index = (index + 1) % cards.length;
+      update();
+    });
+
+    update(false);
+  }
+
+  document.addEventListener('astro:page-load', initModules);
+</script>
+
+<style>
+  /* Measured: 860 tall, H2 at y +103, rail band centred around +382, arrows
+     44² at +645 with a 140 px progress bar between. */
+  .mods {
+    position: relative;
+    height: 860px;
+    padding-top: 103px;
+    overflow: hidden;
+    color: var(--ref-white);
+  }
+
+  .mods__title {
+    max-width: 620px;
+    margin: 0 auto;
+    text-align: center;
+    color: var(--ref-white);
+  }
+
+  .mods__viewport {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 240px;
+    height: 290px;
+    perspective: 1200px;
+  }
+
+  .mods__rail {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    gap: 44px;
+    transform: translate(calc(var(--active) * -270px - 113px), -50%);
+    transform-style: preserve-3d;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mods__rail {
+      transition: transform 450ms var(--ease-out-expo);
+    }
+
+    .mod-card {
+      transition: transform 450ms var(--ease-out-expo);
+    }
+  }
+
+  .mod-card {
+    position: relative;
+    flex: 0 0 226px;
+    width: 226px;
+    height: 226px;
+    padding: 8px;
+    background: var(--ref-ink);
+    border: 1px solid var(--ref-hairline-dark);
+    border-radius: var(--ref-radius-m);
+    transform: rotateY(calc(var(--off) * -14deg));
+    color: var(--ref-white);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mod-card__dot {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ref-orange);
+    z-index: 1;
+  }
+
+  .mod-card__media {
+    flex: 1;
+    border-radius: var(--ref-radius-s);
+    overflow: hidden;
+  }
+
+  .mod-card__media :global(img),
+  .mod-card__media :global(svg) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mod-card__name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding-top: 6px;
+    color: var(--ref-white);
+  }
+
+  .mod-card:hover .mod-card__name,
+  .mod-card:focus-visible .mod-card__name {
+    text-decoration: underline;
+  }
+
+  .mods__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mods__canvas[hidden] {
+    display: none;
+  }
+
+  .mods--upgraded .mods__rail {
+    visibility: hidden;
+  }
+
+  .mods__nav {
+    position: absolute;
+    left: 50%;
+    top: 645px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .mods__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--ref-hairline-dark);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ref-white);
+    cursor: pointer;
+  }
+
+  .mods__arrow:hover {
+    background: var(--ref-card-dark);
+  }
+
+  .mods__arrow :global(.mods__arrow-flip) {
+    transform: rotate(180deg);
+  }
+
+  .mods__progress {
+    width: 140px;
+    height: 2px;
+    background: var(--ref-hairline-dark);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .mods__progress-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--ref-orange);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mods__progress-fill {
+      transition: width 300ms var(--ease-out-expo);
+    }
+  }
+
+  /* The keyboard "open" affordance becomes visible on focus. */
+  .mods__open:focus-visible {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 8px 12px;
+    clip: auto;
+    white-space: nowrap;
+    color: var(--ref-white);
+    outline: 2px solid var(--ref-white);
+    border-radius: var(--ref-radius-s);
+  }
+
+  .mods :global(:focus-visible) {
+    outline-color: var(--ref-white);
+  }
+
+  @media (max-width: 768px) {
+    .mods {
+      height: 804px;
+      padding-top: 88px;
+    }
+
+    .mods__viewport {
+      top: 260px;
+    }
+
+    .mods__nav {
+      top: 620px;
+    }
+  }
+</style>

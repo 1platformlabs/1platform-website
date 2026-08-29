@@ -3,6 +3,22 @@ import Logo from '@components/Logo.astro';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
 import { useI18n, type Locale } from '@i18n';
 
+/**
+ * The site chrome, redrawn to the reference geometry (LMW-03, D-3/D-4).
+ *
+ * Two things and nothing else sit on the 74 px fixed bar: a dark pill on the
+ * left carrying the logo and the menu button, and two calls to action on the
+ * right. The navigation did not disappear — the five items, the seven
+ * solution destinations and the language control live inside the panel the
+ * menu button opens, at EVERY width. That panel is the same `#mobile-menu`
+ * (focus trap, Escape, focus returned to the toggle) the header always had;
+ * it simply stopped being mobile-only.
+ *
+ * `<nav class="site-header__nav">` keeps `class` as its first attribute on
+ * purpose: `tests/home-names-every-solution.spec.ts` anchors on that literal
+ * to read the seven destinations the menu offers.
+ */
+
 type SubItem = { label: string; href: string; divider?: boolean };
 type NavItem = { label: string; href: string; subItems?: SubItem[] };
 
@@ -14,6 +30,8 @@ interface Props {
 
 const { alternates } = Astro.props;
 const { t, l } = useI18n(Astro.url.pathname);
+
+const APP_URL = 'https://app.1platform.pro/app/';
 
 // `l()` is applied here, once, so every consumer below compares and renders the
 // same localised href. The Docs entry is an absolute URL and `l()` returns it
@@ -41,109 +59,47 @@ const navItems: NavItem[] = [
 const currentPath = Astro.url.pathname;
 
 /**
- * Whether a nav item points at the page being viewed.
- *
- * This used to be `currentPath.startsWith(item.href)` against English root
- * hrefs, which under /es/ never matched: the active underline disappeared from
- * every Spanish page. Comparing against the already-localised href fixes it for
- * both trees. Absolute hrefs are excluded because "startsWith" is meaningless
- * against another origin — without the guard, `/` would match nothing but a
- * bare `https://…` href could still slip through on an unusual path.
+ * Whether a nav item points at the page being viewed. Compared against the
+ * already-localised href so it holds in both trees; absolute hrefs are excluded
+ * because "startsWith" is meaningless against another origin.
  */
 const isActive = (href: string) => href.startsWith('/') && currentPath.startsWith(href);
 ---
 
 <header class="site-header" id="site-header">
-  <div class="site-header__inner container">
-    <Logo class="site-header__logo" />
-
-    <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
-      <ul>
-        {navItems.map((item, i) => (
-          item.subItems ? (
-            <li class="has-dropdown" data-nav-dropdown>
-              <a
-                href={item.href}
-                class:list={['nav-link', { 'is-active': isActive(item.href) }]}
-              >
-                {item.label}
-              </a>
-              <button
-                type="button"
-                class="dropdown-toggle"
-                aria-expanded="false"
-                aria-controls={`nav-dropdown-${i}`}
-                aria-label={t('nav.aria.toggleSubmenu', { label: item.label })}
-                data-dropdown-toggle
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-              </button>
-              <div
-                class="dropdown-panel"
-                id={`nav-dropdown-${i}`}
-                role="menu"
-                aria-label={t('nav.aria.submenu', { label: item.label })}
-                aria-hidden="true"
-                data-dropdown-panel
-              >
-                <ul>
-                  {item.subItems.map((sub) => (
-                    sub.divider ? (
-                      <li class="dropdown-divider" role="separator" aria-hidden="true"></li>
-                    ) : (
-                      <li>
-                        <a href={sub.href} role="menuitem" tabindex="-1">{sub.label}</a>
-                      </li>
-                    )
-                  ))}
-                </ul>
-              </div>
-            </li>
-          ) : (
-            <li>
-              <a
-                href={item.href}
-                class:list={['nav-link', { 'is-active': isActive(item.href) }]}
-              >
-                {item.label}
-              </a>
-            </li>
-          )
-        ))}
-      </ul>
-    </nav>
-
-    <div class="site-header__actions">
-      <LanguageSwitcher alternates={alternates} />
-      <a href="https://app.1platform.pro/app/" class="btn btn--primary btn--sm">
-        {t('cta.getStarted')}
-      </a>
+  <div class="site-header__inner">
+    <div class="brand-pill">
+      <Logo class="brand-pill__logo" />
+      <button
+        class="site-header__menu-toggle"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={t('nav.aria.toggleMenu')}
+        id="menu-toggle"
+      >
+        <span class="hamburger" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
     </div>
 
-    <button
-      class="site-header__menu-toggle"
-      aria-expanded="false"
-      aria-controls="mobile-menu"
-      aria-label={t('nav.aria.toggleMenu')}
-      id="menu-toggle"
-    >
-      <span class="hamburger" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-      </span>
-    </button>
+    <div class="site-header__actions">
+      <a href={APP_URL} class="ref-btn ref-btn--yellow site-header__signin">{t('cta.signIn')}</a>
+      <a href={APP_URL} class="ref-btn ref-btn--orange">{t('cta.getStarted')}</a>
+    </div>
   </div>
 
-  <!-- Mobile Menu -->
+  <!-- The menu panel. Opened by the pill's button at every width. -->
   <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <nav aria-label={t('nav.aria.mobile')}>
+    <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
       <ul>
         {navItems.map((item) => (
           <li>
-            <a href={item.href} class="mobile-menu__link">{item.label}</a>
+            <a href={item.href} class:list={['nav-link', { 'is-active': isActive(item.href) }]}>
+              {item.label}
+            </a>
             {item.subItems && (
               <ul class="mobile-menu__sublist">
                 {item.subItems.map((sub) => (
@@ -158,26 +114,21 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
           </li>
         ))}
       </ul>
-      <a href="https://app.1platform.pro/app/" class="btn btn--primary btn--full">
-        {t('cta.getStarted')}
-      </a>
-      <LanguageSwitcher alternates={alternates} variant="mobile" />
     </nav>
+    <a href={APP_URL} class="ref-btn ref-btn--orange ref-btn--full">{t('cta.getStarted')}</a>
+    <LanguageSwitcher alternates={alternates} />
   </div>
 </header>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
-    initMobileMenu();
-    initNavDropdowns();
-  });
+  document.addEventListener('astro:page-load', initMenu);
 
-  function initMobileMenu() {
+  function initMenu() {
     const toggle = document.getElementById('menu-toggle');
     const menu = document.getElementById('mobile-menu');
     if (!toggle || !menu) return;
 
-    /** All focusable elements inside the mobile menu + toggle button. */
+    /** All focusable elements inside the panel + the toggle button. */
     function getFocusableElements(): HTMLElement[] {
       const els = menu!.querySelectorAll<HTMLElement>('a, button, [tabindex]:not([tabindex="-1"])');
       return [toggle!, ...Array.from(els)];
@@ -211,7 +162,7 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
         return;
       }
 
-      // Focus trap: cycle Tab within mobile menu when open
+      // Focus trap: cycle Tab within the panel while it is open.
       if (e.key === 'Tab' && toggle!.getAttribute('aria-expanded') === 'true') {
         const focusable = getFocusableElements();
         if (!focusable.length) return;
@@ -229,103 +180,34 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
       }
     });
 
+    // A click outside the pill and the panel closes it, like any menu.
+    document.addEventListener('click', (e) => {
+      if (toggle!.getAttribute('aria-expanded') !== 'true') return;
+      const target = e.target as Node;
+      if (menu!.contains(target) || toggle!.contains(target)) return;
+      closeMenu();
+    });
+
     menu.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', closeMenu);
-    });
-  }
-
-  function initNavDropdowns() {
-    const dropdowns = document.querySelectorAll<HTMLElement>('[data-nav-dropdown]');
-    dropdowns.forEach((dropdown) => {
-      const button = dropdown.querySelector<HTMLButtonElement>('[data-dropdown-toggle]');
-      const panel = dropdown.querySelector<HTMLElement>('[data-dropdown-panel]');
-      if (!button || !panel) return;
-
-      const items = Array.from(panel.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]'));
-      let hoverTimeout: number | null = null;
-
-      const isOpen = () => button.getAttribute('aria-expanded') === 'true';
-
-      function open() {
-        button!.setAttribute('aria-expanded', 'true');
-        panel!.setAttribute('aria-hidden', 'false');
-      }
-
-      function close(focusButton = false) {
-        button!.setAttribute('aria-expanded', 'false');
-        panel!.setAttribute('aria-hidden', 'true');
-        if (focusButton) button!.focus();
-      }
-
-      button.addEventListener('click', (e) => {
-        e.preventDefault();
-        isOpen() ? close() : open();
-      });
-
-      button.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          open();
-          items[0]?.focus();
-        } else if (e.key === 'Escape' && isOpen()) {
-          e.preventDefault();
-          close(true);
-        }
-      });
-
-      items.forEach((item, i) => {
-        item.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            items[(i + 1) % items.length]?.focus();
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            items[(i - 1 + items.length) % items.length]?.focus();
-          } else if (e.key === 'Escape') {
-            e.preventDefault();
-            close(true);
-          } else if (e.key === 'Tab') {
-            close();
-          }
-        });
-      });
-
-      dropdown.addEventListener('mouseenter', () => {
-        if (hoverTimeout) {
-          clearTimeout(hoverTimeout);
-          hoverTimeout = null;
-        }
-        open();
-      });
-
-      dropdown.addEventListener('mouseleave', () => {
-        hoverTimeout = window.setTimeout(() => close(), 150);
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!isOpen()) return;
-        if (!dropdown.contains(e.target as Node)) close();
-      });
     });
   }
 </script>
 
 <style>
-  /* The frosted, saturated glass bar went. Two reasons, both about this
-     system rather than about taste: it was a hardcoded white at 80% sitting
-     over warm paper, so it read as a colour mismatch rather than a decision;
-     and `saturate(180%) blur()` is the generic SaaS chrome this redesign is
-     trying to stop sounding like. The header is now simply paper with a
-     hairline — it holds the top of the page without competing with it. */
+  /* Measured on the reference: header 74 px tall with 16 px padding, fixed,
+     transparent — the page scrolls under it. It sits below the announcement
+     bar when there is one (`--header-top`, set by BaseLayout). */
   .site-header {
     position: fixed;
-    top: 0;
+    top: var(--header-top);
     left: 0;
     right: 0;
     z-index: 100;
     height: var(--header-height);
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
+    padding: 16px;
+    background: transparent;
+    pointer-events: none;
   }
 
   .site-header__inner {
@@ -333,164 +215,72 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
     align-items: center;
     justify-content: space-between;
     height: 100%;
-    gap: var(--space-8);
   }
 
-  /* `align-items` matters here: the Solutions item is taller than the rest
-     (it carries the chevron button), so with the default `stretch` every other
-     item stretched to match while its inline <a> stayed pinned to the top of
-     that taller row — the links sat ~4px above the logo and the CTA. */
-  .site-header__nav ul {
+  .site-header__inner > * {
+    pointer-events: auto;
+  }
+
+  /* The pill: 230 × 42, r6, dark, 1 px hairline; logo + wordmark left, the
+     40 × 40 menu button flush right. */
+  .brand-pill {
     display: flex;
     align-items: center;
-    gap: var(--space-6);
+    justify-content: space-between;
+    width: 230px;
+    height: 42px;
+    padding: 1px;
+    background: var(--ref-pill);
+    border: 1px solid var(--ref-hairline-dark);
+    border-radius: var(--ref-radius-s);
+    color: var(--ref-white);
   }
 
-  .site-header__nav .nav-link {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    padding: var(--space-2) 0;
-    position: relative;
+  .brand-pill :global(.brand-pill__logo) {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 1.125rem;
   }
 
-  .site-header__nav .nav-link:hover,
-  .site-header__nav .nav-link.is-active {
-    color: var(--color-text);
-  }
-
-  /* The underline marks where you are, and nothing else. It used to sweep out
-     from zero on hover too, which spent motion on a state the colour change
-     already communicates and made every link look like the current one. */
-  .site-header__nav .nav-link.is-active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1.5px;
-    background: var(--color-accent);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .site-header__nav .nav-link {
-      transition: color var(--duration-fast) ease;
-    }
-  }
-
-  /* Solutions dropdown */
-  .has-dropdown {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-  }
-
-  .dropdown-toggle {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--space-2) 2px;
-    color: var(--color-text-secondary);
-    display: inline-flex;
-    align-items: center;
-    line-height: 0;
-  }
-
-  .dropdown-toggle:hover,
-  .dropdown-toggle[aria-expanded='true'] {
-    color: var(--color-text);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .dropdown-toggle svg {
-      transition: transform var(--duration-fast) var(--ease-out-expo);
-    }
-  }
-
-  .dropdown-toggle[aria-expanded='true'] svg {
-    transform: rotate(180deg);
-  }
-
-  .dropdown-panel {
-    position: absolute;
-    top: calc(100% + var(--space-2));
-    left: 0;
-    min-width: 240px;
-    background: var(--color-bg-alt);
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-card-hover);
-    padding: var(--space-2);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-4px);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .dropdown-panel {
-      transition: opacity var(--duration-fast) var(--ease-out-expo),
-                  transform var(--duration-fast) var(--ease-out-expo),
-                  visibility 0s linear var(--duration-fast);
-    }
-  }
-
-  .dropdown-panel[aria-hidden='false'] {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-    transition-delay: 0s;
-  }
-
-  .dropdown-panel ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .dropdown-panel a {
-    display: block;
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    border-radius: 4px;
-    white-space: nowrap;
-  }
-
-  .dropdown-panel a:hover,
-  .dropdown-panel a:focus-visible {
-    color: var(--color-text);
-    background: var(--color-bg-muted);
-  }
-
-  .dropdown-divider {
-    height: 1px;
-    background: var(--color-border);
-    margin: var(--space-2) 0;
+  .brand-pill :global(.logo__text) {
+    color: var(--ref-white);
   }
 
   .site-header__menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: var(--space-2);
-    min-width: 48px;
-    min-height: 48px;
+    position: relative;
+    display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    border-radius: var(--ref-radius-s);
+    cursor: pointer;
+    color: var(--ref-white);
+    touch-action: manipulation;
+  }
+
+  /* 40 px visual, 44 px target (MUST): the extra 2 px each side is a hit
+     area, not a drawn box. */
+  .site-header__menu-toggle::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
   }
 
   .hamburger {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    width: 24px;
+    gap: 4px;
+    width: 14px;
   }
 
   .hamburger span {
     display: block;
-    height: 2px;
-    background: var(--color-text);
+    height: 1.5px;
+    background: currentColor;
     border-radius: 1px;
   }
 
@@ -502,7 +292,7 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
   }
 
   #menu-toggle[aria-expanded='true'] .hamburger span:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
+    transform: translateY(5.5px) rotate(45deg);
   }
 
   #menu-toggle[aria-expanded='true'] .hamburger span:nth-child(2) {
@@ -510,75 +300,121 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
   }
 
   #menu-toggle[aria-expanded='true'] .hamburger span:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
+    transform: translateY(-5.5px) rotate(-45deg);
   }
 
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* The panel opens from the pill: same dark surface, anchored under it,
+     360 px wide on desktop and edge-to-edge on phones. */
   .mobile-menu {
     display: none;
     position: fixed;
-    top: var(--header-height);
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--color-bg);
-    padding: var(--space-8) var(--space-6);
-    z-index: 99;
+    top: calc(var(--header-offset) - 8px);
+    left: 16px;
+    width: min(360px, calc(100% - 32px));
+    max-height: calc(100dvh - var(--header-offset) - 8px);
     overflow-y: auto;
+    background: var(--ref-pill);
+    color: var(--ref-white);
+    border: 1px solid var(--ref-hairline-dark);
+    border-radius: var(--ref-radius-m);
+    padding: var(--space-4);
+    z-index: 99;
+    pointer-events: auto;
   }
 
   .mobile-menu[aria-hidden='false'] {
     display: block;
   }
 
+  /* Without JavaScript the button cannot open anything, and a navigation that
+     only exists behind a script is no navigation. The panel is then shown in
+     place, permanently, under the pill — the site stays fully usable (this
+     repo's RF-10), which `tests/language-detection.spec.ts` asserts without JS.
+     Same media feature the reveal pattern in global.css already relies on. */
+  @media (scripting: none) {
+    .mobile-menu {
+      display: block;
+      position: absolute;
+      top: calc(100% - 8px);
+    }
+
+    .site-header__menu-toggle {
+      display: none;
+    }
+  }
+
   .mobile-menu ul {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-1);
   }
 
-  .mobile-menu a {
-    display: block;
-    padding: var(--space-4);
-    font-size: var(--text-lg);
-    font-weight: 500;
-    border-radius: var(--border-radius);
-  }
-
-  .mobile-menu a:hover {
-    background: var(--color-bg-muted);
-  }
-
-  .mobile-menu .mobile-menu__sublist {
-    gap: 0;
-    margin-top: var(--space-1);
-    margin-left: var(--space-4);
-    padding-left: var(--space-3);
-    border-left: 1px solid var(--color-border);
-  }
-
+  .mobile-menu .nav-link,
   .mobile-menu .mobile-menu__sublist a {
     display: flex;
     align-items: center;
     min-height: 44px;
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--ref-radius-s);
+    color: var(--ref-white);
     font-size: var(--text-base);
-    font-weight: 400;
-    color: var(--color-text-secondary);
+    font-weight: 500;
   }
 
+  .mobile-menu a:hover,
+  .mobile-menu a:focus-visible {
+    background: var(--ref-card-dark);
+  }
+
+  .mobile-menu .nav-link.is-active {
+    box-shadow: inset 3px 0 0 var(--ref-orange);
+  }
+
+  .mobile-menu .mobile-menu__sublist {
+    gap: 0;
+    margin: var(--space-1) 0 var(--space-2) var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--ref-hairline-dark);
+  }
+
+  .mobile-menu .mobile-menu__sublist a {
+    font-size: var(--text-sm);
+    font-weight: 400;
+    color: var(--ref-fg-dim);
+  }
+
+  .mobile-menu .mobile-menu__sublist a:hover,
+  .mobile-menu .mobile-menu__sublist a:focus-visible {
+    color: var(--ref-white);
+  }
+
+  .mobile-menu :global(.ref-btn--full) {
+    margin-top: var(--space-4);
+  }
+
+  .mobile-menu :global(.lang) {
+    margin-top: var(--space-4);
+  }
+
+  .site-header :focus-visible {
+    outline-color: var(--ref-white);
+  }
+
+  /* Phones: the pill shrinks to logo + button and only the primary call to
+     action stays — measured on the reference at 390 px. */
   @media (max-width: 768px) {
-    .site-header__nav,
-    .site-header__actions {
-      display: none;
+    .brand-pill {
+      width: auto;
+      min-width: 0;
     }
 
-    .site-header__menu-toggle {
-      display: flex;
-    }
-
-    /* Hide the desktop chevron + panel on mobile; mobile menu shows sublist inline. */
-    .dropdown-toggle,
-    .dropdown-panel {
+    .site-header__signin {
       display: none;
     }
   }

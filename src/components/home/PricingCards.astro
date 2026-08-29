@@ -1,0 +1,314 @@
+---
+import { useI18n } from '@i18n';
+import Check from '@components/Check.astro';
+import EnterpriseCard from './EnterpriseCard.astro';
+import { METERED_CARDS, QUOTED_CARDS, type PricingCardSpec } from './pricing-content';
+
+/**
+ * Pricing with the reference's geometry and the real model (LMW-08, D-12):
+ * a two-state switch — metered operations / quoted services — three 387 × 794
+ * cards per state, and the wide enterprise card. Where the reference prints a
+ * price, these print HOW the thing is priced; not one figure anywhere, which
+ * is the model this company actually publishes.
+ *
+ * The switch is two radio buttons and `:has()` — no JavaScript, and the
+ * metered state is simply the checked default.
+ */
+const { t, l } = useI18n(Astro.url.pathname);
+
+type Mode = 'metered' | 'quoted';
+
+const card = (spec: PricingCardSpec, mode: Mode) => ({
+  name: t(`home.pricing.card.${spec.key}.name`),
+  tagline: t(`home.pricing.card.${spec.key}.tagline`),
+  eyebrow: t(`home.pricing.eyebrow.${mode}`),
+  // Per-card, not per-mode: three cards printing one shared sentence is the
+  // repeated-paragraph tell the gate exists to catch (and it did).
+  detail: t(`home.pricing.card.${spec.key}.detail`),
+  featuresLabel: t(`home.pricing.features.${mode}`),
+  chip: mode === 'metered' ? t('home.pricing.chip.balance') : t('home.pricing.chip.quote'),
+  features: spec.features.map((key) => t(key)),
+});
+
+const metered = METERED_CARDS.map((spec) => card(spec, 'metered'));
+const quoted = QUOTED_CARDS.map((spec) => card(spec, 'quoted'));
+---
+
+<section id="pricing" class="pricing">
+  <h2 class="ref-h-display pricing__title">{t('home.pricing.title')}</h2>
+
+  <fieldset class="pricing__toggle">
+    <legend class="sr-only">{t('home.pricing.toggle.legend')}</legend>
+    <input type="radio" name="pricing-mode" id="pricing-metered" class="sr-only" checked />
+    <label for="pricing-metered" class="pricing__mode">{t('pricing.metered.eyebrow')}</label>
+    <span class="pricing__knob" aria-hidden="true"></span>
+    <input type="radio" name="pricing-mode" id="pricing-quoted" class="sr-only" />
+    <label for="pricing-quoted" class="pricing__mode pricing__mode--quoted">
+      {t('home.pricing.toggle.quoted')}
+    </label>
+  </fieldset>
+
+  <div class="pricing__grid">
+    {[
+      { mode: 'metered', cards: metered },
+      { mode: 'quoted', cards: quoted },
+    ].map(({ mode, cards }) =>
+      cards.map((c, i) => (
+        <article class:list={['price-card', `price-card--${mode}`, i === 0 && mode === 'metered' && 'price-card--lead', 'reveal']}>
+          <h3 class="price-card__name">{c.name}</h3>
+          <p class="price-card__tagline">{c.tagline}</p>
+          <p class="price-card__eyebrow ref-h-footer">{c.eyebrow}</p>
+          <p class="price-card__chips">
+            <span class="price-card__chip price-card__chip--yellow ref-body-s">{t('home.pricing.chip.noMonthly')}</span>
+            <span class="price-card__chip ref-body-s">{c.chip}</span>
+          </p>
+          <p class="price-card__detail ref-body-s">{c.detail}</p>
+          <p class="price-card__label ref-body-s">{c.featuresLabel}</p>
+          <ul class="price-card__features">
+            {c.features.map((feature) => (
+              <li class="ref-body-s">
+                <Check yes={true} />
+                {feature}
+              </li>
+            ))}
+          </ul>
+          <a href={l('/pricing/')} class="ref-btn ref-btn--orange price-card__cta">{t('home.pricing.cta')}</a>
+        </article>
+      )),
+    )}
+    <EnterpriseCard />
+  </div>
+</section>
+
+<style>
+  /* Measured: 1 428 tall — H2 at +7, toggle at +176, grid at +240
+     (3 × 387 × 794, gaps 40/20), enterprise 1 200 × 274, 80 below. */
+  .pricing {
+    background: var(--ref-dark);
+    padding: 7px 120px 80px;
+    color: var(--ref-white);
+  }
+
+  .pricing__title {
+    text-align: center;
+    color: var(--ref-white);
+    margin: 0;
+  }
+
+  .pricing__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 0;
+    padding: 0;
+    margin: 113px 0 0;
+    min-height: 24px;
+  }
+
+  .pricing__mode {
+    font-size: var(--text-base);
+    color: var(--ref-fg-dim);
+    cursor: pointer;
+  }
+
+  .pricing__knob {
+    position: relative;
+    width: 64px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--ref-card-dark);
+    border: 1px solid var(--ref-hairline-dark);
+  }
+
+  .pricing__knob::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--ref-orange);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pricing__knob::after {
+      transition: transform 200ms var(--ease-out-expo);
+    }
+  }
+
+  .pricing:has(#pricing-quoted:checked) .pricing__knob::after {
+    transform: translateX(38px);
+  }
+
+  .pricing:has(#pricing-metered:checked) .pricing__mode:first-of-type,
+  .pricing:has(#pricing-quoted:checked) .pricing__mode--quoted {
+    color: var(--ref-white);
+  }
+
+  /* Focus lands on the sr-only radios; show it on the visible switch. */
+  .pricing__toggle:has(:focus-visible) .pricing__knob {
+    outline: 2px solid var(--ref-white);
+    outline-offset: 2px;
+  }
+
+  .pricing__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 20px;
+    width: 1200px;
+    max-width: 100%;
+    margin: 40px auto 0;
+  }
+
+  .pricing:has(#pricing-metered:checked) .price-card--quoted,
+  .pricing:has(#pricing-quoted:checked) .price-card--metered {
+    display: none;
+  }
+
+  .price-card {
+    display: flex;
+    flex-direction: column;
+    height: 794px;
+    padding: 24px;
+    background: var(--ref-white);
+    border: 1px solid var(--ref-hairline-light);
+    border-radius: var(--ref-radius-m);
+    color: var(--ref-ink);
+  }
+
+  /* The first card carries the reference's luminous orange edge (CA-5). */
+  .price-card--lead {
+    border-color: var(--ref-orange);
+    box-shadow: 0 0 24px var(--ref-orange-glow);
+  }
+
+  .price-card__name {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 32px;
+    letter-spacing: -1.28px;
+    font-weight: 500;
+    margin: 0 0 8px;
+    color: var(--ref-ink);
+  }
+
+  .price-card__tagline {
+    font-size: var(--text-base);
+    line-height: 24px;
+    color: var(--ref-ink);
+    margin: 0;
+  }
+
+  /* Where the reference prints the big price, the model prints how you pay. */
+  .price-card__eyebrow {
+    margin: 48px 0 0;
+    color: var(--ref-ink);
+  }
+
+  .price-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 0;
+  }
+
+  .price-card__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 2px 10px;
+    border-radius: var(--ref-radius-s);
+    background: var(--recessed);
+    color: var(--ref-ink);
+  }
+
+  .price-card__chip--yellow {
+    background: var(--ref-yellow);
+  }
+
+  .price-card__detail {
+    margin: 24px 0 0;
+    padding: 12px;
+    border-radius: var(--ref-radius-s);
+    background: var(--recessed);
+    color: var(--ref-ink);
+  }
+
+  .price-card__label {
+    margin: 24px 0 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--subtle);
+  }
+
+  .price-card__features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .price-card__features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .price-card__cta {
+    margin-top: auto;
+    min-height: 46px;
+  }
+
+  .pricing :global(:focus-visible) {
+    outline-color: var(--ref-white);
+  }
+
+  @media (max-width: 1100px) {
+    .pricing {
+      padding-inline: 32px;
+    }
+
+    .pricing__grid {
+      grid-template-columns: 1fr;
+      width: 100%;
+    }
+
+    .price-card {
+      height: auto;
+      min-height: 560px;
+    }
+  }
+
+  /* Tuned to land the reference's 2 290 total at 390: four stacked cards at
+     460 minimum with 24 px gaps. */
+  @media (max-width: 768px) {
+    .pricing {
+      padding: 7px 16px 40px;
+    }
+
+    .pricing__grid {
+      gap: 24px;
+    }
+
+    .price-card {
+      min-height: 400px;
+    }
+
+    /* The desktop card breathes into 794 px; stacked on a phone the air
+       between blocks compresses, as the reference's cards do. */
+    .price-card__eyebrow {
+      margin-top: 20px;
+    }
+
+    .price-card__detail,
+    .price-card__label {
+      margin-top: 14px;
+    }
+
+    .price-card__cta {
+      margin-top: 20px;
+    }
+  }
+</style>

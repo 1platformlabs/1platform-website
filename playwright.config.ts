@@ -14,6 +14,10 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  // The visual baseline compares Linux renders and runs through the
+  // Playwright container (`npm run test:visual`) — a macOS render against it
+  // fails on text shaping alone, so it is not part of the default run.
+  testIgnore: 'tests/visual/**',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,

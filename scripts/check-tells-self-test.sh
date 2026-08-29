@@ -26,14 +26,18 @@ SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
 # A fresh copy of everything the guard reads, per case, so cases cannot leak
-# into one another.
+# into one another. Rule 14 measures the BUILD, so the sandbox fabricates a
+# minimal dist/ — tiny and honest: the rule's own floor check would reject an
+# empty one.
 fresh_tree() {
   local dir="$SANDBOX/case"
   rm -rf "$dir"
-  mkdir -p "$dir/public"
+  mkdir -p "$dir/public" "$dir/dist/_astro"
   cp -R "$REPO/src" "$dir/src"
   cp -R "$REPO/scripts" "$dir/scripts"
   cp -R "$REPO/public/fonts" "$dir/public/fonts"
+  printf '%s' '<html></html>' > "$dir/dist/index.html"
+  head -c 4000 /dev/urandom | base64 > "$dir/dist/_astro/app.js"
   printf '%s' "$dir"
 }
 
@@ -92,6 +96,13 @@ assert_red "retired card component" "retired card/kit components" "$PAGE" \
   "<FeatureCard title='x' />"
 assert_red "retired template kit"   "retired template kit"        "$PAGE" \
   '<div class="gradient-text">x</div>'
+# The home's dot texture is exempt BY NAME ONLY (rule 7, D-7). A dot grid under
+# any other name is still the retired kit; the exempt name itself must stay
+# quiet or the home's own class would turn the guard red.
+assert_red "dot grid under another name" "retired template kit"        "$PAGE" \
+  '<div class="hero dot-grid">x</div>'
+assert_green "the home dot grid class is exempt" "$PAGE" \
+  '<section class="ref-dot-grid">x</section>'
 assert_red "decorative gradient"    "decorative gradients"        "$PAGE" \
   '<style>.x { background: linear-gradient(90deg, red, blue); }</style>'
 
@@ -171,6 +182,47 @@ printf '\n%sDocumentation must stay writable%s\n' "$DIM" "$RESET"
 # Naming a retired pattern in a comment is how the reason it went away survives.
 assert_green "comment naming a tell" "$PAGE" \
   '<!-- the old kit used linear-gradient and gradient-text here -->'
+
+printf '\n%sRules of the home epic (14 · 15)%s\n' "$DIM" "$RESET"
+# 14 — a build that outgrows the budget goes red; a missing build never passes
+# quietly. The payload is random (incompressible), so 250 KB stays ~250 KB
+# after gzip and clears the 210 KB line.
+dir="$(fresh_tree)"
+head -c 250000 /dev/urandom > "$dir/dist/_astro/three-fake.js"
+# Capture first, match second (see the preflight note): under pipefail the
+# guard's own exit 1 would poison the condition even when grep matches.
+out="$("$dir/scripts/check-tells.sh" 2>&1)"
+if printf '%s' "$out" | grep -q 'FAIL.*JS inside'; then
+  printf '%sok%s    a build over the JS budget goes red\n' "$GREEN" "$RESET"; PASSED=$((PASSED + 1))
+else
+  printf '%sFAIL%s  a build over the JS budget goes red\n' "$RED" "$RESET"; FAILED=$((FAILED + 1))
+fi
+
+dir="$(fresh_tree)"
+rm -rf "$dir/dist"
+out="$("$dir/scripts/check-tells.sh" 2>&1)"
+if printf '%s' "$out" | grep -q 'FAIL.*JS inside'; then
+  printf '%sok%s    a missing build fails the budget loudly\n' "$GREEN" "$RESET"; PASSED=$((PASSED + 1))
+else
+  printf '%sFAIL%s  a missing build fails the budget loudly\n' "$RED" "$RESET"; FAILED=$((FAILED + 1))
+fi
+
+# 15 — the banned-name scan travels as sha256 digests, so this file cannot
+# prove the REAL name (it must not contain it; the control run in the epic's
+# PROGRESO did that). What it proves is the MECHANISM, with a synthetic term
+# injected by digest, in the shapes that have bitten before: bare word,
+# kebab-case, CamelCase prefix, glued into a longer identifier.
+SYNTH_SHA=$(printf 'zzsyntheticbrand' | shasum -a 256 | cut -d' ' -f1)
+for shape in 'zzsyntheticbrand' 'uikit-zzsyntheticbrand-theme' 'ZzSyntheticBrandProvider' 'tryzzsyntheticbrand'; do
+  dir="$(fresh_tree)"
+  printf "const probe = '%s';\n" "$shape" >> "$dir/src/components/home/media.ts"
+  out="$(CHECK_TELLS_EXTRA_NAME_SHA256="$SYNTH_SHA" "$dir/scripts/check-tells.sh" 2>&1)"
+  if printf '%s' "$out" | grep -q 'FAIL.*never named'; then
+    printf '%sok%s    banned name caught as "%s"\n' "$GREEN" "$RESET" "$shape"; PASSED=$((PASSED + 1))
+  else
+    printf '%sFAIL%s  banned name caught as "%s"\n' "$RED" "$RESET" "$shape"; FAILED=$((FAILED + 1))
+  fi
+done
 
 printf '\n%sPreflight%s\n' "$DIM" "$RESET"
 dir="$(fresh_tree)"; rm -rf "$dir/src/page-content"

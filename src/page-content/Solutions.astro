@@ -427,7 +427,7 @@ const intentChips = groups.map((group) => ({ label: group.eyebrow, href: `#${gro
   /* Breadcrumb strip. The hero carries its own header offset, so it is
      neutralised here to avoid stacking two full header heights of space. */
   .page-top {
-    padding-top: calc(var(--header-height) + var(--space-8));
+    padding-top: calc(var(--header-offset) + var(--space-8));
   }
 
   .page-top + :global(.hero) {
@@ -466,7 +466,7 @@ const intentChips = groups.map((group) => ({ label: group.eyebrow, href: `#${gro
 
   .group__intro {
     position: sticky;
-    top: calc(var(--header-height) + var(--space-10));
+    top: calc(var(--header-offset) + var(--space-10));
   }
 
   .group__title {

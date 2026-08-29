@@ -6,6 +6,11 @@ const lenis = new Lenis({
   touchMultiplier: 2,
 });
 
+// The single scroll source (home epic, D-5): the WebGL scenes read the scroll
+// from here instead of adding a second reader. Published on globalThis because
+// the scenes live in a different script entry.
+(globalThis as { __lenis?: Lenis }).__lenis = lenis;
+
 function raf(time: number) {
   lenis.raf(time);
   requestAnimationFrame(raf);

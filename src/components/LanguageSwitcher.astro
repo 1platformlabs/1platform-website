@@ -12,26 +12,27 @@
  * Destinations come from the same `alternates` map that produces the page's
  * hreflang block, so the control cannot offer a translation that does not
  * exist. That single source is what makes a 404 structurally impossible here.
+ *
+ * One variant, not two. The control used to render twice — a compact one in
+ * the header row and a full-width one in the mobile panel, each hidden by a
+ * media query at the other width. With the redesign (LMW-03, D-4) the header
+ * row carries no navigation at any width, so the control has exactly one home:
+ * the menu panel, as a full-width row of touch-sized targets.
  */
 import { LOCALES, LOCALE_NAMES, useI18n, type Locale } from '@i18n';
 
 interface Props {
   /** Path per locale. A locale missing from the map has no translation. */
   alternates: Partial<Record<Locale, string>>;
-  variant?: 'desktop' | 'mobile';
 }
 
-const { alternates, variant = 'desktop' } = Astro.props;
+const { alternates } = Astro.props;
 const { t, locale: current } = useI18n(Astro.url.pathname);
 
 const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
 ---
 
-<div
-  class:list={['lang', `lang--${variant}`]}
-  role="group"
-  aria-label={t('lang.label')}
->
+<div class="lang" role="group" aria-label={t('lang.label')}>
   {LOCALES.map((code) => {
     const href = alternates[code];
     const isCurrent = code === current;
@@ -130,78 +131,53 @@ const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
 </script>
 
 <style>
-  /* A hairline segmented pair, sized to sit next to the CTA without competing
-     with it: this is a preference control, not an action. */
+  /* A hairline segmented pair, drawn as one full-width row inside the dark
+     menu panel: touch-sized targets, mono labels, the current language marked
+     rather than linked. */
   .lang {
-    display: inline-flex;
+    display: flex;
+    width: 100%;
     align-items: center;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--border-radius);
+    border: 1px solid var(--ref-hairline-dark);
+    border-radius: var(--ref-radius-s);
     overflow: hidden;
   }
 
   .lang__item {
     display: inline-flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
-    min-width: 2.5rem;
-    min-height: 2rem;
+    min-height: 44px;
     padding: 0 var(--space-2);
     font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font-size: var(--text-sm);
     letter-spacing: 0.04em;
-    color: var(--color-text-secondary);
+    color: var(--ref-fg-dim);
   }
 
   .lang__item + .lang__item {
-    border-left: 1px solid var(--color-border);
+    border-left: 1px solid var(--ref-hairline-dark);
   }
 
   .lang__item--current {
-    background: var(--color-bg-muted);
-    color: var(--color-text);
+    background: var(--ref-card-dark);
+    color: var(--ref-white);
   }
 
   .lang__item--off {
-    color: var(--color-text-tertiary);
     cursor: not-allowed;
   }
 
   a.lang__item:hover,
   a.lang__item:focus-visible {
-    color: var(--color-text);
-    background: var(--color-bg-muted);
+    color: var(--ref-white);
+    background: var(--ref-card-dark);
   }
 
   @media (prefers-reduced-motion: no-preference) {
     a.lang__item {
       transition: color var(--duration-fast) ease, background var(--duration-fast) ease;
-    }
-  }
-
-  /* In the mobile panel the control sits below the CTA as its own row, with
-     touch-sized targets rather than the compact header sizing. */
-  .lang--mobile {
-    display: flex;
-    width: 100%;
-    margin-top: var(--space-4);
-  }
-
-  .lang--mobile .lang__item {
-    flex: 1;
-    min-height: 44px;
-    font-size: var(--text-sm);
-  }
-
-  @media (max-width: 768px) {
-    .lang--desktop {
-      display: none;
-    }
-  }
-
-  @media (min-width: 769px) {
-    .lang--mobile {
-      display: none;
     }
   }
 </style>

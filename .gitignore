@@ -26,9 +26,21 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+# Local credentials for scripts (QA logins for scripts/capture-product-media.mjs).
+# `.env` alone did not cover them: a `.env.local` sat one `git add` away from
+# being committed with a password inside.
+.env.local
+.env*.local
+# the Playwright storage state next to .env.local carries LIVE session tokens;
+# `.env*.local` does not match its `.storage.json` suffix — ignore it explicitly
+.env.local.storage.json
 
 # macOS-specific files
 .DS_Store
 
 # jetbrains setting folder
 .idea/
+
+# visual snapshots: only the container's Linux render is authoritative — a
+# local darwin baseline goes green against itself and hides regressions
+tests/visual/**/*-darwin.png

@@ -239,7 +239,7 @@ const related: { icon: IconName; title: string; description: string; href: strin
   /* Breadcrumbs clear the fixed header; the hero then drops its own top
      offset so the two don't stack into a canyon of whitespace. */
   .crumbs {
-    padding-top: calc(var(--header-height) + var(--space-8));
+    padding-top: calc(var(--header-offset) + var(--space-8));
   }
 
   .crumbs + :global(.hero) {
@@ -268,7 +268,7 @@ const related: { icon: IconName; title: string; description: string; href: strin
 
   .samples__contract {
     position: sticky;
-    top: calc(var(--header-height) + var(--space-8));
+    top: calc(var(--header-offset) + var(--space-8));
   }
 
   .contract {

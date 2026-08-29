@@ -1,8 +1,11 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
+import AnnouncementBar from '@components/AnnouncementBar.astro';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
+import { pickAnnouncement } from '@components/announcement';
 import { OG_LOCALES, alternatesForPath, useI18n, type Locale } from '@i18n';
+import { getLocalized } from '@i18n/collections';
 import '@styles/global.css';
 import '@styles/components.css';
 
@@ -54,10 +57,19 @@ const alternateLinks = (Object.entries(alternates) as [Locale, string][]).map(
 const xDefault = alternates.en ? new URL(alternates.en, Astro.site).toString() : null;
 
 const rssPath = l('/rss.xml');
+
+// The announcement bar shows the newest changelog entry of this language, or
+// nothing at all (D-9). The layout decides here, because the bar's 40 px move
+// the fixed header and every offset under it: `has-announcement` on <html>
+// sets `--header-top`, and `--header-offset` (global.css) follows.
+const changelog = await getLocalized('changelog', locale);
+const announcement = pickAnnouncement(
+  changelog.map((entry) => ({ title: entry.data.title, date: entry.data.date })),
+);
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} class:list={[announcement && 'has-announcement']}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -75,6 +87,14 @@ const rssPath = l('/rss.xml');
     <link
       rel="preload"
       href="/fonts/inter-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <!-- The home's display face; the footer draws with it on every page. -->
+    <link
+      rel="preload"
+      href="/fonts/instrument-serif-latin-400-normal.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -221,6 +241,7 @@ const rssPath = l('/rss.xml');
   </head>
   <body>
     <a href="#main-content" class="skip-link">{t('layout.skipToContent')}</a>
+    {announcement && <AnnouncementBar entry={announcement} />}
     <Header alternates={alternates} />
     <main id="main-content">
       <slot />
