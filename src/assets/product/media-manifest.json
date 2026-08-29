@@ -1,1 +1,202 @@
-[]
+[
+  {
+    "slot": "hero-01",
+    "file": "hero-01.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/dashboard",
+    "captured_at": "2026-08-29T15:06:27.142Z",
+    "sha256": "104f29b22620cbc38a658c8591ca4ed10a9adb17b4ef6245900596ae04acf74e",
+    "width": 480,
+    "height": 480,
+    "alt_key": "home.media.hero-01"
+  },
+  {
+    "slot": "hero-02",
+    "file": "hero-02.webp",
+    "source_url": "https://store-qa.bowerfans.com/",
+    "captured_at": "2026-08-29T15:06:31.206Z",
+    "sha256": "70e80290ec7a14b3eb0fc18aa25d300a77d1808b5c067321e28891652f9e7446",
+    "width": 480,
+    "height": 480,
+    "alt_key": "home.media.hero-02"
+  },
+  {
+    "slot": "hero-03",
+    "file": "hero-03.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/billing",
+    "captured_at": "2026-08-29T15:06:34.579Z",
+    "sha256": "a5bbfba0b535d90060a871f32227dbe200296d289531c9a4b02c86af5119ceb3",
+    "width": 480,
+    "height": 480,
+    "alt_key": "home.media.hero-03"
+  },
+  {
+    "slot": "hero-05",
+    "file": "hero-05.webp",
+    "source_url": "https://store-qa.bowerfans.com/products",
+    "captured_at": "2026-08-29T15:06:37.096Z",
+    "sha256": "b02e0c6480472fd03ef98048a6662229d37e8eb57bfc2fb695ef8e109dd6a5c9",
+    "width": 600,
+    "height": 600,
+    "alt_key": "home.media.hero-05"
+  },
+  {
+    "slot": "hero-08",
+    "file": "hero-08.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/deliveries",
+    "captured_at": "2026-08-29T15:06:39.554Z",
+    "sha256": "1095a7481c51fe86396431e2a89b1c0f6db9435d25fe8202b485a501f200c80f",
+    "width": 600,
+    "height": 760,
+    "alt_key": "home.media.hero-08"
+  },
+  {
+    "slot": "hero-10",
+    "file": "hero-10.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/domains",
+    "captured_at": "2026-08-29T15:06:41.947Z",
+    "sha256": "3d79fe702b83633d764efba3bade1f3fc2fc3fd180303ca27755e426a128a5dd",
+    "width": 640,
+    "height": 1120,
+    "alt_key": "home.media.hero-10"
+  },
+  {
+    "slot": "hero-11",
+    "file": "hero-11.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/websites",
+    "captured_at": "2026-08-29T15:06:44.347Z",
+    "sha256": "de1ff5bc13f1a74f0c677142f535d23cde197e063b709fd380b6016358d43112",
+    "width": 720,
+    "height": 1600,
+    "alt_key": "home.media.hero-11"
+  },
+  {
+    "slot": "hero-12",
+    "file": "hero-12.webp",
+    "source_url": "https://atlas-qa.1platform.pro/",
+    "captured_at": "2026-08-29T15:06:47.462Z",
+    "sha256": "8665c59447a2c5a8037dfd5f5aaa65bee33f8fd12ef55b27f68e1fb87ef0f435",
+    "width": 720,
+    "height": 1600,
+    "alt_key": "home.media.hero-12"
+  },
+  {
+    "slot": "hero-13",
+    "file": "hero-13.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/businesses",
+    "captured_at": "2026-08-29T15:06:49.685Z",
+    "sha256": "c54c32a20ab90268dc6f008bcca6fa9128b5338ac3acb9487e90f496bf100b78",
+    "width": 800,
+    "height": 1800,
+    "alt_key": "home.media.hero-13"
+  },
+  {
+    "slot": "hero-14",
+    "file": "hero-14.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/settings",
+    "captured_at": "2026-08-29T15:06:51.648Z",
+    "sha256": "e83c25f1b8659f7a33157426f74b71669a309dd1c8dfe2b8b724d9b71abb643d",
+    "width": 800,
+    "height": 1800,
+    "alt_key": "home.media.hero-14"
+  },
+  {
+    "slot": "showcase-store-bg",
+    "file": "showcase-store-bg.webp",
+    "source_url": "https://store-qa.bowerfans.com/",
+    "captured_at": "2026-08-29T15:06:54.569Z",
+    "sha256": "7cb442352647ca276d503232f3ba93fa3dfa19fc6966eb96d9e9d52c9cec05e7",
+    "width": 2880,
+    "height": 1800,
+    "alt_key": "home.media.showcase-store-bg"
+  },
+  {
+    "slot": "showcase-payments-bg",
+    "file": "showcase-payments-bg.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/billing",
+    "captured_at": "2026-08-29T15:06:57.186Z",
+    "sha256": "023228b6ba9772732d632ebadb386673af81fcbf9c64d121d0a9a876d2a2fc13",
+    "width": 2880,
+    "height": 1800,
+    "alt_key": "home.media.showcase-payments-bg"
+  },
+  {
+    "slot": "showcase-deliveries-bg",
+    "file": "showcase-deliveries-bg.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/deliveries",
+    "captured_at": "2026-08-29T15:06:59.405Z",
+    "sha256": "40ef1404c0bc73d5e3bf8f742576200063057c495dc988109d25abf761774a17",
+    "width": 2880,
+    "height": 1800,
+    "alt_key": "home.media.showcase-deliveries-bg"
+  },
+  {
+    "slot": "module-online-store",
+    "file": "module-online-store.webp",
+    "source_url": "https://store-qa.bowerfans.com/",
+    "captured_at": "2026-08-29T15:07:02.294Z",
+    "sha256": "fdd88688023aa655cce99b209aad5226cca27a530e8db28ad0013bbb42ccf214",
+    "width": 452,
+    "height": 452,
+    "alt_key": "home.media.module-online-store"
+  },
+  {
+    "slot": "module-website",
+    "file": "module-website.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/websites",
+    "captured_at": "2026-08-29T15:07:04.509Z",
+    "sha256": "019aef007d4dc6d73bf295e37e3ade0ded9a4bc2d94b5bdb6e68f1a9b39820cc",
+    "width": 452,
+    "height": 452,
+    "alt_key": "home.media.module-website"
+  },
+  {
+    "slot": "module-deliveries",
+    "file": "module-deliveries.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/deliveries",
+    "captured_at": "2026-08-29T15:07:06.628Z",
+    "sha256": "8e35ea66922095ff4376066cf99978e6818e550c59655fa942205b2501544aef",
+    "width": 452,
+    "height": 452,
+    "alt_key": "home.media.module-deliveries"
+  },
+  {
+    "slot": "module-payments",
+    "file": "module-payments.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/billing",
+    "captured_at": "2026-08-29T15:07:09.183Z",
+    "sha256": "7f0235800bc8d94cf90dd99227a716437e34a2c79877747e30cdb393787175f2",
+    "width": 452,
+    "height": 452,
+    "alt_key": "home.media.module-payments"
+  },
+  {
+    "slot": "module-agents",
+    "file": "module-agents.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/agents",
+    "captured_at": "2026-08-29T15:07:11.672Z",
+    "sha256": "0379e2747fe7823031e6ea37c2e6f3f87819be68ffacb98024a223df8bd46478",
+    "width": 452,
+    "height": 452,
+    "alt_key": "home.media.module-agents"
+  },
+  {
+    "slot": "module-domain",
+    "file": "module-domain.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/domains",
+    "captured_at": "2026-08-29T15:07:13.817Z",
+    "sha256": "f544f687d1fa49fec514e0c330c153e5994f5ea894e9a2b7edf73bf1605e25fd",
+    "width": 452,
+    "height": 452,
+    "alt_key": "home.media.module-domain"
+  },
+  {
+    "slot": "module-search-console",
+    "file": "module-search-console.webp",
+    "source_url": "https://app-qa.1platform.pro/app/main/websites",
+    "captured_at": "2026-08-29T15:07:15.957Z",
+    "sha256": "019aef007d4dc6d73bf295e37e3ade0ded9a4bc2d94b5bdb6e68f1a9b39820cc",
+    "width": 452,
+    "height": 452,
+    "alt_key": "home.media.module-search-console"
+  }
+]

@@ -31,6 +31,9 @@ pnpm-debug.log*
 # being committed with a password inside.
 .env.local
 .env*.local
+# the Playwright storage state next to .env.local carries LIVE session tokens;
+# `.env*.local` does not match its `.storage.json` suffix — ignore it explicitly
+.env.local.storage.json
 
 # macOS-specific files
 .DS_Store

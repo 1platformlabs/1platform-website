@@ -89,41 +89,47 @@ const STORE = process.env.STORE_QA_URL ?? '';
 const ATLAS = process.env.ATLAS_QA_URL ?? '';
 
 const ROUTES = {
-  // Hero fan — product surfaces at a glance
+  // Hero fan — product surfaces at a glance.
+  //
+  // Routes are pinned to what the QA panel ACTUALLY mounts (measured 2026-08-29
+  // against app-qa with a live session: the sidebar exposes dashboard, billing,
+  // businesses, websites, domains, deliveries, agents, tasks, skills, tickets,
+  // settings — and nothing else). The first draft of this map invented routes
+  // (`/transactions`, `/content`, `/ads`, …); the panel 404s them and the
+  // capture shipped the 404 screen with exit 0. A slot whose product surface
+  // does not exist on QA has NO route here — it stays a labelled placeholder,
+  // which is honest — rather than a route that captures an error page.
   'hero-01': { url: `${APP}/app/main/dashboard`, clip: 'main' },
   'hero-02': { url: `${STORE}/`, clip: 'main' },
-  'hero-03': { url: `${APP}/app/main/transactions`, clip: 'main' },
-  'hero-04': { url: `${APP}/app/main/invoices`, clip: 'main' },
+  'hero-03': { url: `${APP}/app/main/billing`, clip: 'main' }, // transactions live in billing ("Recent transactions")
+  // 'hero-04' (invoices): QA mounts no invoices surface — placeholder until it does
   'hero-05': { url: `${STORE}/products`, clip: 'main' },
-  'hero-06': { url: `${APP}/app/main/content`, clip: 'main' },
-  'hero-07': { url: `${APP}/app/main/payment-links`, clip: 'main' },
+  // 'hero-06' (content): the QA app's DashboardConfig does not enable the content module
+  // 'hero-07' (payment-links): not mounted on QA
   'hero-08': { url: `${APP}/app/main/deliveries`, clip: 'main' },
-  'hero-09': { url: `${APP}/app/main/ads`, clip: 'main' },
+  // 'hero-09' (ads): QA does not enable the ads vertical (prod does)
   'hero-10': { url: `${APP}/app/main/domains`, clip: 'main' },
   'hero-11': { url: `${APP}/app/main/websites`, clip: 'main' },
   'hero-12': { url: `${ATLAS}/`, clip: 'main' },
-  'hero-13': { url: `${APP}/app/main/billing`, clip: 'main' },
+  'hero-13': { url: `${APP}/app/main/businesses`, clip: 'main' }, // billing already fills hero-03; keep the fan varied
   'hero-14': { url: `${APP}/app/main/settings`, clip: 'main' },
   // Showcase backgrounds — full screens
   'showcase-store-bg': { url: `${STORE}/` },
-  'showcase-payments-bg': { url: `${APP}/app/main/transactions` },
-  'showcase-content-bg': { url: `${APP}/app/main/content` },
+  'showcase-payments-bg': { url: `${APP}/app/main/billing` },
+  // 'showcase-content-bg': content module not on QA — placeholder
   'showcase-deliveries-bg': { url: `${APP}/app/main/deliveries` },
-  'showcase-ads-bg': { url: `${APP}/app/main/ads` },
+  // 'showcase-ads-bg': ads vertical not on QA — placeholder
   // Module cards
   'module-online-store': { url: `${STORE}/`, clip: 'main' },
   'module-website': { url: `${APP}/app/main/websites`, clip: 'main' },
-  'module-content': { url: `${APP}/app/main/content`, clip: 'main' },
+  // 'module-content', 'module-ai-image': content module not on QA
   'module-deliveries': { url: `${APP}/app/main/deliveries`, clip: 'main' },
-  'module-ads': { url: `${APP}/app/main/ads`, clip: 'main' },
-  'module-whitelabel': { url: `${APP}/app/main/settings/branding`, clip: 'main' },
-  'module-payments': { url: `${APP}/app/main/transactions`, clip: 'main' },
-  'module-payment-links': { url: `${APP}/app/main/payment-links`, clip: 'main' },
-  'module-card-present': { url: `${APP}/app/main/transactions`, clip: 'main' },
-  'module-webhooks': { url: `${APP}/app/main/developer/webhooks`, clip: 'main' },
+  // 'module-ads': ads vertical not on QA
+  // 'module-whitelabel': `/settings/branding` is not a QA route (settings shows Profile only)
+  'module-payments': { url: `${APP}/app/main/billing`, clip: 'main' },
+  // 'module-payment-links', 'module-card-present', 'module-webhooks': not mounted on QA
   'module-agents': { url: `${APP}/app/main/agents`, clip: 'main' },
   'module-domain': { url: `${APP}/app/main/domains`, clip: 'main' },
-  'module-ai-image': { url: `${APP}/app/main/content/images`, clip: 'main' },
   'module-search-console': { url: `${APP}/app/main/websites`, clip: 'main' },
 };
 
