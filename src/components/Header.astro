@@ -169,5 +169,5 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
     .mobile-menu__footer { display: grid; gap: var(--space-4); margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--color-border); }
   }
   @media (max-width: 520px) { .site-header { padding-inline: var(--space-3); } .site-header__rail { min-height: 54px; padding: 5px 5px 5px 14px; } .site-header__cta { min-height: 42px; padding-inline: 12px; font-size: var(--text-xs); } .mobile-menu { right: var(--space-3); left: var(--space-3); padding: var(--space-5); } }
-  @media (scripting: none) { .site-header__menu-toggle { display: none; } .mobile-menu { display: block; position: static; width: min(620px, calc(100% - 32px)); margin: var(--space-3) auto 0; } }
+  @media (scripting: none) { .site-header { position: relative; top: auto; pointer-events: auto; } .site-header__menu-toggle { display: none; } .mobile-menu { display: block; position: static; width: min(620px, calc(100% - 32px)); margin: var(--space-3) auto 0; pointer-events: auto; } }
 </style>

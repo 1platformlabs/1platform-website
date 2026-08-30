@@ -212,7 +212,7 @@ for shape in 'zzsyntheticbrand' 'uikit-zzsyntheticbrand-theme' 'ZzSyntheticBrand
   dir="$(fresh_tree)"
   printf "const probe = '%s';\n" "$shape" >> "$dir/src/components/home/media.ts"
   out="$(CHECK_TELLS_EXTRA_NAME_SHA256="$SYNTH_SHA" "$dir/scripts/check-tells.sh" 2>&1)"
-  if printf '%s' "$out" | grep -q 'FAIL.*never named'; then
+  if printf '%s' "$out" | grep -q 'FAIL.*external visual source is named'; then
     printf '%sok%s    banned name caught as "%s"\n' "$GREEN" "$RESET" "$shape"; PASSED=$((PASSED + 1))
   else
     printf '%sFAIL%s  banned name caught as "%s"\n' "$RED" "$RESET" "$shape"; FAILED=$((FAILED + 1))
