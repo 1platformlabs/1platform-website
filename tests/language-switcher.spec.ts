@@ -14,6 +14,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /** Open the header menu so the language control is on screen and clickable. */
 async function openMenu(page: Page) {
+  await page.setViewportSize({ width: 390, height: 844 });
   const toggle = page.locator('#menu-toggle');
   if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
     await toggle.click();

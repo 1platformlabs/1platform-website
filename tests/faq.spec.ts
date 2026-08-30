@@ -5,7 +5,7 @@ test('the home FAQ uses semantic details and remains available without JavaScrip
   const page = await context.newPage();
   await page.goto('/');
 
-  const items = page.locator('.editorial-faq__item');
+  const items = page.locator('.product-faq__item');
   await expect(items).toHaveCount(2);
   await items.first().locator('summary').click();
   await expect(items.first()).toHaveAttribute('open', /.*/);

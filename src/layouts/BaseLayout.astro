@@ -15,6 +15,9 @@ interface Props {
   ogImage?: string;
   noIndex?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** The home uses a deliberately quiet opening composition. Other routes keep
+   * the current-release strip in the shared chrome. */
+  showAnnouncement?: boolean;
   /**
    * Path per locale. Defaults to "the same slug in both languages", which is
    * true for every marketing page. Content pages whose twin may not exist pass
@@ -29,6 +32,7 @@ const {
   ogImage = '/og/default.png',
   noIndex = false,
   jsonLd,
+  showAnnouncement = true,
   alternates = alternatesForPath(Astro.url.pathname),
 } = Astro.props;
 
@@ -66,15 +70,16 @@ const changelog = await getLocalized('changelog', locale);
 const announcement = pickAnnouncement(
   changelog.map((entry) => ({ title: entry.data.title, date: entry.data.date })),
 );
+const visibleAnnouncement = showAnnouncement ? announcement : null;
 ---
 
 <!doctype html>
-<html lang={locale} class:list={[announcement && 'has-announcement']}>
+<html lang={locale} class:list={[visibleAnnouncement && 'has-announcement']}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#F5F1E8" />
+    <meta name="theme-color" content="#FFFFFF" />
 
     <!-- Self-hosted display + text faces; the rest load on demand with swap. -->
     <link
@@ -241,7 +246,7 @@ const announcement = pickAnnouncement(
   </head>
   <body>
     <a href="#main-content" class="skip-link">{t('layout.skipToContent')}</a>
-    {announcement && <AnnouncementBar entry={announcement} />}
+    {visibleAnnouncement && <AnnouncementBar entry={visibleAnnouncement} />}
     <Header alternates={alternates} />
     <main id="main-content">
       <slot />

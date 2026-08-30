@@ -35,13 +35,13 @@ test('the compact menu is fully keyboard-operable on mobile', async ({ page }) =
   await expect(toggle).toBeFocused();
 });
 
-test('reduced motion keeps the editorial home static and WebGL-free', async ({ page }) => {
+test('reduced motion keeps the product home static and WebGL-free', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
 
   expect(await page.locator('canvas').count()).toBe(0);
-  const state = await page.locator('.editorial-hero__visual').evaluate((node) => ({
+  const state = await page.locator('.product-hero__device').evaluate((node) => ({
     transform: getComputedStyle(node).transform,
     transitionDuration: getComputedStyle(node).transitionDuration,
   }));
@@ -53,6 +53,6 @@ test('the home retains reciprocal SEO alternatives and focused CTAs', async ({ p
   await page.goto('/');
   await expect(page.locator('link[hreflang="en"]')).toHaveAttribute('href', 'https://1platform.pro/');
   await expect(page.locator('link[hreflang="es"]')).toHaveAttribute('href', 'https://1platform.pro/es/');
-  await expect(page.locator('.editorial-hero__actions a').first()).toHaveAttribute('href', 'https://app.1platform.pro/app/');
-  await expect(page.locator('.editorial-hero__actions a').nth(1)).toHaveAttribute('href', 'https://developer.1platform.pro/');
+  await expect(page.locator('.product-hero__actions a').first()).toHaveAttribute('href', 'https://app.1platform.pro/app/');
+  await expect(page.locator('.product-hero__actions a')).toHaveCount(1);
 });
