@@ -1,9 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * The visual baseline (LMW-12 CA-5): full-page screenshots of the finished
- * home in both languages and both widths, COMPARED — never regenerated — on
- * every run (`maxDiffPixelRatio: 0.01`).
+ * The visual baseline: full-page screenshots of the finished home in both
+ * languages and at the required desktop and mobile widths.
  *
  * Baselines are Linux renders, produced inside the Playwright container so
  * the letterforms are the same bytes every time (text shaping is the OS's):
@@ -16,10 +15,7 @@ import { expect, test } from '@playwright/test';
  * on typography alone; the visual gate runs through the container. A stray
  * `-darwin` snapshot must never be committed — .gitignore refuses them.
  *
- * Scroll first, settle after: the page mounts scenes lazily and full-page
- * capture needs the whole tree painted. The WebGL canvases are masked — a GPU
- * render is not byte-stable across drivers; the CSS layers under them are
- * what the baseline pins.
+ * Scroll first so native lazy image loading settles before capture.
  */
 
 for (const [name, path, width, height] of [
@@ -30,8 +26,7 @@ for (const [name, path, width, height] of [
 ] as const) {
   test(name, async ({ page }) => {
     await page.setViewportSize({ width, height });
-    // Reduced motion: reveals settle instantly and the scenes never mount, so
-    // the capture pins the CSS layers — the deterministic ones.
+    // The static rendering is the baseline used to review layout changes.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(path);
     await page.evaluate(() => document.fonts.ready);
@@ -50,7 +45,6 @@ for (const [name, path, width, height] of [
     await expect(page).toHaveScreenshot(`${name}.png`, {
       fullPage: true,
       maxDiffPixelRatio: 0.01,
-      mask: [page.locator('canvas[data-scene]')],
     });
   });
 }

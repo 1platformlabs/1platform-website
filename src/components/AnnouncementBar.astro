@@ -20,7 +20,7 @@ const { t, l } = useI18n(Astro.url.pathname);
 ---
 
 <aside class="announcement" role="note" aria-label={t('announcement.aria')}>
-  <p class="announcement__text ref-body-s">
+  <p class="announcement__text">
     <span class="announcement__title">{entry.title}</span>
     <a href={l('/changelog/')} class="announcement__link">
       {t('announcement.cta')}
@@ -30,9 +30,6 @@ const { t, l } = useI18n(Astro.url.pathname);
 </aside>
 
 <style>
-  /* Measured: 40 px tall, inset 8 px from both edges, 1 px hairline, bottom
-     corners rounded to the card radius, text 12.8 centred, link in the CTA
-     orange (the AA-safe tint, D-6) with an arrow icon — never an arrow glyph. */
   .announcement {
     position: fixed;
     top: 0;
@@ -43,11 +40,11 @@ const { t, l } = useI18n(Astro.url.pathname);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--ref-dark-2);
-    color: var(--ref-white);
-    border: 1px solid var(--ref-hairline-dark);
+    background: var(--color-footer);
+    color: var(--color-footer-text);
+    border: 1px solid var(--color-footer-line);
     border-top: 0;
-    border-radius: 0 0 var(--ref-radius-m) var(--ref-radius-m);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
   }
 
   .announcement__text {
@@ -56,7 +53,7 @@ const { t, l } = useI18n(Astro.url.pathname);
     gap: var(--space-2);
     margin: 0;
     padding: 0 var(--space-4);
-    color: var(--ref-white);
+    color: var(--color-footer-text);
     white-space: nowrap;
     overflow: hidden;
   }
@@ -71,9 +68,7 @@ const { t, l } = useI18n(Astro.url.pathname);
     align-items: center;
     gap: 4px;
     flex-shrink: 0;
-    /* The dark bar carries light text; the orange link must clear AA on it.
-       The exact orange measures 5.4:1 on this bar, so it is allowed here. */
-    color: var(--ref-orange);
+    color: var(--cobalt-bright);
     min-height: 40px;
   }
 
@@ -82,6 +77,6 @@ const { t, l } = useI18n(Astro.url.pathname);
   }
 
   .announcement :focus-visible {
-    outline-color: var(--ref-white);
+    outline-color: var(--color-footer-text);
   }
 </style>

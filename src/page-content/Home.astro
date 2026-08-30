@@ -1,27 +1,30 @@
 ---
-/**
- * Home — the single most important page on the site. Its headline, subhead
- * and section copy set the voice for the whole Spanish tree.
- *
- * `home.hero.headline` is the one string on this page that is NOT translated:
- * it is the brand slogan ("One Platform. Every Solution."), which stays
- * English in both trees by the same rule that keeps "1Platform" itself
- * untranslated — see `common.ts` and the i18n contract's glossary.
- */
+import { Image } from 'astro:assets';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import Faq from '@components/home/Faq.astro';
-import HeroFan from '@components/home/HeroFan.astro';
-import ModuleCarousel from '@components/home/ModuleCarousel.astro';
-import PersonaStack from '@components/home/PersonaStack.astro';
-import PricingCards from '@components/home/PricingCards.astro';
-import Showcase from '@components/home/Showcase.astro';
-import { FAQ_KEYS } from '@components/home/faq-content';
+import platformWorkspace from '@assets/editorial/platform-workspace.png';
+import platformModules from '@assets/editorial/platform-modules.png';
+import paperGrid from '@assets/editorial/paper-grid.png';
 import { useI18n } from '@i18n';
 
 const { t, l } = useI18n(Astro.url.pathname);
-
 const title = t('home.title');
 const description = t('home.description');
+
+const solutions = [
+  { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
+  { label: t('nav.solutions.website'), href: l('/solutions/website/') },
+  { label: t('nav.solutions.content'), href: l('/solutions/content/') },
+  { label: t('nav.solutions.deliveries'), href: l('/solutions/deliveries/') },
+  { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
+  { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
+  { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
+];
+
+const audiences = [
+  { title: t('home.useCase.smallBusiness.title'), body: t('home.useCase.smallBusiness.description'), href: l('/solutions/online-store/') },
+  { title: t('home.useCase.agencies.title'), body: t('home.useCase.agencies.description'), href: l('/for-agencies/') },
+  { title: t('home.useCase.developers.title'), body: t('home.useCase.developers.description'), href: l('/for-developers/') },
+];
 
 const jsonLd = [
   {
@@ -36,53 +39,150 @@ const jsonLd = [
     '@type': 'Product',
     name: t('home.jsonld.name'),
     description,
-    brand: {
-      '@type': 'Brand',
-      name: t('home.jsonld.brandName'),
-    },
+    brand: { '@type': 'Brand', name: t('home.jsonld.brandName') },
     offers: {
       '@type': 'Offer',
       url: new URL(l('/pricing/'), Astro.site).toString(),
       priceCurrency: 'USD',
-      priceSpecification: {
-        '@type': 'UnitPriceSpecification',
-        priceType: 'PayPerUse',
-      },
+      priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'PayPerUse' },
       availability: 'https://schema.org/InStock',
     },
   },
-  // FAQPage as semantic structured data — Google retired FAQ rich results, so
-  // this promises nothing about SERP appearance (D-13). The entries are the
-  // SAME list the accordion renders, from one module, so the markup and the
-  // data cannot drift apart.
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: FAQ_KEYS.map((key) => ({
-      '@type': 'Question',
-      name: t(`${key}.question`),
-      acceptedAnswer: { '@type': 'Answer', text: t(`${key}.answer`) },
-    })),
-  },
 ];
-
-
 ---
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd}>
-  <HeroFan />
-  <Showcase />
-  <PersonaStack />
-  <ModuleCarousel />
+  <section class="editorial-hero" id="hero">
+    <Image class="editorial-hero__paper" src={paperGrid} alt="" aria-hidden="true" widths={[640, 1280, 2560]} sizes="100vw" />
+    <div class="container editorial-hero__inner">
+      <div class="editorial-hero__copy">
+        <p class="eyebrow eyebrow--accent">1Platform</p>
+        <h1>{t('home.hero.headline')}</h1>
+        <p class="editorial-hero__lead">{t('home.hero.lead')}</p>
+        <div class="editorial-hero__actions">
+          <a href="https://app.1platform.pro/app/" class="btn btn--primary">{t('cta.getStarted')}</a>
+          <a href="https://developer.1platform.pro/" class="btn btn--ghost">{t('cta.viewDocs')}</a>
+        </div>
+        <ul class="editorial-hero__index" aria-label={t('home.showcase.aria')}>
+          {solutions.map((solution, index) => (
+            <li><a href={solution.href}><span>{String(index + 1).padStart(2, '0')}</span>{solution.label}</a></li>
+          ))}
+        </ul>
+      </div>
+      <figure class="editorial-hero__visual reveal">
+        <div class="editorial-hero__frame">
+          <Image src={platformWorkspace} alt={t('home.hero.fan.aria')} widths={[640, 960, 1440]} sizes="(min-width: 900px) 50vw, 100vw" loading="eager" />
+        </div>
+        <figcaption>{t('home.hero.lead')}</figcaption>
+      </figure>
+    </div>
+  </section>
 
-  <PricingCards />
-  <Faq />
+  <section class="editorial-statement section">
+    <div class="container editorial-statement__grid">
+      <p class="eyebrow">{t('home.modules.carouselAria')}</p>
+      <h2>{t('home.modules.title').replace('\n', ' ')}</h2>
+      <p>{t('home.description')}</p>
+    </div>
+  </section>
 
-  <!-- The closing CTA lives in the footer, on every page — see Footer.astro. -->
+  <section class="editorial-modules section section--alt" id="modules">
+    <div class="container editorial-modules__grid">
+      <div class="editorial-modules__image reveal">
+        <Image src={platformModules} alt="" aria-hidden="true" widths={[480, 720, 960]} sizes="(min-width: 900px) 42vw, 100vw" />
+      </div>
+      <div class="editorial-modules__copy">
+        <div class="section__rule"><p class="eyebrow">{t('nav.solutions')}</p></div>
+        <h2>{t('home.personas.title')}</h2>
+        <div class="editorial-modules__list">
+          {solutions.map((solution, index) => (
+            <a href={solution.href} class="editorial-module-link">
+              <span class="editorial-module-link__number">{String(index + 1).padStart(2, '0')}</span>
+              <span>{solution.label}</span>
+              <span aria-hidden="true" class="editorial-module-link__arrow"></span>
+            </a>
+          ))}
+        </div>
+        <a href={l('/solutions/')} class="editorial-text-link">{t('nav.solutions.viewAll')}</a>
+      </div>
+    </div>
+  </section>
 
-  <script>
-    // The WebGL upgrade path for the fan and the module carousel (D-5). Wired
-    // here — the page that owns the scenes — so no other page ships it.
-    import '@scripts/three-boot';
-  </script>
+  <section class="editorial-audiences section" id="personas">
+    <div class="container">
+      <div class="section__rule"><p class="eyebrow">{t('home.personas.title')}</p></div>
+      <div class="editorial-audiences__header"><h2>{t('home.personas.title')}</h2><p>{t('home.useCase.sellers.description')}</p></div>
+      <div class="editorial-audiences__grid">
+        {audiences.map((audience, index) => (
+          <a href={audience.href} class="editorial-audience reveal">
+            <span class="editorial-audience__ordinal">{String(index + 1).padStart(2, '0')}</span>
+            <h3>{audience.title}</h3>
+            <p>{audience.body}</p>
+            <span class="editorial-audience__cue" aria-hidden="true"></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="editorial-faq section section--alt" id="faq">
+    <div class="container editorial-faq__grid">
+      <div><p class="eyebrow">{t('home.faq.title')}</p><h2>{t('home.faq.title')}</h2></div>
+      <div class="editorial-faq__list">
+        <details class="editorial-faq__item"><summary>{t('home.faq.whatIs.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.whatIs.answer')}</p></details>
+        <details class="editorial-faq__item"><summary>{t('home.faq.integrate.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.integrate.answer')}</p></details>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .editorial-hero { position: relative; isolation: isolate; overflow: hidden; padding: calc(var(--header-offset) + var(--space-16)) 0 var(--space-12); background: var(--paper); }
+  .editorial-hero__paper { position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .42; mix-blend-mode: multiply; }
+  .editorial-hero__inner { display: grid; gap: var(--space-10); align-items: center; }
+  .editorial-hero__copy { max-width: 39rem; }
+  .editorial-hero h1 { max-width: 12ch; margin: var(--space-4) 0 var(--space-6); font-family: var(--font-serif); font-size: clamp(4.25rem, 8vw, 8.5rem); font-weight: 400; line-height: .84; letter-spacing: -.065em; }
+  .editorial-hero__lead { max-width: 33rem; font-size: var(--text-lg); line-height: 1.65; }
+  .editorial-hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-8); }
+  .editorial-hero__index { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px var(--space-5); margin-top: var(--space-12); border-top: 1px solid var(--color-border-strong); }
+  .editorial-hero__index a { display: flex; gap: var(--space-3); min-height: 43px; align-items: center; border-bottom: 1px solid var(--color-border); color: var(--color-text-secondary); font-size: var(--text-sm); }
+  .editorial-hero__index a:hover { color: var(--color-accent); }
+  .editorial-hero__index span, .editorial-audience__ordinal, .editorial-module-link__number { color: var(--color-text-tertiary); font-family: var(--font-mono); font-size: var(--text-xs); }
+  .editorial-hero__visual { position: relative; margin: 0; }
+  .editorial-hero__frame { position: relative; overflow: hidden; border: 1px solid var(--color-border-strong); border-radius: 3px; box-shadow: 24px 24px 0 var(--cobalt); }
+  .editorial-hero__frame :global(img) { width: 100%; height: auto; }
+  .editorial-hero figcaption { max-width: 23rem; margin-top: var(--space-5); color: var(--color-text-tertiary); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
+  .editorial-statement { border-bottom: 1px solid var(--color-border); }
+  .editorial-statement__grid { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(0, 2fr) minmax(0, 1fr); gap: var(--space-8); align-items: start; }
+  .editorial-statement h2 { font-family: var(--font-serif); font-size: clamp(3.25rem, 5vw, 5.5rem); font-weight: 400; line-height: .9; letter-spacing: -.055em; }
+  .editorial-modules__grid { display: grid; gap: var(--space-12); align-items: center; }
+  .editorial-modules__image { overflow: hidden; border-radius: var(--border-radius-xl); }
+  .editorial-modules__image :global(img) { width: 100%; height: auto; }
+  .editorial-modules h2, .editorial-audiences h2, .editorial-faq h2 { max-width: 12ch; font-family: var(--font-serif); font-size: clamp(3rem, 5vw, 4.75rem); font-weight: 400; line-height: .92; letter-spacing: -.05em; }
+  .editorial-modules__list { display: grid; margin: var(--space-8) 0; border-top: 1px solid var(--color-border-strong); }
+  .editorial-module-link { display: grid; grid-template-columns: 3rem 1fr 12px; align-items: center; min-height: 58px; border-bottom: 1px solid var(--color-border); color: var(--color-text); font-size: var(--text-lg); }
+  .editorial-module-link:hover { padding-left: var(--space-2); color: var(--color-accent); }
+  .editorial-module-link__arrow, .editorial-audience__cue { width: 8px; height: 8px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; transform: rotate(45deg); }
+  .editorial-text-link { color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
+  .editorial-audiences__header { display: grid; gap: var(--space-6); margin-bottom: var(--space-10); }
+  .editorial-audiences__header p { max-width: 37rem; font-size: var(--text-lg); }
+  .editorial-audiences__grid { display: grid; border-top: 1px solid var(--color-border-strong); }
+  .editorial-audience { position: relative; display: grid; grid-template-columns: 3rem minmax(0, 1fr) 14px; gap: var(--space-4); align-items: start; padding: var(--space-6) 0; border-bottom: 1px solid var(--color-border); color: var(--color-text); }
+  .editorial-audience h3 { grid-column: 2; font-size: var(--text-2xl); }
+  .editorial-audience p { grid-column: 2; max-width: 38rem; }
+  .editorial-audience__cue { grid-column: 3; grid-row: 1; margin-top: var(--space-2); }
+  .editorial-audience:hover h3 { color: var(--color-accent); }
+  .editorial-faq__grid { display: grid; gap: var(--space-10); }
+  .editorial-faq__list { border-top: 1px solid var(--color-border-strong); }
+  .editorial-faq__item { border-bottom: 1px solid var(--color-border); }
+  .editorial-faq__item summary { display: flex; gap: var(--space-5); align-items: center; justify-content: space-between; min-height: 72px; list-style: none; font-family: var(--font-display); font-size: var(--text-lg); color: var(--color-text); cursor: pointer; }
+  .editorial-faq__item summary::-webkit-details-marker { display: none; }
+  .editorial-faq__item summary span { position: relative; width: 12px; height: 12px; flex: 0 0 auto; }
+  .editorial-faq__item summary span::before, .editorial-faq__item summary span::after { content: ''; position: absolute; inset: 5px 0 auto; height: 1px; background: currentColor; }
+  .editorial-faq__item summary span::after { transform: rotate(90deg); }
+  .editorial-faq__item[open] summary span::after { transform: rotate(0); }
+  .editorial-faq__item p { max-width: 48rem; padding: 0 0 var(--space-6); }
+  @media (prefers-reduced-motion: no-preference) { .editorial-module-link, .editorial-audience h3, .editorial-hero__index a { transition: padding var(--duration-fast) ease, color var(--duration-fast) ease; } }
+  @media (min-width: 900px) { .editorial-hero__inner { grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: var(--space-12); } .editorial-modules__grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); } .editorial-audiences__grid { grid-template-columns: repeat(3, 1fr); } .editorial-audience { min-height: 300px; grid-template-columns: 1fr 14px; padding: var(--space-6); border-right: 1px solid var(--color-border); } .editorial-audience:first-child { border-left: 1px solid var(--color-border); } .editorial-audience__ordinal, .editorial-audience h3, .editorial-audience p { grid-column: 1; } .editorial-audience h3 { align-self: end; } .editorial-audience p { align-self: start; } .editorial-audience__cue { grid-column: 2; grid-row: 1; } .editorial-faq__grid { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); } }
+  @media (max-width: 700px) { .editorial-hero { padding-top: calc(var(--header-offset) + var(--space-10)); } .editorial-hero h1 { font-size: clamp(3.75rem, 17vw, 5.5rem); } .editorial-hero__index { grid-template-columns: 1fr; } .editorial-statement__grid { grid-template-columns: 1fr; gap: var(--space-5); } .editorial-hero__frame { box-shadow: 12px 12px 0 var(--cobalt); } }
+</style>

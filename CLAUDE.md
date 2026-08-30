@@ -82,25 +82,20 @@ scripts/
   generate-og-images.py, generate-og-default.py
 ```
 
-## Design System — "ink & signal"
+## Design System — editorial paper and cobalt
 
-The site is **light**: `color-scheme: light`, `theme-color: #F6F5F2`. Near-monochrome ink
-on warm paper, **one** accent, and **one** signal colour reserved for a single motif.
+The site is **light**: `color-scheme: light`, `theme-color: #F5F1E8`. Ink on
+warm paper, cobalt navigation and dark editorial footer surfaces establish the
+system across every public route.
 
-- **Palette (tokens in `src/styles/global.css`)** — `--ink #14161B` (text, not pure black),
-  `--paper #F6F5F2` (page), `--surface #FFFFFF`, `--recessed #EFEEEA`,
-  `--cobalt #1F4FE0` (the only accent: links, primary CTA, motif structure),
-  `--signal #F5A524` (**motif strokes only** — it is 1.87:1 on paper and must never carry
-  text), `--muted #5B5F6B`, `--subtle #656974`, `--hairline`.
-  Semantic aliases (`--color-text`, `--color-bg-alt`, `--color-accent`, …) map onto these;
-  prefer the semantic name in components. Status colours are for **functional state only**,
-  never decoration.
-  **Contrast is verified against the WORST surface a token can land on** — `--paper`,
-  `--surface` and `--recessed` — not just `--paper`. Worst-case ratios: ink 15.59:1,
-  muted 5.49:1, subtle 4.73:1, cobalt 5.56:1, all on `--recessed`.
-  `--subtle` is `#656974` for exactly this reason: the earlier `#696D79` cleared paper
-  (4.74) and surface (5.17) but fell to **4.45 on `--recessed`**, which is where
-  code-block headers sit. Measuring only on paper is what hid it.
+- **Palette (tokens in `src/styles/global.css`)** — `--ink #13151A`,
+  `--paper #F5F1E8`, `--surface #FFFDF8`, `--recessed #ECE5D8`,
+  `--cobalt #1748A7`, `--cobalt-deep #10377F`, `--cobalt-bright #78A6FF`,
+  `--cobalt-wash #E5EDFC`, `--muted #555A64`, `--subtle #626873`, and the
+  dark-footer aliases `--color-footer-*`. Prefer semantic aliases inside
+  components. Status colours are functional only, never decoration.
+  `tests/contrast.spec.ts` pins every foreground/surface pair used by the
+  public chrome at AA or better.
 - **Typography — self-hosted, latin subsets, in `public/fonts/` (SIL OFL):**
   **Space Grotesk** display (500/700) for headings and the logo · **Inter** text
   (400/500/600) · **JetBrains Mono** (400) for labels, data and code ·
@@ -121,29 +116,17 @@ on warm paper, **one** accent, and **one** signal colour reserved for a single m
 - **Logo:** the "1" is set as a node — the same cobalt rounded square the schematic uses.
 - `text-wrap: balance` on headings, `text-wrap: pretty` on body copy.
 
-### The home system (epic home-landing-redesign)
+### The home system
 
-The home (`/`, `/es/`) and the site chrome (announcement bar, header, footer)
-draw with a SECOND palette that coexists with ink & signal (D-2): the `--ref-*`
-tokens in `global.css`, measured on a reference landing whose geometry the home
-replicates with 1Platform's content. Dark surfaces (`--ref-dark`,
-`--ref-dark-2`, `--ref-pill`, `--ref-card-dark`), a light canvas
-(`--ref-canvas`), radii 6 px (buttons/chips) and 8 px (cards/panels), a dot
-texture (`.ref-dot-grid`, 15 px pitch — exempt from the guard's dot-grid rule
-BY THAT NAME ONLY), and two tints that deliberately diverge from the measured
-reference because AA wins over parity (D-6): `--ref-orange-cta #C63A12` under
-light text (the exact `--ref-orange #F04E23` is for surfaces that carry none)
-and `--ref-fg-dim #9A9A9A` for links on the footer card.
-`tests/contrast.spec.ts` pins the arithmetic; `tests/ref-fidelity.spec.ts`
-measures the geometry against `tests/ref-fidelity.table.json` on every run.
-**The home centres its openers** — the deliberate exception to the left-aligned
-rule below; every other page keeps it. The reference site itself is never
-named anywhere in this repo (guard rule 15 scans for it as a hashed token);
-its measurements live with the epic, outside this tree.
+The home (`/`, `/es/`) uses an editorial grid, large Instrument Serif openers,
+numbered solution index, original Astro Image assets under `src/assets/editorial/`
+and a dark closing footer. Keep interactions to native controls and small
+progressive enhancements; every motion path must have a reduced-motion state.
+`tests/chrome-navigation.spec.ts`, `tests/contrast.spec.ts` and the visual
+baselines are the contracts for this system.
 
 **Anti-patterns — do not reintroduce** (`scripts/check-tells.sh` enforces these):
-aurora blobs, dot-grid textures (the home's `ref-dot-grid` is the ONE named
-exemption), clipped gradient text, 135deg gradient icon tiles,
+aurora blobs, decorative gradient text, gradient icon tiles,
 marquees of capability pills, animated vanity counters, per-index reveal cascades,
 `transition: all`, emoji or entity glyphs as icons, hardcoded brand hexes,
 `var(--token, #fallback)`, competitor brand names, fabricated prices or metrics.
@@ -155,19 +138,13 @@ Restrained by design — over-animation was one of the tells this site was rebui
 - **Lenis smooth scroll** on all pages (`src/scripts/lenis-init.ts`, imported in `BaseLayout`).
 - **One reveal:** IntersectionObserver adds `.is-visible` to `.reveal` (a short fade-up).
   `animations.ts` deliberately supports **no** per-element or per-index delay.
-- **The motif's signal** is the only ambient animation: amber pulses along the schematic's
-  traces, `stroke-dashoffset` only.
+- **Decorative motion** is limited to opacity, colour and transform changes in
+  the editorial system; public pages never mount a canvas or WebGL runtime.
 - **Hover:** cards firm their border and take a faint shadow — no lift. Link cues nudge
   their arrow 3px.
 - **Primary easing:** `cubic-bezier(0.16, 1, 0.3, 1)` (ease-out-expo).
 - **ALL animation** sits inside `@media (prefers-reduced-motion: no-preference)`, with a
   static fallback — including the motif, which collapses to a plain schematic.
-- **The home's two WebGL scenes** (hero fan, module carousel) are UPGRADES over
-  CSS 3D layers that are the page: they mount after `astro:page-load` +
-  `requestIdleCallback`, only ≥ 769 px with WebGL2 and no reduced-motion, read
-  their geometry from the CSS layer's data attributes, take scroll from Lenis
-  (`globalThis.__lenis`, the single scroll source) and dispose fully in
-  `astro:before-swap`. A failed upgrade never costs the page.
 
 ## SEO Essentials
 
@@ -186,7 +163,7 @@ Restrained by design — over-animation was one of the tells this site was rebui
 The website **navbar AND footer** must stay in sync with the developer docs counterparts — users should perceive `1platform.pro` and `developer.1platform.pro` as one product.
 
 **The two sides share the design system itself, not just the link lists.**
-Both chromes draw with the `--ref-*` tokens (this repo is upstream:
+Both chromes draw with the shared editorial tokens (this repo is upstream:
 `src/styles/global.css` first, `../1platform-api-developer/src/css/custom.css`
 follows), the four self-hosted typefaces and the cobalt-node logo. The icon
 registry (`src/components/icons.ts`) is likewise upstream of
@@ -204,17 +181,11 @@ structure**, never about the literal strings.
   `.../src/theme/Footer/` (footer), `.../src/theme/Navbar/MobileSidebar/` (panel),
   `.../src/theme/Logo/` (mark), `.../src/css/custom.css` (tokens)
 
-**Navbar contract (since the home redesign):** a 74 px transparent fixed bar
-carrying exactly two things — a 230 × 42 dark pill (logo + menu button) on the
-left, and two 44 px CTAs on the right ("Sign In" on `--ref-yellow`,
-"Get Started Free" on `--ref-orange-cta`). **No navigation link is visible in
-the bar at any width.** The navigation — Solutions with its seven destinations,
-Features, Pricing, Docs, Blog, the CTA and `EN | ES` — lives in the panel the
-menu button opens (`#mobile-menu` here; the theme's mobile sidebar, rendered at
-every width by a wrap swizzle, on the docs side). Without JavaScript the panel
-renders open under the pill (`@media (scripting: none)`) — navigation that only
-exists behind a script is not navigation. The docs side keeps its search box in
-the bar: a documentation portal without search is not a portal.
+**Navbar contract:** a floating, paper-coloured rail holds the logo, Solutions
+with its seven destinations, Features, Pricing, Docs, Blog and the CTA. A
+circular menu opens the compact navigation and the `EN | ES` control at small
+viewports; without JavaScript the compact menu remains available. The docs side
+keeps the same destinations and CTA in its desktop rail, plus search.
 
 **Solutions destinations (order matters, mirror in `docusaurus.config.ts`):**
 Online Store → `/solutions/online-store/` · Website Builder →
@@ -224,17 +195,12 @@ Dashboard → `/solutions/whitelabel/` · Payments & Invoicing →
 `/payments-invoicing/` · then a divider and "View all solutions" →
 `/solutions/`.
 
-**Footer contract (since the home redesign):** a `--ref-dark` band with the
-brand watermark (an SVG drawing, deliberately not HTML text — axe's
-color-contrast applies to glyphs sighted readers see) behind one
-`--ref-card-dark` card: an e-mail sign-up on the left (composes a `mailto:` in
-the browser — there is NO list backend; without JS it goes to the contact
-page), three columns — PRODUCT (the seven solutions + All Solutions), COMPANY
-(About · Pricing · For Agencies · For Developers · Blog), RESOURCES
-(Documentation · API Reference · Code Examples · Changelog) — and a legal row
-(copyright · Terms · Privacy · Cookie preferences). **There is no closing CTA
-and no "Status" claim** — the reference has none and there is no status page to
-back one. `tests/footer-ref.spec.ts` pins the exact link set.
+**Footer contract:** a dark editorial band opens with the logo, brand line and
+CTA, followed by a `mailto:` sign-up, three columns — PRODUCT (the seven
+solutions + All Solutions), COMPANY (About · Pricing · For Agencies · For
+Developers · Blog), RESOURCES (Documentation · API Reference · Code Examples ·
+Changelog) — and a legal row (copyright · Terms · Privacy · Cookie preferences).
+`tests/footer-system.spec.ts` pins the exact link set and keyboard behaviour.
 
 **If you add/remove/rename a navbar item or footer column/link on this site, update the developer docs in the same change.**
 
@@ -320,13 +286,10 @@ Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm r
 - Images: Use Astro's `<Image />` component from `astro:assets` (auto WebP, srcset, lazy loading)
 - Fonts: self-host WOFF2 in `public/fonts/`, preload the critical two in `BaseLayout.astro`, `font-display: swap`, **3 families max** (display / text / mono), latin subsets, weights kept to what is actually used
 - JS: zero by default on every page but the home — never add `client:*` to
-  presentational components (the guard rejects it). The HOME carries a measured
-  budget instead: **210 KB gzip** for everything it loads (guard rule 14
-  statically, `tests/js-budget.spec.ts` over the network). The number is
-  arithmetic, not taste: three 0.185 is ~188 KB gzip WHOLE — `module.min`
-  86.8 + the `core.min` it imports, 101.5; measuring only the first file is
-  how budgets get invented — plus ~17 KB of our own and ~2% headroom. There is
-  no room for a second dependency, which is the point
+  presentational components (the guard rejects it). The home has a **64 KB
+  gzip** public-JS ceiling, enforced statically and by
+  `tests/js-budget.spec.ts` over the network. Do not add WebGL or a new runtime
+  dependency to cross that boundary.
 - CSS: scoped `<style>` per component + global CSS. Astro bundles and minifies automatically
 - Animations: only `transform`/`opacity`, never `transition: all`
 
@@ -351,7 +314,7 @@ Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm r
 ## Restrictions (NEVER)
 
 - Never use `client:*` on presentational components; the home's JS budget is
-  210 KB gzip (rule 14) and every other page stays effectively zero
+  64 KB gzip (rule 14) and every other page stays effectively zero
 - Never expose provider names on client-facing pages (only in Privacy Policy)
 - Never `outline: none` without replacement focus indicator
 - Never `user-scalable=no` or `maximum-scale=1`
@@ -371,7 +334,7 @@ must be run before opening a PR**:
 ```bash
 npm run build            # Must succeed, zero errors — BEFORE check (rule 14 measures dist/)
 npm run check            # Design-system guard (15 rules) + its 43 self-tests
-npm test                 # 100+ Playwright tests against the real dist/
+npm test                 # Playwright tests against the real dist/
 npm run typecheck        # astro check
 npm run test:visual      # visual baseline, compared in the Playwright container
 # Lighthouse (local): Performance 90+ on the home (95+ elsewhere), A11y 100, SEO 100

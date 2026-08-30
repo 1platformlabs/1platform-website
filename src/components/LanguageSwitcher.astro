@@ -131,15 +131,12 @@ const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
 </script>
 
 <style>
-  /* A hairline segmented pair, drawn as one full-width row inside the dark
-     menu panel: touch-sized targets, mono labels, the current language marked
-     rather than linked. */
   .lang {
     display: flex;
     width: 100%;
     align-items: center;
-    border: 1px solid var(--ref-hairline-dark);
-    border-radius: var(--ref-radius-s);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--border-radius);
     overflow: hidden;
   }
 
@@ -153,16 +150,16 @@ const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     letter-spacing: 0.04em;
-    color: var(--ref-fg-dim);
+    color: var(--color-text-secondary);
   }
 
   .lang__item + .lang__item {
-    border-left: 1px solid var(--ref-hairline-dark);
+    border-left: 1px solid var(--color-border);
   }
 
   .lang__item--current {
-    background: var(--ref-card-dark);
-    color: var(--ref-white);
+    background: var(--color-bg-muted);
+    color: var(--color-text);
   }
 
   .lang__item--off {
@@ -171,8 +168,8 @@ const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
 
   a.lang__item:hover,
   a.lang__item:focus-visible {
-    color: var(--ref-white);
-    background: var(--ref-card-dark);
+    color: var(--color-text);
+    background: var(--color-bg-muted);
   }
 
   @media (prefers-reduced-motion: no-preference) {

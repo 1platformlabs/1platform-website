@@ -59,13 +59,12 @@ for (const [path, locale, cta] of [
     await expect(link).toHaveText(new RegExp(cta));
     await expect(link).toHaveAttribute('href', locale === 'es' ? '/es/changelog/' : '/changelog/');
 
-    // The header moved down by exactly the bar's height, and stays there
-    // after scrolling — both are fixed.
+    // The rail keeps a breathing gap below the announcement and remains fixed.
     const headerTop = () => page.locator('header.site-header').evaluate((el) => el.getBoundingClientRect().top);
-    expect(await headerTop()).toBe(40);
+    expect(await headerTop()).toBe(56);
     await page.mouse.wheel(0, 1600);
     await page.waitForTimeout(300);
-    expect(await headerTop()).toBe(40);
+    expect(await headerTop()).toBe(56);
     expect(await bar.evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
   });
 }
@@ -76,7 +75,7 @@ test('the offset the bar adds reaches every anchor: a hash navigation leaves the
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/pricing/');
   // Any id on the page will do; measure that scrolling it into view leaves it
-  // below the fixed chrome (bar + header = 114 px).
+  // below the fixed chrome (bar + floating rail).
   const id = await page.evaluate(() => {
     const el = [...document.querySelectorAll('main [id]')].find((e) => e.getBoundingClientRect().top > 1200);
     return el?.id ?? '';
@@ -84,5 +83,5 @@ test('the offset the bar adds reaches every anchor: a hash navigation leaves the
   expect(id).not.toBe('');
   await page.evaluate((i) => document.getElementById(i)!.scrollIntoView(), id);
   const top = await page.evaluate((i) => document.getElementById(i)!.getBoundingClientRect().top, id);
-  expect(top).toBeGreaterThanOrEqual(114);
+  expect(top).toBeGreaterThanOrEqual(130);
 });

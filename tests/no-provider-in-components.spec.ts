@@ -3,9 +3,8 @@ import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 
 /**
- * The ecosystem's one critical rule, on the surface this epic grew (LMW-07
- * CA-2): nothing under src/components/ may name an external provider. The
- * pattern is read out of the guard so the two can never drift
+ * The ecosystem's one critical rule: nothing under src/components/ may name an
+ * external provider. The pattern is read out of the guard so the two can never drift
  * (tests/provider-lists-agree.spec.ts polices the other copy).
  */
 
@@ -35,7 +34,7 @@ test('no provider name anywhere under src/components', () => {
   const banned = bannedPattern();
   const files = filesUnder('src/components');
   // Floor: an empty walk would pass while asserting nothing.
-  expect(files.length).toBeGreaterThan(30);
+  expect(files.length).toBeGreaterThan(20);
 
   const offenders = files.filter((f) => banned.test(readFileSync(f, 'utf8')));
   expect(offenders, offenders.join('\n')).toEqual([]);
