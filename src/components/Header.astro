@@ -3,40 +3,18 @@ import Logo from '@components/Logo.astro';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
 import { useI18n, type Locale } from '@i18n';
 
-/**
- * The site chrome, redrawn to the reference geometry (LMW-03, D-3/D-4).
- *
- * Two things and nothing else sit on the 74 px fixed bar: a dark pill on the
- * left carrying the logo and the menu button, and two calls to action on the
- * right. The navigation did not disappear — the five items, the seven
- * solution destinations and the language control live inside the panel the
- * menu button opens, at EVERY width. That panel is the same `#mobile-menu`
- * (focus trap, Escape, focus returned to the toggle) the header always had;
- * it simply stopped being mobile-only.
- *
- * `<nav class="site-header__nav">` keeps `class` as its first attribute on
- * purpose: `tests/home-names-every-solution.spec.ts` anchors on that literal
- * to read the seven destinations the menu offers.
- */
-
-type SubItem = { label: string; href: string; divider?: boolean };
+type SubItem = { label: string; href: string };
 type NavItem = { label: string; href: string; subItems?: SubItem[] };
 
 interface Props {
-  /** Path per locale, forwarded to the language control. Same map that feeds
-   *  the hreflang block, so the control and the crawler agree on what exists. */
   alternates: Partial<Record<Locale, string>>;
 }
 
 const { alternates } = Astro.props;
 const { t, l } = useI18n(Astro.url.pathname);
+const appUrl = 'https://app.1platform.pro/app/';
 
-const APP_URL = 'https://app.1platform.pro/app/';
-
-// `l()` is applied here, once, so every consumer below compares and renders the
-// same localised href. The Docs entry is an absolute URL and `l()` returns it
-// untouched — that is the case the helper exists to get right.
-const solutionsSubItems: SubItem[] = [
+const solutions: SubItem[] = [
   { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
   { label: t('nav.solutions.website'), href: l('/solutions/website/') },
   { label: t('nav.solutions.content'), href: l('/solutions/content/') },
@@ -44,12 +22,10 @@ const solutionsSubItems: SubItem[] = [
   { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
   { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
   { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
-  { label: '', href: '', divider: true },
-  { label: t('nav.solutions.viewAll'), href: l('/solutions/') },
 ];
 
 const navItems: NavItem[] = [
-  { label: t('nav.solutions'), href: l('/solutions/'), subItems: solutionsSubItems },
+  { label: t('nav.solutions'), href: l('/solutions/'), subItems: solutions },
   { label: t('nav.features'), href: l('/features/') },
   { label: t('nav.pricing'), href: l('/pricing/') },
   { label: t('nav.docs'), href: 'https://developer.1platform.pro/' },
@@ -57,19 +33,37 @@ const navItems: NavItem[] = [
 ];
 
 const currentPath = Astro.url.pathname;
-
-/**
- * Whether a nav item points at the page being viewed. Compared against the
- * already-localised href so it holds in both trees; absolute hrefs are excluded
- * because "startsWith" is meaningless against another origin.
- */
 const isActive = (href: string) => href.startsWith('/') && currentPath.startsWith(href);
 ---
 
 <header class="site-header" id="site-header">
-  <div class="site-header__inner">
-    <div class="brand-pill">
-      <Logo class="brand-pill__logo" />
+  <div class="site-header__rail">
+    <Logo class="site-header__logo" />
+
+    <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
+      <details class="site-header__solutions">
+        <summary class:list={['site-header__link', 'nav-link', { 'is-active': isActive(l('/solutions/')) }]}>
+          {t('nav.solutions')}<span class="site-header__chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="solutions-menu">
+          <ul>
+            {solutions.map((item) => (
+              <li><a href={item.href}>{item.label}</a></li>
+            ))}
+          </ul>
+          <a href={l('/solutions/')} class="solutions-menu__all">{t('nav.solutions.viewAll')}</a>
+        </div>
+      </details>
+      {navItems.slice(1).map((item) => (
+        <a href={item.href} class:list={['site-header__link', { 'is-active': isActive(item.href) }]}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="site-header__actions">
+      <a href={appUrl} class="site-header__signin">{t('cta.signIn')}</a>
+      <a href={appUrl} class="btn btn--primary site-header__cta">{t('cta.getStarted')}</a>
       <button
         class="site-header__menu-toggle"
         aria-expanded="false"
@@ -77,345 +71,103 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
         aria-label={t('nav.aria.toggleMenu')}
         id="menu-toggle"
       >
-        <span class="hamburger" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
+        <span aria-hidden="true"></span><span aria-hidden="true"></span>
       </button>
-    </div>
-
-    <div class="site-header__actions">
-      <a href={APP_URL} class="ref-btn ref-btn--yellow site-header__signin">{t('cta.signIn')}</a>
-      <a href={APP_URL} class="ref-btn ref-btn--orange">{t('cta.getStarted')}</a>
     </div>
   </div>
 
-  <!-- The menu panel. Opened by the pill's button at every width. -->
   <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
-      <ul>
+    <nav aria-label={t('nav.aria.main')}>
+      <ul class="mobile-menu__links">
         {navItems.map((item) => (
           <li>
-            <a href={item.href} class:list={['nav-link', { 'is-active': isActive(item.href) }]}>
-              {item.label}
-            </a>
+            <a href={item.href} class:list={['mobile-menu__link', { 'is-active': isActive(item.href) }]}>{item.label}</a>
             {item.subItems && (
               <ul class="mobile-menu__sublist">
-                {item.subItems.map((sub) => (
-                  sub.divider ? null : (
-                    <li>
-                      <a href={sub.href}>{sub.label}</a>
-                    </li>
-                  )
-                ))}
+                {item.subItems.map((sub) => <li><a href={sub.href}>{sub.label}</a></li>)}
+                <li><a href={l('/solutions/')}>{t('nav.solutions.viewAll')}</a></li>
               </ul>
             )}
           </li>
         ))}
       </ul>
     </nav>
-    <a href={APP_URL} class="ref-btn ref-btn--orange ref-btn--full">{t('cta.getStarted')}</a>
-    <LanguageSwitcher alternates={alternates} />
+    <div class="mobile-menu__footer">
+      <a href={appUrl} class="btn btn--primary btn--full">{t('cta.getStarted')}</a>
+      <LanguageSwitcher alternates={alternates} />
+    </div>
   </div>
 </header>
 
 <script>
-  document.addEventListener('astro:page-load', initMenu);
-
   function initMenu() {
     const toggle = document.getElementById('menu-toggle');
     const menu = document.getElementById('mobile-menu');
-    if (!toggle || !menu) return;
+    if (!toggle || !menu || toggle.dataset.wired) return;
+    toggle.dataset.wired = 'true';
 
-    /** All focusable elements inside the panel + the toggle button. */
-    function getFocusableElements(): HTMLElement[] {
-      const els = menu!.querySelectorAll<HTMLElement>('a, button, [tabindex]:not([tabindex="-1"])');
-      return [toggle!, ...Array.from(els)];
-    }
-
-    function closeMenu() {
-      toggle!.setAttribute('aria-expanded', 'false');
-      menu!.setAttribute('aria-hidden', 'true');
+    const close = (returnFocus = false) => {
+      toggle.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
-      toggle!.focus();
-    }
-
-    function openMenu() {
-      toggle!.setAttribute('aria-expanded', 'true');
-      menu!.setAttribute('aria-hidden', 'false');
+      if (returnFocus) toggle.focus();
+    };
+    const open = () => {
+      toggle.setAttribute('aria-expanded', 'true');
+      menu.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      const firstLink = menu!.querySelector<HTMLElement>('a');
-      firstLink?.focus();
-    }
+      menu.querySelector<HTMLElement>('a')?.focus();
+    };
 
-    toggle.addEventListener('click', () => {
-      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
-      isOpen ? closeMenu() : openMenu();
+    toggle.addEventListener('click', () => (
+      toggle.getAttribute('aria-expanded') === 'true' ? close() : open()
+    ));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') close(true);
     });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (toggle!.getAttribute('aria-expanded') === 'true') {
-          closeMenu();
-        }
-        return;
-      }
-
-      // Focus trap: cycle Tab within the panel while it is open.
-      if (e.key === 'Tab' && toggle!.getAttribute('aria-expanded') === 'true') {
-        const focusable = getFocusableElements();
-        if (!focusable.length) return;
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    });
-
-    // A click outside the pill and the panel closes it, like any menu.
-    document.addEventListener('click', (e) => {
-      if (toggle!.getAttribute('aria-expanded') !== 'true') return;
-      const target = e.target as Node;
-      if (menu!.contains(target) || toggle!.contains(target)) return;
-      closeMenu();
-    });
-
-    menu.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', closeMenu);
-    });
+    menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => close()));
   }
+
+  document.addEventListener('astro:page-load', initMenu);
 </script>
 
 <style>
-  /* Measured on the reference: header 74 px tall with 16 px padding, fixed,
-     transparent — the page scrolls under it. It sits below the announcement
-     bar when there is one (`--header-top`, set by BaseLayout). */
-  .site-header {
-    position: fixed;
-    top: var(--header-top);
-    left: 0;
-    right: 0;
-    z-index: 100;
-    height: var(--header-height);
-    padding: 16px;
-    background: transparent;
-    pointer-events: none;
+  .site-header { position: fixed; z-index: 100; top: calc(var(--header-top) + 16px); left: 0; right: 0; padding-inline: var(--space-4); pointer-events: none; }
+  .site-header__rail { display: flex; align-items: center; gap: var(--space-5); width: min(1240px, 100%); min-height: 58px; margin: 0 auto; padding: 7px 8px 7px 18px; background: color-mix(in srgb, var(--color-surface) 94%, transparent); border: 1px solid var(--color-border-strong); border-radius: var(--border-radius-pill); box-shadow: var(--shadow-md); pointer-events: auto; }
+  .site-header :global(.site-header__logo) { font-size: var(--text-lg); }
+  .site-header__nav { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+  .site-header__solutions { position: relative; }
+  .site-header__solutions summary { list-style: none; }
+  .site-header__solutions summary::-webkit-details-marker { display: none; }
+  .site-header__link, .site-header__signin { display: inline-flex; align-items: center; min-height: 40px; padding: 0 10px; border-radius: var(--border-radius-pill); color: var(--color-text-secondary); font-size: var(--text-sm); cursor: pointer; white-space: nowrap; }
+  .site-header__link:hover, .site-header__link:focus-visible, .site-header__link.is-active, .site-header__signin:hover { color: var(--color-text); background: var(--color-bg-muted); }
+  .site-header__chevron { width: 6px; height: 6px; margin-left: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+  .site-header__solutions[open] .site-header__chevron { transform: rotate(225deg) translateY(-1px); }
+  .solutions-menu { position: absolute; top: calc(100% + 12px); left: -14px; width: 265px; padding: 10px; background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); }
+  .solutions-menu ul { display: grid; gap: 1px; }
+  .solutions-menu a { display: flex; min-height: 38px; align-items: center; padding: 7px 10px; border-radius: var(--border-radius); color: var(--color-text-secondary); font-size: var(--text-sm); }
+  .solutions-menu a:hover, .solutions-menu a:focus-visible { background: var(--color-bg-muted); color: var(--color-text); }
+  .solutions-menu__all { margin-top: 8px; border-top: 1px solid var(--color-border); padding-top: 12px !important; color: var(--color-accent) !important; }
+  .site-header__actions { display: flex; align-items: center; gap: var(--space-2); }
+  .site-header__cta { min-height: 42px; padding-inline: 16px; }
+  .site-header__menu-toggle { display: grid; width: 44px; height: 44px; padding: 0; place-content: center; gap: 5px; border: 0; border-radius: 50%; color: var(--color-text); background: var(--color-bg-muted); cursor: pointer; }
+  .site-header__menu-toggle span { display: block; width: 16px; height: 1.5px; background: currentColor; }
+  .mobile-menu { display: none; }
+  .mobile-menu[aria-hidden='false'] { position: fixed; top: calc(var(--header-top) + 86px); right: var(--space-4); z-index: 99; display: block; width: min(420px, calc(100% - 32px)); padding: var(--space-6); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); pointer-events: auto; }
+  @media (prefers-reduced-motion: no-preference) { .site-header__link, .site-header__signin, .solutions-menu a, .site-header__menu-toggle span { transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease, transform var(--duration-fast) ease; } }
+  @media (max-width: 980px) {
+    .site-header__rail { padding-left: 14px; }
+    .site-header__nav, .site-header__signin { display: none; }
+    .mobile-menu { position: fixed; top: calc(var(--header-top) + 86px); right: var(--space-4); left: var(--space-4); z-index: 99; max-width: 620px; margin-left: auto; padding: var(--space-6); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--border-radius-xl); box-shadow: var(--shadow-lg); pointer-events: auto; }
+    .mobile-menu[aria-hidden='false'] { display: block; }
+    .mobile-menu__links { display: grid; gap: var(--space-2); }
+    .mobile-menu__link { display: flex; min-height: 44px; align-items: center; padding: 0 var(--space-3); border-radius: var(--border-radius); font-size: var(--text-lg); color: var(--color-text); }
+    .mobile-menu__link.is-active, .mobile-menu__link:hover { background: var(--color-bg-muted); }
+    .mobile-menu__sublist { display: grid; gap: 2px; margin: 0 0 var(--space-3) var(--space-4); padding-left: var(--space-4); border-left: 1px solid var(--color-border); }
+    .mobile-menu__sublist a { display: flex; align-items: center; min-height: 34px; color: var(--color-text-secondary); font-size: var(--text-sm); }
+    .mobile-menu__sublist a:hover { color: var(--color-accent); }
+    .mobile-menu__footer { display: grid; gap: var(--space-4); margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--color-border); }
   }
-
-  .site-header__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-  }
-
-  .site-header__inner > * {
-    pointer-events: auto;
-  }
-
-  /* The pill: 230 × 42, r6, dark, 1 px hairline; logo + wordmark left, the
-     40 × 40 menu button flush right. */
-  .brand-pill {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 230px;
-    height: 42px;
-    padding: 1px;
-    background: var(--ref-pill);
-    border: 1px solid var(--ref-hairline-dark);
-    border-radius: var(--ref-radius-s);
-    color: var(--ref-white);
-  }
-
-  .brand-pill :global(.brand-pill__logo) {
-    height: 38px;
-    padding: 0 12px;
-    font-size: 1.125rem;
-  }
-
-  .brand-pill :global(.logo__text) {
-    color: var(--ref-white);
-  }
-
-  .site-header__menu-toggle {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-    background: none;
-    border: none;
-    border-radius: var(--ref-radius-s);
-    cursor: pointer;
-    color: var(--ref-white);
-    touch-action: manipulation;
-  }
-
-  /* 40 px visual, 44 px target (MUST): the extra 2 px each side is a hit
-     area, not a drawn box. */
-  .site-header__menu-toggle::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-  }
-
-  .hamburger {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 14px;
-  }
-
-  .hamburger span {
-    display: block;
-    height: 1.5px;
-    background: currentColor;
-    border-radius: 1px;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .hamburger span {
-      transition: transform var(--duration-normal) ease,
-                  opacity var(--duration-fast) ease;
-    }
-  }
-
-  #menu-toggle[aria-expanded='true'] .hamburger span:nth-child(1) {
-    transform: translateY(5.5px) rotate(45deg);
-  }
-
-  #menu-toggle[aria-expanded='true'] .hamburger span:nth-child(2) {
-    opacity: 0;
-  }
-
-  #menu-toggle[aria-expanded='true'] .hamburger span:nth-child(3) {
-    transform: translateY(-5.5px) rotate(-45deg);
-  }
-
-  .site-header__actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  /* The panel opens from the pill: same dark surface, anchored under it,
-     360 px wide on desktop and edge-to-edge on phones. */
-  .mobile-menu {
-    display: none;
-    position: fixed;
-    top: calc(var(--header-offset) - 8px);
-    left: 16px;
-    width: min(360px, calc(100% - 32px));
-    max-height: calc(100dvh - var(--header-offset) - 8px);
-    overflow-y: auto;
-    background: var(--ref-pill);
-    color: var(--ref-white);
-    border: 1px solid var(--ref-hairline-dark);
-    border-radius: var(--ref-radius-m);
-    padding: var(--space-4);
-    z-index: 99;
-    pointer-events: auto;
-  }
-
-  .mobile-menu[aria-hidden='false'] {
-    display: block;
-  }
-
-  /* Without JavaScript the button cannot open anything, and a navigation that
-     only exists behind a script is no navigation. The panel is then shown in
-     place, permanently, under the pill — the site stays fully usable (this
-     repo's RF-10), which `tests/language-detection.spec.ts` asserts without JS.
-     Same media feature the reveal pattern in global.css already relies on. */
-  @media (scripting: none) {
-    .mobile-menu {
-      display: block;
-      position: absolute;
-      top: calc(100% - 8px);
-    }
-
-    .site-header__menu-toggle {
-      display: none;
-    }
-  }
-
-  .mobile-menu ul {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-
-  .mobile-menu .nav-link,
-  .mobile-menu .mobile-menu__sublist a {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--ref-radius-s);
-    color: var(--ref-white);
-    font-size: var(--text-base);
-    font-weight: 500;
-  }
-
-  .mobile-menu a:hover,
-  .mobile-menu a:focus-visible {
-    background: var(--ref-card-dark);
-  }
-
-  .mobile-menu .nav-link.is-active {
-    box-shadow: inset 3px 0 0 var(--ref-orange);
-  }
-
-  .mobile-menu .mobile-menu__sublist {
-    gap: 0;
-    margin: var(--space-1) 0 var(--space-2) var(--space-3);
-    padding-left: var(--space-3);
-    border-left: 1px solid var(--ref-hairline-dark);
-  }
-
-  .mobile-menu .mobile-menu__sublist a {
-    font-size: var(--text-sm);
-    font-weight: 400;
-    color: var(--ref-fg-dim);
-  }
-
-  .mobile-menu .mobile-menu__sublist a:hover,
-  .mobile-menu .mobile-menu__sublist a:focus-visible {
-    color: var(--ref-white);
-  }
-
-  .mobile-menu :global(.ref-btn--full) {
-    margin-top: var(--space-4);
-  }
-
-  .mobile-menu :global(.lang) {
-    margin-top: var(--space-4);
-  }
-
-  .site-header :focus-visible {
-    outline-color: var(--ref-white);
-  }
-
-  /* Phones: the pill shrinks to logo + button and only the primary call to
-     action stays — measured on the reference at 390 px. */
-  @media (max-width: 768px) {
-    .brand-pill {
-      width: auto;
-      min-width: 0;
-    }
-
-    .site-header__signin {
-      display: none;
-    }
-  }
+  @media (max-width: 520px) { .site-header { padding-inline: var(--space-3); } .site-header__rail { min-height: 54px; padding: 5px 5px 5px 14px; } .site-header__cta { min-height: 42px; padding-inline: 12px; font-size: var(--text-xs); } .mobile-menu { right: var(--space-3); left: var(--space-3); padding: var(--space-5); } }
+  @media (scripting: none) { .site-header__menu-toggle { display: none; } .mobile-menu { display: block; position: static; width: min(620px, calc(100% - 32px)); margin: var(--space-3) auto 0; } }
 </style>

@@ -1,54 +1,25 @@
 import { gzipSync } from 'node:zlib';
 import { expect, test } from '@playwright/test';
 
-/**
- * What the home actually makes the browser download in JavaScript (LMW-04
- * CA-6 as amended — see the deviation in the epic's PROGRESO).
- *
- * The budget is 210 KB gzip, not the plan's 180: three 0.185 ships split in
- * two (`three.module.min` 86.8 KB gz + `three.core.min` 101.5 KB gz), so the
- * plan's "three = 86.8" measured HALF the library and its 180 KB budget is
- * unsatisfiable with three at all. 210 = the whole library (~188) + the
- * page's own ~17 (router, lenis, the two scenes, three controllers) + ~2%
- * headroom — and no room for a second dependency, which is the point of a
- * budget.
- *
- * Measured over the network, not the dist/ tree: the three chunk loads lazily
- * after idle, and a static sum can neither see a request that never fires nor
- * miss one that does. `scripts/check-tells.sh` rule #14 keeps the static
- * floor-check for `npm run check`.
- */
+const budget = 65_536;
 
-const BUDGET = 215_040;
-
-test('the JS the home loads, gzipped, stays inside the budget', async ({ page }) => {
+test('the public home keeps its JavaScript under the editorial budget', async ({ page }) => {
   const sizes = new Map<string, number>();
   page.on('response', async (response) => {
-    const url = response.url();
-    if (!/\.m?js(\?|$)/.test(url)) return;
+    if (!/\.m?js(\?|$)/.test(response.url())) return;
     try {
-      sizes.set(url, gzipSync(await response.body()).byteLength);
+      sizes.set(response.url(), gzipSync(await response.body()).byteLength);
     } catch {
-      /* a cancelled response has no body; it also cost no bytes */
+      // Cancelled responses do not contribute transfer bytes.
     }
   });
 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/', { waitUntil: 'networkidle' });
-  // Let the idle-mounted scene fetch its chunk — the biggest one.
-  await page.waitForTimeout(4000);
+  const total = [...sizes.values()].reduce((sum, size) => sum + size, 0);
 
-  const total = [...sizes.values()].reduce((a, b) => a + b, 0);
-
-  // Floor first: a measurement that saw neither the boot script nor the three
-  // chunk is not a pass, it is a broken probe.
-  expect(sizes.size).toBeGreaterThanOrEqual(3);
-  expect(total).toBeGreaterThan(100_000);
-
-  expect(
-    total,
-    `home JS is ${total} bytes gzip over ${sizes.size} files:\n${[...sizes.entries()]
-      .map(([u, s]) => `  ${s}\t${u}`)
-      .join('\n')}`,
-  ).toBeLessThanOrEqual(BUDGET);
+  expect(sizes.size).toBeGreaterThanOrEqual(1);
+  expect(total).toBeGreaterThan(1_000);
+  expect(total).toBeLessThanOrEqual(budget);
+  await expect(page.locator('canvas')).toHaveCount(0);
 });

@@ -9,11 +9,7 @@
  * that is not declared here cannot be filled, and a file that names no hole is
  * not used — both are reported, neither is silent.
  *
- * Sizes are CSS pixels at 1x, measured on the reference (epic
- * home-landing-redesign, §6.1). Produced assets are stored at 2x for retina.
- *
- * Alt text lives in the i18n catalogue under `home.media.<slot>` — one key per
- * hole, so a screenshot is described by what it shows, not by its file name.
+ * Sizes are CSS pixels at 1x. Produced assets are stored at 2x for retina.
  */
 
 export type MediaSlot = { id: string; width: number; height: number };

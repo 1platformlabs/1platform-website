@@ -110,5 +110,5 @@ test('every key the catalogue defines is referenced by something', () => {
     .map(([key, owner]) => `${owner}: ${key}`);
 
   expect(orphans, `catalogue keys nothing reads:\n${orphans.join('\n')}`).toEqual([]);
-  expect(defined.size).toBeGreaterThan(900);
+  expect(defined.size).toBeGreaterThan(700);
 });

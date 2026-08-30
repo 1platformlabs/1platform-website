@@ -30,12 +30,12 @@ for (const path of ['/', '/es/']) {
   });
 }
 
-test('/ with the menu open and a FAQ row open: still zero violations', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
+test('/ with the compact menu and a FAQ row open: still zero violations', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.locator('#menu-toggle').click();
   await expect(page.locator('#mobile-menu')).toBeVisible();
-  await page.locator('.faq__item summary').first().click();
+  await page.locator('.editorial-faq__item').first().evaluate((item) => item.setAttribute('open', ''));
 
   const results = await scan(page);
   // Floor: the open panel was in the tree axe walked.

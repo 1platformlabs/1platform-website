@@ -120,62 +120,28 @@ ul, ol {
    ink 15.59:1 · muted 5.49:1 · subtle 4.73:1 · cobalt 5.56:1. */
 :root {
   /* Primitives */
-  --ink:         #14161B;
-  --paper:       #F6F5F2;
-  --surface:     #FFFFFF;
-  --recessed:    #EFEEEA;
-  --cobalt:      #1F4FE0;
-  --cobalt-deep: #1A44C4;
-  --cobalt-wash: #ECF0FD;
+  --ink:         #13151A;
+  --paper:       #F5F1E8;
+  --surface:     #FFFDF8;
+  --recessed:    #ECE5D8;
+  --cobalt:      #1748A7;
+  --cobalt-deep: #10377F;
+  --cobalt-bright: #78A6FF;
+  --cobalt-wash: #E5EDFC;
   /* Reserved for the interconnect motif. Never text — 1.87:1 on paper. */
   --signal:      #F5A524;
-  --muted:       #5B5F6B;
+  --muted:       #555A64;
   /* Checked against every surface it can land on, not just --paper: the
      earlier #696D79 cleared paper (4.74) and surface (5.17) but fell to 4.45
      on --recessed, which is where code-block headers sit. */
-  --subtle:      #656974;
+  --subtle:      #626873;
   --hairline:        rgba(20, 22, 27, 0.10);
   --hairline-strong: rgba(20, 22, 27, 0.16);
 
-  /* ===== Home system — a second palette that coexists with "ink & signal" =====
-     Used by the home page and the site chrome (header, announcement bar,
-     footer); the other pages keep the tokens above. Every value below was
-     measured on the reference landing (epic home-landing-redesign, D-2 / §6.1)
-     and lives here, once — components reference the token, never the hex.
-
-     Two tints are deliberately NOT the measured value, because the measured
-     value fails WCAG AA and AA wins over parity (D-6):
-       --ref-orange-cta  #C63A12 replaces #F04E23 under light 12.8 px text
-                         (5.01:1 vs 3.46:1 on --ref-white)
-       --ref-fg-dim      #9A9A9A replaces #676767 for links on --ref-card-dark
-                         (5.10:1 vs 2.54:1)
-     The exact orange stays for surfaces that carry no text: dots, connectors,
-     progress bars, the pricing card's glow border. */
-  --ref-ink:        #0E0E0E;
-  --ref-dark:       #1A1616;
-  --ref-dark-2:     #0E0E0E;
-  --ref-pill:       #202020;
-  --ref-card-dark:  #2A2A2A;
-  --ref-canvas:     #E3E3E3;
-  --ref-white:      #FAFAFA;
-  --ref-gray:       #D9D9D9;
-  --ref-orange:     #F04E23;
-  --ref-orange-cta: #C63A12;
-  --ref-yellow:     #FFF78B;
-  --ref-fg-dim:     #9A9A9A;
-  --ref-panel:      rgba(10, 10, 10, 0.9);
-  --ref-hairline-dark:  rgba(250, 250, 250, 0.12);
-  --ref-hairline-light: rgba(14, 14, 14, 0.12);
-  /* The dot grid: 1 px dots on a 15 px pitch, ~3 % darker than the canvas
-     (measured on the reference hero capture, Python/PIL). */
-  /* The pricing lead card's luminous edge — the exact orange at low alpha,
-     a surface with no text on it. */
-  --ref-orange-glow: rgba(240, 78, 35, 0.35);
-  --ref-dot-light:  rgba(14, 14, 14, 0.07);
-  --ref-dot-dark:   rgba(250, 250, 250, 0.07);
-  --ref-dot-pitch:  15px;
-  --ref-radius-s:   6px;
-  --ref-radius-m:   8px;
+  --color-footer: #111720;
+  --color-footer-text: #F8F4EC;
+  --color-footer-muted: #B3B5BB;
+  --color-footer-line: rgba(248, 244, 236, 0.17);
   --font-serif:     'Instrument Serif', Georgia, 'Times New Roman', serif;
 
   /* Semantic surfaces */
@@ -251,11 +217,8 @@ ul, ol {
   /* Layout */
   --max-width: 1200px;
   --max-width-narrow: 800px;
-  /* The chrome is 74 px (D-20) and may sit under a 40 px announcement bar.
-     `--header-top` is set on <body> by BaseLayout when the bar renders; every
-     "start below the fixed chrome" offset in the site reads --header-offset so
-     the bar can never hide a page's opener or an anchor's title. */
-  --header-height: 74px;
+  /* The floating rail sits below the optional announcement strip. */
+  --header-height: 90px;
   --header-top: 0px;
   --header-offset: calc(var(--header-top) + var(--header-height));
   --border-radius: 6px;
@@ -436,58 +399,6 @@ code, pre, kbd, samp {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* ===== Home system utilities =====
-   The dot grid is a radial-gradient on purpose (not linear-gradient: rule 8
-   of the design-system guard rejects decorative linear gradients, and this is
-   a texture, not a wash). Static in v1 — the reference reacts to the cursor
-   (D-7, declared loss). */
-.ref-dot-grid {
-  background-color: var(--ref-canvas);
-  background-image: radial-gradient(var(--ref-dot-light) 1px, transparent 1px);
-  background-size: var(--ref-dot-pitch) var(--ref-dot-pitch);
-}
-
-.ref-dot-grid--dark {
-  background-color: var(--ref-dark);
-  background-image: radial-gradient(var(--ref-dot-dark) 1px, transparent 1px);
-}
-
-/* Type scale measured on the reference: display 56/56 −1.12, card 36/36,
-   footer heading 27.2/27.2, small body 12.8/15.36 −0.384. All weight 400 —
-   the serif carries the size, not the weight. */
-.ref-h-display {
-  font-family: var(--font-serif);
-  font-size: 56px;
-  line-height: 56px;
-  letter-spacing: -1.12px;
-  font-weight: 400;
-  text-wrap: balance;
-}
-
-.ref-h-card {
-  font-family: var(--font-serif);
-  font-size: 36px;
-  line-height: 36px;
-  letter-spacing: normal;
-  font-weight: 400;
-}
-
-.ref-h-footer {
-  font-family: var(--font-serif);
-  font-size: 27.2px;
-  line-height: 27.2px;
-  letter-spacing: normal;
-  font-weight: 400;
-}
-
-.ref-body-s {
-  font-family: var(--font-sans);
-  font-size: 12.8px;
-  line-height: 15.36px;
-  letter-spacing: -0.384px;
-  font-weight: 400;
 }
 
 /* ===== Responsive ===== */

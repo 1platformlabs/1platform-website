@@ -72,9 +72,22 @@ const {
 
 <style>
   .hero {
-    padding-top: calc(var(--header-offset) + var(--space-16));
-    padding-bottom: var(--space-16);
+    position: relative;
+    overflow: hidden;
+    padding-top: calc(var(--header-offset) + var(--space-12));
+    padding-bottom: var(--space-12);
+    background: var(--paper);
     border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--header-offset) + var(--space-12));
+    left: max(var(--space-6), calc((100vw - var(--max-width)) / 2 + var(--space-6)));
+    width: 42px;
+    height: 4px;
+    background: var(--cobalt);
   }
 
   .hero__inner {
@@ -85,7 +98,7 @@ const {
   /* Copy sits left, not centred — the centred stack is the template posture
      this redesign leaves behind. */
   .hero__copy {
-    max-width: 34rem;
+    max-width: 43rem;
   }
 
   .hero__eyebrow {
@@ -93,12 +106,16 @@ const {
   }
 
   .hero__headline {
-    font-size: var(--text-6xl);
-    line-height: 1.04;
+    font-family: var(--font-serif);
+    font-size: clamp(3.75rem, 7vw, 7rem);
+    font-weight: 400;
+    line-height: .88;
+    letter-spacing: -0.06em;
     margin-bottom: var(--space-6);
   }
 
   .hero__sub {
+    max-width: 37rem;
     font-size: var(--text-lg);
     line-height: 1.6;
     margin-bottom: var(--space-8);
@@ -123,7 +140,7 @@ const {
     min-height: 44px;
     padding: var(--space-2) var(--space-4);
     border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-pill);
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     background: var(--color-bg-alt);
@@ -168,7 +185,7 @@ const {
 
   @media (max-width: 768px) {
     .hero {
-      padding-top: calc(var(--header-offset) + var(--space-10));
+    padding-top: calc(var(--header-offset) + var(--space-8));
       padding-bottom: var(--space-12);
     }
 

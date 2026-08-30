@@ -7,12 +7,9 @@ import { expect, test, type Page } from '@playwright/test';
  * properties that matter are: it keeps you on the page you were reading, it
  * remembers, and it never offers a language that does not exist.
  *
- * Since the home redesign (epic home-landing-redesign, LMW-03 / D-4) the header
- * row carries no navigation at any width: the control lives inside the panel
- * the pill's menu button opens, and there is one variant of it rather than a
- * `.lang` / `.lang--mobile` pair. Every interaction below therefore
- * opens the menu first. The properties asserted did not change; where they
- * were asserted did.
+ * The language control lives in the compact menu. Every interaction below opens
+ * that menu first, so keyboard access follows the same public path as a
+ * narrow viewport visitor.
  */
 
 /** Open the header menu so the language control is on screen and clickable. */

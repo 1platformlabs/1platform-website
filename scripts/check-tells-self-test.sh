@@ -96,13 +96,8 @@ assert_red "retired card component" "retired card/kit components" "$PAGE" \
   "<FeatureCard title='x' />"
 assert_red "retired template kit"   "retired template kit"        "$PAGE" \
   '<div class="gradient-text">x</div>'
-# The home's dot texture is exempt BY NAME ONLY (rule 7, D-7). A dot grid under
-# any other name is still the retired kit; the exempt name itself must stay
-# quiet or the home's own class would turn the guard red.
-assert_red "dot grid under another name" "retired template kit"        "$PAGE" \
+assert_red "dot grid" "retired template kit"        "$PAGE" \
   '<div class="hero dot-grid">x</div>'
-assert_green "the home dot grid class is exempt" "$PAGE" \
-  '<section class="ref-dot-grid">x</section>'
 assert_red "decorative gradient"    "decorative gradients"        "$PAGE" \
   '<style>.x { background: linear-gradient(90deg, red, blue); }</style>'
 
@@ -186,9 +181,9 @@ assert_green "comment naming a tell" "$PAGE" \
 printf '\n%sRules of the home epic (14 · 15)%s\n' "$DIM" "$RESET"
 # 14 — a build that outgrows the budget goes red; a missing build never passes
 # quietly. The payload is random (incompressible), so 250 KB stays ~250 KB
-# after gzip and clears the 210 KB line.
+# after gzip and clears the 64 KB line.
 dir="$(fresh_tree)"
-head -c 250000 /dev/urandom > "$dir/dist/_astro/three-fake.js"
+head -c 250000 /dev/urandom > "$dir/dist/_astro/oversized-runtime.js"
 # Capture first, match second (see the preflight note): under pipefail the
 # guard's own exit 1 would poison the condition even when grep matches.
 out="$("$dir/scripts/check-tells.sh" 2>&1)"
