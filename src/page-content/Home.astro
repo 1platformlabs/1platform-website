@@ -1,9 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import platformWorkspace from '@assets/editorial/platform-workspace.png';
+import platformHeroDevice from '@assets/editorial/platform-hero-device.png';
+import heroDeskObjects from '@assets/editorial/hero-desk-objects.png';
 import platformModules from '@assets/editorial/platform-modules.png';
-import paperGrid from '@assets/editorial/paper-grid.png';
 import { useI18n } from '@i18n';
 
 const { t, l } = useI18n(Astro.url.pathname);
@@ -27,162 +27,151 @@ const audiences = [
 ];
 
 const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: t('home.jsonld.name'), url: new URL(l('/'), Astro.site).toString(), description },
   {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: t('home.jsonld.name'),
-    url: new URL(l('/'), Astro.site).toString(),
-    description,
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: t('home.jsonld.name'),
-    description,
+    '@context': 'https://schema.org', '@type': 'Product', name: t('home.jsonld.name'), description,
     brand: { '@type': 'Brand', name: t('home.jsonld.brandName') },
     offers: {
-      '@type': 'Offer',
-      url: new URL(l('/pricing/'), Astro.site).toString(),
-      priceCurrency: 'USD',
-      priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'PayPerUse' },
-      availability: 'https://schema.org/InStock',
+      '@type': 'Offer', url: new URL(l('/pricing/'), Astro.site).toString(), priceCurrency: 'USD',
+      priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'PayPerUse' }, availability: 'https://schema.org/InStock',
     },
   },
 ];
 ---
 
-<BaseLayout title={title} description={description} jsonLd={jsonLd}>
-  <section class="editorial-hero" id="hero">
-    <Image class="editorial-hero__paper" src={paperGrid} alt="" aria-hidden="true" widths={[640, 1280, 2560]} sizes="100vw" />
-    <div class="container editorial-hero__inner">
-      <div class="editorial-hero__copy">
-        <p class="eyebrow eyebrow--accent">1Platform</p>
+<BaseLayout title={title} description={description} jsonLd={jsonLd} showAnnouncement={false}>
+  <section class="product-hero" id="hero">
+    <Image class="product-hero__props product-hero__props--laptop" src={heroDeskObjects} alt="" aria-hidden="true" widths={[960, 1440, 1774]} sizes="100vw" />
+    <Image class="product-hero__props product-hero__props--clip" src={heroDeskObjects} alt="" aria-hidden="true" widths={[960, 1440, 1774]} sizes="100vw" />
+    <Image class="product-hero__props product-hero__props--peripherals" src={heroDeskObjects} alt="" aria-hidden="true" widths={[960, 1440, 1774]} sizes="100vw" />
+    <div class="container product-hero__inner">
+      <div class="product-hero__copy">
+        <p class="product-hero__badge">{t('home.hero.badge')}</p>
         <h1>{t('home.hero.headline')}</h1>
-        <p class="editorial-hero__lead">{t('home.hero.lead')}</p>
-        <div class="editorial-hero__actions">
+        <p class="product-hero__lead">{t('home.hero.lead')}</p>
+        <div class="product-hero__actions">
           <a href="https://app.1platform.pro/app/" class="btn btn--primary">{t('cta.getStarted')}</a>
-          <a href="https://developer.1platform.pro/" class="btn btn--ghost">{t('cta.viewDocs')}</a>
         </div>
-        <ul class="editorial-hero__index" aria-label={t('home.showcase.aria')}>
-          {solutions.map((solution, index) => (
-            <li><a href={solution.href}><span>{String(index + 1).padStart(2, '0')}</span>{solution.label}</a></li>
-          ))}
-        </ul>
       </div>
-      <figure class="editorial-hero__visual reveal">
-        <div class="editorial-hero__frame">
-          <Image src={platformWorkspace} alt={t('home.hero.fan.aria')} widths={[640, 960, 1440]} sizes="(min-width: 900px) 50vw, 100vw" loading="eager" />
-        </div>
-        <figcaption>{t('home.hero.lead')}</figcaption>
+
+      <ul class="product-hero__capabilities" aria-label={t('home.showcase.aria')}>
+        {solutions.slice(0, 3).map((solution) => (
+          <li><span aria-hidden="true"></span><a href={solution.href}>{solution.label}</a></li>
+        ))}
+      </ul>
+
+      <figure class="product-hero__device reveal">
+        <Image src={platformHeroDevice} alt={t('home.hero.fan.aria')} widths={[640, 960, 1280, 1536]} sizes="(min-width: 900px) 920px, 96vw" loading="eager" />
       </figure>
     </div>
   </section>
 
-  <section class="editorial-statement section">
-    <div class="container editorial-statement__grid">
+  <section class="product-statement section">
+    <div class="container product-statement__inner">
       <p class="eyebrow">{t('home.modules.carouselAria')}</p>
       <h2>{t('home.modules.title').replace('\n', ' ')}</h2>
       <p>{t('home.description')}</p>
     </div>
   </section>
 
-  <section class="editorial-modules section section--alt" id="modules">
-    <div class="container editorial-modules__grid">
-      <div class="editorial-modules__image reveal">
+  <section class="product-modules section section--alt" id="modules">
+    <div class="container product-modules__grid">
+      <div class="product-modules__image reveal">
         <Image src={platformModules} alt="" aria-hidden="true" widths={[480, 720, 960]} sizes="(min-width: 900px) 42vw, 100vw" />
       </div>
-      <div class="editorial-modules__copy">
-        <div class="section__rule"><p class="eyebrow">{t('nav.solutions')}</p></div>
+      <div class="product-modules__copy">
+        <p class="eyebrow">{t('nav.solutions')}</p>
         <h2>{t('home.personas.title')}</h2>
-        <div class="editorial-modules__list">
-          {solutions.map((solution, index) => (
-            <a href={solution.href} class="editorial-module-link">
-              <span class="editorial-module-link__number">{String(index + 1).padStart(2, '0')}</span>
-              <span>{solution.label}</span>
-              <span aria-hidden="true" class="editorial-module-link__arrow"></span>
-            </a>
+        <div class="product-modules__list">
+          {solutions.map((solution) => (
+            <a href={solution.href} class="product-module-link"><span>{solution.label}</span><span aria-hidden="true" class="product-module-link__arrow"></span></a>
           ))}
         </div>
-        <a href={l('/solutions/')} class="editorial-text-link">{t('nav.solutions.viewAll')}</a>
+        <a href={l('/solutions/')} class="product-text-link">{t('nav.solutions.viewAll')}</a>
       </div>
     </div>
   </section>
 
-  <section class="editorial-audiences section" id="personas">
+  <section class="product-audiences section" id="personas">
     <div class="container">
-      <div class="section__rule"><p class="eyebrow">{t('home.personas.title')}</p></div>
-      <div class="editorial-audiences__header"><h2>{t('home.personas.title')}</h2><p>{t('home.useCase.sellers.description')}</p></div>
-      <div class="editorial-audiences__grid">
-        {audiences.map((audience, index) => (
-          <a href={audience.href} class="editorial-audience reveal">
-            <span class="editorial-audience__ordinal">{String(index + 1).padStart(2, '0')}</span>
-            <h3>{audience.title}</h3>
-            <p>{audience.body}</p>
-            <span class="editorial-audience__cue" aria-hidden="true"></span>
-          </a>
+      <div class="product-audiences__header">
+        <div><p class="eyebrow">{t('home.personas.title')}</p><h2>{t('home.personas.title')}</h2></div>
+        <p>{t('home.useCase.sellers.description')}</p>
+      </div>
+      <div class="product-audiences__grid">
+        {audiences.map((audience) => (
+          <a href={audience.href} class="product-audience reveal"><span class="product-audience__cue" aria-hidden="true"></span><h3>{audience.title}</h3><p>{audience.body}</p></a>
         ))}
       </div>
     </div>
   </section>
 
-  <section class="editorial-faq section section--alt" id="faq">
-    <div class="container editorial-faq__grid">
+  <section class="product-faq section section--alt" id="faq">
+    <div class="container product-faq__grid">
       <div><p class="eyebrow">{t('home.faq.title')}</p><h2>{t('home.faq.title')}</h2></div>
-      <div class="editorial-faq__list">
-        <details class="editorial-faq__item"><summary>{t('home.faq.whatIs.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.whatIs.answer')}</p></details>
-        <details class="editorial-faq__item"><summary>{t('home.faq.integrate.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.integrate.answer')}</p></details>
+      <div class="product-faq__list">
+        <details class="product-faq__item"><summary>{t('home.faq.whatIs.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.whatIs.answer')}</p></details>
+        <details class="product-faq__item"><summary>{t('home.faq.integrate.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.integrate.answer')}</p></details>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .editorial-hero { position: relative; isolation: isolate; overflow: hidden; padding: calc(var(--header-offset) + var(--space-16)) 0 var(--space-12); background: var(--paper); }
-  .editorial-hero__paper { position: absolute; z-index: -1; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .42; mix-blend-mode: multiply; }
-  .editorial-hero__inner { display: grid; gap: var(--space-10); align-items: center; }
-  .editorial-hero__copy { max-width: 39rem; }
-  .editorial-hero h1 { max-width: 12ch; margin: var(--space-4) 0 var(--space-6); font-family: var(--font-serif); font-size: clamp(4.25rem, 8vw, 8.5rem); font-weight: 400; line-height: .84; letter-spacing: -.065em; }
-  .editorial-hero__lead { max-width: 33rem; font-size: var(--text-lg); line-height: 1.65; }
-  .editorial-hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-8); }
-  .editorial-hero__index { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px var(--space-5); margin-top: var(--space-12); border-top: 1px solid var(--color-border-strong); }
-  .editorial-hero__index a { display: flex; gap: var(--space-3); min-height: 43px; align-items: center; border-bottom: 1px solid var(--color-border); color: var(--color-text-secondary); font-size: var(--text-sm); }
-  .editorial-hero__index a:hover { color: var(--color-accent); }
-  .editorial-hero__index span, .editorial-audience__ordinal, .editorial-module-link__number { color: var(--color-text-tertiary); font-family: var(--font-mono); font-size: var(--text-xs); }
-  .editorial-hero__visual { position: relative; margin: 0; }
-  .editorial-hero__frame { position: relative; overflow: hidden; border: 1px solid var(--color-border-strong); border-radius: 3px; box-shadow: 24px 24px 0 var(--cobalt); }
-  .editorial-hero__frame :global(img) { width: 100%; height: auto; }
-  .editorial-hero figcaption { max-width: 23rem; margin-top: var(--space-5); color: var(--color-text-tertiary); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
-  .editorial-statement { border-bottom: 1px solid var(--color-border); }
-  .editorial-statement__grid { display: grid; grid-template-columns: minmax(120px, 1fr) minmax(0, 2fr) minmax(0, 1fr); gap: var(--space-8); align-items: start; }
-  .editorial-statement h2 { font-family: var(--font-serif); font-size: clamp(3.25rem, 5vw, 5.5rem); font-weight: 400; line-height: .9; letter-spacing: -.055em; }
-  .editorial-modules__grid { display: grid; gap: var(--space-12); align-items: center; }
-  .editorial-modules__image { overflow: hidden; border-radius: var(--border-radius-xl); }
-  .editorial-modules__image :global(img) { width: 100%; height: auto; }
-  .editorial-modules h2, .editorial-audiences h2, .editorial-faq h2 { max-width: 12ch; font-family: var(--font-serif); font-size: clamp(3rem, 5vw, 4.75rem); font-weight: 400; line-height: .92; letter-spacing: -.05em; }
-  .editorial-modules__list { display: grid; margin: var(--space-8) 0; border-top: 1px solid var(--color-border-strong); }
-  .editorial-module-link { display: grid; grid-template-columns: 3rem 1fr 12px; align-items: center; min-height: 58px; border-bottom: 1px solid var(--color-border); color: var(--color-text); font-size: var(--text-lg); }
-  .editorial-module-link:hover { padding-left: var(--space-2); color: var(--color-accent); }
-  .editorial-module-link__arrow, .editorial-audience__cue { width: 8px; height: 8px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; transform: rotate(45deg); }
-  .editorial-text-link { color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
-  .editorial-audiences__header { display: grid; gap: var(--space-6); margin-bottom: var(--space-10); }
-  .editorial-audiences__header p { max-width: 37rem; font-size: var(--text-lg); }
-  .editorial-audiences__grid { display: grid; border-top: 1px solid var(--color-border-strong); }
-  .editorial-audience { position: relative; display: grid; grid-template-columns: 3rem minmax(0, 1fr) 14px; gap: var(--space-4); align-items: start; padding: var(--space-6) 0; border-bottom: 1px solid var(--color-border); color: var(--color-text); }
-  .editorial-audience h3 { grid-column: 2; font-size: var(--text-2xl); }
-  .editorial-audience p { grid-column: 2; max-width: 38rem; }
-  .editorial-audience__cue { grid-column: 3; grid-row: 1; margin-top: var(--space-2); }
-  .editorial-audience:hover h3 { color: var(--color-accent); }
-  .editorial-faq__grid { display: grid; gap: var(--space-10); }
-  .editorial-faq__list { border-top: 1px solid var(--color-border-strong); }
-  .editorial-faq__item { border-bottom: 1px solid var(--color-border); }
-  .editorial-faq__item summary { display: flex; gap: var(--space-5); align-items: center; justify-content: space-between; min-height: 72px; list-style: none; font-family: var(--font-display); font-size: var(--text-lg); color: var(--color-text); cursor: pointer; }
-  .editorial-faq__item summary::-webkit-details-marker { display: none; }
-  .editorial-faq__item summary span { position: relative; width: 12px; height: 12px; flex: 0 0 auto; }
-  .editorial-faq__item summary span::before, .editorial-faq__item summary span::after { content: ''; position: absolute; inset: 5px 0 auto; height: 1px; background: currentColor; }
-  .editorial-faq__item summary span::after { transform: rotate(90deg); }
-  .editorial-faq__item[open] summary span::after { transform: rotate(0); }
-  .editorial-faq__item p { max-width: 48rem; padding: 0 0 var(--space-6); }
-  @media (prefers-reduced-motion: no-preference) { .editorial-module-link, .editorial-audience h3, .editorial-hero__index a { transition: padding var(--duration-fast) ease, color var(--duration-fast) ease; } }
-  @media (min-width: 900px) { .editorial-hero__inner { grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: var(--space-12); } .editorial-modules__grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); } .editorial-audiences__grid { grid-template-columns: repeat(3, 1fr); } .editorial-audience { min-height: 300px; grid-template-columns: 1fr 14px; padding: var(--space-6); border-right: 1px solid var(--color-border); } .editorial-audience:first-child { border-left: 1px solid var(--color-border); } .editorial-audience__ordinal, .editorial-audience h3, .editorial-audience p { grid-column: 1; } .editorial-audience h3 { align-self: end; } .editorial-audience p { align-self: start; } .editorial-audience__cue { grid-column: 2; grid-row: 1; } .editorial-faq__grid { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); } }
-  @media (max-width: 700px) { .editorial-hero { padding-top: calc(var(--header-offset) + var(--space-10)); } .editorial-hero h1 { font-size: clamp(3.75rem, 17vw, 5.5rem); } .editorial-hero__index { grid-template-columns: 1fr; } .editorial-statement__grid { grid-template-columns: 1fr; gap: var(--space-5); } .editorial-hero__frame { box-shadow: 12px 12px 0 var(--cobalt); } }
+  .product-hero { position: relative; min-height: min(1080px, 100svh); overflow: hidden; padding: calc(var(--header-offset) + 11.5rem) 0 0; background: var(--surface); }
+  .product-hero__props { position: absolute; z-index: 0; left: 50%; width: max(100%, 1420px); max-width: none; height: auto; transform: translateX(-50%); pointer-events: none; }
+  .product-hero__props--laptop { top: 0; clip-path: inset(0 0 46% 66%); }
+  .product-hero__props--clip { top: 92px; clip-path: inset(11% 85% 43% 0); }
+  .product-hero__props--peripherals { top: 590px; clip-path: inset(44% 0 0 0); }
+  .product-hero__inner { position: relative; z-index: 1; display: grid; justify-items: center; text-align: center; }
+  .product-hero__copy { max-width: 50rem; }
+  .product-hero__badge { display: inline-flex; align-items: center; min-height: 38px; padding: 0 var(--space-4); border-radius: var(--border-radius-pill); background: var(--color-accent-soft); color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
+  .product-hero h1 { margin: var(--space-8) auto; font-family: var(--font-display); font-size: clamp(3.4rem, 5.3vw, 5.75rem); font-weight: 700; line-height: .96; letter-spacing: -.065em; }
+  .product-hero__lead { max-width: 39rem; margin-inline: auto; font-size: clamp(1rem, 1.45vw, 1.25rem); line-height: 1.55; }
+  .product-hero__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-8); }
+  .product-hero__capabilities { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-6); margin-top: var(--space-12); }
+  .product-hero__capabilities li { display: inline-flex; align-items: center; gap: 9px; color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
+  .product-hero__capabilities li > span { width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); box-shadow: inset 0 0 0 4px var(--color-accent-soft); }
+  .product-hero__capabilities a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .product-hero__device { width: min(920px, 96vw); margin: var(--space-12) auto -12rem; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0; box-shadow: 0 -1px 0 rgba(20, 22, 27, .03), 0 24px 65px rgba(20, 22, 27, .14); }
+  .product-hero__device :global(img) { width: 100%; height: auto; }
+  .product-statement { border-bottom: 1px solid var(--color-border); }
+  .product-statement__inner { display: grid; gap: var(--space-5); max-width: 840px; text-align: center; }
+  .product-statement__inner .eyebrow { justify-self: center; }
+  .product-statement h2, .product-modules h2, .product-audiences h2, .product-faq h2 { font-size: clamp(2.25rem, 4.2vw, 4.75rem); line-height: 1; letter-spacing: -.055em; }
+  .product-statement p:last-child { max-width: 44rem; margin-inline: auto; font-size: var(--text-lg); }
+  .product-modules__grid { display: grid; gap: var(--space-12); align-items: center; }
+  .product-modules__image { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); background: var(--surface); }
+  .product-modules__image :global(img) { width: 100%; height: auto; }
+  .product-modules__copy h2 { max-width: 11ch; margin: var(--space-4) 0 var(--space-8); }
+  .product-modules__list { display: grid; border-top: 1px solid var(--color-border); }
+  .product-module-link { display: flex; align-items: center; justify-content: space-between; min-height: 58px; border-bottom: 1px solid var(--color-border); color: var(--color-text); font-size: var(--text-lg); }
+  .product-module-link__arrow, .product-audience__cue { width: 9px; height: 9px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; transform: rotate(45deg); }
+  .product-module-link:hover { color: var(--color-accent); }
+  .product-text-link { display: inline-flex; margin-top: var(--space-6); color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
+  .product-text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .product-audiences__header { display: grid; gap: var(--space-6); align-items: end; margin-bottom: var(--space-10); }
+  .product-audiences__header h2 { max-width: 11ch; margin-top: var(--space-4); }
+  .product-audiences__header > p { max-width: 32rem; font-size: var(--text-lg); }
+  .product-audiences__grid { display: grid; gap: var(--space-4); }
+  .product-audience { display: grid; gap: var(--space-5); min-height: 240px; padding: var(--space-8); border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); color: var(--color-text); background: var(--surface); }
+  .product-audience h3 { margin-top: auto; font-size: var(--text-2xl); }
+  .product-audience__cue { justify-self: end; color: var(--color-accent); }
+  .product-audience:hover { border-color: var(--color-accent); }
+  .product-faq__grid { display: grid; gap: var(--space-10); }
+  .product-faq h2 { max-width: 10ch; margin-top: var(--space-4); }
+  .product-faq__list { border-top: 1px solid var(--color-border); }
+  .product-faq__item { border-bottom: 1px solid var(--color-border); }
+  .product-faq__item summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); min-height: 76px; list-style: none; color: var(--color-text); font-family: var(--font-display); font-size: var(--text-lg); font-weight: 500; cursor: pointer; }
+  .product-faq__item summary::-webkit-details-marker { display: none; }
+  .product-faq__item summary span { position: relative; width: 14px; height: 14px; flex: 0 0 auto; }
+  .product-faq__item summary span::before, .product-faq__item summary span::after { content: ''; position: absolute; top: 6px; left: 0; width: 14px; height: 1px; background: currentColor; }
+  .product-faq__item summary span::after { transform: rotate(90deg); }
+  .product-faq__item[open] summary span::after { transform: rotate(0); }
+  .product-faq__item p { max-width: 48rem; padding-bottom: var(--space-6); }
+  @media (prefers-reduced-motion: no-preference) { .product-module-link, .product-audience { transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease; } }
+  @media (min-width: 760px) { .product-audiences__header { grid-template-columns: 1fr minmax(260px, .65fr); } .product-audiences__grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 900px) { .product-modules__grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); } .product-faq__grid { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); } }
+  @media (min-width: 760px) { .product-hero h1 { white-space: nowrap; } }
+  @media (max-width: 700px) { .product-hero { min-height: 820px; padding-top: calc(var(--header-offset) + 5.75rem); } .product-hero__props { width: 980px; } .product-hero__props--laptop { top: 0; } .product-hero__props--clip, .product-hero__props--peripherals { display: none; } .product-hero h1 { font-size: clamp(3rem, 15vw, 4.5rem); } .product-hero__capabilities { gap: var(--space-3) var(--space-5); } .product-hero__capabilities li { font-size: var(--text-xs); } .product-hero__device { margin-top: var(--space-10); margin-bottom: -8rem; } }
 </style>

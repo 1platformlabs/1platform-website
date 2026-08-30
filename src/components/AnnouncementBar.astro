@@ -4,7 +4,8 @@ import { useI18n } from '@i18n';
 import type { AnnouncementEntry } from '@components/announcement';
 
 /**
- * The 40 px fixed strip above the header (LMW-02).
+ * A compact changelog strip above the header. It keeps current release
+ * information available without competing with the product navigation.
  *
  * The text is the title of the newest changelog entry in the page's language,
  * chosen by `BaseLayout` (which also sets `--header-top` so the header and
@@ -33,18 +34,16 @@ const { t, l } = useI18n(Astro.url.pathname);
   .announcement {
     position: fixed;
     top: 0;
-    left: 8px;
-    right: 8px;
+    left: 0;
+    right: 0;
     z-index: 101;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-footer);
-    color: var(--color-footer-text);
-    border: 1px solid var(--color-footer-line);
-    border-top: 0;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .announcement__text {
@@ -53,7 +52,7 @@ const { t, l } = useI18n(Astro.url.pathname);
     gap: var(--space-2);
     margin: 0;
     padding: 0 var(--space-4);
-    color: var(--color-footer-text);
+    color: var(--color-text-secondary);
     white-space: nowrap;
     overflow: hidden;
   }
@@ -68,7 +67,7 @@ const { t, l } = useI18n(Astro.url.pathname);
     align-items: center;
     gap: 4px;
     flex-shrink: 0;
-    color: var(--cobalt-bright);
+    color: var(--color-accent);
     min-height: 40px;
   }
 
@@ -77,6 +76,6 @@ const { t, l } = useI18n(Astro.url.pathname);
   }
 
   .announcement :focus-visible {
-    outline-color: var(--color-footer-text);
+    outline-color: var(--color-accent);
   }
 </style>

@@ -10,6 +10,7 @@ export default defineMessages({
     'home.jsonld.name': '1Platform',
     'home.jsonld.brandName': '1Platform Labs',
     'home.hero.headline': 'One Platform. Every Solution.',
+    'home.hero.badge': 'One connected workspace',
     'home.hero.lead':
       'Sell online, get paid, invoice and publish from a single account — in the dashboard or through one REST API. Every module already talks to the others.',
     'home.hero.fan.aria': 'A 1Platform workspace on a tablet',
@@ -43,6 +44,7 @@ export default defineMessages({
     'home.jsonld.name': '1Platform',
     'home.jsonld.brandName': '1Platform Labs',
     'home.hero.headline': 'One Platform. Every Solution.',
+    'home.hero.badge': 'Un espacio de trabajo conectado',
     'home.hero.lead':
       'Vende por internet, cobra, factura y publica desde una sola cuenta — en el panel o con una sola API REST. Cada módulo ya habla con los demás.',
     'home.hero.fan.aria': 'Un espacio de trabajo de 1Platform en una tableta',

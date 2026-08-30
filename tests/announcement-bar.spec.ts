@@ -35,8 +35,8 @@ test('the picker chooses the newest entry and returns null for an empty changelo
 });
 
 for (const [path, locale, cta] of [
-  ['/', 'en', 'See what changed'],
-  ['/es/', 'es', 'Ver qué cambió'],
+  ['/pricing/', 'en', 'See what changed'],
+  ['/es/pricing/', 'es', 'Ver qué cambió'],
 ] as const) {
   test(`${path}: a 40 px fixed bar shows the newest ${locale} changelog title and links to the changelog`, async ({
     page,
@@ -61,10 +61,10 @@ for (const [path, locale, cta] of [
 
     // The rail keeps a breathing gap below the announcement and remains fixed.
     const headerTop = () => page.locator('header.site-header').evaluate((el) => el.getBoundingClientRect().top);
-    expect(await headerTop()).toBe(56);
+    expect(await headerTop()).toBe(72);
     await page.mouse.wheel(0, 1600);
     await page.waitForTimeout(300);
-    expect(await headerTop()).toBe(56);
+    expect(await headerTop()).toBe(72);
     expect(await bar.evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
   });
 }

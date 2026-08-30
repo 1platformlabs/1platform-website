@@ -102,9 +102,8 @@ ul, ol {
   font-display: swap;
 }
 
-/* Fourth family, home system only (see "Home system" below). A serif display
-   face at 56 px carries the home's headline and section openers; the rest of
-   the site keeps Space Grotesk. Latin subset, one weight, SIL OFL. */
+/* Kept for long-form editorial accents only. Product landing pages use the
+   same direct sans display face as the rest of the public system. */
 @font-face {
   font-family: 'Instrument Serif';
   src: url('/fonts/instrument-serif-latin-400-normal.woff2') format('woff2');
@@ -121,9 +120,9 @@ ul, ol {
 :root {
   /* Primitives */
   --ink:         #13151A;
-  --paper:       #F5F1E8;
-  --surface:     #FFFDF8;
-  --recessed:    #ECE5D8;
+  --paper:       #FFFFFF;
+  --surface:     #FFFFFF;
+  --recessed:    #F3F5F7;
   --cobalt:      #1748A7;
   --cobalt-deep: #10377F;
   --cobalt-bright: #78A6FF;
