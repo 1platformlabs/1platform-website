@@ -40,6 +40,11 @@ const RETIRED: Record<string, string> = {
   '/es/compare/1platform-vs-custom-integration/': '/es/solutions/',
   '/es/compare/1platform-vs-wp-auto-pro/': '/es/solutions/',
 
+  // Three of its four cards were the target page said again; the one claim it
+  // owned alone (custom domain) moved there with it.
+  '/solutions/website/': '/solutions/content/',
+  '/es/solutions/website/': '/es/solutions/content/',
+
   // One or two posts each and no prose of their own.
   '/blog/category/ai-content/': '/blog/',
   '/blog/category/api-tutorials/': '/blog/',

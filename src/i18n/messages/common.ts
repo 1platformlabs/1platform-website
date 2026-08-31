@@ -25,8 +25,7 @@ export default defineMessages({
     'nav.aria.toggleMenu': 'Open or close the menu',
 
     'nav.solutions.onlineStore': 'Online Store',
-    'nav.solutions.website': 'Website Builder',
-    'nav.solutions.content': 'AI Content',
+    'nav.solutions.content': 'Website & Content',
     'nav.solutions.deliveries': 'Deliveries',
     'nav.solutions.ads': 'Advertising',
     'nav.solutions.whitelabel': 'Whitelabel Dashboard',
@@ -115,8 +114,7 @@ export default defineMessages({
     'nav.aria.toggleMenu': 'Abrir o cerrar el menú',
 
     'nav.solutions.onlineStore': 'Tienda online',
-    'nav.solutions.website': 'Creador de sitios web',
-    'nav.solutions.content': 'Contenido con IA',
+    'nav.solutions.content': 'Sitio web y contenido',
     'nav.solutions.deliveries': 'Envíos',
     'nav.solutions.ads': 'Publicidad',
     'nav.solutions.whitelabel': 'Panel de marca blanca',

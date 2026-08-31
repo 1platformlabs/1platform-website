@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 
 const dist = 'dist';
 const stableLinks = [
-  '/solutions/online-store/', '/solutions/website/', '/solutions/content/', '/solutions/deliveries/',
+  '/solutions/online-store/', '/solutions/content/', '/solutions/deliveries/',
   '/solutions/ads/', '/solutions/whitelabel/', '/payments-invoicing/', '/for-agencies/',
   '/for-developers/', '/solutions/', '/blog/', '/changelog/', '/about/', '/pricing/',
   '/terms/', '/privacy/', '/cookies/',

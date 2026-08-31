@@ -68,6 +68,14 @@ export default defineConfig({
     '/es/compare/1platform-vs-custom-integration/': '/es/solutions/',
     '/es/compare/1platform-vs-wp-auto-pro/': '/es/solutions/',
 
+    // Three of its four cards were `/solutions/content/` said again: AI
+    // content, CMS publishing and "built for SEO" (keywords + indexing + link
+    // building). The only claim it owned alone was the custom domain, and the
+    // comparison row selling it was already on `/solutions/online-store/`,
+    // identical on both sides. The domain moved to the target instead.
+    '/solutions/website/': '/solutions/content/',
+    '/es/solutions/website/': '/es/solutions/content/',
+
     // Twelve pages holding one or two posts each and no prose of their own.
     '/blog/category/ai-content/': '/blog/',
     '/blog/category/api-tutorials/': '/blog/',

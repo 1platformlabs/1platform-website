@@ -34,7 +34,21 @@ const jsonLd = [
   },
 ];
 
+/**
+ * Two claims about the site, then four about what fills it — in that order,
+ * because the domain is what the rest is raised on rather than an extra.
+ */
 const features: { icon: IconName; title: string; description: string }[] = [
+  {
+    icon: 'domain',
+    title: t('solutions-content.feature.domain.title'),
+    description: t('solutions-content.feature.domain.desc'),
+  },
+  {
+    icon: 'monitor',
+    title: t('solutions-content.feature.site.title'),
+    description: t('solutions-content.feature.site.desc'),
+  },
   {
     icon: 'content',
     title: t('solutions-content.feature.articles.title'),
@@ -51,18 +65,28 @@ const features: { icon: IconName; title: string; description: string }[] = [
     description: t('solutions-content.feature.keyword.desc'),
   },
   {
-    icon: 'indexing',
-    title: t('solutions-content.feature.indexing.title'),
-    description: t('solutions-content.feature.indexing.desc'),
+    icon: 'cms',
+    title: t('solutions-content.feature.publishing.title'),
+    description: t('solutions-content.feature.publishing.desc'),
   },
 ];
 
-/* The sequence is the information here. Steps carry labels, not decoration. */
+/**
+ * The sequence is the information here. Steps carry labels, not decoration.
+ *
+ * It is the product's order, not a tidier one: the domain comes first because
+ * provisioning refuses to run without a verified one (422 DOMAIN_NOT_VERIFIED),
+ * and the last step stops at publishing-and-linking rather than at a submit to
+ * indexing — that endpoint needs the property verified in Search Console, and
+ * the CMS plugin does not call it at all.
+ */
 const contentSteps = [
+  { label: t('solutions-content.step.domain') },
+  { label: t('solutions-content.step.chooseKind') },
+  { label: t('solutions-content.step.raise') },
   { label: t('solutions-content.step.extractKeywords') },
   { label: t('solutions-content.step.generateContent') },
   { label: t('solutions-content.step.publishCms') },
-  { label: t('solutions-content.step.submitIndexing') },
 ];
 
 /**
@@ -78,16 +102,16 @@ const comparisonRows = [
 
 const related: { icon: IconName; title: string; description: string; href: string }[] = [
   {
-    icon: 'monitor',
-    title: t('nav.solutions.website'),
-    description: t('solutions-content.related.website.desc'),
-    href: l('/solutions/website/'),
-  },
-  {
     icon: 'cart',
     title: t('nav.solutions.onlineStore'),
     description: t('solutions-content.related.onlineStore.desc'),
     href: l('/solutions/online-store/'),
+  },
+  {
+    icon: 'megaphone',
+    title: t('nav.solutions.ads'),
+    description: t('solutions-content.related.ads.desc'),
+    href: l('/solutions/ads/'),
   },
   {
     icon: 'code',
