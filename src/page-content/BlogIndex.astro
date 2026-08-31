@@ -12,19 +12,6 @@ const { t, l, locale } = useI18n(Astro.url.pathname);
 // posts on the Spanish index.
 const posts = await getLocalized('blog', locale);
 
-/**
- * Category routes exist and were reachable from nothing. Counts are derived
- * from the collection, so the rail can never disagree with the archive.
- * Labels come from the catalogue — the same six were copied into four files.
- */
-const categories = [...new Set(posts.map((post) => post.data.category))]
-  .map((slug) => ({
-    slug,
-    label: t(`blog.category.${slug}`),
-    count: posts.filter((post) => post.data.category === slug).length,
-  }))
-  .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-
 const [lead, ...archive] = posts;
 ---
 
@@ -45,22 +32,6 @@ const [lead, ...archive] = posts;
           {t('blog.subscribe')}
         </a>
       </header>
-
-      {categories.length > 0 && (
-        <nav class="topics" aria-label={t('blog.topicsAria')}>
-          <span class="eyebrow topics__label">{t('blog.topics')}</span>
-          <ul class="topics__list">
-            {categories.map((category) => (
-              <li>
-                <a href={l(`/blog/category/${category.slug}/`)} class="topics__link">
-                  {category.label}
-                  <span class="topics__count">{category.count}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
 
       {lead && (
         <div class="lead-slot">

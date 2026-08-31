@@ -25,8 +25,6 @@ export default defineMessages({
     'blog.length': 'Length',
     'blog.published': 'Published',
     'blog.updated': 'Updated',
-    'blog.topics': 'Topics',
-    'blog.topicsAria': 'Browse by topic',
     'blog.latest': 'Latest',
     'blog.archive': 'Archive',
 
@@ -90,8 +88,6 @@ export default defineMessages({
     'blog.length': 'Extensión',
     'blog.published': 'Publicado',
     'blog.updated': 'Actualizado',
-    'blog.topics': 'Temas',
-    'blog.topicsAria': 'Explorar por tema',
     'blog.latest': 'Lo último',
     'blog.archive': 'Archivo',
 

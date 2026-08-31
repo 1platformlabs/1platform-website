@@ -18,7 +18,6 @@ export default defineMessages({
   en: {
     // — Header ————————————————————————————————————————————————
     'nav.solutions': 'Solutions',
-    'nav.features': 'Features',
     'nav.pricing': 'Pricing',
     'nav.docs': 'Docs',
     'nav.blog': 'Blog',
@@ -116,7 +115,6 @@ export default defineMessages({
   es: {
     // — Cabecera ——————————————————————————————————————————————
     'nav.solutions': 'Soluciones',
-    'nav.features': 'Funciones',
     'nav.pricing': 'Precios',
     'nav.docs': 'Docs',
     'nav.blog': 'Blog',

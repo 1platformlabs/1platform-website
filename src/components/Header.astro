@@ -26,7 +26,9 @@ const solutions: SubItem[] = [
 
 const navItems: NavItem[] = [
   { label: t('nav.solutions'), href: l('/solutions/'), subItems: solutions },
-  { label: t('nav.features'), href: l('/features/') },
+  // "Features" is gone: it was a smaller copy of /solutions/ — twelve of its
+  // twenty-one headings appeared there verbatim, every destination it linked
+  // was already linked there, and no page body on the site pointed at it.
   { label: t('nav.pricing'), href: l('/pricing/') },
   { label: t('nav.docs'), href: 'https://developer.1platform.pro/' },
   { label: t('nav.blog'), href: l('/blog/') },

@@ -44,7 +44,42 @@ export default defineConfig({
   // chrome on a nominally Spanish URL for anyone with meta-refresh disabled or
   // a slow connection. Redirecting a URL that never existed bought nothing and
   // cost the only Spanish-caused accessibility defect in the build.
+  /**
+   * Retired URLs. Every one of these was indexable and is in the live sitemap,
+   * so none of them may start answering 404 — Astro emits a stub per entry
+   * (meta-refresh + `noindex` + a canonical at the target), which is also what
+   * keeps `i18n-build.spec.ts` honest: it asserts the English tree never loses
+   * a path, and asserts every English path has a Spanish twin. Both locales are
+   * therefore listed for every retirement, deliberately.
+   */
   redirects: {
     '/why-1platform/': '/for-developers/',
+
+    // A smaller duplicate of /solutions/, linked from no page body.
+    '/features/': '/solutions/',
+    '/es/features/': '/es/solutions/',
+
+    // A closed island: these three linked only to each other, and argued the
+    // content-tooling positioning the site no longer holds.
+    '/compare/1platform-vs-ai-writing-tools/': '/solutions/',
+    '/compare/1platform-vs-custom-integration/': '/solutions/',
+    '/compare/1platform-vs-wp-auto-pro/': '/solutions/',
+    '/es/compare/1platform-vs-ai-writing-tools/': '/es/solutions/',
+    '/es/compare/1platform-vs-custom-integration/': '/es/solutions/',
+    '/es/compare/1platform-vs-wp-auto-pro/': '/es/solutions/',
+
+    // Twelve pages holding one or two posts each and no prose of their own.
+    '/blog/category/ai-content/': '/blog/',
+    '/blog/category/api-tutorials/': '/blog/',
+    '/blog/category/ecommerce/': '/blog/',
+    '/blog/category/payments-invoicing/': '/blog/',
+    '/blog/category/product-updates/': '/blog/',
+    '/blog/category/seo-automation/': '/blog/',
+    '/es/blog/category/ai-content/': '/es/blog/',
+    '/es/blog/category/api-tutorials/': '/es/blog/',
+    '/es/blog/category/ecommerce/': '/es/blog/',
+    '/es/blog/category/payments-invoicing/': '/es/blog/',
+    '/es/blog/category/product-updates/': '/es/blog/',
+    '/es/blog/category/seo-automation/': '/es/blog/',
   },
 });
