@@ -36,7 +36,7 @@ test('the picker chooses the newest entry and returns null for an empty changelo
 
 for (const [path, locale, cta] of [
   ['/pricing/', 'en', 'See what changed'],
-  ['/es/pricing/', 'es', 'Ver qué cambió'],
+  ['/es/precios/', 'es', 'Ver qué cambió'],
 ] as const) {
   test(`${path}: a 40 px fixed bar shows the newest ${locale} changelog title and links to the changelog`, async ({
     page,
@@ -57,7 +57,7 @@ for (const [path, locale, cta] of [
     await expect(bar.locator('.announcement__title')).toHaveText(newestTitle(locale));
     const link = bar.locator('a.announcement__link');
     await expect(link).toHaveText(new RegExp(cta));
-    await expect(link).toHaveAttribute('href', locale === 'es' ? '/es/changelog/' : '/changelog/');
+    await expect(link).toHaveAttribute('href', locale === 'es' ? '/es/novedades/' : '/changelog/');
 
     // The rail keeps a breathing gap below the announcement and remains fixed.
     const headerTop = () => page.locator('header.site-header').evaluate((el) => el.getBoundingClientRect().top);

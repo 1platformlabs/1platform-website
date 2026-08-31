@@ -19,13 +19,13 @@ test.describe('sends a Spanish browser to Spanish', () => {
 
   test('redirects an unprefixed URL', async ({ page }) => {
     await page.goto('/pricing/');
-    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await expect(page).toHaveURL(/\/es\/precios\/$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
   });
 
   test('keeps the query string and the fragment', async ({ page }) => {
     await page.goto('/pricing/?utm_source=test#faq');
-    await expect(page).toHaveURL('/es/pricing/?utm_source=test#faq');
+    await expect(page).toHaveURL('/es/precios/?utm_source=test#faq');
   });
 
   test('leaves no history entry behind it', async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe('sends a Spanish browser to Spanish', () => {
     // again. If it pushed, this would land on /pricing/ and redirect forever.
     await page.goto('/');
     await page.goto('/pricing/');
-    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await expect(page).toHaveURL(/\/es\/precios\/$/);
 
     await page.goBack();
     await expect(page).toHaveURL(/\/es\/$/);
@@ -53,8 +53,8 @@ test.describe('leaves an English browser alone', () => {
   test('does not redirect away from Spanish either', async ({ page }) => {
     // The hard rule. An English-speaking visitor who follows a link to a
     // Spanish page gets the Spanish page.
-    await page.goto('/es/pricing/');
-    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await page.goto('/es/precios/');
+    await expect(page).toHaveURL(/\/es\/precios\/$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
   });
 });
@@ -64,7 +64,7 @@ test.describe('treats any other language as Spanish', () => {
 
   test('sends a French browser to Spanish', async ({ page }) => {
     await page.goto('/pricing/');
-    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await expect(page).toHaveURL(/\/es\/precios\/$/);
   });
 });
 
@@ -95,7 +95,7 @@ test.describe('an explicit choice beats the browser', () => {
       ]);
 
       await page.goto('/pricing/');
-      await expect(page, `cookie value ${JSON.stringify(value)}`).toHaveURL(/\/es\/pricing\/$/);
+      await expect(page, `cookie value ${JSON.stringify(value)}`).toHaveURL(/\/es\/precios\/$/);
     }
   });
 });
@@ -113,7 +113,7 @@ test.describe('choosing Spanish is honoured, not merely noted', () => {
     ]);
 
     await page.goto('/pricing/');
-    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await expect(page).toHaveURL(/\/es\/precios\/$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
   });
 
@@ -172,7 +172,7 @@ test.describe('redirects at most once', () => {
     });
 
     await page.goto('/pricing/');
-    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await expect(page).toHaveURL(/\/es\/precios\/$/);
     await page.waitForTimeout(500);
 
     // Distinct destinations, not raw events: the client router can report the
@@ -181,7 +181,7 @@ test.describe('redirects at most once', () => {
     // alternating.
     const visited = [...new Set(hard)];
     expect(visited, `hard navigations: ${hard.join(', ')}`).toHaveLength(2);
-    expect(visited[1]).toMatch(/\/es\/pricing\/$/);
+    expect(visited[1]).toMatch(/\/es\/precios\/$/);
     expect(soft.length, `router navigations: ${soft.join(', ')}`).toBeLessThanOrEqual(1);
   });
 });
@@ -196,7 +196,7 @@ test.describe('the document language survives a soft navigation', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
 
     await page.getByRole('link', { name: 'Precios', exact: true }).first().click();
-    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await expect(page).toHaveURL(/\/es\/precios\/$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
   });
 });
@@ -219,9 +219,9 @@ test.describe('without JavaScript', () => {
   test('the language control is still a working link', async ({ page }) => {
     await page.goto('/pricing/');
     const toSpanish = page.locator('a[data-lang-choice="es"]').first();
-    await expect(toSpanish).toHaveAttribute('href', '/es/pricing/');
+    await expect(toSpanish).toHaveAttribute('href', '/es/precios/');
 
     await toSpanish.click();
-    await expect(page).toHaveURL(/\/es\/pricing\/$/);
+    await expect(page).toHaveURL(/\/es\/precios\/$/);
   });
 });
