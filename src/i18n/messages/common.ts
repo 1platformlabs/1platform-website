@@ -34,10 +34,10 @@ export default defineMessages({
     'nav.solutions.payments': 'Payments & Invoicing',
     'nav.solutions.viewAll': 'View all solutions',
 
-    'cta.getStarted': 'Get Started Free',
+    'cta.getStarted': 'Start Free',
     'cta.signIn': 'Sign In',
     'cta.launchStore': 'Launch Your Store',
-    'cta.viewDocs': 'View Documentation',
+    'cta.viewDocs': 'Read API Docs',
 
     // — Announcement bar ————————————————————————————————————————
     'announcement.aria': 'Latest update',
@@ -55,7 +55,7 @@ export default defineMessages({
     'footer.signup.body': 'Enter your email for news and updates',
     'footer.signup.label': 'Email address',
     'footer.signup.placeholder': 'Enter your email',
-    'footer.signup.submit': 'Send',
+    'footer.signup.submit': 'Subscribe to updates',
     'footer.signup.subject': 'Keep me posted about 1Platform',
     'footer.signup.status': 'Opening your email app…',
     'footer.link.forAgencies': 'For Agencies',
@@ -135,7 +135,7 @@ export default defineMessages({
     'cta.getStarted': 'Empieza gratis',
     'cta.signIn': 'Iniciar sesión',
     'cta.launchStore': 'Lanza tu tienda',
-    'cta.viewDocs': 'Ver la documentación',
+    'cta.viewDocs': 'Ver documentación de la API',
 
     // — Barra de novedades ————————————————————————————————————
     'announcement.aria': 'Última novedad',
@@ -151,7 +151,7 @@ export default defineMessages({
     'footer.signup.body': 'Deja tu correo para recibir novedades',
     'footer.signup.label': 'Correo electrónico',
     'footer.signup.placeholder': 'Escribe tu correo',
-    'footer.signup.submit': 'Enviar',
+    'footer.signup.submit': 'Suscribirme a las novedades',
     'footer.signup.subject': 'Quiero recibir las novedades de 1Platform',
     'footer.signup.status': 'Abriendo tu aplicación de correo…',
     'footer.link.forAgencies': 'Para agencias',

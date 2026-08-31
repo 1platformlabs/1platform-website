@@ -73,7 +73,7 @@ export default defineMessages({
     'solutions-website.next.desc':
       'Pay only for what you use — no subscriptions, no hidden fees. Build your website with content, domain, and SEO from one platform.',
     'solutions-website.next.linkCue': 'Read the API docs',
-    'solutions-website.next.actions.viewPricing': 'View Pricing',
+    'solutions-website.next.actions.viewPricing': 'See Pricing',
   },
   es: {
     'solutions-website.title': 'Creador de sitios web con contenido de IA y dominio propio | 1Platform',

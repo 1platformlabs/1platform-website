@@ -70,10 +70,10 @@ export default defineMessages({
 
     'paymentsInvoicing.faq.countries.q': 'Which countries are supported for electronic invoicing?',
     'paymentsInvoicing.faq.countries.a':
-      'Electronic invoicing currently issues compliant invoices for Guatemala (FEL). Additional jurisdictions are on the roadmap — contact sales for timelines.',
+      'Electronic invoicing currently issues compliant invoices for Guatemala (FEL). Additional jurisdictions are on the roadmap — write to us for timelines.',
     'paymentsInvoicing.faq.currencies.q': 'What currencies and payment methods do you accept?',
     'paymentsInvoicing.faq.currencies.a':
-      'We accept all major credit and debit cards. Settlement currency is configured per merchant — contact sales to enable additional currencies.',
+      'We accept all major credit and debit cards. Settlement currency is configured per merchant — write to us to enable additional currencies.',
     'paymentsInvoicing.faq.invoiceTypes.q': 'What types of invoices can I issue?',
     'paymentsInvoicing.faq.invoiceTypes.a':
       'Standard invoices, credit notes, and cancellations — all PDF + XML output. Multi-item line support and automatic tax calculation.',
@@ -151,10 +151,10 @@ export default defineMessages({
 
     'paymentsInvoicing.faq.countries.q': '¿Para qué países está disponible la facturación electrónica?',
     'paymentsInvoicing.faq.countries.a':
-      'Hoy la facturación electrónica emite facturas conformes para Guatemala (FEL). Más jurisdicciones están en el roadmap — contacta a ventas para conocer los plazos.',
+      'Hoy la facturación electrónica emite facturas conformes para Guatemala (FEL). Más jurisdicciones están en el roadmap — escríbenos para conocer los plazos.',
     'paymentsInvoicing.faq.currencies.q': '¿Qué monedas y métodos de pago aceptan?',
     'paymentsInvoicing.faq.currencies.a':
-      'Aceptamos las principales tarjetas de crédito y débito. La moneda de liquidación se configura por comercio — contacta a ventas para habilitar monedas adicionales.',
+      'Aceptamos las principales tarjetas de crédito y débito. La moneda de liquidación se configura por comercio — escríbenos para habilitar monedas adicionales.',
     'paymentsInvoicing.faq.invoiceTypes.q': '¿Qué tipos de factura puedo emitir?',
     'paymentsInvoicing.faq.invoiceTypes.a':
       'Facturas estándar, notas de crédito y anulaciones — todas en PDF y XML. Soporta múltiples líneas por factura y calcula los impuestos automáticamente.',

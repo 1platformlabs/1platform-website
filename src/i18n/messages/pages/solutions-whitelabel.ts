@@ -16,7 +16,7 @@ export default defineMessages({
     'solutions-whitelabel.hero.headline': 'Your own brand, your own dashboard',
     'solutions-whitelabel.hero.subheadline':
       'Bootstrap a fully branded dashboard from one API call. Branding, theme, layout, i18n, and home KPIs — everything your users see, under your name.',
-    'solutions-whitelabel.hero.cta.primary': 'Talk to Sales',
+    'solutions-whitelabel.hero.cta.primary': 'Let’s Talk',
     'solutions-whitelabel.hero.cta.secondary': 'Read API Docs',
 
     'solutions-whitelabel.bootstrap.eyebrow': 'One bootstrap call',
@@ -64,7 +64,7 @@ export default defineMessages({
     'solutions-whitelabel.next.eyebrow': 'Next step',
     'solutions-whitelabel.next.title': 'Ready to whitelabel?',
     'solutions-whitelabel.next.desc':
-      'Talk to sales about pricing and onboarding for your tenant, or read the API reference and try the bootstrap call first.',
+      'Let’s talk about pricing and onboarding for your tenant, or read the API reference and try the bootstrap call first.',
   },
   es: {
     'solutions-whitelabel.title': 'Panel de marca blanca — SaaS con tu marca en una sola llamada a la API | 1Platform',
@@ -75,7 +75,7 @@ export default defineMessages({
     'solutions-whitelabel.hero.headline': 'Tu propia marca, tu propio panel',
     'solutions-whitelabel.hero.subheadline':
       'Arranca un panel totalmente personalizado con tu marca desde una sola llamada a la API. Marca, tema, diseño, idiomas y KPIs de inicio — todo lo que ven tus usuarios, bajo tu nombre.',
-    'solutions-whitelabel.hero.cta.primary': 'Habla con ventas',
+    'solutions-whitelabel.hero.cta.primary': 'Hablemos',
     'solutions-whitelabel.hero.cta.secondary': 'Ver documentación de la API',
 
     'solutions-whitelabel.bootstrap.eyebrow': 'Una sola llamada de arranque',
@@ -123,6 +123,6 @@ export default defineMessages({
     'solutions-whitelabel.next.eyebrow': 'Siguiente paso',
     'solutions-whitelabel.next.title': '¿Listo para tu marca blanca?',
     'solutions-whitelabel.next.desc':
-      'Habla con ventas sobre precios y alta de tu tenant, o lee la referencia de la API y prueba primero la llamada de arranque.',
+      'Hablemos de precios y del alta de tu tenant, o lee la referencia de la API y prueba primero la llamada de arranque.',
   },
 });

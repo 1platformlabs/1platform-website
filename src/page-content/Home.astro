@@ -10,18 +10,45 @@ const { t, l } = useI18n(Astro.url.pathname);
 const title = t('home.title');
 const description = t('home.description');
 
-const solutions = [
-  { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
+/**
+ * The home has two tiers of solution, and the split is the page's argument:
+ * `focus` is what a merchant needs before anything else can matter — sell,
+ * get paid, deliver — and `tools` is what makes those three earn more.
+ *
+ * Together they must still cover EVERY destination the header offers, which
+ * `tests/home-names-every-solution.spec.ts` enforces: a solution demoted out
+ * of `focus` has to land in `tools`, never be dropped.
+ */
+const focus = [
+  {
+    label: t('nav.solutions.onlineStore'),
+    title: t('home.focus.store.title'),
+    body: t('home.focus.store.description'),
+    href: l('/solutions/online-store/'),
+  },
+  {
+    label: t('nav.solutions.payments'),
+    title: t('home.focus.payments.title'),
+    body: t('home.focus.payments.description'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    label: t('nav.solutions.deliveries'),
+    title: t('home.focus.deliveries.title'),
+    body: t('home.focus.deliveries.description'),
+    href: l('/solutions/deliveries/'),
+  },
+];
+
+const tools = [
   { label: t('nav.solutions.website'), href: l('/solutions/website/') },
   { label: t('nav.solutions.content'), href: l('/solutions/content/') },
-  { label: t('nav.solutions.deliveries'), href: l('/solutions/deliveries/') },
   { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
-  { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
   { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
 ];
 
 const audiences = [
-  { title: t('home.useCase.smallBusiness.title'), body: t('home.useCase.smallBusiness.description'), href: l('/solutions/online-store/') },
+  { title: t('home.useCase.merchants.title'), body: t('home.useCase.merchants.description'), href: l('/solutions/online-store/') },
   { title: t('home.useCase.agencies.title'), body: t('home.useCase.agencies.description'), href: l('/for-agencies/') },
   { title: t('home.useCase.developers.title'), body: t('home.useCase.developers.description'), href: l('/for-developers/') },
 ];
@@ -50,13 +77,14 @@ const jsonLd = [
         <h1>{t('home.hero.headline')}</h1>
         <p class="product-hero__lead">{t('home.hero.lead')}</p>
         <div class="product-hero__actions">
-          <a href="https://app.1platform.pro/app/" class="btn btn--primary">{t('cta.getStarted')}</a>
+          <a href="https://app.1platform.pro/app/" class="btn btn--primary">{t('home.hero.cta')}</a>
         </div>
+        <p class="product-hero__note">{t('home.hero.ctaNote')}</p>
       </div>
 
-      <ul class="product-hero__capabilities" aria-label={t('home.showcase.aria')}>
-        {solutions.slice(0, 3).map((solution) => (
-          <li><span aria-hidden="true"></span><a href={solution.href}>{solution.label}</a></li>
+      <ul class="product-hero__capabilities" aria-label={t('home.hero.capabilities.aria')}>
+        {focus.map((item) => (
+          <li><span aria-hidden="true"></span><a href={item.href}>{item.label}</a></li>
         ))}
       </ul>
 
@@ -66,25 +94,38 @@ const jsonLd = [
     </div>
   </section>
 
-  <section class="product-statement section">
-    <div class="container product-statement__inner">
-      <p class="eyebrow">{t('home.modules.carouselAria')}</p>
-      <h2>{t('home.modules.title').replace('\n', ' ')}</h2>
-      <p>{t('home.description')}</p>
+  <section class="product-focus section" id="essentials">
+    <div class="container">
+      <div class="product-focus__intro">
+        <p class="eyebrow">{t('home.focus.eyebrow')}</p>
+        <h2>{t('home.focus.title')}</h2>
+        <p class="product-focus__lead">{t('home.focus.lead')}</p>
+      </div>
+      <div class="product-focus__grid">
+        {focus.map((item, index) => (
+          <a href={item.href} class="product-focus__card reveal">
+            <span class="product-focus__step" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+            <span class="product-focus__cue" aria-hidden="true"></span>
+          </a>
+        ))}
+      </div>
     </div>
   </section>
 
-  <section class="product-modules section section--alt" id="modules">
-    <div class="container product-modules__grid">
-      <div class="product-modules__image reveal">
+  <section class="product-tools section section--alt" id="tools">
+    <div class="container product-tools__grid">
+      <div class="product-tools__image reveal">
         <Image src={platformModules} alt="" aria-hidden="true" widths={[480, 720, 960]} sizes="(min-width: 900px) 42vw, 100vw" />
       </div>
-      <div class="product-modules__copy">
-        <p class="eyebrow">{t('nav.solutions')}</p>
-        <h2>{t('home.personas.title')}</h2>
-        <div class="product-modules__list">
-          {solutions.map((solution) => (
-            <a href={solution.href} class="product-module-link"><span>{solution.label}</span><span aria-hidden="true" class="product-module-link__arrow"></span></a>
+      <div class="product-tools__copy">
+        <p class="eyebrow">{t('home.tools.eyebrow')}</p>
+        <h2>{t('home.tools.title')}</h2>
+        <p class="product-tools__lead">{t('home.tools.lead')}</p>
+        <div class="product-tools__list">
+          {tools.map((tool) => (
+            <a href={tool.href} class="product-tool-link"><span>{tool.label}</span><span aria-hidden="true" class="product-tool-link__arrow"></span></a>
           ))}
         </div>
         <a href={l('/solutions/')} class="product-text-link">{t('nav.solutions.viewAll')}</a>
@@ -95,8 +136,8 @@ const jsonLd = [
   <section class="product-audiences section" id="personas">
     <div class="container">
       <div class="product-audiences__header">
-        <div><p class="eyebrow">{t('home.personas.title')}</p><h2>{t('home.personas.title')}</h2></div>
-        <p>{t('home.useCase.sellers.description')}</p>
+        <div><p class="eyebrow">{t('home.personas.eyebrow')}</p><h2>{t('home.personas.title')}</h2></div>
+        <p>{t('home.personas.lead')}</p>
       </div>
       <div class="product-audiences__grid">
         {audiences.map((audience) => (
@@ -108,9 +149,10 @@ const jsonLd = [
 
   <section class="product-faq section section--alt" id="faq">
     <div class="container product-faq__grid">
-      <div><p class="eyebrow">{t('home.faq.title')}</p><h2>{t('home.faq.title')}</h2></div>
+      <div><p class="eyebrow">{t('home.faq.eyebrow')}</p><h2>{t('home.faq.title')}</h2></div>
       <div class="product-faq__list">
         <details class="product-faq__item"><summary>{t('home.faq.whatIs.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.whatIs.answer')}</p></details>
+        <details class="product-faq__item"><summary>{t('home.faq.technical.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.technical.answer')}</p></details>
         <details class="product-faq__item"><summary>{t('home.faq.integrate.question')}<span aria-hidden="true"></span></summary><p>{t('home.faq.integrate.answer')}</p></details>
       </div>
     </div>
@@ -126,28 +168,42 @@ const jsonLd = [
   .product-hero__inner { position: relative; z-index: 1; display: grid; justify-items: center; text-align: center; }
   .product-hero__copy { max-width: 50rem; }
   .product-hero__badge { display: inline-flex; align-items: center; min-height: 38px; padding: 0 var(--space-4); border-radius: var(--border-radius-pill); background: var(--color-accent-soft); color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
-  .product-hero h1 { margin: var(--space-8) auto; font-family: var(--font-display); font-size: clamp(3.4rem, 5.3vw, 5.75rem); font-weight: 700; line-height: .96; letter-spacing: -.065em; }
+  /* The headline is a sentence now, not the 29-character brand line, so it
+     WRAPS. The `white-space: nowrap` that used to sit here was sized for
+     "One Platform. Every Solution." and would push a real sentence off both
+     edges of the viewport. */
+  .product-hero h1 { max-width: 19ch; margin: var(--space-8) auto; font-family: var(--font-display); font-size: clamp(2.9rem, 4.55vw, 4.5rem); font-weight: 700; line-height: 1.02; letter-spacing: -.055em; text-wrap: balance; }
   .product-hero__lead { max-width: 39rem; margin-inline: auto; font-size: clamp(1rem, 1.45vw, 1.25rem); line-height: 1.55; }
   .product-hero__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-8); }
+  .product-hero__note { margin-top: var(--space-4); color: var(--color-text-secondary); font-size: var(--text-sm); }
   .product-hero__capabilities { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-6); margin-top: var(--space-12); }
   .product-hero__capabilities li { display: inline-flex; align-items: center; gap: 9px; color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
   .product-hero__capabilities li > span { width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); box-shadow: inset 0 0 0 4px var(--color-accent-soft); }
   .product-hero__capabilities a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .product-hero__device { width: min(920px, 96vw); margin: var(--space-12) auto -12rem; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0; box-shadow: 0 -1px 0 rgba(20, 22, 27, .03), 0 24px 65px rgba(20, 22, 27, .14); }
   .product-hero__device :global(img) { width: 100%; height: auto; }
-  .product-statement { border-bottom: 1px solid var(--color-border); }
-  .product-statement__inner { display: grid; gap: var(--space-5); max-width: 840px; text-align: center; }
-  .product-statement__inner .eyebrow { justify-self: center; }
-  .product-statement h2, .product-modules h2, .product-audiences h2, .product-faq h2 { font-size: clamp(2.25rem, 4.2vw, 4.75rem); line-height: 1; letter-spacing: -.055em; }
-  .product-statement p:last-child { max-width: 44rem; margin-inline: auto; font-size: var(--text-lg); }
-  .product-modules__grid { display: grid; gap: var(--space-12); align-items: center; }
-  .product-modules__image { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); background: var(--surface); }
-  .product-modules__image :global(img) { width: 100%; height: auto; }
-  .product-modules__copy h2 { max-width: 11ch; margin: var(--space-4) 0 var(--space-8); }
-  .product-modules__list { display: grid; border-top: 1px solid var(--color-border); }
-  .product-module-link { display: flex; align-items: center; justify-content: space-between; min-height: 58px; border-bottom: 1px solid var(--color-border); color: var(--color-text); font-size: var(--text-lg); }
-  .product-module-link__arrow, .product-audience__cue { width: 9px; height: 9px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; transform: rotate(45deg); }
-  .product-module-link:hover { color: var(--color-accent); }
+
+  .product-focus { border-bottom: 1px solid var(--color-border); }
+  .product-focus__intro { display: grid; gap: var(--space-5); max-width: 840px; margin-inline: auto; text-align: center; }
+  .product-focus__intro .eyebrow { justify-self: center; }
+  .product-focus__lead { max-width: 44rem; margin-inline: auto; font-size: var(--text-lg); }
+  .product-focus__grid { display: grid; gap: var(--space-4); margin-top: var(--space-12); }
+  .product-focus__card { display: grid; gap: var(--space-4); min-height: 300px; padding: var(--space-8); border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); color: var(--color-text); background: var(--surface); }
+  .product-focus__step { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; letter-spacing: .12em; color: var(--color-accent); }
+  .product-focus__card h3 { margin-top: auto; font-size: var(--text-2xl); letter-spacing: -.02em; }
+  .product-focus__card:hover { border-color: var(--color-accent); }
+
+  .product-focus h2, .product-tools h2, .product-audiences h2, .product-faq h2 { font-size: clamp(2.25rem, 4.2vw, 4.75rem); line-height: 1; letter-spacing: -.055em; }
+  .product-tools__grid { display: grid; gap: var(--space-12); align-items: center; }
+  .product-tools__image { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); background: var(--surface); }
+  .product-tools__image :global(img) { width: 100%; height: auto; }
+  .product-tools__copy h2 { max-width: 13ch; margin: var(--space-4) 0 var(--space-5); }
+  .product-tools__lead { max-width: 34rem; margin-bottom: var(--space-8); font-size: var(--text-lg); }
+  .product-tools__list { display: grid; border-top: 1px solid var(--color-border); }
+  .product-tool-link { display: flex; align-items: center; justify-content: space-between; min-height: 58px; border-bottom: 1px solid var(--color-border); color: var(--color-text); font-size: var(--text-lg); }
+  .product-tool-link__arrow, .product-audience__cue, .product-focus__cue { width: 9px; height: 9px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; transform: rotate(45deg); }
+  .product-focus__cue { justify-self: start; color: var(--color-accent); }
+  .product-tool-link:hover { color: var(--color-accent); }
   .product-text-link { display: inline-flex; margin-top: var(--space-6); color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
   .product-text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
   .product-audiences__header { display: grid; gap: var(--space-6); align-items: end; margin-bottom: var(--space-10); }
@@ -169,9 +225,8 @@ const jsonLd = [
   .product-faq__item summary span::after { transform: rotate(90deg); }
   .product-faq__item[open] summary span::after { transform: rotate(0); }
   .product-faq__item p { max-width: 48rem; padding-bottom: var(--space-6); }
-  @media (prefers-reduced-motion: no-preference) { .product-module-link, .product-audience { transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease; } }
-  @media (min-width: 760px) { .product-audiences__header { grid-template-columns: 1fr minmax(260px, .65fr); } .product-audiences__grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 900px) { .product-modules__grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); } .product-faq__grid { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); } }
-  @media (min-width: 760px) { .product-hero h1 { white-space: nowrap; } }
-  @media (max-width: 700px) { .product-hero { min-height: 820px; padding-top: calc(var(--header-offset) + 5.75rem); } .product-hero__props { width: 980px; } .product-hero__props--laptop { top: 0; } .product-hero__props--clip, .product-hero__props--peripherals { display: none; } .product-hero h1 { font-size: clamp(3rem, 15vw, 4.5rem); } .product-hero__capabilities { gap: var(--space-3) var(--space-5); } .product-hero__capabilities li { font-size: var(--text-xs); } .product-hero__device { margin-top: var(--space-10); margin-bottom: -8rem; } }
+  @media (prefers-reduced-motion: no-preference) { .product-tool-link, .product-audience, .product-focus__card { transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease; } }
+  @media (min-width: 760px) { .product-focus__grid { grid-template-columns: repeat(3, 1fr); } .product-audiences__header { grid-template-columns: 1fr minmax(260px, .65fr); } .product-audiences__grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 900px) { .product-tools__grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); } .product-faq__grid { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); } }
+  @media (max-width: 700px) { .product-hero { min-height: 820px; padding-top: calc(var(--header-offset) + 5.75rem); } .product-hero__props { width: 980px; } .product-hero__props--laptop { top: 0; } .product-hero__props--clip, .product-hero__props--peripherals { display: none; } .product-hero h1 { max-width: 14ch; font-size: clamp(2.25rem, 9.4vw, 3.25rem); } .product-hero__capabilities { gap: var(--space-3) var(--space-5); } .product-hero__capabilities li { font-size: var(--text-xs); } .product-hero__device { margin-top: var(--space-10); margin-bottom: -8rem; } }
 </style>

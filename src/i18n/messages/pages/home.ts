@@ -1,72 +1,163 @@
 import { defineMessages } from '@i18n/ui';
 
 /** Copy used by the current editorial home. Keep this module deliberately
- * small: retired visual systems must not keep translation keys alive. */
+ * small: retired visual systems must not keep translation keys alive.
+ *
+ * The home speaks to a merchant who wants to go digital, so it is built on
+ * three load-bearing jobs — sell, get paid, deliver — and everything else is
+ * framed as a tool that makes those three earn more. Two rules follow from
+ * that and are easy to undo by accident:
+ *
+ * 1. The H1 is the merchant's sentence, not the product's. The brand line
+ *    ("One Platform. Every Solution.") is the badge above it — it signs the
+ *    page, it does not open it. A visitor who reads Spanish should not meet
+ *    English in the largest type on the page.
+ * 2. Every band owns its own eyebrow, heading and lead. They used to share
+ *    keys, so "Hecho para tu forma de trabajar" rendered three times and
+ *    "Preguntas frecuentes" twice — `no-repeated-paragraph.spec.ts` never saw
+ *    it because its floor is 60 characters and these are short. Reusing a
+ *    neighbour's key here is a defect, not a saving.
+ */
 export default defineMessages({
   en: {
-    'home.title': '1Platform — Online Store, Website & Payments in One Platform',
+    'home.title': '1Platform — Online Store, Card Payments & Deliveries',
     'home.description':
-      'Launch an online store or website with payments, electronic invoicing, AI content, and your own domain — all from one platform. Or integrate it via REST API.',
+      'Open your online store, take card payments, issue the invoice on every sale, and dispatch your deliveries — your whole business, from one place.',
     'home.jsonld.name': '1Platform',
     'home.jsonld.brandName': '1Platform Labs',
-    'home.hero.headline': 'One Platform. Every Solution.',
-    'home.hero.badge': 'One connected workspace',
+
+    // — Hero ——————————————————————————————————————————————————
+    'home.hero.badge': 'One Platform. Every Solution.',
+    'home.hero.headline': 'Your business, selling online today',
     'home.hero.lead':
-      'Sell online, get paid, invoice and publish from a single account — in the dashboard or through one REST API. Every module already talks to the others.',
+      'Open your store, take card payments, deliver to the door and invoice automatically — all from one place, with no tools to glue together.',
     'home.hero.fan.aria': 'A 1Platform workspace on a tablet',
-    'home.showcase.aria': '1Platform solutions',
-    'home.modules.title': 'One platform.\nEvery solution.',
-    'home.modules.carouselAria': 'Every module of the platform',
+    'home.hero.capabilities.aria': 'The three essentials of your business',
+    // The home does NOT reuse the chrome's generic `cta.getStarted`. The header
+    // button has to work on every page, so it stays broad; the most-visited
+    // page can name the outcome the visitor came for.
+    'home.hero.cta': 'Open Your Store Free',
+    // Both halves are sourced from /pricing/ — "Start on the free plan … No
+    // credit card" and "Pay for the operations you run" — not written here.
+    // The price objection was already answered by the word "free"; what stops
+    // a merchant is the fear of being signed up for something.
+    'home.hero.ctaNote': 'No credit card and no subscription. You pay only for what you use.',
+
+    // — The three that carry the business ——————————————————————
+    'home.focus.eyebrow': 'The essentials',
+    'home.focus.title': 'Sell, get paid, deliver',
+    'home.focus.lead':
+      'Three things hold an online business up. Here all three arrive already connected to each other, so you start selling instead of assembling.',
+    // Each card carries a PROMISE, never a menu label. The pills above them
+    // already name the products ("Online Store", "Payments & Invoicing",
+    // "Deliveries"); a card that repeats one of those names reads as a second,
+    // slightly different name for the same thing on the same screen.
+    'home.focus.store.title': 'Your store, open around the clock',
+    'home.focus.store.description':
+      'Your catalogue, your prices and your brand in a store of your own — with a cart, a one-page checkout and accounts for your customers.',
+    'home.focus.payments.title': 'Card payments that invoice themselves',
+    'home.focus.payments.description':
+      'Accept card payments and issue the valid electronic invoice at the very moment of the sale, with nobody typing it out afterwards.',
+    'home.focus.deliveries.title': 'Delivery to the door',
+    'home.focus.deliveries.description':
+      'Dispatch with your own staff or with a courier, and give your buyer a link where they watch their order move all the way to their door.',
+
+    // — Everything that makes those three earn more ————————————
+    'home.tools.eyebrow': 'Tools',
+    'home.tools.title': 'And everything that makes you sell more',
+    'home.tools.lead':
+      'With the essentials handled, these pieces go to work so more people find you, choose you and come back to buy again.',
+
+    // — Who it is for ——————————————————————————————————————————
+    'home.personas.eyebrow': 'Who it is for',
     'home.personas.title': 'Made for how you work',
-    'home.useCase.smallBusiness.title': 'Small business owners',
-    'home.useCase.smallBusiness.description':
-      'Launch your store or website in days, not months — payments, invoicing, and content handled for you.',
-    'home.useCase.sellers.description':
-      'Sell products, services, or digital downloads — accept payments and issue compliant invoices automatically.',
-    'home.useCase.agencies.title': 'Agencies managing client sites',
+    'home.personas.lead':
+      'Whether you sell from a counter, run your clients’ brands or are building your own product, you start from the same account.',
+    'home.useCase.merchants.title': 'Businesses ready to grow',
+    'home.useCase.merchants.description':
+      'Put your business online and sell to everyone who never makes it to your counter — payments, invoices and deliveries already handled.',
+    'home.useCase.agencies.title': 'Agencies running several brands',
     'home.useCase.agencies.description':
-      'Run dozens of client stores and websites from one dashboard — whitelabel optional, billing per client.',
-    'home.useCase.developers.title': 'Developers building SaaS',
+      'Run your clients’ stores and sites from one dashboard — your own brand up front, billing kept separate for each client.',
+    'home.useCase.developers.title': 'Teams building their own product',
     'home.useCase.developers.description':
-      'Use 1Platform as the backend for your own product — payments, invoicing, content, and dashboard included.',
+      'Use 1Platform as the engine of your own product — payments, invoicing, deliveries, content and dashboard included.',
+
+    // — FAQ ————————————————————————————————————————————————————
+    'home.faq.eyebrow': 'Before you start',
     'home.faq.title': 'Frequently asked questions',
     'home.faq.whatIs.question': 'What is 1Platform?',
     'home.faq.whatIs.answer':
-      'One account that sells online, gets paid, issues invoices, ships and publishes content — from one dashboard, or through one REST API if you are building your own product.',
+      'One account your business sells from, takes card payments through, issues its invoices with, dispatches its deliveries from and publishes its content on — from one dashboard, or through one REST API if you are building your own product.',
+    'home.faq.technical.question': 'Do I need to be technical to use it?',
+    'home.faq.technical.answer':
+      'No. You build your store, load your products and start taking payments from the dashboard, without writing a line of code. The API is there for whoever wants it, not for whoever wants to sell.',
     'home.faq.integrate.question': 'Can I integrate it into my own product?',
     'home.faq.integrate.answer':
       'Yes. Everything the dashboard does is exposed through the REST API, with two-token authentication and webhooks — and the whitelabel dashboard can run under your own brand.',
   },
   es: {
-    'home.title': '1Platform — Tienda online, sitio web y pagos en una sola plataforma',
+    'home.title': '1Platform — Tienda en línea, cobros con tarjeta y entregas',
     'home.description':
-      'Lanza una tienda online o un sitio web con pagos, facturación electrónica, contenido con IA y tu propio dominio — todo desde una sola plataforma. O intégralo vía API REST.',
+      'Abre tu tienda en línea, cobra con tarjeta, emite la factura sola en cada venta y despacha tus entregas — todo tu comercio, desde un solo lugar.',
     'home.jsonld.name': '1Platform',
     'home.jsonld.brandName': '1Platform Labs',
-    'home.hero.headline': 'One Platform. Every Solution.',
-    'home.hero.badge': 'Un espacio de trabajo conectado',
+
+    // — Portada ———————————————————————————————————————————————
+    'home.hero.badge': 'One Platform. Every Solution.',
+    'home.hero.headline': 'Tu comercio, vendiendo en línea desde hoy',
     'home.hero.lead':
-      'Vende por internet, cobra, factura y publica desde una sola cuenta — en el panel o con una sola API REST. Cada módulo ya habla con los demás.',
+      'Abre tu tienda, cobra con tarjeta, entrega a domicilio y factura en automático — todo desde un solo lugar, sin pegar herramientas sueltas.',
     'home.hero.fan.aria': 'Un espacio de trabajo de 1Platform en una tableta',
-    'home.showcase.aria': 'Soluciones de 1Platform',
-    'home.modules.title': 'One platform.\nEvery solution.',
-    'home.modules.carouselAria': 'Todos los módulos de la plataforma',
+    'home.hero.capabilities.aria': 'Lo esencial de tu comercio',
+    'home.hero.cta': 'Abre tu tienda gratis',
+    'home.hero.ctaNote': 'Sin tarjeta de crédito y sin suscripción. Pagas solo por lo que uses.',
+
+    // — Las tres que sostienen el comercio —————————————————————
+    'home.focus.eyebrow': 'Lo esencial',
+    'home.focus.title': 'Vende, cobra y entrega',
+    'home.focus.lead':
+      'Tres cosas sostienen a un comercio en línea. Aquí las tres llegan ya conectadas entre sí, así que empiezas vendiendo en vez de armando.',
+    'home.focus.store.title': 'Tu tienda, abierta a toda hora',
+    'home.focus.store.description':
+      'Tu catálogo, tus precios y tu marca en una tienda propia — con carrito, checkout de una sola página y cuentas para tus clientes.',
+    'home.focus.payments.title': 'Cobra con tarjeta y factura sola',
+    'home.focus.payments.description':
+      'Recibe pagos con tarjeta y emite la factura electrónica válida en el mismo momento de la venta, sin que nadie la escriba después.',
+    'home.focus.deliveries.title': 'Entrega a domicilio',
+    'home.focus.deliveries.description':
+      'Despacha con tu propio personal o con una mensajería, y dale a tu comprador un enlace donde ve su pedido avanzar hasta su puerta.',
+
+    // — Lo que hace rendir más a esas tres —————————————————————
+    'home.tools.eyebrow': 'Herramientas',
+    'home.tools.title': 'Y todo lo que hace que vendas más',
+    'home.tools.lead':
+      'Con lo esencial resuelto, estas piezas se ponen a trabajar para que más gente te encuentre, te elija y vuelva a comprarte.',
+
+    // — Para quién es —————————————————————————————————————————
+    'home.personas.eyebrow': 'Para quién es',
     'home.personas.title': 'Hecho para tu forma de trabajar',
-    'home.useCase.smallBusiness.title': 'Pequeños negocios',
-    'home.useCase.smallBusiness.description':
-      'Lanza tu tienda o sitio en días, no en meses — con pagos, facturación y contenido ya resueltos.',
-    'home.useCase.sellers.description':
-      'Vende productos, servicios o descargas digitales — acepta pagos y emite facturas conformes de forma automática.',
-    'home.useCase.agencies.title': 'Agencias con sitios de clientes',
+    'home.personas.lead':
+      'Ya vendas desde un mostrador, lleves las marcas de tus clientes o estés construyendo tu propio producto, empiezas desde la misma cuenta.',
+    'home.useCase.merchants.title': 'Comercios que quieren crecer',
+    'home.useCase.merchants.description':
+      'Pon tu negocio en línea y véndele a toda la gente que hoy no llega hasta tu mostrador — con los cobros, las facturas y las entregas ya resueltos.',
+    'home.useCase.agencies.title': 'Agencias que llevan varias marcas',
     'home.useCase.agencies.description':
-      'Administra decenas de tiendas y sitios de clientes desde un panel — marca blanca opcional, facturación por cliente.',
-    'home.useCase.developers.title': 'Desarrolladores que construyen SaaS',
+      'Administra las tiendas y los sitios de tus clientes desde un solo panel — con tu marca al frente y la facturación separada para cada uno.',
+    'home.useCase.developers.title': 'Equipos que construyen su producto',
     'home.useCase.developers.description':
-      'Usa 1Platform como backend de tu propio producto — pagos, facturación, contenido y panel incluidos.',
+      'Usa 1Platform como el motor de tu propio producto — pagos, facturación, envíos, contenido y panel ya incluidos.',
+
+    // — Preguntas frecuentes ——————————————————————————————————
+    'home.faq.eyebrow': 'Antes de empezar',
     'home.faq.title': 'Preguntas frecuentes',
     'home.faq.whatIs.question': '¿Qué es 1Platform?',
     'home.faq.whatIs.answer':
-      'Una sola cuenta que vende por internet, cobra, emite facturas, envía y publica contenido — desde un panel, o con una sola API REST si construyes tu propio producto.',
+      'Una sola cuenta desde la que tu comercio vende, cobra con tarjeta, emite sus facturas, despacha sus entregas y publica su contenido — desde un panel, o con una sola API REST si construyes tu propio producto.',
+    'home.faq.technical.question': '¿Necesito saber de tecnología para usarlo?',
+    'home.faq.technical.answer':
+      'No. Armas tu tienda, cargas tus productos y empiezas a cobrar desde el panel, sin escribir una línea de código. La API está ahí para quien la quiera, no para quien quiera vender.',
     'home.faq.integrate.question': '¿Puedo integrarlo en mi propio producto?',
     'home.faq.integrate.answer':
       'Sí. Todo lo que hace el panel está expuesto en la API REST, con autenticación de dos tokens y webhooks — y el panel de marca blanca puede correr con tu propia marca.',

@@ -85,7 +85,7 @@ export default defineMessages({
     'solutions-online-store.next.desc':
       'Pay only for what you use — no subscriptions, no hidden fees, and a free tier for testing every solution before you open the doors.',
     'solutions-online-store.next.linkCue': 'Read the API docs',
-    'solutions-online-store.next.actions.viewPricing': 'View Pricing',
+    'solutions-online-store.next.actions.viewPricing': 'See Pricing',
   },
   es: {
     'solutions-online-store.title': 'Plataforma de tienda online — Lanza tu tienda en minutos | 1Platform',

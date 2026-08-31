@@ -112,7 +112,7 @@ export default defineMessages({
     'solutions-ads.next.desc':
       'Advertising is enabled per workspace. Tell us which one, and it appears in your dashboard alongside everything else.',
     'solutions-ads.next.linkCue': 'Read the advertising reference',
-    'solutions-ads.next.actions.contact': 'Contact us',
+    'solutions-ads.next.actions.contact': 'Let’s Talk',
   },
 
   es: {
@@ -206,6 +206,6 @@ export default defineMessages({
     'solutions-ads.next.desc':
       'La publicidad se habilita por espacio de trabajo. Dinos cuál, y aparece en tu panel junto a todo lo demás.',
     'solutions-ads.next.linkCue': 'Leer la referencia de publicidad',
-    'solutions-ads.next.actions.contact': 'Contáctanos',
+    'solutions-ads.next.actions.contact': 'Hablemos',
   },
 });

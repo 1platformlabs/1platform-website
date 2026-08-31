@@ -175,7 +175,7 @@ export default defineMessages({
 
     'solutions.next.eyebrow': 'Next step',
     'solutions.next.title': 'Ready to simplify your stack?',
-    'solutions.next.actions.viewPricing': 'View Pricing',
+    'solutions.next.actions.viewPricing': 'See Pricing',
   },
   es: {
     'solutions.title': 'Soluciones — Tienda online, sitio web, pagos, contenido | 1Platform',

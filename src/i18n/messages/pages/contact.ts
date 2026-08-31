@@ -12,16 +12,16 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'contact.title': 'Contact Sales — Custom Quotes & Onboarding | 1Platform',
+    'contact.title': 'Contact — Custom Quotes & Help Getting Started | 1Platform',
     'contact.description':
-      'Talk to the 1Platform sales team. Custom quotes, demos, onboarding help, and partnership inquiries. Response within 24 hours, business days.',
+      'Write to us about custom quotes, a live demo, help getting your business running, or a partnership. We reply within 24 hours, business days.',
     'contact.breadcrumb': 'Contact',
 
-    'contact.eyebrow': 'Talk to sales',
+    'contact.eyebrow': 'We’re here to help',
     'contact.headline.pre': "Let's talk about",
-    'contact.headline.accent': 'your scale',
+    'contact.headline.accent': 'your business',
     'contact.sub.pre':
-      'Need a custom quote, a live demo, or onboarding help for your team? Our sales engineers reply within',
+      'Need a custom quote, a live demo, or a hand getting set up? We reply within',
     'contact.sub.strong': '24 hours',
     'contact.sub.post': 'on business days.',
     'contact.topicPrefix': 'Asking about',
@@ -44,7 +44,7 @@ export default defineMessages({
     'contact.expectations.technical.linkText': 'developer documentation',
     'contact.expectations.technical.detailAfter': 'first — it covers most integrations.',
 
-    'contact.panel.title': 'Email sales',
+    'contact.panel.title': 'Email us',
     'contact.panel.emailAria': 'sales at 1platform dot pro',
     'contact.panel.noscript': 'Enable JavaScript to see the email address, or use the Open Email button below.',
     'contact.panel.openEmail': 'Open Email',
@@ -55,16 +55,16 @@ export default defineMessages({
     'contact.panel.hint.post': 'and use the in-app chat for faster support.',
   },
   es: {
-    'contact.title': 'Contacta a ventas — Cotizaciones personalizadas y onboarding | 1Platform',
+    'contact.title': 'Contacto — Cotizaciones a tu medida y ayuda para empezar | 1Platform',
     'contact.description':
-      'Habla con el equipo de ventas de 1Platform. Cotizaciones personalizadas, demos, ayuda de onboarding y consultas de alianzas. Respuesta en 24 horas, días hábiles.',
+      'Escríbenos por una cotización a tu medida, una demo en vivo, ayuda para poner tu negocio en marcha o una alianza. Respondemos en 24 horas, días hábiles.',
     'contact.breadcrumb': 'Contacto',
 
-    'contact.eyebrow': 'Habla con ventas',
+    'contact.eyebrow': 'Estamos para ayudarte',
     'contact.headline.pre': 'Hablemos de',
-    'contact.headline.accent': 'tu escala',
+    'contact.headline.accent': 'tu negocio',
     'contact.sub.pre':
-      '¿Necesitas una cotización personalizada, una demo en vivo o ayuda de onboarding para tu equipo? Nuestros ingenieros de ventas responden en',
+      '¿Necesitas una cotización a tu medida, una demo en vivo o una mano para arrancar? Te respondemos en',
     'contact.sub.strong': '24 horas',
     'contact.sub.post': 'en días hábiles.',
     // Not a calque of "Asking about": that reads as "Consultando sobre Consulta
@@ -88,7 +88,7 @@ export default defineMessages({
     'contact.expectations.technical.linkText': 'documentación para desarrolladores',
     'contact.expectations.technical.detailAfter': 'primero — cubre la mayoría de las integraciones.',
 
-    'contact.panel.title': 'Escríbenos a ventas',
+    'contact.panel.title': 'Escríbenos',
     'contact.panel.emailAria': 'sales arroba 1platform punto pro',
     'contact.panel.noscript': 'Activa JavaScript para ver la dirección de correo, o usa el botón Abrir correo de abajo.',
     'contact.panel.openEmail': 'Abrir correo',
