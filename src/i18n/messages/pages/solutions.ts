@@ -43,6 +43,10 @@ export default defineMessages({
     'solutions.group.intelligence.item.electronicInvoicing.desc':
       'Compliant electronic invoices generated automatically. PDF + XML output, multi-item lines, automatic tax calculation.',
     'solutions.group.intelligence.item.electronicInvoicing.replaces': 'Invoicing software plus manual compliance',
+    'solutions.group.intelligence.item.branches.title': 'Businesses & Branches',
+    'solutions.group.intelligence.item.branches.desc':
+      'A workspace can hold several businesses, and each branch issues its invoices independently — its own address, its own numbering, its own record.',
+    'solutions.group.intelligence.item.branches.replaces': 'One account per location, reconciled by hand',
     'solutions.group.intelligence.item.domainManagement.title': 'Domain Management',
     'solutions.group.intelligence.item.domainManagement.desc':
       'Register, transfer, and renew domains. Manage DNS records and nameservers — all programmatically.',
@@ -95,6 +99,19 @@ export default defineMessages({
     'solutions.group.content.item.legalPageGeneration.desc':
       'Auto-generate privacy policies, terms of service, and cookie notices — tailored to your business.',
     'solutions.group.content.item.legalPageGeneration.replaces': 'Legal template services',
+    // Moved here from /features/ when that page was retired: these three were
+    // the only capabilities it named that this page did not. Everything else it
+    // listed was already here, sometimes under a second name — "Keyword
+    // Intelligence" and "SEO Intelligence" carried the same description word
+    // for word, which is how one product ends up competing with itself.
+    'solutions.group.content.item.aiComments.title': 'AI Comments',
+    'solutions.group.content.item.aiComments.desc':
+      'Generate contextual comments for blog posts and articles. Natural language that matches your voice.',
+    'solutions.group.content.item.aiComments.replaces': 'A separate engagement or moderation tool',
+    'solutions.group.content.item.authorProfiles.title': 'Author Profiles',
+    'solutions.group.content.item.authorProfiles.desc':
+      'Create and manage author profiles with bios, avatars, and metadata for multi-author publishing.',
+    'solutions.group.content.item.authorProfiles.replaces': 'Author metadata kept by hand in the CMS',
     'solutions.group.content.item.cmsPublishing.title': 'CMS Publishing',
     'solutions.group.content.item.cmsPublishing.desc':
       'Publish directly to WordPress and other CMS platforms. Schedule posts, set categories, manage media.',
@@ -213,6 +230,10 @@ export default defineMessages({
     'solutions.group.intelligence.item.electronicInvoicing.desc':
       'Facturas electrónicas conformes generadas automáticamente. Salida en PDF y XML, múltiples líneas y cálculo automático de impuestos.',
     'solutions.group.intelligence.item.electronicInvoicing.replaces': 'Software de facturación más cumplimiento manual',
+    'solutions.group.intelligence.item.branches.title': 'Comercios y sucursales',
+    'solutions.group.intelligence.item.branches.desc':
+      'Un espacio de trabajo puede tener varios comercios, y cada sucursal emite sus facturas de forma independiente: su dirección, su numeración y su registro propios.',
+    'solutions.group.intelligence.item.branches.replaces': 'Una cuenta por local, cuadrada a mano',
     'solutions.group.intelligence.item.domainManagement.title': 'Gestión de dominios',
     'solutions.group.intelligence.item.domainManagement.desc':
       'Registra, transfiere y renueva dominios. Gestiona registros DNS y nameservers — todo de forma programática.',
@@ -265,6 +286,14 @@ export default defineMessages({
     'solutions.group.content.item.legalPageGeneration.desc':
       'Genera automáticamente políticas de privacidad, términos del servicio y avisos de cookies — a la medida de tu negocio.',
     'solutions.group.content.item.legalPageGeneration.replaces': 'Servicios de plantillas legales',
+    'solutions.group.content.item.aiComments.title': 'Comentarios con IA',
+    'solutions.group.content.item.aiComments.desc':
+      'Genera comentarios contextuales para publicaciones de blog y artículos. Lenguaje natural que se ajusta a tu voz.',
+    'solutions.group.content.item.aiComments.replaces': 'Una herramienta aparte de interacción o moderación',
+    'solutions.group.content.item.authorProfiles.title': 'Perfiles de autor',
+    'solutions.group.content.item.authorProfiles.desc':
+      'Crea y administra perfiles de autor con biografías, avatares y metadatos para publicaciones con varios autores.',
+    'solutions.group.content.item.authorProfiles.replaces': 'Metadatos de autor mantenidos a mano en el CMS',
     'solutions.group.content.item.cmsPublishing.title': 'Publicación en CMS',
     'solutions.group.content.item.cmsPublishing.desc':
       'Publica directamente en WordPress y otras plataformas CMS. Programa publicaciones, define categorías y gestiona medios.',

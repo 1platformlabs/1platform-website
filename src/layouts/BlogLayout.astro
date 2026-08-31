@@ -90,9 +90,10 @@ const articleJsonLd = {
       ]} />
 
       <header class="blog-post__header">
-        <a href={l(`/blog/category/${frontmatter.category}/`)} class="eyebrow blog-post__category">
-          {categoryLabel}
-        </a>
+        {/* The label stays, the link is gone: the category pages it pointed at
+            held one or two posts each and no prose of their own, so they were
+            twelve indexable pages whose content already sat on /blog/. */}
+        <p class="eyebrow blog-post__category">{categoryLabel}</p>
 
         <h1>{frontmatter.title}</h1>
 

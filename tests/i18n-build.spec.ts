@@ -106,7 +106,12 @@ test('every page declares its language and every hreflang is reciprocal', () => 
   }
 
   expect(broken, broken.join('\n')).toEqual([]);
-  expect(byCanonical.size).toBeGreaterThan(60);
+  // A floor against the selector going stale, not a page count. It was 60 when
+  // the tree held 74 indexable pages; retiring /features/, the three
+  // comparisons and the twelve blog-category pages took that to 54, so the old
+  // floor now fails on a healthy build. Kept well clear of the real number in
+  // both directions: a broken regex still reports ~0 and still goes red.
+  expect(byCanonical.size).toBeGreaterThan(45);
 });
 
 test('no hreflang points at a page that was not built', () => {
