@@ -58,12 +58,18 @@ for (const { label, home, prefix } of LOCALES) {
     const html = readFileSync(home, 'utf8');
     const destinations = menuDestinations(html, prefix);
 
-    // Floor. A prefix typo or a renamed nav class would yield an empty list,
-    // and "0 missing" over 0 destinations reads exactly like a healthy page.
+    // Floor, not an inventory. A prefix typo or a renamed nav class would yield
+    // an empty list, and "0 missing" over 0 destinations reads exactly like a
+    // healthy page. It was 7 while the menu offered seven solutions; the
+    // whitelabel dashboard then left the menu — it is resold by agencies, not
+    // bought by merchants — so a healthy build now finds 6 and the old floor
+    // failed for the wrong reason, blaming the selector for an editorial
+    // decision. Kept clear of the real number so a stale selector still reports
+    // ~0 and still goes red.
     expect(
       destinations.length,
       `no solution destinations found in the ${label} header — the selector or the prefix went stale`,
-    ).toBeGreaterThanOrEqual(7);
+    ).toBeGreaterThanOrEqual(4);
 
     const linked = bodyLinks(html);
     const missing = destinations.filter((d) => !linked.has(d));
