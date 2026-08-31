@@ -40,11 +40,20 @@ const focus = [
   },
 ];
 
+/**
+ * Ordered by distance from the sale, nearest first, and each one labelled with
+ * the job it does rather than the technology it is — a shopkeeper decides by
+ * "what does this get me", not by "what is this called".
+ *
+ * The whitelabel dashboard used to sit here, because this rail carried whatever
+ * the header menu had left over after the three protagonists. It is a thing
+ * agencies resell, not a thing a merchant buys, so it left the menu (see
+ * `Header.astro`) and left this list with it.
+ */
 const tools = [
-  { label: t('nav.solutions.website'), href: l('/solutions/website/') },
-  { label: t('nav.solutions.content'), href: l('/solutions/content/') },
-  { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
-  { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
+  { label: t('home.tools.website'), href: l('/solutions/website/') },
+  { label: t('home.tools.ads'), href: l('/solutions/ads/') },
+  { label: t('home.tools.content'), href: l('/solutions/content/') },
 ];
 
 const audiences = [

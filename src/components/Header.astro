@@ -14,14 +14,26 @@ const { alternates } = Astro.props;
 const { t, l } = useI18n(Astro.url.pathname);
 const appUrl = 'https://app.1platform.pro/app/';
 
+/**
+ * Ordered the way a merchant meets them: sell, get paid, deliver, then the
+ * things that make those three earn more.
+ *
+ * The whitelabel dashboard is deliberately NOT here. It is the one capability
+ * on this menu that a merchant never buys — it is what an agency or a developer
+ * resells to their own customers — and both of those audiences reach it from
+ * their own pages and from the footer. Its place in this menu also decided the
+ * home's second rail, because `home-names-every-solution.spec.ts` requires the
+ * home to link everything this list offers: the rail carried whatever was left
+ * after the three protagonists, so a menu entry aimed at agencies was occupying
+ * a slot on the page that speaks to shopkeepers.
+ */
 const solutions: SubItem[] = [
   { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
-  { label: t('nav.solutions.website'), href: l('/solutions/website/') },
-  { label: t('nav.solutions.content'), href: l('/solutions/content/') },
-  { label: t('nav.solutions.deliveries'), href: l('/solutions/deliveries/') },
-  { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
-  { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
   { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
+  { label: t('nav.solutions.deliveries'), href: l('/solutions/deliveries/') },
+  { label: t('nav.solutions.website'), href: l('/solutions/website/') },
+  { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
+  { label: t('nav.solutions.content'), href: l('/solutions/content/') },
 ];
 
 const navItems: NavItem[] = [

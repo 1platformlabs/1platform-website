@@ -1,5 +1,4 @@
 ---
-import Icon from '@components/Icon.astro';
 import Logo from '@components/Logo.astro';
 import { useI18n } from '@i18n';
 
@@ -55,26 +54,11 @@ const year = new Date().getFullYear();
     </div>
 
     <div class="site-footer__content">
-      <div class="signup">
-        <p class="eyebrow">{t('footer.signup.title')}</p>
-        <h2>{t('footer.signup.body')}</h2>
-        <form
-          class="signup__form"
-          method="get"
-          action={l('/contact/')}
-          data-signup
-          data-user="sales"
-          data-domain="1platform.pro"
-          data-subject={t('footer.signup.subject')}
-          data-status={t('footer.signup.status')}
-        >
-          <label for="footer-email" class="sr-only">{t('footer.signup.label')}</label>
-          <input id="footer-email" type="email" name="email" required autocomplete="email" placeholder={t('footer.signup.placeholder')} />
-          <button type="submit" aria-label={t('footer.signup.submit')}><Icon name="arrow-right" size={18} /></button>
-        </form>
-        <p class="signup__status" aria-live="polite" data-signup-status></p>
-      </div>
-
+      {/* The newsletter capture that used to sit here opened a `mailto:` to the
+          public sales address on submit, so anything that filled it in — a bot
+          included — produced a message aimed at that inbox. It was removed
+          rather than hardened: a dedicated contact landing is coming, and until
+          it exists the footer offers no form at all. */}
       <div class="footer-cols">
         {columns.map((column) => (
           <details class="footer-col" open data-footer-col>
@@ -96,20 +80,6 @@ const year = new Date().getFullYear();
 
 <script>
   function wireFooter() {
-    const form = document.querySelector<HTMLFormElement>('[data-signup]');
-    const status = document.querySelector<HTMLElement>('[data-signup-status]');
-    if (form && !form.dataset.wired) {
-      form.dataset.wired = 'true';
-      form.addEventListener('submit', (event) => {
-        const user = form.dataset.user ?? '';
-        const domain = form.dataset.domain ?? '';
-        if (!user || !domain) return;
-        event.preventDefault();
-        const email = form.querySelector<HTMLInputElement>('input[type="email"]')?.value ?? '';
-        if (status) status.textContent = form.dataset.status ?? '';
-        globalThis.location.href = `mailto:${user}@${domain}?subject=${encodeURIComponent(form.dataset.subject ?? '')}&body=${encodeURIComponent(email)}`;
-      });
-    }
     const folded = globalThis.matchMedia('(max-width: 720px)').matches;
     document.querySelectorAll<HTMLDetailsElement>('[data-footer-col]').forEach((column) => { column.open = !folded; });
   }
@@ -125,14 +95,9 @@ const year = new Date().getFullYear();
   .site-footer :global(.site-footer__logo .logo__text) { color: var(--color-footer-text); }
   .site-footer__intro p { max-width: 35rem; color: var(--color-footer-muted); }
   .btn--footer { background: var(--cobalt-bright); color: var(--ink); border-color: var(--cobalt-bright); }
-  .site-footer__content { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--space-12); padding-block: var(--space-12); }
-  .signup .eyebrow { color: var(--color-footer-muted); }
-  .signup h2 { max-width: 20rem; margin: var(--space-4) 0 var(--space-5); font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 400; line-height: .95; color: var(--color-footer-text); }
-  .signup__form { display: flex; max-width: 390px; min-height: 48px; border-bottom: 1px solid var(--color-footer-text); }
-  .signup__form input { width: 100%; min-width: 0; border: 0; background: transparent; color: var(--color-footer-text); }
-  .signup__form input::placeholder { color: var(--color-footer-muted); }
-  .signup__form button { width: 48px; border: 0; background: transparent; color: var(--color-footer-text); cursor: pointer; }
-  .signup__status { min-height: 1.5em; margin-top: var(--space-2); color: var(--color-footer-muted); font-size: var(--text-sm); }
+  /* One column now that the signup is gone. Left as `1fr 2fr` it kept an empty
+     cell and squeezed the link columns into the right-hand two thirds. */
+  .site-footer__content { display: grid; gap: var(--space-12); padding-block: var(--space-12); }
   .footer-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6); }
   .footer-col summary { display: flex; align-items: center; justify-content: space-between; min-height: 32px; list-style: none; color: var(--color-footer-text); font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .12em; text-transform: uppercase; cursor: default; }
   .footer-col summary::-webkit-details-marker { display: none; }

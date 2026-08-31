@@ -55,9 +55,13 @@ export default defineMessages({
     'home.focus.store.title': 'Your store, open around the clock',
     'home.focus.store.description':
       'Your catalogue, your prices and your brand in a store of your own — with a cart, a one-page checkout and accounts for your customers.',
-    'home.focus.payments.title': 'Card payments that invoice themselves',
+    // The card used to describe the checkout case only. /payments-invoicing/
+    // also documents a payment link, a card terminal and recurring plans —
+    // three ways of getting paid that a shopkeeper who has no catalogue yet can
+    // use on day one, and that this page never named.
+    'home.focus.payments.title': 'Get paid however suits you',
     'home.focus.payments.description':
-      'Accept card payments and issue the valid electronic invoice at the very moment of the sale, with nobody typing it out afterwards.',
+      'At the checkout, through a link you send, or on a card terminal at your counter — and the valid electronic invoice is issued at the moment of the sale, with nobody typing it out afterwards.',
     'home.focus.deliveries.title': 'Delivery to the door',
     'home.focus.deliveries.description':
       'Dispatch with your own staff or with a courier, and give your buyer a link where they watch their order move all the way to their door.',
@@ -66,7 +70,13 @@ export default defineMessages({
     'home.tools.eyebrow': 'Tools',
     'home.tools.title': 'And everything that makes you sell more',
     'home.tools.lead':
-      'With the essentials handled, these pieces go to work so more people find you, choose you and come back to buy again.',
+      'With the essentials handled, these three go to work so more people find you, choose you and come back to buy again.',
+    // Labelled by the job, not the product name: the nav still calls these
+    // "Website Builder", "Advertising" and "AI Content", and it should — that is
+    // a directory. This is an argument, and it is ordered nearest-to-the-sale.
+    'home.tools.website': 'A site of your own, on your own domain',
+    'home.tools.ads': 'Ads that bring buyers to it',
+    'home.tools.content': 'Words and pictures that sell for you',
 
     // — Who it is for ——————————————————————————————————————————
     'home.personas.eyebrow': 'Who it is for',
@@ -121,9 +131,9 @@ export default defineMessages({
     'home.focus.store.title': 'Tu tienda, abierta a toda hora',
     'home.focus.store.description':
       'Tu catálogo, tus precios y tu marca en una tienda propia — con carrito, checkout de una sola página y cuentas para tus clientes.',
-    'home.focus.payments.title': 'Cobra con tarjeta y factura sola',
+    'home.focus.payments.title': 'Cobra como te sirva',
     'home.focus.payments.description':
-      'Recibe pagos con tarjeta y emite la factura electrónica válida en el mismo momento de la venta, sin que nadie la escriba después.',
+      'En el checkout, con un enlace que mandas, o en una terminal sobre tu mostrador — y la factura electrónica válida sale en el mismo momento de la venta, sin que nadie la escriba después.',
     'home.focus.deliveries.title': 'Entrega a domicilio',
     'home.focus.deliveries.description':
       'Despacha con tu propio personal o con una mensajería, y dale a tu comprador un enlace donde ve su pedido avanzar hasta su puerta.',
@@ -132,7 +142,10 @@ export default defineMessages({
     'home.tools.eyebrow': 'Herramientas',
     'home.tools.title': 'Y todo lo que hace que vendas más',
     'home.tools.lead':
-      'Con lo esencial resuelto, estas piezas se ponen a trabajar para que más gente te encuentre, te elija y vuelva a comprarte.',
+      'Con lo esencial resuelto, estas tres se ponen a trabajar para que más gente te encuentre, te elija y vuelva a comprarte.',
+    'home.tools.website': 'Un sitio tuyo, en tu propio dominio',
+    'home.tools.ads': 'Publicidad que te trae compradores',
+    'home.tools.content': 'Textos e imágenes que venden por ti',
 
     // — Para quién es —————————————————————————————————————————
     'home.personas.eyebrow': 'Para quién es',
