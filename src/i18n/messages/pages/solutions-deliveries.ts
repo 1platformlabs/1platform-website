@@ -31,6 +31,10 @@ export default defineMessages({
     'solutions-deliveries.hero.subheadline':
       'Register a shipment, dispatch it, and follow it to the door. Your own staff can run the whole thing from day one, and your buyer gets a tracking link that needs no account.',
     'solutions-deliveries.hero.badge': 'Delivery Management',
+    // The destination was already specific (`?intent=deliveries`); only the
+    // label was still the site-wide generic. "Order" is this page's own word —
+    // its headline is "Let every order go out the door".
+    'solutions-deliveries.hero.cta.primary': 'Send Your First Order',
     'solutions-deliveries.hero.cta.secondary': 'See Pricing',
 
     'solutions-deliveries.whatYouGet.eyebrow': 'What you get',
@@ -125,6 +129,7 @@ export default defineMessages({
     'solutions-deliveries.hero.subheadline':
       'Registra un envío, despáchalo y síguelo hasta la puerta. Tu propio personal puede hacerlo todo desde el primer día, y tu comprador recibe un enlace de seguimiento que no necesita cuenta.',
     'solutions-deliveries.hero.badge': 'Gestión de envíos',
+    'solutions-deliveries.hero.cta.primary': 'Envía tu primer pedido',
     'solutions-deliveries.hero.cta.secondary': 'Ver precios',
 
     'solutions-deliveries.whatYouGet.eyebrow': 'Qué obtienes',

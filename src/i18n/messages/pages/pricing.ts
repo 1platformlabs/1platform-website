@@ -20,7 +20,7 @@ export default defineMessages({
     'pricing.hero.subheadline':
       'No subscription and no seat count. Your account holds a balance, each operation draws from it at a per-unit rate, and everything else that comes with the platform is not metered at all.',
     'pricing.cta.startFree': 'Start Free',
-    'pricing.cta.contactSales': 'Contact Sales',
+    'pricing.cta.contactSales': 'Ask for Your Rate Card',
 
     // — The model ——————————————————————————————————————————————
     'pricing.model.eyebrow': 'The model',
@@ -173,7 +173,7 @@ export default defineMessages({
     'pricing.hero.subheadline':
       'Sin suscripción ni número de usuarios. Tu cuenta mantiene un saldo, cada operación descuenta de él a una tarifa por unidad, y todo lo demás que trae la plataforma no se factura por uso.',
     'pricing.cta.startFree': 'Empieza gratis',
-    'pricing.cta.contactSales': 'Contacta a ventas',
+    'pricing.cta.contactSales': 'Pide tu tarifario',
 
     // — El modelo ——————————————————————————————————————————————
     'pricing.model.eyebrow': 'El modelo',

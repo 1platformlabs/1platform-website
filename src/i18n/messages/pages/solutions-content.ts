@@ -73,7 +73,7 @@ export default defineMessages({
     'solutions-content.next.desc':
       'Pay only for what you use — no subscriptions, no hidden fees. Generate, publish, and rank content from one platform.',
     'solutions-content.next.linkCue': 'Read the content API docs',
-    'solutions-content.next.actions.viewPricing': 'View Pricing',
+    'solutions-content.next.actions.viewPricing': 'See Pricing',
   },
   es: {
     'solutions-content.title': 'API de generación de contenido con IA — Artículos, imágenes y SEO | 1Platform',
