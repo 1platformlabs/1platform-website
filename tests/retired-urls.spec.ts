@@ -30,20 +30,20 @@ const RETIRED: Record<string, string> = {
   // A smaller duplicate of /solutions/: twelve of its twenty-one headings
   // appeared there verbatim and no page body on the site linked it.
   '/features/': '/solutions/',
-  '/es/features/': '/es/solutions/',
+  '/es/features/': '/es/soluciones/',
 
   // A closed island — these linked only to each other.
   '/compare/1platform-vs-ai-writing-tools/': '/solutions/',
   '/compare/1platform-vs-custom-integration/': '/solutions/',
   '/compare/1platform-vs-wp-auto-pro/': '/solutions/',
-  '/es/compare/1platform-vs-ai-writing-tools/': '/es/solutions/',
-  '/es/compare/1platform-vs-custom-integration/': '/es/solutions/',
-  '/es/compare/1platform-vs-wp-auto-pro/': '/es/solutions/',
+  '/es/compare/1platform-vs-ai-writing-tools/': '/es/soluciones/',
+  '/es/compare/1platform-vs-custom-integration/': '/es/soluciones/',
+  '/es/compare/1platform-vs-wp-auto-pro/': '/es/soluciones/',
 
   // Three of its four cards were the target page said again; the one claim it
   // owned alone (custom domain) moved there with it.
   '/solutions/website/': '/solutions/content/',
-  '/es/solutions/website/': '/es/solutions/content/',
+  '/es/solutions/website/': '/es/soluciones/sitio-web-y-contenido/',
 
   // One or two posts each and no prose of their own.
   '/blog/category/ai-content/': '/blog/',

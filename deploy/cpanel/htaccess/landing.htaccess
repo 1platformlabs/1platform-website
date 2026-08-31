@@ -59,6 +59,53 @@ Options -Indexes +FollowSymLinks
   RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
 </IfModule>
 
+# ── Spanish slugs: 301 from the English-slugged address ──────────────────────
+# The Spanish tree used to publish English slugs — `/es/solutions/deliveries/`,
+# `/es/blog/launch-online-store-30-minutes/`. It now publishes Spanish ones, and
+# every old address answers a real 301 here.
+#
+# A real 301 rather than only the redirect stub Astro emits at each old path:
+# the stub is a `<meta http-equiv="refresh">`, which Google treats as a weaker,
+# slower signal than a 301 and which no non-browser client follows at all. The
+# stub stays as the fallback — if a rule below ever fails to match, the reader
+# still lands on the right page instead of a 404 — but it is not the contract.
+#
+# These are MOVES, not retirements: same page, new address. That is why the
+# target is the translated page itself and never a section index.
+#
+# mod_alias runs in the URL-translation phase, so it wins over the stub file
+# sitting at the same path. Each pattern is anchored at both ends: an unanchored
+# `Redirect /es/solutions/` would also swallow paths that were never moved.
+#
+# Generated from `src/i18n/ES_PATHS`; `tests/htaccess-301.spec.ts` fails if the
+# two ever disagree. Nothing here changes scheme or host, so the three
+# `assemble.sh` guards do not apply.
+<IfModule mod_alias.c>
+  RedirectMatch 301 "^/es/about/$" /es/nosotros/
+  RedirectMatch 301 "^/es/contact/$" /es/contacto/
+  RedirectMatch 301 "^/es/pricing/$" /es/precios/
+  RedirectMatch 301 "^/es/privacy/$" /es/privacidad/
+  RedirectMatch 301 "^/es/terms/$" /es/terminos/
+  RedirectMatch 301 "^/es/changelog/$" /es/novedades/
+  RedirectMatch 301 "^/es/for-agencies/$" /es/para-agencias/
+  RedirectMatch 301 "^/es/for-developers/$" /es/para-desarrolladores/
+  RedirectMatch 301 "^/es/payments-invoicing/$" /es/pagos-y-facturacion/
+  RedirectMatch 301 "^/es/solutions/$" /es/soluciones/
+  RedirectMatch 301 "^/es/solutions/online-store/$" /es/soluciones/tienda-online/
+  RedirectMatch 301 "^/es/solutions/deliveries/$" /es/soluciones/envios/
+  RedirectMatch 301 "^/es/solutions/ads/$" /es/soluciones/publicidad/
+  RedirectMatch 301 "^/es/solutions/whitelabel/$" /es/soluciones/marca-blanca/
+  RedirectMatch 301 "^/es/solutions/content/$" /es/soluciones/sitio-web-y-contenido/
+  RedirectMatch 301 "^/es/blog/1platform-vs-custom-toolchain/$" /es/blog/1platform-vs-herramientas-seo-propias/
+  RedirectMatch 301 "^/es/blog/ai-content-best-practices/$" /es/blog/contenido-con-ia-buenas-practicas-seo/
+  RedirectMatch 301 "^/es/blog/automate-seo-pipeline/$" /es/blog/automatizar-el-pipeline-de-seo/
+  RedirectMatch 301 "^/es/blog/electronic-invoicing-online-business/$" /es/blog/facturacion-electronica-para-negocios-online/
+  RedirectMatch 301 "^/es/blog/getting-started-5-minutes/$" /es/blog/primeros-pasos-en-5-minutos/
+  RedirectMatch 301 "^/es/blog/integrating-payments-into-your-saas/$" /es/blog/integrar-pagos-en-tu-saas/
+  RedirectMatch 301 "^/es/blog/launch-online-store-30-minutes/$" /es/blog/lanzar-una-tienda-online-en-30-minutos/
+  RedirectMatch 301 "^/es/blog/programmatic-link-building/$" /es/blog/link-building-programatico/
+</IfModule>
+
 DirectoryIndex index.html
 
 # Astro builds with trailingSlash:'always', so /pricing must 301 to /pricing/.

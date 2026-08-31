@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { movedEsPaths, translateFromEs, translateToEs } from './src/i18n/routes.ts';
 
 export default defineConfig({
   site: 'https://1platform.pro',
@@ -34,6 +35,40 @@ export default defineConfig({
         defaultLocale: 'en',
         locales: { en: 'en', es: 'es' },
       },
+
+      /**
+       * The language pairing, rebuilt from the route map.
+       *
+       * `i18n` above cannot do it any more. The integration pairs two URLs by
+       * literal string equality of the path with the locale prefix removed
+       * (`parse-i18n-url.js`), so the moment `/solutions/deliveries/` is
+       * published in Spanish as `/es/soluciones/envios/` the two stop matching
+       * and it emits NO `<xhtml:link rel="alternate">` for EITHER of them —
+       * not a wrong pair, no pair at all, silently, on every translated page.
+       *
+       * `serialize` runs after the sitemap is generated (`index.js:96-110`),
+       * so what we set here is what ships. The option above is kept because it
+       * still gets the untranslated pairs right on its own, and because
+       * removing it would also drop the `hreflang` naming this file relies on.
+       *
+       * `tests/sitemap-alternates.spec.ts` asserts every alternate emitted
+       * here names a URL the sitemap also lists, which is the failure this
+       * hand-rolled pairing could otherwise introduce.
+       */
+      serialize(item) {
+        const { pathname } = new URL(item.url);
+        const canonical = pathname.startsWith('/es/') || pathname === '/es'
+          ? translateFromEs(pathname)
+          : pathname;
+        const site = 'https://1platform.pro';
+        return {
+          ...item,
+          links: [
+            { lang: 'en', url: `${site}${canonical}` },
+            { lang: 'es', url: `${site}${translateToEs(canonical)}` },
+          ],
+        };
+      },
     }),
   ],
 
@@ -57,16 +92,16 @@ export default defineConfig({
 
     // A smaller duplicate of /solutions/, linked from no page body.
     '/features/': '/solutions/',
-    '/es/features/': '/es/solutions/',
+    '/es/features/': '/es/soluciones/',
 
     // A closed island: these three linked only to each other, and argued the
     // content-tooling positioning the site no longer holds.
     '/compare/1platform-vs-ai-writing-tools/': '/solutions/',
     '/compare/1platform-vs-custom-integration/': '/solutions/',
     '/compare/1platform-vs-wp-auto-pro/': '/solutions/',
-    '/es/compare/1platform-vs-ai-writing-tools/': '/es/solutions/',
-    '/es/compare/1platform-vs-custom-integration/': '/es/solutions/',
-    '/es/compare/1platform-vs-wp-auto-pro/': '/es/solutions/',
+    '/es/compare/1platform-vs-ai-writing-tools/': '/es/soluciones/',
+    '/es/compare/1platform-vs-custom-integration/': '/es/soluciones/',
+    '/es/compare/1platform-vs-wp-auto-pro/': '/es/soluciones/',
 
     // Three of its four cards were `/solutions/content/` said again: AI
     // content, CMS publishing and "built for SEO" (keywords + indexing + link
@@ -74,7 +109,7 @@ export default defineConfig({
     // comparison row selling it was already on `/solutions/online-store/`,
     // identical on both sides. The domain moved to the target instead.
     '/solutions/website/': '/solutions/content/',
-    '/es/solutions/website/': '/es/solutions/content/',
+    '/es/solutions/website/': '/es/soluciones/sitio-web-y-contenido/',
 
     // Twelve pages holding one or two posts each and no prose of their own.
     '/blog/category/ai-content/': '/blog/',
@@ -89,5 +124,18 @@ export default defineConfig({
     '/es/blog/category/payments-invoicing/': '/es/blog/',
     '/es/blog/category/product-updates/': '/es/blog/',
     '/es/blog/category/seo-automation/': '/es/blog/',
+
+    /**
+     * Every Spanish URL whose slug was translated, derived from the route map
+     * rather than written out again — a hand-kept second list is how one of
+     * twenty-three moves quietly starts answering 404.
+     *
+     * These are MOVES, not retirements: the address changed, the page did not.
+     * `deploy/cpanel/htaccess/landing.htaccess` carries a real 301 for each,
+     * which is the signal Google actually follows; the stub Astro emits here
+     * is the belt to that pair of braces, so a rule that fails to match on the
+     * host still lands the reader on the right page instead of a 404.
+     */
+    ...movedEsPaths(),
   },
 });

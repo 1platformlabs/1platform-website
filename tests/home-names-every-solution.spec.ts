@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { translateToEs } from '../src/i18n/routes';
 
 /**
  * The home page must name every solution the menu offers.
@@ -34,15 +35,24 @@ const LOCALES = [
   { label: 'es', home: join(DIST, 'es', 'index.html'), prefix: '/es' },
 ];
 
-/** Solution destinations the header offers, minus the `/solutions/` catch-all. */
-function menuDestinations(html: string, prefix: string): string[] {
+/**
+  * Solution destinations the header offers, minus the section index itself.
+  *
+  * The roots are asked of the route map rather than built as `${prefix}` plus
+  * the English path: under /es/ they are `/es/soluciones/` and
+  * `/es/pagos-y-facturacion/`, and a filter that kept concatenating would match
+  * nothing at all — which reads as "the menu offers no solutions" and passes
+  * every assertion below by finding nothing to check.
+  */
+function menuDestinations(html: string, locale: 'en' | 'es'): string[] {
   const nav = html.match(/<nav class="site-header__nav"[\s\S]*?<\/nav>/)?.[0];
   if (!nav) throw new Error('the header nav did not match — the selector went stale');
+  const at = (path: string) => (locale === 'en' ? path : translateToEs(path));
+  const section = at('/solutions/');
+  const payments = at('/payments-invoicing/');
   const hrefs = [...new Set([...nav.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]))];
   return hrefs.filter(
-    (h) =>
-      (h.startsWith(`${prefix}/solutions/`) || h === `${prefix}/payments-invoicing/`) &&
-      h.replace(/\/$/, '') !== `${prefix}/solutions`,
+    (h) => (h.startsWith(section) || h === payments) && h !== section,
   );
 }
 
@@ -53,10 +63,10 @@ function bodyLinks(html: string): Set<string> {
   return new Set([...body.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]));
 }
 
-for (const { label, home, prefix } of LOCALES) {
+for (const { label, home } of LOCALES) {
   test(`the ${label} home page names every solution the menu offers`, () => {
     const html = readFileSync(home, 'utf8');
-    const destinations = menuDestinations(html, prefix);
+    const destinations = menuDestinations(html, label as 'en' | 'es');
 
     // Floor, not an inventory. A prefix typo or a renamed nav class would yield
     // an empty list, and "0 missing" over 0 destinations reads exactly like a
