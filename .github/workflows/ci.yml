@@ -1,0 +1,113 @@
+name: CI — Pull Request
+
+# Las cuatro compuertas reales del repo, corriendo ANTES del merge.
+#
+# Hasta que existió este archivo no corría ninguna: `prod.yml` dispara sólo en
+# `push: [main]` y su job de build ejecuta `astro build` y nada más. O sea que
+# un PR que rompía el guard de proveedores —el que enforcea la regla crítica
+# del ecosistema, cero nombres de proveedor en superficie de cliente— mergeaba
+# y desplegaba en verde, y lo mismo un error de tipos, porque `astro build` no
+# typechequea.
+#
+# Deliberadamente NO se le agrega un trigger `pull_request` a `prod.yml`: ese
+# workflow es la tubería de despliegue y darle ese disparador arrastraría el
+# environment de PROD y sus credenciales a cada pull request.
+#
+# Molde: el repo hermano `1platform-api-developer` (`.github/workflows/ci.yml`).
+on:
+  pull_request:
+    branches: [main]
+
+# Ningún job necesita escribir nada.
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Tipos, guard de diseño y build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Instalar dependencias
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+
+      # `astro build` transpila sin typechequear, así que un error de tipos
+      # llegaba a producción compilando en verde.
+      - name: Typecheck
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run typecheck
+
+      # El build va ANTES del guard a propósito: dos de sus reglas —el
+      # presupuesto de 64 KB de JS público y el «motion CSS-first»— miden
+      # `dist/`, y sin él el guard aborta con «dist/index.html not found»
+      # (medido: `npm run check` sobre un árbol limpio sale 1 por eso solo).
+      - name: Build
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run build
+
+      # `npm run check` es `check-tells.sh && check-tells-self-test.sh`: el
+      # guard y la prueba de que el guard todavía FALLA ante cada tell. Un
+      # guard sólo es evidencia si se lo vio fallar.
+      - name: Guard de sistema de diseño y proveedores (con su self-test)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run check
+
+  browser:
+    name: Suite de navegador
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Instalar dependencias
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+
+      # Sólo chromium: es el único proyecto declarado en playwright.config.ts.
+      - name: Instalar navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+
+      # El `webServer` del config corre `npm run build && astro preview`, así
+      # que esta suite mide el `dist/` real, el mismo artefacto que se rsyncea.
+      # La línea base visual queda fuera a propósito (`testIgnore`): compara
+      # renders de Linux por contenedor y es su propio comando.
+      - name: Tests de navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test
