@@ -6,6 +6,7 @@ import Footer from '@components/Footer.astro';
 import { pickAnnouncement } from '@components/announcement';
 import { OG_LOCALES, alternatesForPath, useI18n, type Locale } from '@i18n';
 import { getLocalized } from '@i18n/collections';
+import { localizedOgImage } from '@i18n/og';
 import '@styles/global.css';
 import '@styles/components.css';
 
@@ -39,7 +40,12 @@ const {
 const { locale, t, l } = useI18n(Astro.url.pathname);
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL(ogImage, Astro.site);
+// The share card follows the page's language. A Spanish page pointing at an
+// English card was issue #59: the headline of the card is the reader's first
+// contact with the product, and it arrived in a language they did not pick.
+// Cards with nothing to translate (the wordmark fallback) are left alone —
+// `localizedOgImage` only swaps names it knows were drawn in that language.
+const ogImageURL = new URL(localizedOgImage(ogImage, locale), Astro.site);
 
 // hreflang must be absolute, and reciprocal: if English names Spanish, Spanish
 // has to name English with the identical pair, or Google discards the whole

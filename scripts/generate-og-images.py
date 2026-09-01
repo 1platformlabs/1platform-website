@@ -2,7 +2,15 @@
 """
 Generate per-page Open Graph images for 1platform.pro Tier 1 surfaces.
 
-Output: public/og/{solution-*,blog-*}.png — 1200×630 PNGs, ≤200 KB each.
+Output: public/og/{solution-*,blog-*}[-es].png — 1200×630 PNGs, ≤200 KB each.
+
+Every card is emitted twice, once per locale. A Spanish page that points at an
+English card is the defect reported in issue #59: the reader's first contact
+with the product — the headline of the share card — arrives in a language they
+did not pick, and the link looks like it leads to an English page. The `-es`
+suffix is a contract, not a convention: `src/i18n/og.ts` derives the Spanish
+name from the English one by appending it, and `tests/og-locale.spec.ts` fails
+if a name in that list has no file here.
 
 Tier 1 surfaces (from issue #32, plus the two verticals this epic publishes):
   - 7 solution sub-pages
@@ -126,7 +134,7 @@ def make_background() -> Image.Image:
 @dataclass
 class Card:
     out_name: str
-    kind: str        # "Solution" / "Blog"
+    kind: str        # "Solution" / "Blog" — or "Solución" / "Artículo" in Spanish
     title: str
     subline: str | None = None
 
@@ -254,6 +262,70 @@ CARDS = [
         kind="Blog",
         title="Integrating Payments Into Your SaaS API",
         subline="Checkout URLs, webhooks, balances, refunds — and the architectural decisions that actually matter.",
+    ),
+
+    # ── Español ────────────────────────────────────────────────────────
+    # Traducción, no transliteración: los titulares se acortan donde el
+    # castellano crece, para que sigan entrando en 3 líneas a 80 px.
+    Card(
+        out_name="solution-online-store-es.png",
+        kind="Solución",
+        title="Plataforma de tienda online",
+        subline="Lanza una tienda completa con checkout, pagos, facturación electrónica y tu propio dominio — desde una sola plataforma.",
+    ),
+    Card(
+        out_name="solution-website-es.png",
+        kind="Solución",
+        title="Sitio web con contenido por IA",
+        subline="Crea un sitio completo con contenido generado por IA, dominio propio y publicación integrada en el gestor de contenidos.",
+    ),
+    Card(
+        out_name="solution-content-es.png",
+        kind="Solución",
+        title="API de contenido con IA",
+        subline="Artículos, imágenes, comentarios y páginas de destino con IA. Extrae palabras clave, publica y envía a indexar.",
+    ),
+    Card(
+        out_name="solution-whitelabel-es.png",
+        kind="Solución",
+        title="Panel de marca blanca",
+        subline="Levanta un panel con tu marca desde una sola llamada a la API — tema, disposición, idiomas e indicadores de inicio.",
+    ),
+    Card(
+        out_name="solution-payments-invoicing-es.png",
+        kind="Solución",
+        title="Pagos y facturación electrónica",
+        subline="Cobra con tarjeta en línea y emite facturas electrónicas válidas de forma automática. Con webhooks y trazabilidad.",
+    ),
+    Card(
+        out_name="solution-deliveries-es.png",
+        kind="Solución",
+        title="Gestión de envíos",
+        subline="Registra, despacha y sigue cada envío. La flota propia funciona de punta a punta y tu comprador lo rastrea sin crear cuenta.",
+    ),
+    Card(
+        out_name="solution-ads-es.png",
+        kind="Solución",
+        title="Campañas publicitarias",
+        subline="Arma una campaña, fóndeala con el saldo de tu espacio de trabajo y recupera lo que no se gastó cuando cierra.",
+    ),
+    Card(
+        out_name="blog-launch-online-store-30-minutes-es.png",
+        kind="Artículo",
+        title="Cómo lanzar una tienda online en 30 minutos",
+        subline="Checkout, pagos, facturación y tu propio dominio — una guía práctica del equipo de 1Platform.",
+    ),
+    Card(
+        out_name="blog-electronic-invoicing-online-business-es.png",
+        kind="Artículo",
+        title="Facturación electrónica para negocios en línea",
+        subline="Las reglas, el flujo de trabajo y el modelo de integración — cobra y emite facturas válidas.",
+    ),
+    Card(
+        out_name="blog-integrating-payments-into-your-saas-es.png",
+        kind="Artículo",
+        title="Integrar pagos en tu API SaaS",
+        subline="URLs de checkout, webhooks, saldos, reembolsos — y las decisiones de arquitectura que de verdad importan.",
     ),
 ]
 
