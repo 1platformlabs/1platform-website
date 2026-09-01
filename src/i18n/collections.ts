@@ -61,7 +61,7 @@ export function dateOf(entry: CollectionEntry<LocalizableCollection>): Date {
 export async function postPaths(locale: Locale) {
   const posts = await getLocalized('blog', locale);
   return posts.map((post) => ({
-    params: { slug: bareSlug(post.slug) },
+    params: { slug: bareSlug(post.id) },
     props: { post },
   }));
 }
@@ -143,7 +143,7 @@ export async function entryAlternates<C extends LocalizableCollection>(
     }
 
     claimedBy[locale] = entry.id;
-    alternates[locale] = pathFor(locale, bareSlug(entry.slug));
+    alternates[locale] = pathFor(locale, bareSlug(entry.id));
   }
 
   return alternates;
