@@ -2,15 +2,15 @@
 import BlogLayout from '@layouts/BlogLayout.astro';
 import { localizePath } from '@i18n';
 import { bareSlug, entryAlternates } from '@i18n/collections';
-import type { CollectionEntry } from 'astro:content';
+import { render, type CollectionEntry } from 'astro:content';
 
 interface Props {
   post: CollectionEntry<'blog'>;
 }
 
 const { post } = Astro.props;
-const { Content, headings } = await post.render();
-const slug = bareSlug(post.slug);
+const { Content, headings } = await render(post);
+const slug = bareSlug(post.id);
 
 /**
  * Which languages this post exists in.

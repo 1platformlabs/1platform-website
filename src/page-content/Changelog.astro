@@ -4,6 +4,7 @@ import Breadcrumb from '@components/Breadcrumb.astro';
 import Icon from '@components/Icon.astro';
 import { formatDate, useI18n } from '@i18n';
 import { getLocalized } from '@i18n/collections';
+import { render } from 'astro:content';
 
 const { t, l, locale } = useI18n(Astro.url.pathname);
 
@@ -11,7 +12,7 @@ const entries = await getLocalized('changelog', locale);
 
 const renderedEntries = await Promise.all(
   entries.map(async (entry) => {
-    const { Content } = await entry.render();
+    const { Content } = await render(entry);
     return { entry, Content };
   })
 );

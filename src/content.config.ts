@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 
 /**
  * The locale is NOT a field here: it is the directory the file lives in
@@ -8,10 +9,17 @@ import { defineCollection, z } from 'astro:content';
  * It is required rather than optional so a new post cannot be added without
  * saying what it is a translation of — including when the answer is "nothing
  * yet", which is expressed by simply having no twin carrying that key.
+ *
+ * The `glob` loader replaced the implicit `type: 'content'` collection: from
+ * Astro 6 the legacy form is removed and the config has to live at
+ * `src/content.config.ts` rather than `src/content/config.ts`. The entry `id`
+ * it produces is the path under `base` without its extension — `en/foo` —
+ * which is the same shape the old `slug` had, so `bareSlug()` and `localeOf()`
+ * keep working unchanged and the public URLs do not move.
  */
 
 const blog = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
@@ -38,7 +46,7 @@ const blog = defineCollection({
 });
 
 const changelog = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './src/content/changelog' }),
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
