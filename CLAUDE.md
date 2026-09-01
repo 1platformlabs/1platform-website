@@ -118,9 +118,13 @@ system across every public route.
 
 ### The home system
 
-The home (`/`, `/es/`) uses an editorial grid, large Instrument Serif openers,
-numbered solution index, original Astro Image assets under `src/assets/editorial/`
-and a dark closing footer. Keep interactions to native controls and small
+The home (`/`, `/es/`) opens on a white orbital commerce scene built from
+semantic HTML and CSS: Online Store, online payment, electronic invoicing and
+delivery remain visible together while emphasis follows one order through the
+four states. It contains no radio inputs, fake selectors or carousel controls.
+The four-step index below the fold repeats the same narrative as real links,
+then hands off to the editorial Astro Image assets under `src/assets/editorial/`
+and the dark closing footer. Keep interactions to native controls and small
 progressive enhancements; every motion path must have a reduced-motion state.
 `tests/chrome-navigation.spec.ts`, `tests/contrast.spec.ts` and the visual
 baselines are the contracts for this system.
@@ -139,7 +143,9 @@ Restrained by design — over-animation was one of the tells this site was rebui
 - **One reveal:** IntersectionObserver adds `.is-visible` to `.reveal` (a short fade-up).
   `animations.ts` deliberately supports **no** per-element or per-index delay.
 - **Decorative motion** is limited to opacity, colour and transform changes in
-  the editorial system; public pages never mount a canvas or WebGL runtime.
+  the editorial system. The home orbit is the only ambient sequence and its
+  four cards never disappear, so the story remains legible at every phase;
+  public pages never mount a canvas or WebGL runtime.
 - **Hover:** cards firm their border and take a faint shadow — no lift. Link cues nudge
   their arrow 3px.
 - **Primary easing:** `cubic-bezier(0.16, 1, 0.3, 1)` (ease-out-expo).

@@ -59,7 +59,9 @@ test('the cookie is written before the client router swaps the document', async 
   await page.goto('/es/');
   await openMenu(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
-  await expect(page).toHaveURL(/localhost:4321\/$/);
+  // Assert the destination, not the development port: isolated worktrees run
+  // their static server on different ports but still exercise the same route.
+  await expect(page).toHaveURL(/\/$/);
 
   const cookie = (await context.cookies()).find((c) => c.name === '1p_lang');
   expect(cookie?.value).toBe('en');
@@ -77,7 +79,7 @@ test('the choice survives a new page load', async ({ browser }) => {
   await page.goto('/es/');
   await openMenu(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
-  await expect(page).toHaveURL(/localhost:4321\/$/);
+  await expect(page).toHaveURL(/\/$/);
 
   // Fresh navigation, same context: the Spanish browser locale would otherwise
   // send this straight back to /es/.

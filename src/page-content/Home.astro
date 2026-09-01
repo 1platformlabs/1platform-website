@@ -1,8 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import BaseLayout from '@layouts/BaseLayout.astro';
-import platformHeroDevice from '@assets/editorial/platform-hero-device.png';
-import heroDeskObjects from '@assets/editorial/hero-desk-objects.png';
+import CommerceOrbit from '@components/home/CommerceOrbit.astro';
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
 import platformModules from '@assets/editorial/platform-modules.png';
 import { useI18n } from '@i18n';
 
@@ -10,46 +11,46 @@ const { t, l } = useI18n(Astro.url.pathname);
 const title = t('home.title');
 const description = t('home.description');
 
+type JourneyStep = {
+  icon: IconName;
+  title: string;
+  body: string;
+  href: string;
+};
+
 /**
- * The home has two tiers of solution, and the split is the page's argument:
- * `focus` is what a merchant needs before anything else can matter — sell,
- * get paid, deliver — and `tools` is what makes those three earn more.
- *
- * Together they must still cover EVERY destination the header offers, which
- * `tests/home-names-every-solution.spec.ts` enforces: a solution demoted out
- * of `focus` has to land in `tools`, never be dropped.
+ * One sale, in the order a merchant experiences it. Payment and invoicing
+ * share a product destination but remain separate moments in the story: that
+ * distinction is what makes automatic invoicing visible at first glance.
  */
-const focus = [
+const journey: JourneyStep[] = [
   {
-    label: t('nav.solutions.onlineStore'),
-    title: t('home.focus.store.title'),
-    body: t('home.focus.store.description'),
+    icon: 'store',
+    title: t('home.flow.store.title'),
+    body: t('home.flow.store.description'),
     href: l('/solutions/online-store/'),
   },
   {
-    label: t('nav.solutions.payments'),
-    title: t('home.focus.payments.title'),
-    body: t('home.focus.payments.description'),
+    icon: 'card',
+    title: t('home.flow.payment.title'),
+    body: t('home.flow.payment.description'),
     href: l('/payments-invoicing/'),
   },
   {
-    label: t('nav.solutions.deliveries'),
-    title: t('home.focus.deliveries.title'),
-    body: t('home.focus.deliveries.description'),
+    icon: 'invoice',
+    title: t('home.flow.invoice.title'),
+    body: t('home.flow.invoice.description'),
+    href: l('/payments-invoicing/'),
+  },
+  {
+    icon: 'truck',
+    title: t('home.flow.delivery.title'),
+    body: t('home.flow.delivery.description'),
     href: l('/solutions/deliveries/'),
   },
 ];
 
-/**
- * Ordered by distance from the sale, nearest first, and each one labelled with
- * the job it does rather than the technology it is — a shopkeeper decides by
- * "what does this get me", not by "what is this called".
- *
- * The whitelabel dashboard used to sit here, because this rail carried whatever
- * the header menu had left over after the three protagonists. It is a thing
- * agencies resell, not a thing a merchant buys, so it left the menu (see
- * `Header.astro`) and left this list with it.
- */
+/** Ordered by distance from the sale, nearest first. */
 const tools = [
   { label: t('home.tools.website'), href: l('/solutions/website/') },
   { label: t('home.tools.ads'), href: l('/solutions/ads/') },
@@ -76,68 +77,64 @@ const jsonLd = [
 ---
 
 <BaseLayout title={title} description={description} jsonLd={jsonLd} showAnnouncement={false}>
-  <section class="product-hero" id="hero">
-    <Image class="product-hero__props product-hero__props--laptop" src={heroDeskObjects} alt="" aria-hidden="true" widths={[960, 1440, 1774]} sizes="100vw" />
-    <Image class="product-hero__props product-hero__props--clip" src={heroDeskObjects} alt="" aria-hidden="true" widths={[960, 1440, 1774]} sizes="100vw" />
-    <Image class="product-hero__props product-hero__props--peripherals" src={heroDeskObjects} alt="" aria-hidden="true" widths={[960, 1440, 1774]} sizes="100vw" />
-    <div class="container product-hero__inner">
-      <div class="product-hero__copy">
-        <p class="product-hero__badge">{t('home.hero.badge')}</p>
+  <section class="commerce-hero" id="hero">
+    <div class="container commerce-hero__inner">
+      <div class="commerce-hero__copy">
+        <p class="commerce-hero__badge"><span aria-hidden="true"></span>{t('home.hero.badge')}</p>
         <h1>{t('home.hero.headline')}</h1>
-        <p class="product-hero__lead">{t('home.hero.lead')}</p>
-        <div class="product-hero__actions">
+        <p class="commerce-hero__lead">{t('home.hero.lead')}</p>
+        <div class="product-hero__actions commerce-hero__actions">
           <a href="https://app.1platform.pro/app/" class="btn btn--primary">{t('home.hero.cta')}</a>
         </div>
-        <p class="product-hero__note">{t('home.hero.ctaNote')}</p>
+        <p class="commerce-hero__note">{t('home.hero.ctaNote')}</p>
       </div>
-
-      <ul class="product-hero__capabilities" aria-label={t('home.hero.capabilities.aria')}>
-        {focus.map((item) => (
-          <li><span aria-hidden="true"></span><a href={item.href}>{item.label}</a></li>
-        ))}
-      </ul>
-
-      <figure class="product-hero__device reveal">
-        <Image src={platformHeroDevice} alt={t('home.hero.fan.aria')} widths={[640, 960, 1280, 1536]} sizes="(min-width: 900px) 920px, 96vw" loading="eager" />
-      </figure>
     </div>
+    <CommerceOrbit />
   </section>
 
-  <section class="product-focus section" id="essentials">
+  <section class="commerce-flow section" id="essentials">
     <div class="container">
-      <div class="product-focus__intro">
-        <p class="eyebrow">{t('home.focus.eyebrow')}</p>
-        <h2>{t('home.focus.title')}</h2>
-        <p class="product-focus__lead">{t('home.focus.lead')}</p>
+      <div class="commerce-flow__intro">
+        <p class="eyebrow">{t('home.flow.eyebrow')}</p>
+        <h2>{t('home.flow.title')}</h2>
+        <p>{t('home.flow.lead')}</p>
       </div>
-      <div class="product-focus__grid">
-        {focus.map((item, index) => (
-          <a href={item.href} class="product-focus__card reveal">
-            <span class="product-focus__step" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-            <h3>{item.title}</h3>
-            <p>{item.body}</p>
-            <span class="product-focus__cue" aria-hidden="true"></span>
-          </a>
+
+      <ol class="commerce-flow__steps">
+        {journey.map((item, index) => (
+          <li>
+            <a href={item.href} class="commerce-step">
+              <span class="commerce-step__top">
+                <span class="commerce-step__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <span class="commerce-step__icon" aria-hidden="true"><Icon name={item.icon} size={22} /></span>
+              </span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+              <span class="commerce-step__cue" aria-hidden="true"><Icon name="arrow-right" size={18} /></span>
+            </a>
+          </li>
         ))}
-      </div>
+      </ol>
     </div>
   </section>
 
-  <section class="product-tools section section--alt" id="tools">
+  <section class="product-tools section" id="tools">
     <div class="container product-tools__grid">
-      <div class="product-tools__image reveal">
+      <figure class="product-tools__image">
         <Image src={platformModules} alt="" aria-hidden="true" widths={[480, 720, 960]} sizes="(min-width: 900px) 42vw, 100vw" />
-      </div>
+      </figure>
       <div class="product-tools__copy">
         <p class="eyebrow">{t('home.tools.eyebrow')}</p>
         <h2>{t('home.tools.title')}</h2>
         <p class="product-tools__lead">{t('home.tools.lead')}</p>
         <div class="product-tools__list">
           {tools.map((tool) => (
-            <a href={tool.href} class="product-tool-link"><span>{tool.label}</span><span aria-hidden="true" class="product-tool-link__arrow"></span></a>
+            <a href={tool.href} class="product-tool-link">
+              <span>{tool.label}</span><span aria-hidden="true"><Icon name="arrow-right" size={18} /></span>
+            </a>
           ))}
         </div>
-        <a href={l('/solutions/')} class="product-text-link">{t('nav.solutions.viewAll')}</a>
+        <a href={l('/solutions/')} class="product-text-link">{t('nav.solutions.viewAll')}<Icon name="arrow-right" size={16} /></a>
       </div>
     </div>
   </section>
@@ -150,13 +147,17 @@ const jsonLd = [
       </div>
       <div class="product-audiences__grid">
         {audiences.map((audience) => (
-          <a href={audience.href} class="product-audience reveal"><span class="product-audience__cue" aria-hidden="true"></span><h3>{audience.title}</h3><p>{audience.body}</p></a>
+          <a href={audience.href} class="product-audience">
+            <span class="product-audience__cue" aria-hidden="true"><Icon name="arrow-right" size={19} /></span>
+            <h3>{audience.title}</h3>
+            <p>{audience.body}</p>
+          </a>
         ))}
       </div>
     </div>
   </section>
 
-  <section class="product-faq section section--alt" id="faq">
+  <section class="product-faq section" id="faq">
     <div class="container product-faq__grid">
       <div><p class="eyebrow">{t('home.faq.eyebrow')}</p><h2>{t('home.faq.title')}</h2></div>
       <div class="product-faq__list">
@@ -169,73 +170,323 @@ const jsonLd = [
 </BaseLayout>
 
 <style>
-  .product-hero { position: relative; min-height: min(1080px, 100svh); overflow: hidden; padding: calc(var(--header-offset) + 11.5rem) 0 0; background: var(--surface); }
-  .product-hero__props { position: absolute; z-index: 0; left: 50%; width: max(100%, 1420px); max-width: none; height: auto; transform: translateX(-50%); pointer-events: none; }
-  .product-hero__props--laptop { top: 0; clip-path: inset(0 0 46% 66%); }
-  .product-hero__props--clip { top: 92px; clip-path: inset(11% 85% 43% 0); }
-  .product-hero__props--peripherals { top: 590px; clip-path: inset(44% 0 0 0); }
-  .product-hero__inner { position: relative; z-index: 1; display: grid; justify-items: center; text-align: center; }
-  .product-hero__copy { max-width: 50rem; }
-  .product-hero__badge { display: inline-flex; align-items: center; min-height: 38px; padding: 0 var(--space-4); border-radius: var(--border-radius-pill); background: var(--color-accent-soft); color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
-  /* The headline is a sentence now, not the 29-character brand line, so it
-     WRAPS. The `white-space: nowrap` that used to sit here was sized for
-     "One Platform. Every Solution." and would push a real sentence off both
-     edges of the viewport. */
-  .product-hero h1 { max-width: 19ch; margin: var(--space-8) auto; font-family: var(--font-display); font-size: clamp(2.9rem, 4.55vw, 4.5rem); font-weight: 700; line-height: 1.02; letter-spacing: -.055em; text-wrap: balance; }
-  .product-hero__lead { max-width: 39rem; margin-inline: auto; font-size: clamp(1rem, 1.45vw, 1.25rem); line-height: 1.55; }
-  .product-hero__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-8); }
-  .product-hero__note { margin-top: var(--space-4); color: var(--color-text-secondary); font-size: var(--text-sm); }
-  .product-hero__capabilities { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-6); margin-top: var(--space-12); }
-  .product-hero__capabilities li { display: inline-flex; align-items: center; gap: 9px; color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
-  .product-hero__capabilities li > span { width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); box-shadow: inset 0 0 0 4px var(--color-accent-soft); }
-  .product-hero__capabilities a:hover { text-decoration: underline; text-underline-offset: 4px; }
-  .product-hero__device { width: min(920px, 96vw); margin: var(--space-12) auto -12rem; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0; box-shadow: 0 -1px 0 rgba(20, 22, 27, .03), 0 24px 65px rgba(20, 22, 27, .14); }
-  .product-hero__device :global(img) { width: 100%; height: auto; }
+  .commerce-hero {
+    position: relative;
+    min-height: clamp(840px, 100svh, 1200px);
+    overflow: hidden;
+    padding: calc(var(--header-offset) + 8.5rem) 0 5rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--color-border);
+  }
 
-  .product-focus { border-bottom: 1px solid var(--color-border); }
-  .product-focus__intro { display: grid; gap: var(--space-5); max-width: 840px; margin-inline: auto; text-align: center; }
-  .product-focus__intro .eyebrow { justify-self: center; }
-  .product-focus__lead { max-width: 44rem; margin-inline: auto; font-size: var(--text-lg); }
-  .product-focus__grid { display: grid; gap: var(--space-4); margin-top: var(--space-12); }
-  .product-focus__card { display: grid; gap: var(--space-4); min-height: 300px; padding: var(--space-8); border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); color: var(--color-text); background: var(--surface); }
-  .product-focus__step { font-family: var(--font-display); font-size: var(--text-sm); font-weight: 600; letter-spacing: .12em; color: var(--color-accent); }
-  .product-focus__card h3 { margin-top: auto; font-size: var(--text-2xl); letter-spacing: -.02em; }
-  .product-focus__card:hover { border-color: var(--color-accent); }
+  .commerce-hero__inner {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
 
-  .product-focus h2, .product-tools h2, .product-audiences h2, .product-faq h2 { font-size: clamp(2.25rem, 4.2vw, 4.75rem); line-height: 1; letter-spacing: -.055em; }
-  .product-tools__grid { display: grid; gap: var(--space-12); align-items: center; }
-  .product-tools__image { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); background: var(--surface); }
+  .commerce-hero__copy { max-width: 47rem; }
+
+  .commerce-hero__badge {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-text-secondary);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .commerce-hero__badge span {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    background: var(--color-accent);
+    box-shadow: inset 0 0 0 3px var(--color-accent-soft);
+  }
+
+  .commerce-hero h1 {
+    max-width: 13ch;
+    margin: var(--space-5) auto var(--space-6);
+    font-size: clamp(3.25rem, 5.5vw, 5.4rem);
+    line-height: 0.94;
+    letter-spacing: -0.065em;
+  }
+
+  .commerce-hero__lead {
+    max-width: 40rem;
+    margin-inline: auto;
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
+    line-height: 1.6;
+  }
+
+  .commerce-hero__actions {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-8);
+  }
+
+  .commerce-hero__actions .btn {
+    min-height: 52px;
+    padding-inline: var(--space-8);
+    border-radius: var(--border-radius-pill);
+  }
+
+  .commerce-hero__note {
+    margin-top: var(--space-4);
+    color: var(--color-text-tertiary);
+    font-size: var(--text-sm);
+  }
+
+  .commerce-flow {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(5rem, 9vw, 9rem);
+    background: var(--color-bg-muted);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .commerce-flow__intro {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 790px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .commerce-flow__intro .eyebrow { justify-self: center; }
+
+  .commerce-flow__intro h2,
+  .product-tools h2,
+  .product-audiences h2,
+  .product-faq h2 {
+    font-size: clamp(2.35rem, 4.4vw, 4.85rem);
+    line-height: 0.98;
+    letter-spacing: -0.06em;
+  }
+
+  .commerce-flow__intro > p:last-child {
+    max-width: 42rem;
+    margin-inline: auto;
+    font-size: var(--text-lg);
+  }
+
+  .commerce-flow__steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: clamp(3rem, 6vw, 5.5rem);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 18px;
+    background: var(--color-border);
+    box-shadow: 0 20px 60px rgba(20, 22, 27, 0.07);
+  }
+
+  .commerce-step {
+    position: relative;
+    display: grid;
+    min-height: 330px;
+    padding: var(--space-8);
+    color: var(--color-text);
+    background: var(--surface);
+  }
+
+  .commerce-flow__steps li:first-child .commerce-step { border-radius: 17px 0 0 17px; }
+  .commerce-flow__steps li:last-child .commerce-step { border-radius: 0 17px 17px 0; }
+
+  .commerce-step__top { display: flex; align-items: center; justify-content: space-between; }
+
+  .commerce-step__number {
+    color: var(--color-text-tertiary);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+  }
+
+  .commerce-step__icon {
+    display: inline-grid;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    border-radius: 12px;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .commerce-step h3 {
+    align-self: end;
+    margin-top: var(--space-12);
+    font-size: clamp(1.25rem, 1.75vw, 1.65rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+
+  .commerce-step p { margin-top: var(--space-3); font-size: var(--text-sm); line-height: 1.55; }
+  .commerce-step__cue { justify-self: end; margin-top: var(--space-6); color: var(--color-accent); }
+
+  .product-tools {
+    padding-block: clamp(5rem, 9vw, 9rem);
+    background: var(--surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .product-tools__grid { display: grid; gap: clamp(3rem, 7vw, 7rem); align-items: center; }
+
+  .product-tools__image {
+    overflow: hidden;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 20px;
+    background: var(--color-bg-muted);
+    box-shadow: 0 22px 64px rgba(20, 22, 27, 0.1);
+    transform: rotate(-1.25deg);
+  }
+
   .product-tools__image :global(img) { width: 100%; height: auto; }
-  .product-tools__copy h2 { max-width: 13ch; margin: var(--space-4) 0 var(--space-5); }
+  .product-tools__copy h2 { max-width: 12ch; margin: var(--space-5) 0; }
   .product-tools__lead { max-width: 34rem; margin-bottom: var(--space-8); font-size: var(--text-lg); }
   .product-tools__list { display: grid; border-top: 1px solid var(--color-border); }
-  .product-tool-link { display: flex; align-items: center; justify-content: space-between; min-height: 58px; border-bottom: 1px solid var(--color-border); color: var(--color-text); font-size: var(--text-lg); }
-  .product-tool-link__arrow, .product-audience__cue, .product-focus__cue { width: 9px; height: 9px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; transform: rotate(45deg); }
-  .product-focus__cue { justify-self: start; color: var(--color-accent); }
-  .product-tool-link:hover { color: var(--color-accent); }
-  .product-text-link { display: inline-flex; margin-top: var(--space-6); color: var(--color-accent); font-size: var(--text-sm); font-weight: 600; }
-  .product-text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
-  .product-audiences__header { display: grid; gap: var(--space-6); align-items: end; margin-bottom: var(--space-10); }
-  .product-audiences__header h2 { max-width: 11ch; margin-top: var(--space-4); }
+
+  .product-tool-link {
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-size: var(--text-lg);
+  }
+
+  .product-tool-link > span:last-child { color: var(--color-accent); }
+
+  .product-text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .product-audiences {
+    padding-block: clamp(5rem, 9vw, 9rem);
+    background: var(--color-bg-muted);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .product-audiences__header { display: grid; gap: var(--space-6); align-items: end; margin-bottom: var(--space-12); }
+  .product-audiences__header h2 { max-width: 10ch; margin-top: var(--space-4); }
   .product-audiences__header > p { max-width: 32rem; font-size: var(--text-lg); }
   .product-audiences__grid { display: grid; gap: var(--space-4); }
-  .product-audience { display: grid; gap: var(--space-5); min-height: 240px; padding: var(--space-8); border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); color: var(--color-text); background: var(--surface); }
-  .product-audience h3 { margin-top: auto; font-size: var(--text-2xl); }
+
+  .product-audience {
+    display: grid;
+    min-height: 280px;
+    padding: var(--space-8);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 16px;
+    color: var(--color-text);
+    background: var(--surface);
+  }
+
   .product-audience__cue { justify-self: end; color: var(--color-accent); }
-  .product-audience:hover { border-color: var(--color-accent); }
+  .product-audience h3 { align-self: end; margin-top: var(--space-12); font-size: var(--text-2xl); font-weight: 600; }
+  .product-audience p { margin-top: var(--space-3); }
+
+  .product-faq { padding-block: clamp(5rem, 9vw, 9rem); background: var(--surface); }
   .product-faq__grid { display: grid; gap: var(--space-10); }
   .product-faq h2 { max-width: 10ch; margin-top: var(--space-4); }
   .product-faq__list { border-top: 1px solid var(--color-border); }
   .product-faq__item { border-bottom: 1px solid var(--color-border); }
-  .product-faq__item summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); min-height: 76px; list-style: none; color: var(--color-text); font-family: var(--font-display); font-size: var(--text-lg); font-weight: 500; cursor: pointer; }
+
+  .product-faq__item summary {
+    display: flex;
+    min-height: 78px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    list-style: none;
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
   .product-faq__item summary::-webkit-details-marker { display: none; }
   .product-faq__item summary span { position: relative; width: 14px; height: 14px; flex: 0 0 auto; }
-  .product-faq__item summary span::before, .product-faq__item summary span::after { content: ''; position: absolute; top: 6px; left: 0; width: 14px; height: 1px; background: currentColor; }
+  .product-faq__item summary span::before,
+  .product-faq__item summary span::after { content: ''; position: absolute; top: 6px; left: 0; width: 14px; height: 1px; background: currentColor; }
   .product-faq__item summary span::after { transform: rotate(90deg); }
   .product-faq__item[open] summary span::after { transform: rotate(0); }
   .product-faq__item p { max-width: 48rem; padding-bottom: var(--space-6); }
-  @media (prefers-reduced-motion: no-preference) { .product-tool-link, .product-audience, .product-focus__card { transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease; } }
-  @media (min-width: 760px) { .product-focus__grid { grid-template-columns: repeat(3, 1fr); } .product-audiences__header { grid-template-columns: 1fr minmax(260px, .65fr); } .product-audiences__grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 900px) { .product-tools__grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); } .product-faq__grid { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); } }
-  @media (max-width: 700px) { .product-hero { min-height: 820px; padding-top: calc(var(--header-offset) + 5.75rem); } .product-hero__props { width: 980px; } .product-hero__props--laptop { top: 0; } .product-hero__props--clip, .product-hero__props--peripherals { display: none; } .product-hero h1 { max-width: 14ch; font-size: clamp(2.25rem, 9.4vw, 3.25rem); } .product-hero__capabilities { gap: var(--space-3) var(--space-5); } .product-hero__capabilities li { font-size: var(--text-xs); } .product-hero__device { margin-top: var(--space-10); margin-bottom: -8rem; } }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .commerce-step,
+    .product-tool-link,
+    .product-audience,
+    .product-text-link,
+    .product-tools__image {
+      transition: color var(--duration-fast) ease,
+                  border-color var(--duration-fast) ease,
+                  box-shadow var(--duration-normal) ease,
+                  transform var(--duration-normal) var(--ease-out-expo);
+    }
+
+    .commerce-step:hover .commerce-step__cue,
+    .product-tool-link:hover > span:last-child,
+    .product-text-link:hover :global(svg),
+    .product-audience:hover .product-audience__cue { transform: translateX(3px); }
+  }
+
+  .commerce-step:hover,
+  .product-audience:hover { border-color: var(--color-accent); box-shadow: var(--shadow-card-hover); }
+  .product-tool-link:hover,
+  .product-text-link:hover { color: var(--color-accent); }
+
+  @media (min-width: 760px) {
+    .product-audiences__header { grid-template-columns: 1fr minmax(260px, 0.65fr); }
+    .product-audiences__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (min-width: 900px) {
+    .product-tools__grid { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); }
+    .product-faq__grid { grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); }
+  }
+
+  @media (max-width: 1080px) {
+    .commerce-hero { min-height: auto; padding-top: calc(var(--header-offset) + 6.5rem); }
+  }
+
+  @media (max-width: 820px) {
+    .commerce-flow__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .commerce-flow__steps li:first-child .commerce-step { border-radius: 17px 0 0; }
+    .commerce-flow__steps li:nth-child(2) .commerce-step { border-radius: 0 17px 0 0; }
+    .commerce-flow__steps li:nth-child(3) .commerce-step { border-radius: 0 0 0 17px; }
+    .commerce-flow__steps li:last-child .commerce-step { border-radius: 0 0 17px; }
+  }
+
+  @media (max-width: 560px) {
+    .commerce-hero { padding: calc(var(--header-offset) + 3.5rem) 0 3rem; }
+    .commerce-hero__copy { max-width: 22rem; }
+    .commerce-hero h1 { max-width: 11ch; margin-block: var(--space-4) var(--space-5); font-size: clamp(2.7rem, 13.2vw, 3.5rem); }
+    .commerce-hero__lead { max-width: 21rem; font-size: 0.98rem; }
+    .commerce-hero__actions { margin-top: var(--space-6); }
+    .commerce-hero__actions .btn { width: min(280px, 100%); }
+    .commerce-hero__note { max-width: 19rem; margin-inline: auto; font-size: var(--text-xs); }
+    .commerce-step { min-height: 270px; padding: var(--space-5); }
+    .commerce-step h3 { margin-top: var(--space-8); font-size: var(--text-lg); }
+    .commerce-step p { font-size: var(--text-xs); }
+    .commerce-step__icon { width: 40px; height: 40px; }
+    .product-tools__grid { gap: var(--space-10); }
+    .product-tools__image { border-radius: 14px; transform: none; }
+    .product-audience { min-height: 235px; padding: var(--space-6); }
+    .product-audience h3 { margin-top: var(--space-8); }
+  }
 </style>
