@@ -85,9 +85,8 @@ export default defineMessages({
     // Labelled by the job, not the product name: the nav still calls these
     // "Website Builder", "Advertising" and "AI Content", and it should — that is
     // a directory. This is an argument, and it is ordered nearest-to-the-sale.
-    'home.tools.website': 'A site of your own, on your own domain',
     'home.tools.ads': 'Ads that bring buyers to it',
-    'home.tools.content': 'Words and pictures that sell for you',
+    'home.tools.content': 'A site of your own, with words and pictures that sell',
 
     // — Who it is for ——————————————————————————————————————————
     'home.personas.eyebrow': 'Who it is for',
@@ -173,9 +172,8 @@ export default defineMessages({
     'home.tools.title': 'Y todo lo que hace que vendas más',
     'home.tools.lead':
       'Con lo esencial resuelto, estas tres se ponen a trabajar para que más gente te encuentre, te elija y vuelva a comprarte.',
-    'home.tools.website': 'Un sitio tuyo, en tu propio dominio',
     'home.tools.ads': 'Publicidad que te trae compradores',
-    'home.tools.content': 'Textos e imágenes que venden por ti',
+    'home.tools.content': 'Un sitio tuyo, con textos e imágenes que venden',
 
     // — Para quién es —————————————————————————————————————————
     'home.personas.eyebrow': 'Para quién es',

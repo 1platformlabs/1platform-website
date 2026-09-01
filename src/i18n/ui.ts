@@ -13,6 +13,8 @@
  * a cast smuggled a gap past the compiler.
  */
 
+import { translateFromEs, translateToEs } from '@i18n/routes';
+
 export const LOCALES = ['en', 'es'] as const;
 export type Locale = (typeof LOCALES)[number];
 
@@ -52,13 +54,18 @@ export function localeFromPath(pathname: string): Locale {
 }
 
 /**
- * Remove the locale prefix, yielding the canonical (English-rooted) path.
- * `/es/pricing/` and `/pricing/` both return `/pricing/`.
+ * Yield the canonical (English-rooted) path for any address.
+ * `/es/precios/` and `/pricing/` both return `/pricing/`.
+ *
+ * This used to be `slice(3)` — strip `/es`, keep the rest — because both trees
+ * carried the same slug. They no longer do: the Spanish tree publishes Spanish
+ * slugs, so the answer comes from the route map instead of from string
+ * arithmetic. `translateFromEs` still falls back to stripping the prefix for
+ * anything the map does not name, which is what keeps untranslated addresses
+ * (`/es/blog/`, `/es/cookies/`) working without an entry each.
  */
 export function stripLocale(pathname: string): string {
-  if (pathname === '/es' || pathname === '/es/') return '/';
-  if (pathname.startsWith('/es/')) return pathname.slice(3);
-  return pathname;
+  return localeFromPath(pathname) === 'es' ? translateFromEs(pathname) : pathname;
 }
 
 /**
@@ -73,11 +80,12 @@ export function localizePath(href: string, locale: Locale): string {
   if (!href.startsWith('/')) return href;
   const canonical = stripLocale(href);
   if (locale === DEFAULT_LOCALE) return canonical;
-  return canonical === '/' ? '/es/' : `/es${canonical}`;
+  return translateToEs(canonical);
 }
 
 /**
- * The default translation map for a page: both languages, same slug.
+ * The default translation map for a page: both languages, each at its own
+ * address.
  *
  * Pages whose twin may be absent — a blog post with no Spanish version — build
  * their own map instead and simply omit the locale that does not exist. That

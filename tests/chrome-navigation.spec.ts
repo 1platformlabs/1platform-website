@@ -13,11 +13,13 @@ test('the desktop rail exposes the primary navigation and solution destinations'
   await solutions.locator('summary').focus();
   await page.keyboard.press('Space');
   await expect(solutions).toHaveAttribute('open', /.*/);
-  // Six solutions plus "view all". It was eight until the whitelabel dashboard
-  // left this menu: it is resold by agencies, not bought by merchants. An exact
-  // count is kept on purpose — a floor would stop noticing a menu entry that
-  // silently fails to render, which is the failure this line exists for.
-  await expect(solutions.locator('.solutions-menu a')).toHaveCount(7);
+  // Five solutions plus "view all". It was eight until the whitelabel dashboard
+  // left this menu (resold by agencies, not bought by merchants), and seven
+  // until the website builder merged into the content entry — three of its four
+  // cards were that page said again. An exact count is kept on purpose: a floor
+  // would stop noticing a menu entry that silently fails to render, which is
+  // the failure this line exists for.
+  await expect(solutions.locator('.solutions-menu a')).toHaveCount(6);
   await expect(solutions.locator('.solutions-menu a').first()).toHaveAttribute('href', '/solutions/online-store/');
 });
 
@@ -31,7 +33,7 @@ test('the compact menu is fully keyboard-operable on mobile', async ({ page }) =
   await page.keyboard.press('Enter');
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expect(menu).toBeVisible();
-  await expect(menu.locator('.mobile-menu__sublist a')).toHaveCount(7);
+  await expect(menu.locator('.mobile-menu__sublist a')).toHaveCount(6);
   await expect(menu.locator('.btn--primary')).toHaveAttribute('href', 'https://app.1platform.pro/app/');
 
   await page.keyboard.press('Escape');

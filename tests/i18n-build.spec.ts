@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { translateToEs } from '../src/i18n/routes';
 
 /**
  * Assertions about the built artefact.
@@ -66,13 +67,30 @@ test('no page renders an unresolved key or placeholder', () => {
 test('every English page has a Spanish counterpart', () => {
   // The 404 is the one deliberate exception: the origin never serves it as an
   // error document, so a Spanish copy would be a file nobody can reach.
+  //
+  // The counterpart is no longer "the same path under /es/": the Spanish tree
+  // publishes Spanish slugs, so the address comes from the route map. Asking
+  // the map rather than reproducing it here is the point — a copy of the map
+  // inside its own guard would agree with itself while both were wrong.
+  // Redirect stubs are excluded: a stub is an address, not a page, and its
+  // Spanish counterpart is declared in the same `redirects` table rather than
+  // derived from the route map. Including them asked for a Spanish twin of a
+  // retired English URL at the translated address of a page that no longer
+  // exists — a demand nothing could satisfy.
   const expected = englishPages()
     .map((p) => relative(DIST, p))
-    .filter((p) => !p.startsWith('why-1platform/'));
+    .filter((p) => !p.startsWith('why-1platform/'))
+    .filter((p) => !readFileSync(join(DIST, p), 'utf8').includes('http-equiv="refresh"'));
 
-  const missing = expected.filter((p) => !existsSync(join(DIST, 'es', p)));
+  const missing = expected.filter((p) => {
+    const canonical = `/${p.replace(/index\.html$/, '')}`;
+    return !existsSync(join(DIST, translateToEs(canonical).slice(1), 'index.html'));
+  });
   expect(missing, `Spanish pages missing: ${missing.join(', ')}`).toEqual([]);
-  expect(expected.length).toBeGreaterThan(30);
+  // Floor against a stale crawl, not an inventory. It was 30 while redirect
+  // stubs were counted as pages; excluding them leaves 26 real English pages,
+  // so the floor sits below that and still goes red if the walk finds nothing.
+  expect(expected.length).toBeGreaterThan(20);
 });
 
 test('every page declares its language and every hreflang is reciprocal', () => {
@@ -134,7 +152,7 @@ test('no hreflang points at a page that was not built', () => {
 });
 
 test('Spanish pages carry Spanish Open Graph locales', () => {
-  const html = readFileSync(join(DIST, 'es', 'pricing', 'index.html'), 'utf8');
+  const html = readFileSync(join(DIST, 'es', 'precios', 'index.html'), 'utf8');
   expect(html).toContain('<meta property="og:locale" content="es_ES">');
   expect(html).toContain('<meta property="og:locale:alternate" content="en_US">');
 
@@ -144,8 +162,8 @@ test('Spanish pages carry Spanish Open Graph locales', () => {
 });
 
 test('Spanish pages canonicalise to themselves', () => {
-  const html = readFileSync(join(DIST, 'es', 'pricing', 'index.html'), 'utf8');
-  expect(html).toContain('<link rel="canonical" href="https://1platform.pro/es/pricing/">');
+  const html = readFileSync(join(DIST, 'es', 'precios', 'index.html'), 'utf8');
+  expect(html).toContain('<link rel="canonical" href="https://1platform.pro/es/precios/">');
 });
 
 test('the sitemap exists and carries alternates', () => {
@@ -158,7 +176,7 @@ test('the sitemap exists and carries alternates', () => {
   const body = readFileSync(join(DIST, 'sitemap-0.xml'), 'utf8');
   const alternates = [...body.matchAll(/xhtml:link/g)].length;
   expect(alternates).toBeGreaterThan(100);
-  expect(body).toContain('https://1platform.pro/es/pricing/');
+  expect(body).toContain('https://1platform.pro/es/precios/');
 });
 
 test('neither RSS feed carries the other language', () => {
@@ -183,7 +201,7 @@ test('no provider name appears under /es/ outside the privacy policy', () => {
     /openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b/i;
 
   const leaks = spanishPages()
-    .filter((p) => !relative(DIST, p).startsWith('es/privacy/'))
+    .filter((p) => !relative(DIST, p).startsWith('es/privacidad/'))
     .filter((p) => banned.test(readFileSync(p, 'utf8')))
     .map((p) => relative(DIST, p));
 
@@ -191,7 +209,7 @@ test('no provider name appears under /es/ outside the privacy policy', () => {
 
   // The privacy policy must still contain them — the disclosure is the point,
   // and a test that only checks for absence would pass on an empty page.
-  const privacy = readFileSync(join(DIST, 'es', 'privacy', 'index.html'), 'utf8');
+  const privacy = readFileSync(join(DIST, 'es', 'privacidad', 'index.html'), 'utf8');
   expect(banned.test(privacy)).toBe(true);
 });
 
@@ -222,7 +240,7 @@ test('none of the shell English survives in the Spanish tree', () => {
 
 test('dates render in the language of the page', () => {
   const en = readFileSync(join(DIST, 'changelog', 'index.html'), 'utf8');
-  const es = readFileSync(join(DIST, 'es', 'changelog', 'index.html'), 'utf8');
+  const es = readFileSync(join(DIST, 'es', 'novedades', 'index.html'), 'utf8');
 
   expect(en).toMatch(/(January|March|April|May) \d{1,2}, \d{4}/);
   expect(es).toMatch(/\d{1,2} de (enero|marzo|abril|mayo) de \d{4}/);
