@@ -73,11 +73,24 @@ const included = [
   t('solutions-online-store.included.dns'),
 ];
 
+/**
+ * The sequence the product actually enforces, in its order.
+ *
+ * The previous list put the domain third and closed on "Go live", and both were
+ * wrong about the product. The domain is a blocking prerequisite that costs
+ * money: `ProvisioningCreateRequest.domain` is required, the wizard's selector
+ * only offers domains already registered to the account, and an unverified
+ * external name is rejected with 422 DOMAIN_NOT_VERIFIED. There is no courtesy
+ * subdomain to start on. "Go live" named an action that does not exist — there
+ * is no Publish control; the store is live once the provisioning job completes.
+ * The step that WAS missing is the collection account: a store's provisioning
+ * runs MERCHANT_CREDENTIAL, and without it the store cannot charge anyone.
+ */
 const storeSteps = [
-  { label: t('solutions-online-store.step.createAccount') },
-  { label: t('solutions-online-store.step.addProducts') },
-  { label: t('solutions-online-store.step.connectDomain') },
-  { label: t('solutions-online-store.step.goLive') },
+  { label: t('solutions-online-store.step.domain') },
+  { label: t('solutions-online-store.step.buildStore') },
+  { label: t('solutions-online-store.step.collectionAccount') },
+  { label: t('solutions-online-store.step.addProductsAndSell') },
 ];
 
 /**
