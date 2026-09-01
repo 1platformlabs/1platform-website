@@ -8,10 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Home and shared public chrome** now use the calm, product-led composition:
-  a floating white navigation rail, a quiet home opening, a focused 1Platform
-  product device and physical desk-object accents. The hierarchy carries the
-  existing brand, routes and capability copy in both English and Spanish.
+- **The home now explains the complete commerce cycle on first view.** Its
+  original CSS scene keeps Online Store, online payment, electronic invoicing
+  and delivery visible at once, then hands emphasis from one state to the next
+  as a single order advances. The former dot-led capability row is gone: there
+  are no radio inputs, fake selectors or carousel controls in the opening.
 - **Public route heroes** now share the same white editorial canvas, proportion
   system and motion-safe interaction states. Existing SEO metadata, hreflang,
   JSON-LD and public URLs remain unchanged.

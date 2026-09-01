@@ -45,12 +45,62 @@ test('reduced motion keeps the product home static and WebGL-free', async ({ pag
   await page.goto('/');
 
   expect(await page.locator('canvas').count()).toBe(0);
-  const state = await page.locator('.product-hero__device').evaluate((node) => ({
+  await expect(page.locator('.orbit-card')).toHaveCount(4);
+  const state = await page.locator('.orbit-card').first().evaluate((node) => ({
+    animationName: getComputedStyle(node).animationName,
+    opacity: getComputedStyle(node).opacity,
     transform: getComputedStyle(node).transform,
     transitionDuration: getComputedStyle(node).transitionDuration,
   }));
+  expect(state.animationName).toBe('none');
+  expect(state.opacity).toBe('1');
   expect(state.transform).toBe('none');
   expect(state.transitionDuration).toBe('0s');
+});
+
+test('the opening scene names the complete commerce flow without radio controls', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  await expect(page.locator('input[type="radio"], [role="radio"], [role="radiogroup"]')).toHaveCount(0);
+  await expect(page.locator('.orbit-card__title')).toHaveText([
+    'Online Store',
+    'Online payment',
+    'Electronic invoice',
+    'Delivery',
+  ]);
+  await expect(page.locator('.commerce-flow__steps > li')).toHaveCount(4);
+
+  await page.goto('/es/');
+  await expect(page.locator('.orbit-card__title')).toHaveText([
+    'Tienda en línea',
+    'Pago en línea',
+    'Factura electrónica',
+    'Envío',
+  ]);
+});
+
+test('the commerce orbit hands emphasis through the four stages without hiding any', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  const motion = await page.locator('.orbit-card').evaluateAll((cards) =>
+    cards.map((card) => {
+      const style = getComputedStyle(card);
+      return {
+        animationName: style.animationName,
+        animationDuration: style.animationDuration,
+        animationDelay: style.animationDelay,
+        opacity: style.opacity,
+      };
+    }),
+  );
+
+  expect(motion.map((state) => state.animationName)).toEqual(Array(4).fill('commerce-card-turn'));
+  expect(motion.map((state) => state.animationDuration)).toEqual(Array(4).fill('12s'));
+  expect(motion.map((state) => state.animationDelay)).toEqual(['0s', '-9s', '-6s', '-3s']);
+  expect(motion.map((state) => state.opacity)).toEqual(Array(4).fill('1'));
 });
 
 test('the home retains reciprocal SEO alternatives and focused CTAs', async ({ page }) => {

@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 4321);
+const baseURL = `http://localhost:${port}`;
+
 /**
  * Tests run against the real `dist/`, served statically.
  *
@@ -24,13 +27,16 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
 
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL,
     trace: 'retain-on-failure',
   },
 
   webServer: {
-    command: 'npm run build && npx astro preview --port 4321',
-    url: 'http://localhost:4321/',
+    // Astro 7's preview command can hand the server to a detached process and
+    // exit, which Playwright correctly treats as an early webServer failure.
+    // Vite serves the same static dist/ bytes and remains the owned child.
+    command: `npm run build && npx vite preview --host 127.0.0.1 --port ${port}`,
+    url: `${baseURL}/`,
     reuseExistingServer: false,
     timeout: 180_000,
   },
