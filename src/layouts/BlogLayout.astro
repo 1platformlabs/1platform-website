@@ -5,6 +5,7 @@ import TOC from '@components/TOC.astro';
 import ShareButtons from '@components/ShareButtons.astro';
 import RelatedPosts from '@components/RelatedPosts.astro';
 import { formatDate, useI18n, type Locale } from '@i18n';
+import { localizedOgImage } from '@i18n/og';
 
 interface Props {
   frontmatter: {
@@ -43,7 +44,11 @@ const showUpdated =
   frontmatter.updatedDate.valueOf() !== frontmatter.pubDate.valueOf();
 
 const ogImage = frontmatter.ogImage || frontmatter.image || '/og/default.png';
-const ogImageURL = new URL(ogImage, 'https://1platform.pro').href;
+// Same swap as BaseLayout, and it has to happen here too: this URL is what
+// goes into the Article JSON-LD `image`, which search engines read separately
+// from the `og:image` meta. Leaving one of the two in English would make the
+// page describe itself in two languages at once.
+const ogImageURL = new URL(localizedOgImage(ogImage, locale), 'https://1platform.pro').href;
 
 const articleJsonLd = {
   '@context': 'https://schema.org',
