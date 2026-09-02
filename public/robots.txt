@@ -1,4 +1,43 @@
+# Política de rastreo de 1platform.pro
+#
+# Cloudflare ANTEPONE su propio bloque «Cloudflare Managed content» a este archivo
+# (no lo reemplaza): en el robots.txt servido, sus reglas quedan arriba y estas al
+# final. Las de abajo son la decisión del repo y sobreviven a cualquier cambio de
+# esa configuración del borde.
+#
+# Los rastreadores de IA se bloquean a propósito. Deliberadamente NO se declara
+# `Content-Signal:` acá: es una directiva no estándar que Lighthouse marca como
+# inválida y es la ÚNICA causa del techo de 92 en el puntaje SEO (medido
+# 2026-09-01, Lighthouse 12 contra el sitio en vivo). Los `Disallow:` de abajo son
+# sintaxis estándar y no afectan el puntaje.
+
 User-agent: *
 Allow: /
 Disallow: /api/
+
+# Rastreadores de IA: sin permiso para recolectar contenido de este sitio.
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
 Sitemap: https://1platform.pro/sitemap-index.xml
