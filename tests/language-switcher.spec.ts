@@ -190,7 +190,7 @@ test('a modifier click does not record a preference in this tab', async ({ conte
   // detection, it would keep doing so on every later visit.
   await page.goto('/pricing/');
   await openMenu(page);
-  await page.locator('a[data-lang-choice="es"]').first().click({ modifiers: ['Meta'] });
+  await page.locator('a[data-lang-choice="es"]').first().click({ modifiers: ['ControlOrMeta'] });
 
   await expect(page).toHaveURL(/\/pricing\/$/);
   expect((await context.cookies()).find((c) => c.name === '1p_lang')).toBeUndefined();
