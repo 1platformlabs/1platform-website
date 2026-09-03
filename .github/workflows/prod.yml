@@ -398,7 +398,12 @@ jobs:
   release:
     name: Tag & Release
     needs: [build, version_bump]
-    if: needs.version_bump.result == 'success'
+    # `outputs.push_sha` y no `result`: el job del bump puede terminar EXITOSO
+    # con su push rechazado, y entonces `result == 'success'` acuña un tag que
+    # nombra una versión que no está en el repositorio. `push_sha` sólo se
+    # escribe si `git push origin main` funcionó, así que es la señal de que el
+    # commit aterrizó. Es lo que ya hace `1platform-dashboard`.
+    if: needs.version_bump.outputs.push_sha != ''
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: PROD
@@ -597,8 +602,28 @@ jobs:
 
   deploy_hetzner:
     name: Deploy al dedicado (PROD)
-    needs: [build, version_bump, release]
-    if: needs.release.result == 'success'
+    # SIN `release`, y con `!cancelled()`. Desplegar el código mergeado es el
+    # propósito de este workflow; el tag es contabilidad alrededor. Encadenar
+    # producción detrás de la contabilidad detiene los despliegues en silencio,
+    # y acá no es hipotético — está medido en este mismo repo y en su hermano:
+    #
+    #   website run 29644272240 · build ✅ · Auto Version Bump ❌ · deploy SKIPPED
+    #   console run 32815934311 · build ✅ · Auto Version Bump ❌ · deploy SKIPPED
+    #
+    # Ninguno de los dos falló por un push rechazado: uno murió en la llamada al
+    # proveedor de IA que calcula el bump, el otro en la política que rechaza un
+    # major. Dos builds sanos que no llegaron a producción por no saber qué
+    # número ponerles.
+    #
+    # `version_bump` SÍ queda en `needs`: este job consume su output, y un job
+    # que no está en `needs` no expone los suyos. Lo que cambia es que un
+    # `failure` suyo ya no arrastra al despliegue, porque `!cancelled()` es lo
+    # único que sobrescribe el salteo automático de un `needs` en rojo.
+    needs: [build, version_bump]
+    if: >-
+      !cancelled() &&
+      needs.build.result == 'success' &&
+      needs.build.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # El environment es el de ESTE repo (`PROD`), no el del molde (`prod`). Los
@@ -624,7 +649,13 @@ jobs:
           # `v` + la versión: este repo expone `new_version` SIN la `v` y crea el
           # tag en el job `release`. El molde exponía `version` ya con `v` —
           # clonarlo literal daría `git reset --hard ""`.
-          VERSION: v${{ needs.version_bump.outputs.new_version }}
+          # El SHA que el bump empujó, no el tag. Tres motivos: el tag lo crea
+          # `release`, del que este job ya no cuelga (habría carrera); si el
+          # bump no aterrizó, `v` a secas no es una ref y `git reset --hard`
+          # revienta; y `push_sha` es exactamente el árbol que se quiere servir.
+          # Sin bump aterrizado cae al commit del merge, que es el código que se
+          # acaba de aprobar. Mismo patrón que `bower-dashboard`.
+          VERSION: ${{ needs.version_bump.outputs.push_sha || github.sha }}
         with:
           host: ${{ secrets.HETZNER_SSH_HOST }}
           username: ${{ secrets.HETZNER_SSH_USER }}
