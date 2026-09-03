@@ -80,8 +80,6 @@ export default defineMessages({
       '1Platform Labs is a team of engineers, designers and operators who got tired of the fragmentation problem. We build the platform we always wished existed: developer-first, API-native, and relentlessly focused on removing complexity rather than adding surface.',
     'about.team.p2':
       'We are committed to building tools that are accessible, affordable and powerful enough for any scale of operation.',
-    'about.team.facts.basedIn.term': 'Based in',
-    'about.team.facts.basedIn.value': 'Guatemala',
     'about.team.facts.serving.term': 'Serving',
     'about.team.facts.serving.value': 'Clients worldwide',
     'about.team.facts.languages.term': 'Languages',
@@ -156,8 +154,6 @@ export default defineMessages({
       '1Platform Labs es un equipo de ingenieros, diseñadores y operadores cansados del problema de la fragmentación. Construimos la plataforma que siempre quisimos que existiera: centrada en el desarrollador, nativa de API y enfocada sin descanso en quitar complejidad en vez de sumar superficie.',
     'about.team.p2':
       'Estamos comprometidos a construir herramientas accesibles, asequibles y suficientemente potentes para cualquier escala de operación.',
-    'about.team.facts.basedIn.term': 'Sede',
-    'about.team.facts.basedIn.value': 'Guatemala',
     'about.team.facts.serving.term': 'Servimos a',
     'about.team.facts.serving.value': 'Clientes en todo el mundo',
     'about.team.facts.languages.term': 'Idiomas',
