@@ -20,19 +20,35 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'home.title': '1Platform — Online Store, Card Payments & Deliveries',
+    'home.title': '1Platform — Online Store, Payments, Invoicing & Delivery',
     'home.description':
       'Open your online store, take card payments, issue the invoice on every sale, and dispatch your deliveries — your whole business, from one place.',
     'home.jsonld.name': '1Platform',
     'home.jsonld.brandName': '1Platform Labs',
 
     // — Hero ——————————————————————————————————————————————————
-    'home.hero.badge': 'One Platform. Every Solution.',
-    'home.hero.headline': 'Your business, selling online today',
+    'home.hero.badge': 'Connected commerce',
+    'home.hero.headline': 'Sell online. Get paid, invoice and deliver.',
     'home.hero.lead':
-      'Open your store, take card payments, deliver to the door and invoice automatically — all from one place, with no tools to glue together.',
-    'home.hero.fan.aria': 'A 1Platform workspace on a tablet',
-    'home.hero.capabilities.aria': 'The three essentials of your business',
+      'A customer buys in your store. 1Platform takes the online payment, issues the invoice and moves the order into delivery — one connected flow from checkout to door.',
+    'home.hero.scene.aria':
+      'A sale moves from an online store to an approved online payment, an automatically issued invoice and a tracked delivery.',
+    'home.hero.store.kicker': 'Storefront',
+    'home.hero.store.title': 'Online Store',
+    'home.hero.store.event': 'Checkout received',
+    'home.hero.store.status': 'Ready',
+    'home.hero.payment.kicker': 'Checkout',
+    'home.hero.payment.title': 'Online payment',
+    'home.hero.payment.event': 'Card payment',
+    'home.hero.payment.status': 'Approved',
+    'home.hero.invoice.kicker': 'Automatic',
+    'home.hero.invoice.title': 'Electronic invoice',
+    'home.hero.invoice.event': 'Sale document',
+    'home.hero.invoice.status': 'Issued',
+    'home.hero.delivery.kicker': 'Dispatch',
+    'home.hero.delivery.title': 'Delivery',
+    'home.hero.delivery.event': 'Tracking shared',
+    'home.hero.delivery.status': 'In transit',
     // The home does NOT reuse the chrome's generic `cta.getStarted`. The header
     // button has to work on every page, so it stays broad; the most-visited
     // page can name the outcome the visitor came for.
@@ -43,28 +59,23 @@ export default defineMessages({
     // a merchant is the fear of being signed up for something.
     'home.hero.ctaNote': 'No credit card and no subscription. You pay only for what you use.',
 
-    // — The three that carry the business ——————————————————————
-    'home.focus.eyebrow': 'The essentials',
-    'home.focus.title': 'Sell, get paid, deliver',
-    'home.focus.lead':
-      'Three things hold an online business up. Here all three arrive already connected to each other, so you start selling instead of assembling.',
-    // Each card carries a PROMISE, never a menu label. The pills above them
-    // already name the products ("Online Store", "Payments & Invoicing",
-    // "Deliveries"); a card that repeats one of those names reads as a second,
-    // slightly different name for the same thing on the same screen.
-    'home.focus.store.title': 'Your store, open around the clock',
-    'home.focus.store.description':
-      'Your catalogue, your prices and your brand in a store of your own — with a cart, a one-page checkout and accounts for your customers.',
-    // The card used to describe the checkout case only. /payments-invoicing/
-    // also documents a payment link, a card terminal and recurring plans —
-    // three ways of getting paid that a shopkeeper who has no catalogue yet can
-    // use on day one, and that this page never named.
-    'home.focus.payments.title': 'Get paid however suits you',
-    'home.focus.payments.description':
-      'At the checkout, through a link you send, or on a card terminal at your counter — and the valid electronic invoice is issued at the moment of the sale, with nobody typing it out afterwards.',
-    'home.focus.deliveries.title': 'Delivery to the door',
-    'home.focus.deliveries.description':
-      'Dispatch with your own staff or with a courier, and give your buyer a link where they watch their order move all the way to their door.',
+    // — One order, four connected moments ——————————————————————
+    'home.flow.eyebrow': 'One connected sale',
+    'home.flow.title': 'One order. Every step moving.',
+    'home.flow.lead':
+      'The checkout does not end at payment. The same order becomes its invoice and delivery without being copied between disconnected systems.',
+    'home.flow.store.title': 'The store receives the order',
+    'home.flow.store.description':
+      'Your catalogue, cart and checkout work together on a store that carries your own brand and domain.',
+    'home.flow.payment.title': 'The online payment is approved',
+    'home.flow.payment.description':
+      'The customer pays at checkout and the order advances from the same workspace when the payment is confirmed.',
+    'home.flow.invoice.title': 'The invoice is issued',
+    'home.flow.invoice.description':
+      'The valid electronic invoice is created from the sale automatically, without typing the order out again.',
+    'home.flow.delivery.title': 'The delivery goes out',
+    'home.flow.delivery.description':
+      'Dispatch with your own staff or a courier and share a tracking link all the way to the customer’s door.',
 
     // — Everything that makes those three earn more ————————————
     'home.tools.eyebrow': 'Tools',
@@ -74,9 +85,8 @@ export default defineMessages({
     // Labelled by the job, not the product name: the nav still calls these
     // "Website Builder", "Advertising" and "AI Content", and it should — that is
     // a directory. This is an argument, and it is ordered nearest-to-the-sale.
-    'home.tools.website': 'A site of your own, on your own domain',
     'home.tools.ads': 'Ads that bring buyers to it',
-    'home.tools.content': 'Words and pictures that sell for you',
+    'home.tools.content': 'A site of your own, with words and pictures that sell',
 
     // — Who it is for ——————————————————————————————————————————
     'home.personas.eyebrow': 'Who it is for',
@@ -107,45 +117,63 @@ export default defineMessages({
       'Yes. Everything the dashboard does is exposed through the REST API, with two-token authentication and webhooks — and the whitelabel dashboard can run under your own brand.',
   },
   es: {
-    'home.title': '1Platform — Tienda en línea, cobros con tarjeta y entregas',
+    'home.title': '1Platform — Tienda online, pagos, facturación y envíos',
     'home.description':
       'Abre tu tienda en línea, cobra con tarjeta, emite la factura sola en cada venta y despacha tus entregas — todo tu comercio, desde un solo lugar.',
     'home.jsonld.name': '1Platform',
     'home.jsonld.brandName': '1Platform Labs',
 
     // — Portada ———————————————————————————————————————————————
-    'home.hero.badge': 'One Platform. Every Solution.',
-    'home.hero.headline': 'Tu comercio, vendiendo en línea desde hoy',
+    'home.hero.badge': 'Comercio conectado',
+    'home.hero.headline': 'Vende en línea. Cobra, factura y entrega.',
     'home.hero.lead':
-      'Abre tu tienda, cobra con tarjeta, entrega a domicilio y factura en automático — todo desde un solo lugar, sin pegar herramientas sueltas.',
-    'home.hero.fan.aria': 'Un espacio de trabajo de 1Platform en una tableta',
-    'home.hero.capabilities.aria': 'Lo esencial de tu comercio',
+      'Tu cliente compra en la tienda. 1Platform recibe el pago en línea, emite la factura y mueve el pedido a reparto — un solo flujo desde el checkout hasta la puerta.',
+    'home.hero.scene.aria':
+      'Una venta pasa de la tienda en línea a un pago aprobado, una factura emitida automáticamente y un envío con seguimiento.',
+    'home.hero.store.kicker': 'Escaparate',
+    'home.hero.store.title': 'Tienda en línea',
+    'home.hero.store.event': 'Checkout recibido',
+    'home.hero.store.status': 'Listo',
+    'home.hero.payment.kicker': 'Checkout',
+    'home.hero.payment.title': 'Pago en línea',
+    'home.hero.payment.event': 'Pago con tarjeta',
+    'home.hero.payment.status': 'Aprobado',
+    'home.hero.invoice.kicker': 'Automática',
+    'home.hero.invoice.title': 'Factura electrónica',
+    'home.hero.invoice.event': 'Documento de venta',
+    'home.hero.invoice.status': 'Emitida',
+    'home.hero.delivery.kicker': 'Despacho',
+    'home.hero.delivery.title': 'Envío',
+    'home.hero.delivery.event': 'Seguimiento compartido',
+    'home.hero.delivery.status': 'En ruta',
     'home.hero.cta': 'Abre tu tienda gratis',
     'home.hero.ctaNote': 'Sin tarjeta de crédito y sin suscripción. Pagas solo por lo que uses.',
 
-    // — Las tres que sostienen el comercio —————————————————————
-    'home.focus.eyebrow': 'Lo esencial',
-    'home.focus.title': 'Vende, cobra y entrega',
-    'home.focus.lead':
-      'Tres cosas sostienen a un comercio en línea. Aquí las tres llegan ya conectadas entre sí, así que empiezas vendiendo en vez de armando.',
-    'home.focus.store.title': 'Tu tienda, abierta a toda hora',
-    'home.focus.store.description':
-      'Tu catálogo, tus precios y tu marca en una tienda propia — con carrito, checkout de una sola página y cuentas para tus clientes.',
-    'home.focus.payments.title': 'Cobra como te sirva',
-    'home.focus.payments.description':
-      'En el checkout, con un enlace que mandas, o en una terminal sobre tu mostrador — y la factura electrónica válida sale en el mismo momento de la venta, sin que nadie la escriba después.',
-    'home.focus.deliveries.title': 'Entrega a domicilio',
-    'home.focus.deliveries.description':
-      'Despacha con tu propio personal o con una mensajería, y dale a tu comprador un enlace donde ve su pedido avanzar hasta su puerta.',
+    // — Un pedido, cuatro momentos conectados ——————————————————
+    'home.flow.eyebrow': 'Una venta conectada',
+    'home.flow.title': 'Un pedido. Todo avanzando.',
+    'home.flow.lead':
+      'El checkout no termina en el cobro. El mismo pedido se convierte en su factura y su envío sin copiarlo entre sistemas desconectados.',
+    'home.flow.store.title': 'La tienda recibe el pedido',
+    'home.flow.store.description':
+      'Tu catálogo, carrito y checkout trabajan juntos en una tienda con tu propia marca y dominio.',
+    'home.flow.payment.title': 'El pago en línea se aprueba',
+    'home.flow.payment.description':
+      'El cliente paga en el checkout y el pedido avanza desde el mismo espacio cuando se confirma el cobro.',
+    'home.flow.invoice.title': 'La factura se emite',
+    'home.flow.invoice.description':
+      'La factura electrónica válida se crea desde la venta en automático, sin volver a escribir el pedido.',
+    'home.flow.delivery.title': 'El envío sale a ruta',
+    'home.flow.delivery.description':
+      'Despacha con tu propio personal o una mensajería y comparte seguimiento hasta la puerta del cliente.',
 
     // — Lo que hace rendir más a esas tres —————————————————————
     'home.tools.eyebrow': 'Herramientas',
     'home.tools.title': 'Y todo lo que hace que vendas más',
     'home.tools.lead':
       'Con lo esencial resuelto, estas tres se ponen a trabajar para que más gente te encuentre, te elija y vuelva a comprarte.',
-    'home.tools.website': 'Un sitio tuyo, en tu propio dominio',
     'home.tools.ads': 'Publicidad que te trae compradores',
-    'home.tools.content': 'Textos e imágenes que venden por ti',
+    'home.tools.content': 'Un sitio tuyo, con textos e imágenes que venden',
 
     // — Para quién es —————————————————————————————————————————
     'home.personas.eyebrow': 'Para quién es',

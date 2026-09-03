@@ -1,0 +1,483 @@
+---
+import Icon from '@components/Icon.astro';
+import { useI18n } from '@i18n';
+
+const { t } = useI18n(Astro.url.pathname);
+---
+
+<div class="commerce-orbit" role="img" aria-label={t('home.hero.scene.aria')}>
+  <div class="commerce-orbit__path" aria-hidden="true">
+    <span class="commerce-orbit__path-mark commerce-orbit__path-mark--one"></span>
+    <span class="commerce-orbit__path-mark commerce-orbit__path-mark--two"></span>
+    <span class="commerce-orbit__path-mark commerce-orbit__path-mark--three"></span>
+    <span class="commerce-orbit__path-mark commerce-orbit__path-mark--four"></span>
+  </div>
+
+  <div class="commerce-orbit__position commerce-orbit__position--store">
+    <article class="orbit-card orbit-card--store">
+      <header class="orbit-card__header">
+        <span class="orbit-card__icon"><Icon name="store" size={18} /></span>
+        <div>
+          <p class="orbit-card__kicker">{t('home.hero.store.kicker')}</p>
+          <p class="orbit-card__title">{t('home.hero.store.title')}</p>
+        </div>
+        <span class="orbit-card__signal" aria-hidden="true"></span>
+      </header>
+      <div class="store-preview">
+        <span class="store-preview__image" aria-hidden="true"><span></span></span>
+        <div class="store-preview__copy">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="store-preview__action" aria-hidden="true"></span>
+      </div>
+      <div class="orbit-card__event">
+        <Icon name="cart" size={16} />
+        <span>{t('home.hero.store.event')}</span>
+        <strong>{t('home.hero.store.status')}</strong>
+      </div>
+    </article>
+  </div>
+
+  <div class="commerce-orbit__position commerce-orbit__position--payment">
+    <article class="orbit-card orbit-card--payment">
+      <header class="orbit-card__header">
+        <span class="orbit-card__icon orbit-card__icon--inverse"><Icon name="card" size={18} /></span>
+        <div>
+          <p class="orbit-card__kicker">{t('home.hero.payment.kicker')}</p>
+          <p class="orbit-card__title">{t('home.hero.payment.title')}</p>
+        </div>
+        <span class="orbit-card__signal" aria-hidden="true"></span>
+      </header>
+      <div class="payment-card" aria-hidden="true">
+        <span class="payment-card__chip"></span>
+        <span class="payment-card__line"></span>
+        <span class="payment-card__mark"><Icon name="card" size={16} /></span>
+      </div>
+      <div class="orbit-card__event orbit-card__event--inverse">
+        <Icon name="indexing" size={16} />
+        <span>{t('home.hero.payment.event')}</span>
+        <strong>{t('home.hero.payment.status')}</strong>
+      </div>
+    </article>
+  </div>
+
+  <div class="commerce-orbit__position commerce-orbit__position--invoice">
+    <article class="orbit-card orbit-card--invoice">
+      <header class="orbit-card__header">
+        <span class="orbit-card__icon"><Icon name="invoice" size={18} /></span>
+        <div>
+          <p class="orbit-card__kicker">{t('home.hero.invoice.kicker')}</p>
+          <p class="orbit-card__title">{t('home.hero.invoice.title')}</p>
+        </div>
+        <span class="orbit-card__signal" aria-hidden="true"></span>
+      </header>
+      <div class="invoice-preview" aria-hidden="true">
+        <span class="invoice-preview__brand"></span>
+        <span class="invoice-preview__number">1P</span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="orbit-card__event">
+        <Icon name="invoice" size={16} />
+        <span>{t('home.hero.invoice.event')}</span>
+        <strong>{t('home.hero.invoice.status')}</strong>
+      </div>
+    </article>
+  </div>
+
+  <div class="commerce-orbit__position commerce-orbit__position--delivery">
+    <article class="orbit-card orbit-card--delivery">
+      <header class="orbit-card__header">
+        <span class="orbit-card__icon"><Icon name="truck" size={18} /></span>
+        <div>
+          <p class="orbit-card__kicker">{t('home.hero.delivery.kicker')}</p>
+          <p class="orbit-card__title">{t('home.hero.delivery.title')}</p>
+        </div>
+        <span class="orbit-card__signal" aria-hidden="true"></span>
+      </header>
+      <div class="delivery-route" aria-hidden="true">
+        <span class="delivery-route__line"></span>
+        <span class="delivery-route__stop delivery-route__stop--one"></span>
+        <span class="delivery-route__stop delivery-route__stop--two"></span>
+        <span class="delivery-route__stop delivery-route__stop--three"></span>
+        <span class="delivery-route__truck"><Icon name="truck" size={18} /></span>
+      </div>
+      <div class="orbit-card__event">
+        <Icon name="share" size={16} />
+        <span>{t('home.hero.delivery.event')}</span>
+        <strong>{t('home.hero.delivery.status')}</strong>
+      </div>
+    </article>
+  </div>
+</div>
+
+<style>
+  .commerce-orbit {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .commerce-orbit__path {
+    position: absolute;
+    top: 51%;
+    left: 50%;
+    width: min(70vw, 1080px);
+    height: min(56vh, 540px);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: 50%;
+    opacity: 0.5;
+    transform: translate(-50%, -50%) rotate(-3deg);
+  }
+
+  .commerce-orbit__path-mark {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-border-strong);
+  }
+
+  .commerce-orbit__path-mark--one { top: 7%; left: 20%; }
+  .commerce-orbit__path-mark--two { top: 10%; right: 17%; }
+  .commerce-orbit__path-mark--three { right: 8%; bottom: 15%; }
+  .commerce-orbit__path-mark--four { bottom: 8%; left: 17%; }
+
+  .commerce-orbit__position {
+    position: absolute;
+    z-index: 2;
+  }
+
+  .commerce-orbit__position--store {
+    top: 22%;
+    left: -38px;
+    width: 286px;
+    transform: rotate(-5deg);
+  }
+
+  .commerce-orbit__position--payment {
+    top: 17%;
+    right: -34px;
+    width: 282px;
+    transform: rotate(4deg);
+  }
+
+  .commerce-orbit__position--invoice {
+    right: -26px;
+    bottom: 8%;
+    width: 270px;
+    transform: rotate(-4deg);
+  }
+
+  .commerce-orbit__position--delivery {
+    bottom: 7%;
+    left: -28px;
+    width: 304px;
+    transform: rotate(3deg);
+  }
+
+  .orbit-card {
+    min-height: 188px;
+    padding: 18px;
+    overflow: hidden;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: 0 24px 70px rgba(20, 22, 27, 0.15), 0 3px 10px rgba(20, 22, 27, 0.05);
+    opacity: 1;
+  }
+
+  .orbit-card--payment {
+    color: var(--color-text-inverse);
+    background: var(--ink);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .orbit-card__header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .orbit-card__icon {
+    display: inline-grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 9px;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .orbit-card__icon--inverse {
+    color: var(--ink);
+    background: var(--color-text-inverse);
+  }
+
+  .orbit-card__kicker {
+    color: var(--color-text-tertiary);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .orbit-card__title {
+    margin-top: 2px;
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+  }
+
+  .orbit-card--payment .orbit-card__kicker { color: var(--color-footer-muted); }
+  .orbit-card--payment .orbit-card__title { color: var(--color-text-inverse); }
+
+  .orbit-card__signal {
+    width: 9px;
+    height: 9px;
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 0 1px var(--color-border-strong);
+  }
+
+  .store-preview {
+    display: grid;
+    grid-template-columns: 48px 1fr 28px;
+    gap: 10px;
+    align-items: center;
+    margin-top: 17px;
+    padding: 9px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg-muted);
+  }
+
+  .store-preview__image {
+    position: relative;
+    height: 42px;
+    overflow: hidden;
+    border-radius: 7px;
+    background: var(--cobalt-wash);
+  }
+
+  .store-preview__image span {
+    position: absolute;
+    right: 8px;
+    bottom: -6px;
+    width: 24px;
+    height: 34px;
+    border: 1px solid var(--cobalt);
+    border-radius: 4px 4px 0 0;
+    background: var(--surface);
+    transform: rotate(-10deg);
+  }
+
+  .store-preview__copy { display: grid; gap: 5px; }
+  .store-preview__copy span { height: 4px; border-radius: 2px; background: var(--color-border-strong); }
+  .store-preview__copy span:nth-child(1) { width: 78%; background: var(--ink); }
+  .store-preview__copy span:nth-child(2) { width: 92%; }
+  .store-preview__copy span:nth-child(3) { width: 55%; }
+  .store-preview__action { width: 24px; height: 24px; border-radius: 6px; background: var(--ink); }
+
+  .payment-card {
+    position: relative;
+    height: 68px;
+    margin-top: 17px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--cobalt) 44%, var(--ink));
+  }
+
+  .payment-card__chip {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    width: 23px;
+    height: 17px;
+    border: 1px solid rgba(255, 255, 255, 0.46);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .payment-card__line {
+    position: absolute;
+    bottom: 17px;
+    left: 18px;
+    width: 76px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .payment-card__mark { position: absolute; top: 17px; right: 18px; color: var(--color-text-inverse); }
+
+  .invoice-preview {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+    margin-top: 17px;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg-muted);
+  }
+
+  .invoice-preview__brand { width: 52px; height: 6px; border-radius: 3px; background: var(--ink); }
+  .invoice-preview__number { grid-row: 1 / span 4; grid-column: 2; color: var(--color-accent); font-family: var(--font-mono); font-size: 0.72rem; }
+  .invoice-preview > span:not(.invoice-preview__brand):not(.invoice-preview__number) { width: 88%; height: 4px; border-radius: 2px; background: var(--color-border-strong); }
+  .invoice-preview > span:nth-last-child(1) { width: 56%; }
+
+  .delivery-route {
+    position: relative;
+    height: 58px;
+    margin: 17px 4px 0;
+  }
+
+  .delivery-route__line {
+    position: absolute;
+    top: 28px;
+    right: 8px;
+    left: 8px;
+    height: 2px;
+    background: var(--color-border-strong);
+  }
+
+  .delivery-route__stop {
+    position: absolute;
+    top: 23px;
+    width: 12px;
+    height: 12px;
+    border: 3px solid var(--surface);
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-border-strong);
+  }
+
+  .delivery-route__stop--one { left: 4px; }
+  .delivery-route__stop--two { left: calc(50% - 6px); }
+  .delivery-route__stop--three { right: 4px; background: var(--color-success); }
+  .delivery-route__truck { position: absolute; top: 1px; left: calc(50% - 9px); color: var(--color-accent); }
+
+  .orbit-card__event {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+    color: var(--color-text-secondary);
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  .orbit-card__event strong {
+    color: var(--color-success);
+    font-size: 0.65rem;
+    font-weight: 600;
+  }
+
+  .orbit-card__event--inverse { color: var(--color-footer-muted); }
+  .orbit-card__event--inverse strong { color: var(--cobalt-bright); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .orbit-card {
+      animation: commerce-card-turn 12s var(--ease-out-expo) infinite both;
+    }
+
+    .commerce-orbit__position--store .orbit-card { animation-delay: 0s; }
+    .commerce-orbit__position--payment .orbit-card { animation-delay: -9s; }
+    .commerce-orbit__position--invoice .orbit-card { animation-delay: -6s; }
+    .commerce-orbit__position--delivery .orbit-card { animation-delay: -3s; }
+
+    .orbit-card__signal {
+      animation: commerce-signal 12s ease-in-out infinite both;
+    }
+
+    .commerce-orbit__position--store .orbit-card__signal { animation-delay: 0s; }
+    .commerce-orbit__position--payment .orbit-card__signal { animation-delay: -9s; }
+    .commerce-orbit__position--invoice .orbit-card__signal { animation-delay: -6s; }
+    .commerce-orbit__position--delivery .orbit-card__signal { animation-delay: -3s; }
+
+    @keyframes commerce-card-turn {
+      0%, 14% { transform: translateY(-8px) scale(1); }
+      22%, 92% { transform: translateY(0) scale(0.985); }
+      100% { transform: translateY(-8px) scale(1); }
+    }
+
+    @keyframes commerce-signal {
+      0%, 14% { opacity: 1; transform: scale(1.35); }
+      22%, 92% { opacity: 0.42; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.35); }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orbit-card { opacity: 1; }
+  }
+
+  @media (max-width: 1200px) and (min-width: 1081px) {
+    .commerce-orbit__position--store { left: -82px; }
+    .commerce-orbit__position--payment { right: -82px; }
+    .commerce-orbit__position--invoice { right: -74px; }
+    .commerce-orbit__position--delivery { left: -84px; }
+  }
+
+  @media (max-width: 1080px) {
+    .commerce-orbit {
+      position: relative;
+      inset: auto;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      width: min(760px, calc(100% - 32px));
+      margin: 56px auto 0;
+    }
+
+    .commerce-orbit__path { display: none; }
+    .commerce-orbit__position { position: static; width: auto; transform: none; }
+    .orbit-card { height: 100%; min-height: 194px; }
+  }
+
+  @media (max-width: 560px) {
+    .commerce-orbit {
+      gap: 9px;
+      width: calc(100% - 20px);
+      margin-top: 42px;
+    }
+
+    .orbit-card {
+      min-height: 164px;
+      padding: 12px;
+      border-radius: 13px;
+      box-shadow: 0 13px 34px rgba(20, 22, 27, 0.11), 0 2px 6px rgba(20, 22, 27, 0.04);
+    }
+
+    .orbit-card__header { grid-template-columns: auto 1fr; gap: 8px; }
+    .orbit-card__signal { display: none; }
+    .orbit-card__icon { width: 30px; height: 30px; }
+    .orbit-card__kicker { display: none; }
+    .orbit-card__title { font-size: 0.78rem; }
+    .store-preview, .payment-card, .invoice-preview { margin-top: 12px; }
+    .store-preview { grid-template-columns: 36px 1fr 20px; gap: 6px; padding: 7px; }
+    .store-preview__image { height: 32px; }
+    .store-preview__action { width: 20px; height: 20px; }
+    .payment-card { height: 50px; }
+    .payment-card__chip { top: 12px; left: 12px; }
+    .payment-card__line { bottom: 11px; left: 12px; }
+    .payment-card__mark { top: 11px; right: 12px; }
+    .invoice-preview { gap: 4px 8px; padding: 9px; }
+    .delivery-route { height: 44px; margin-top: 11px; }
+    .delivery-route__line { top: 24px; }
+    .delivery-route__stop { top: 19px; }
+    .orbit-card__event { grid-template-columns: auto 1fr; margin-top: 9px; font-size: 0.58rem; }
+    .orbit-card__event strong { display: none; }
+  }
+</style>

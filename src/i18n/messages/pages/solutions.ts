@@ -24,7 +24,7 @@ export default defineMessages({
     'solutions.featured.onlineStore.desc':
       'Catalog, cart, and checkout on your own domain — with payments and invoicing already wired in.',
     'solutions.featured.website.desc':
-      'A complete site with AI-generated content, your own domain, and publishing straight to your CMS.',
+      'Your own domain, a live site raised on it, and AI content that fills it.',
     'solutions.featured.payments.desc':
       'Accept card payments and issue compliant electronic invoices from the same transaction.',
     'solutions.featured.whitelabel.desc':
@@ -84,8 +84,9 @@ export default defineMessages({
     'solutions.group.content.item.onlineStore.desc':
       'Launch a store with checkout, catalog, and customer accounts — no plugins, no patchwork.',
     'solutions.group.content.item.onlineStore.replaces': 'A standalone ecommerce platform',
+    'solutions.group.content.item.websiteBuilder.title': 'Website & Domain',
     'solutions.group.content.item.websiteBuilder.desc':
-      'Build a complete website with AI content, your own domain, and integrated publishing.',
+      'Register or connect a domain and we raise the site on it — DNS, routing and mail included.',
     'solutions.group.content.item.websiteBuilder.replaces': 'A standalone website builder',
     'solutions.group.content.item.aiContentGeneration.title': 'AI Content Generation',
     'solutions.group.content.item.aiContentGeneration.desc':
@@ -211,7 +212,7 @@ export default defineMessages({
     'solutions.featured.onlineStore.desc':
       'Catálogo, carrito y checkout en tu propio dominio — con pagos y facturación ya integrados.',
     'solutions.featured.website.desc':
-      'Un sitio completo con contenido generado por IA, tu propio dominio y publicación directa a tu CMS.',
+      'Tu propio dominio, un sitio levantado sobre él y contenido con IA que lo llena.',
     'solutions.featured.payments.desc':
       'Acepta pagos con tarjeta y emite facturas electrónicas conformes desde la misma transacción.',
     'solutions.featured.whitelabel.desc':
@@ -271,8 +272,9 @@ export default defineMessages({
     'solutions.group.content.item.onlineStore.desc':
       'Lanza una tienda con checkout, catálogo y cuentas de cliente — sin plugins ni parches.',
     'solutions.group.content.item.onlineStore.replaces': 'Una plataforma de ecommerce independiente',
+    'solutions.group.content.item.websiteBuilder.title': 'Sitio web y dominio',
     'solutions.group.content.item.websiteBuilder.desc':
-      'Crea un sitio web completo con contenido generado por IA, tu propio dominio y publicación integrada.',
+      'Registra o conecta un dominio y levantamos el sitio sobre él — DNS, enrutamiento y correo incluidos.',
     'solutions.group.content.item.websiteBuilder.replaces': 'Un creador de sitios web independiente',
     'solutions.group.content.item.aiContentGeneration.title': 'Generación de contenido con IA',
     'solutions.group.content.item.aiContentGeneration.desc':

@@ -23,7 +23,7 @@ async function openMenu(page: Page) {
 }
 
 test('switching to English keeps the page and sets the cookie', async ({ context, page }) => {
-  await page.goto('/es/pricing/');
+  await page.goto('/es/precios/');
   await openMenu(page);
 
   await page.locator('a[data-lang-choice="en"]').first().click();
@@ -35,17 +35,19 @@ test('switching to English keeps the page and sets the cookie', async ({ context
 });
 
 test('switching to Spanish keeps the page', async ({ page }) => {
+  // "Keeps the page", not "keeps the path": the Spanish tree publishes Spanish
+  // slugs, so staying on the same page means landing on its translated address.
   await page.goto('/pricing/');
   await openMenu(page);
   await page.locator('a[data-lang-choice="es"]').first().click();
-  await expect(page).toHaveURL(/\/es\/pricing\/$/);
+  await expect(page).toHaveURL(/\/es\/precios\/$/);
 });
 
 test('a blog post switches to its own translation, not the index', async ({ page }) => {
   await page.goto('/blog/getting-started-5-minutes/');
   await openMenu(page);
   await page.locator('a[data-lang-choice="es"]').first().click();
-  await expect(page).toHaveURL(/\/es\/blog\/getting-started-5-minutes\/$/);
+  await expect(page).toHaveURL(/\/es\/blog\/primeros-pasos-en-5-minutos\/$/);
 });
 
 test('the cookie is written before the client router swaps the document', async ({
@@ -59,7 +61,9 @@ test('the cookie is written before the client router swaps the document', async 
   await page.goto('/es/');
   await openMenu(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
-  await expect(page).toHaveURL(/localhost:4321\/$/);
+  // Assert the destination, not the development port: isolated worktrees run
+  // their static server on different ports but still exercise the same route.
+  await expect(page).toHaveURL(/\/$/);
 
   const cookie = (await context.cookies()).find((c) => c.name === '1p_lang');
   expect(cookie?.value).toBe('en');
@@ -77,7 +81,7 @@ test('the choice survives a new page load', async ({ browser }) => {
   await page.goto('/es/');
   await openMenu(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
-  await expect(page).toHaveURL(/localhost:4321\/$/);
+  await expect(page).toHaveURL(/\/$/);
 
   // Fresh navigation, same context: the Spanish browser locale would otherwise
   // send this straight back to /es/.
@@ -88,7 +92,7 @@ test('the choice survives a new page load', async ({ browser }) => {
 });
 
 test('the current language is marked, not linked', async ({ page }) => {
-  await page.goto('/es/pricing/');
+  await page.goto('/es/precios/');
   await openMenu(page);
 
   const current = page.locator('.lang [aria-current="true"]');
@@ -132,7 +136,7 @@ test('an unavailable language explains itself to the eye, not only to a screen r
 });
 
 test('the control is reachable and operable by keyboard alone', async ({ page }) => {
-  await page.goto('/es/pricing/');
+  await page.goto('/es/precios/');
   await openMenu(page);
 
   const link = page.locator('.lang a[data-lang-choice="en"]');
@@ -144,7 +148,7 @@ test('the control is reachable and operable by keyboard alone', async ({ page })
 });
 
 test('each option names its language in that language', async ({ page }) => {
-  for (const path of ['/pricing/', '/es/pricing/']) {
+  for (const path of ['/pricing/', '/es/precios/']) {
     await page.goto(path);
     await openMenu(page);
     const group = page.locator('.lang');
@@ -160,21 +164,21 @@ test('each option names its language in that language', async ({ page }) => {
 test('the active nav item is marked in Spanish', async ({ page }) => {
   // This is the regression the epic had to fix: the header compared the path
   // against English root hrefs, so under /es/ nothing was ever active.
-  await page.goto('/es/solutions/');
+  await page.goto('/es/soluciones/');
   const active = page.locator('.site-header__nav .nav-link.is-active');
   await expect(active).toHaveCount(1);
   await expect(active).toHaveText('Soluciones');
 });
 
 test('the active legal document is marked in Spanish', async ({ page }) => {
-  await page.goto('/es/privacy/');
+  await page.goto('/es/privacidad/');
   const current = page.locator('.legal__docs [aria-current="page"]');
   await expect(current).toHaveCount(1);
   await expect(current).toHaveText('Política de privacidad');
 });
 
 test('the logo returns to the home page of the language being read', async ({ page }) => {
-  await page.goto('/es/about/');
+  await page.goto('/es/nosotros/');
   await page.locator('header a.logo').click();
   await expect(page).toHaveURL(/\/es\/$/);
 });
@@ -186,7 +190,7 @@ test('a modifier click does not record a preference in this tab', async ({ conte
   // detection, it would keep doing so on every later visit.
   await page.goto('/pricing/');
   await openMenu(page);
-  await page.locator('a[data-lang-choice="es"]').first().click({ modifiers: ['Meta'] });
+  await page.locator('a[data-lang-choice="es"]').first().click({ modifiers: ['ControlOrMeta'] });
 
   await expect(page).toHaveURL(/\/pricing\/$/);
   expect((await context.cookies()).find((c) => c.name === '1p_lang')).toBeUndefined();

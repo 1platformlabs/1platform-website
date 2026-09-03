@@ -39,7 +39,7 @@ export async function blogFeed(context: APIContext, locale: Locale) {
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.pubDate,
-      link: localizePath(`/blog/${bareSlug(post.slug)}/`, locale),
+      link: localizePath(`/blog/${bareSlug(post.id)}/`, locale),
       categories: [post.data.category],
     })),
   });
@@ -60,7 +60,7 @@ export async function changelogFeed(context: APIContext, locale: Locale) {
       // Changelog entries share one page, so a constant link gave all seven
       // items the same derived guid and a reader deduped them down to one. The
       // anchor makes each guid unique and still lands on the right release.
-      link: `${localizePath('/changelog/', locale)}#${entry.data.version ?? bareSlug(entry.slug)}`,
+      link: `${localizePath('/changelog/', locale)}#${entry.data.version ?? bareSlug(entry.id)}`,
       categories: [entry.data.category],
     })),
   });

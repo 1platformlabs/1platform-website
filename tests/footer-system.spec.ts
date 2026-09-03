@@ -1,10 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { translateToEs } from '../src/i18n/routes';
 
 const dist = 'dist';
 const stableLinks = [
-  '/solutions/online-store/', '/solutions/website/', '/solutions/content/', '/solutions/deliveries/',
+  '/solutions/online-store/', '/solutions/content/', '/solutions/deliveries/',
   '/solutions/ads/', '/solutions/whitelabel/', '/payments-invoicing/', '/for-agencies/',
   '/for-developers/', '/solutions/', '/blog/', '/changelog/', '/about/', '/pricing/',
   '/terms/', '/privacy/', '/cookies/',
@@ -15,10 +16,15 @@ function footerLinks(html: string) {
   return [...footer.matchAll(/href="([^"#]*)"/g)].map((match) => match[1]);
 }
 
-for (const [file, prefix] of [['index.html', ''], [join('es', 'index.html'), '/es']] as const) {
-  test(`the ${prefix || 'English'} footer preserves every public destination`, () => {
+// The Spanish footer no longer carries `/es` + the English path: each entry
+// sits at its own translated address, so the expectation is read from the route
+// map instead of concatenated.
+for (const [file, locale] of [['index.html', 'en'], [join('es', 'index.html'), 'es']] as const) {
+  test(`the ${locale === 'en' ? 'English' : '/es'} footer preserves every public destination`, () => {
     const links = footerLinks(readFileSync(join(dist, file), 'utf8'));
-    for (const link of stableLinks) expect(links).toContain(`${prefix}${link}`);
+    for (const link of stableLinks) {
+      expect(links).toContain(locale === 'en' ? link : translateToEs(link));
+    }
   });
 }
 

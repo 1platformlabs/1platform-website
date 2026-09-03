@@ -54,10 +54,20 @@ export default defineMessages({
     'solutions-online-store.howItWorks.eyebrow': 'How it works',
     'solutions-online-store.howItWorks.lead': 'Four steps from idea to live store.',
     'solutions-online-store.howItWorks.aria': 'How to launch a store, step by step',
-    'solutions-online-store.step.createAccount': 'Create your account',
-    'solutions-online-store.step.addProducts': 'Add products',
-    'solutions-online-store.step.connectDomain': 'Connect your domain',
-    'solutions-online-store.step.goLive': 'Go live',
+    // The order is the product's, not a marketing arc. The domain is a
+    // blocking, paid prerequisite: `ProvisioningCreateRequest.domain` is
+    // `Field(...)` with no default, and the endpoint answers 422
+    // DOMAIN_NOT_VERIFIED for an unverified external name — there is no
+    // courtesy subdomain anywhere in the product. And "Go live" was not a
+    // step at all: no Publish button exists; the store is live when the
+    // provisioning job reaches `completed`. The collection account, which the
+    // old list never mentioned, is a mandatory step for a store
+    // (MERCHANT_CREDENTIAL in `_STORE_STEPS`) — without it the store cannot
+    // charge.
+    'solutions-online-store.step.domain': 'Register or connect your domain',
+    'solutions-online-store.step.buildStore': 'Build your store on it',
+    'solutions-online-store.step.collectionAccount': 'Connect your collection account',
+    'solutions-online-store.step.addProductsAndSell': 'Add products and sell',
 
     'solutions-online-store.whatItReplaces.eyebrow': 'What it replaces',
     'solutions-online-store.whatItReplaces.lead': 'One platform instead of separate tools',
@@ -136,10 +146,10 @@ export default defineMessages({
     'solutions-online-store.howItWorks.eyebrow': 'Cómo funciona',
     'solutions-online-store.howItWorks.lead': 'Cuatro pasos de la idea a una tienda en vivo.',
     'solutions-online-store.howItWorks.aria': 'Cómo lanzar una tienda, paso a paso',
-    'solutions-online-store.step.createAccount': 'Crea tu cuenta',
-    'solutions-online-store.step.addProducts': 'Agrega productos',
-    'solutions-online-store.step.connectDomain': 'Conecta tu dominio',
-    'solutions-online-store.step.goLive': 'Publica',
+    'solutions-online-store.step.domain': 'Registra o conecta tu dominio',
+    'solutions-online-store.step.buildStore': 'Crea tu tienda sobre él',
+    'solutions-online-store.step.collectionAccount': 'Conecta tu cuenta de cobro',
+    'solutions-online-store.step.addProductsAndSell': 'Agrega productos y vende',
 
     'solutions-online-store.whatItReplaces.eyebrow': 'Lo que reemplaza',
     'solutions-online-store.whatItReplaces.lead': 'Una plataforma en lugar de herramientas separadas',
