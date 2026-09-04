@@ -111,3 +111,126 @@ jobs:
         run: |
           set -euo pipefail
           npm test
+
+  sonarcloud:
+    # ⚠️ `name:` EXACTO — es el contexto que se marca requerido en la protección
+    # de `main`. Cambiarlo desengancha la compuerta sin que nada avise.
+    name: SonarCloud Code Analysis
+    # Sin `needs:`: corre EN PARALELO con `validate` y `browser`. El escáner de
+    # JS/TS lee las fuentes, no el `dist/`, así que no depende del build; y
+    # colgarlo del build alargaría el camino crítico del PR sin ganar nada.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+        with:
+          # El análisis de código NUEVO se apoya en `git blame`: sin historia
+          # completa SonarCloud no sabe qué líneas son del PR.
+          fetch-depth: 0
+
+      # NO hay paso de descarga de cobertura, y es deliberado: este repo no
+      # produce ninguna. `npm test` es Playwright contra el `dist/` construido
+      # —una suite de navegador, no de unidad— y no emite lcov. Por eso
+      # `sonar-project.properties` trae `sonar.coverage.exclusions=**`: sin
+      # reporte, el gate mediría 0 % en código nuevo y fallaría por FALTA DE
+      # DATOS y no por calidad, que es el modo de fallo que termina con alguien
+      # apagando el gate.
+
+      - name: Check for SONAR_TOKEN
+        id: sonar_token
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          ES_FORK: ${{ github.event.pull_request.head.repo.fork == true }}
+        run: |
+          set -euo pipefail
+          if [ -n "${SONAR_TOKEN:-}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "present=false" >> "$GITHUB_OUTPUT"
+          if [ "${ES_FORK}" = "true" ]; then
+            MOTIVO="el PR viene de un fork, que por diseño no recibe los secretos del repositorio"
+            echo "::warning::SonarCloud NO analizó este PR: ${MOTIVO}."
+          else
+            MOTIVO="el secreto SONAR_TOKEN no llegó a este job, y este PR NO viene de un fork"
+            echo "::error::SonarCloud NO analizó este PR: ${MOTIVO}. La credencial vive en la organización (gh secret list --org 1platformlabs)."
+          fi
+          {
+            echo "## SonarCloud NO analizó este PR"
+            echo
+            echo "Este check está en verde y **no midió nada**."
+            echo
+            echo "**Motivo:** ${MOTIVO}."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: SonarCloud Scan
+        id: sonar_scan
+        if: steps.sonar_token.outputs.present == 'true'
+        # Pinneada al SHA, no al tag: `githubactions:S7637` — un tag móvil deja
+        # que el dueño de la acción cambie lo que corre en un job que recibe
+        # `SONAR_TOKEN` y `GITHUB_TOKEN`.
+        uses: SonarSource/sonarcloud-github-action@ffc3010689be73b8e5ae0c57ce35968afd7909e8 # v5
+        # INFORMATIVO en la primera corrida, A PROPÓSITO. Este repositorio nunca
+        # tuvo una corrida del escáner —al 2026-09-04 no existía siquiera el
+        # proyecto `1platformlabs_1platform-website` en la organización, medido
+        # contra `api/projects/search`—, así que el color del gate es
+        # literalmente desconocido. Sin esta línea, un primer gate rojo no
+        # bloquea UN PR: congela TODO merge del repositorio. Se quita después de
+        # dos o tres PRs midiendo.
+        #
+        # `sonar.qualitygate.wait` NO se pone por la misma razón: esperar el
+        # veredicto sólo tiene sentido cuando el veredicto ya se conoce.
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # El host, EXPLÍCITO: sin esto el escáner CLI 7.x pide
+          # `/api/v2/analysis/jres` y `sonarcloud.io` responde 404, con un error
+          # que MIENTE ("check the property sonar.token"). Y es intermitente:
+          # si el runner tiene el escáner en caché no baja el JRE y no falla.
+          SONAR_HOST_URL: https://sonarcloud.io
+
+  secretos:
+    name: Secretos
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    env:
+      GITLEAKS_VERSION: "8.30.1"   # verificada contra el release el 2026-09-04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+
+      - name: Instalar gitleaks
+        run: |
+          set -euo pipefail
+          curl -sSL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          tar -xzf gitleaks.tar.gz gitleaks
+
+      # La casa no le cree a un detector que no demostró discriminar — mismo
+      # patrón que `check-tells-self-test.sh`. El token falso se CONSTRUYE acá:
+      # el literal no vive nunca en el repo, así que este paso no se vuelve el
+      # hallazgo de la próxima auditoría.
+      - name: El detector discrimina (secreto sembrado)
+        run: |
+          set -euo pipefail
+          TMP="$(mktemp -d)"
+          FALSO="ghp_$(head -c 64 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 36)"
+          printf 'token = "%s"\n' "$FALSO" > "$TMP/sembrado.txt"
+          if ./gitleaks detect --source "$TMP" --no-git --config .gitleaks.toml --redact --exit-code 1; then
+            echo "::error::gitleaks NO marcó el secreto sembrado — este gate no discrimina."
+            exit 1
+          fi
+          rm -rf "$TMP"
+
+      # `--no-git` escanea el ÁRBOL, no el historial: caza el secreto que se
+      # está agregando, no el que ya está commiteado. El barrido histórico es
+      # una tarea aparte.
+      - name: Secretos en el árbol
+        run: ./gitleaks detect --source . --no-git --config .gitleaks.toml --redact --exit-code 1

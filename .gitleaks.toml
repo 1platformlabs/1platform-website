@@ -1,0 +1,41 @@
+# Configuración de gitleaks para 1platform-website.
+# Documenta los ÚNICOS falsos-positivos permitidos: ejemplos ilustrativos de la documentación
+# pública de la API (no son secretos reales; este repositorio ES superficie pública).
+#
+# IMPORTANTE (seguridad): los regexes del allowlist son **anclados/acotados** para que
+# NO silencien credenciales REALES. Validado empíricamente con gitleaks: una OpenAI
+# `sk-…T3BlbkFJ…`, un JWT firmado completo, y llaves AWS/GitHub siguen BLOQUEANDO el merge; solo pasan
+# los shapes de EJEMPLO del corpus (JWT truncados con `...`, tokens cortos `ak-`/`sk-`, UUID placeholder).
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Ejemplos de documentación (placeholders ilustrativos) + artefactos de build"
+
+paths = [
+  '''node_modules/.*''',
+  '''dist/.*''',
+  '''\.astro/.*''',
+  '''\.gitleaks\.toml''',
+]
+
+regexes = [
+  # JWT de ejemplo: SOLO truncados con `...` (los del corpus). Un JWT firmado real NO contiene `...`.
+  '''eyJ[A-Za-z0-9_-]+\.\.\.''',
+  # Tokens placeholder del modelo two-token (ak-/sk-): ANCLADOS (^…$) y acotados a <=28 chars, así
+  # cubren los ejemplos del corpus (`ak-your-app-token`, `sk-the-user-token`, `sk-user-…-2026`, etc.)
+  # pero NO una OpenAI `sk-proj-…`/`sk-…`(~51) ni una Anthropic `sk-ant-api03-…` (largas) — esas bloquean.
+  '''^(?:ak|sk)-[A-Za-z0-9_<>-]{2,28}$''',
+  # UUID placeholder de ejemplo (authorization_number FEL en respuestas de muestra): secuencia hex obvia.
+  '''A1B2C3D4(?:-[0-9A-Fa-f]+)+''',
+  # Placeholder de los ejemplos `curl` del blog: la regla `curl-auth-header` marca el
+  # `Bearer …` y el "secreto" que extrae es literalmente `YOUR_TOKEN` / `YOUR_APP_TOKEN`
+  # (10 hallazgos medidos el 2026-09-04 en `src/content/blog/{en,es}/`). ANCLADO a
+  # MAYÚSCULAS con prefijo `YOUR_`: ningún token real tiene esa forma.
+  '''^YOUR_[A-Z_]{2,20}$''',
+  # `translationKey` del changelog (`src/content/changelog/`): el slug `AAAA-MM-DD-tema`
+  # del propio archivo, que `generic-api-key` confunde con una clave por estar al lado de
+  # la palabra "key". ANCLADO a esa forma exacta — una clave real no empieza con una fecha.
+  '''^\d{4}-\d{2}-\d{2}-[a-z0-9-]{3,60}$''',
+]
