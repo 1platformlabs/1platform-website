@@ -692,7 +692,30 @@ jobs:
             cd "$APP_DIR"/
             git remote set-url origin "https://x-access-token:${DEPLOY_GH_TOKEN}@github.com/1platformlabs/1platform-website.git"
             chmod 600 .git/config
-            git fetch --prune --force --all --tags
+
+            # El dedicado corre git 1.8.3.1 (CentOS 7.9), donde `--tags`
+            # REEMPLAZA la refspec configurada en vez de sumarse a ella:
+            # `fetch --all --tags` sólo trae tags y NO actualiza ningún
+            # `refs/remotes/origin/*`. Con reset a un TAG el agujero quedaba
+            # tapado (el tag sí llegaba); al pasar a resetear a un SHA
+            # (`push_sha || github.sha`, arriba) el `origin/main` congelado
+            # quedó expuesto: `fatal: Could not parse object <sha>` desde
+            # 2026-09-03 (#88), con `origin/main` frozen dos releases atrás.
+            # Refspecs explícitas — git 1.8 sí las honra.
+            git fetch --prune --force origin \
+              "+refs/heads/*:refs/remotes/origin/*" \
+              "+refs/tags/*:refs/tags/*"
+
+            # Guarda: `Could not parse object` no distingue si falló el SHA,
+            # la red o el fetch. Verificar ANTES de tocar el árbol convierte
+            # "desplegó una versión vieja en silencio" en "el deploy falla y
+            # se ve", en vez de dejar `git reset --hard` fallar más abajo con
+            # un mensaje que no dice qué pasó.
+            if ! git cat-file -e "${VERSION}^{commit}" 2>/dev/null; then
+              echo "::error::${VERSION} no llegó al fetch — origin/main no avanzó"
+              exit 1
+            fi
+
             git reset --hard "${VERSION}"
 
             # `deploy.sh` aborta si falta `.env.prod`, antes de construir. La
