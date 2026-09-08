@@ -31,7 +31,7 @@ interface Props {
   class?: string;
 }
 
-const { t } = useI18n(Astro.url.pathname);
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
 
 const {
   title,

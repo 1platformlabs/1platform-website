@@ -2,7 +2,7 @@
 import Icon from '@components/Icon.astro';
 import { useI18n } from '@i18n';
 
-const { t } = useI18n(Astro.url.pathname);
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
 ---
 
 <div class="commerce-orbit" role="img" aria-label={t('home.hero.scene.aria')}>

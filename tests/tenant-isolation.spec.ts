@@ -41,6 +41,12 @@ function manifest(slug: string, domain: string, accent: string): SiteTenant {
     theme: { accent, accent_contrast: '#ffffff', display_font: 'system-sans' },
     destinations: { docs: null, app: null, support: null, status: null },
     pages: ['/'],
+    // Widened by F3: the manifest now carries the tenant's Search Console
+    // token, and `isTenant` verifies it structurally. A double that omits a
+    // field the validator checks is rejected as an unrecognised manifest, which
+    // is the correct behaviour and why this line is here rather than the check
+    // being loosened.
+    google_site_verification: null,
     indexable: true,
   }
 }

@@ -7,8 +7,10 @@ import Icon from '@components/Icon.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import { useI18n } from '@i18n';
 import type { IconName } from '@components/icons';
+import { siteOrigin } from '@lib/site-origin';
+import { appUrl, docsUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('paymentsInvoicing.title');
 const description = t('paymentsInvoicing.description');
@@ -18,8 +20,8 @@ const description = t('paymentsInvoicing.description');
 // repeating the English path as a literal) keeps the Service/BreadcrumbList
 // schema accurate on both trees instead of the Spanish page's structured data
 // silently claiming the English URL.
-const homeUrl = new URL(l('/'), Astro.site).toString();
-const pageUrl = new URL(l('/payments-invoicing/'), Astro.site).toString();
+const homeUrl = new URL(l('/'), siteOrigin(Astro.locals)).toString();
+const pageUrl = new URL(l('/payments-invoicing/'), siteOrigin(Astro.locals)).toString();
 
 const paymentsCrumbLabel = t('nav.solutions.payments');
 
@@ -28,7 +30,7 @@ const jsonLd = [
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: t('paymentsInvoicing.jsonld.serviceName'),
-    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    provider: { '@type': 'Organization', name: t('org.legalName'), url: siteOrigin(Astro.locals) },
     description,
     url: pageUrl,
   },
@@ -165,8 +167,8 @@ const related: { icon: IconName; title: string; description: string; href: strin
     headline={t('paymentsInvoicing.hero.headline')}
     subheadline={t('paymentsInvoicing.hero.subheadline')}
     badge={t('paymentsInvoicing.hero.badge')}
-    primaryCta={{ label: t('paymentsInvoicing.hero.primaryCta'), href: 'https://app.1platform.pro/app/?intent=payments' }}
-    secondaryCta={{ label: t('paymentsInvoicing.hero.secondaryCta'), href: 'https://developer.1platform.pro/' }}
+    primaryCta={ctaTo(t('paymentsInvoicing.hero.primaryCta'), appUrl(Astro.locals, 'payments'))}
+    secondaryCta={ctaTo(t('paymentsInvoicing.hero.secondaryCta'), docsUrl(Astro.locals))}
   />
 
   <!-- What you get -->

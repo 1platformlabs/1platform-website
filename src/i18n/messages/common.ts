@@ -103,6 +103,15 @@ export default defineMessages({
     'lang.aria.current': 'Language: {language}',
     'lang.aria.switchTo': 'View this page in {language}',
     'lang.unavailable': 'Not available in {language}',
+
+    // — The organisation behind the site ——————————————————————
+    // The LEGAL entity, which is not the brand: "1Platform" is what the site
+    // calls itself, "1Platform Labs" is who signs the terms. It lives here as
+    // copy rather than as a manifest field because that is what it is — a
+    // rendered string, in the tenant's own language, that a tenant sets for
+    // itself. It was six hardcoded literals inside JSON-LD blocks before this
+    // key existed, and a grep for the brand did not find them all.
+    'org.legalName': '1Platform Labs',
   },
   es: {
     // — Cabecera ——————————————————————————————————————————————
@@ -186,5 +195,8 @@ export default defineMessages({
     'lang.aria.current': 'Idioma: {language}',
     'lang.aria.switchTo': 'Ver esta página en {language}',
     'lang.unavailable': 'No disponible en {language}',
+
+    // — La organización detrás del sitio ——————————————————————
+    'org.legalName': '1Platform Labs',
   },
 });

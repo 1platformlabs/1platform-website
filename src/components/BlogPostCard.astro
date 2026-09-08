@@ -49,7 +49,7 @@ const {
 
 const Heading = `h${headingLevel}` as 'h2' | 'h3';
 
-const { t, l, locale } = useI18n(Astro.url.pathname);
+const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 const categoryLabel = t(`blog.category.${category}`);
 const dateISO = pubDate.toISOString();

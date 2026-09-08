@@ -30,6 +30,12 @@ export interface SiteTenant {
     status: string | null
   }
   pages: string[]
+  /**
+   * The Search Console ownership token, without the `.html` suffix, or null.
+   * Served at `/<token>.html` to THIS tenant only — see
+   * `src/pages/[token].html.ts` for why it stopped being a file in `public/`.
+   */
+  google_site_verification: string | null
   indexable: boolean
 }
 
@@ -141,6 +147,7 @@ function isTenant(value: unknown): value is SiteTenant {
 
   if (!str(t.slug) || !str(t.brand_name) || !str(t.domain)) return false
   if (!strOrNull(t.brand_mark)) return false
+  if (!strOrNull(t.google_site_verification)) return false
   if (!Array.isArray(t.locales) || t.locales.length === 0 || !t.locales.every(str)) return false
   if (!str(t.default_locale)) return false
   if (typeof t.indexable !== 'boolean') return false

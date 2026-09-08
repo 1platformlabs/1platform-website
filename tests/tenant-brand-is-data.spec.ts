@@ -75,9 +75,15 @@ test('the leak that is LEFT is content, and its size is pinned', async () => {
   const { html: clinic } = await serve(CLINIC_HOST)
 
   // What still names the platform on a clinic page is tenant #1's CONTENT — the
-  // title, the description, the page-level JSON-LD — because the page set and
-  // the copy still come from this repository's file router and i18n catalogues.
-  // Moving them is F3's job (contenido en la API), not this commit's.
+  // title, the description, the RSS title — and ONLY when the site is running
+  // from the repo catalogues (`SITE_MANIFEST_SOURCE=repo`), which is what this
+  // suite does and what a laptop does. In `api` mode the clinic reads its own
+  // copy, so the remaining 13 are a property of the harness, not of the site.
+  //
+  // The DOMAIN half is a different story and is now zero: F3 moved every
+  // absolute URL off `Astro.site` (a build constant one build cannot vary) and
+  // every outbound destination off a literal, so the cap below came down from
+  // 19 to 0 with the measurement rather than ahead of it.
   //
   // Rather than pretend that is fine, or skip the check until F3 lands, the
   // count is PINNED. It may only go down. If it grows, a surface that was data
@@ -93,9 +99,11 @@ test('the leak that is LEFT is content, and its size is pinned', async () => {
   ).toBeLessThanOrEqual(13)
   expect(
     apex,
-    `the clinic page names the platform apex ${apex} times. Most of it is ` +
-      `Astro.site, a BUILD constant one build cannot vary per tenant (WMT-06/10).`,
-  ).toBeLessThanOrEqual(19)
+    `the clinic page names the platform apex ${apex} times. This was 19 before ` +
+      `F3 — canonical, og:url, og:image, hreflang and x-default all came from ` +
+      `Astro.site, plus a hardcoded app CTA. It is now ZERO, so any increase is ` +
+      `a surface that stopped being data.`,
+  ).toBe(0)
 })
 
 test('the clinic tenant serves its OWN brand', async () => {

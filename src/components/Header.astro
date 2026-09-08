@@ -11,8 +11,16 @@ interface Props {
 }
 
 const { alternates } = Astro.props;
-const { t, l } = useI18n(Astro.url.pathname);
-const appUrl = 'https://app.1platform.pro/app/';
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
+/**
+ * The chrome's outbound links, as DATA (D-7).
+ *
+ * A tenant without a product to sign into does not get an empty link, a
+ * disabled link, or a link to the platform's own app: the element is not
+ * rendered at all. Absence is a first-class answer here, and every use below
+ * is guarded on it — which is why these are `| null` rather than defaulted.
+ */
+const { app: appUrl, docs: docsUrl } = Astro.locals.tenant.destinations;
 
 /**
  * Ordered the way a merchant meets them: sell, get paid, deliver, then the
@@ -41,7 +49,10 @@ const navItems: NavItem[] = [
   // twenty-one headings appeared there verbatim, every destination it linked
   // was already linked there, and no page body on the site pointed at it.
   { label: t('nav.pricing'), href: l('/pricing/') },
-  { label: t('nav.docs'), href: 'https://developer.1platform.pro/' },
+  // Docs only when the tenant HAS docs. A clinic has no developer portal, and
+  // the wrong answers are all worse than absence: an empty href, a dead link,
+  // or — the one this epic exists to prevent — a link to the platform's own.
+  ...(docsUrl ? [{ label: t('nav.docs'), href: docsUrl }] : []),
   { label: t('nav.blog'), href: l('/blog/') },
 ];
 
@@ -75,8 +86,8 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
     </nav>
 
     <div class="site-header__actions">
-      <a href={appUrl} class="site-header__signin">{t('cta.signIn')}</a>
-      <a href={appUrl} class="btn btn--primary site-header__cta">{t('cta.getStarted')}</a>
+      {appUrl && <a href={appUrl} class="site-header__signin">{t('cta.signIn')}</a>}
+      {appUrl && <a href={appUrl} class="btn btn--primary site-header__cta">{t('cta.getStarted')}</a>}
       <button
         class="site-header__menu-toggle"
         aria-expanded="false"
@@ -106,7 +117,7 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
       </ul>
     </nav>
     <div class="mobile-menu__footer">
-      <a href={appUrl} class="btn btn--primary btn--full">{t('cta.getStarted')}</a>
+      {appUrl && <a href={appUrl} class="btn btn--primary btn--full">{t('cta.getStarted')}</a>}
       <LanguageSwitcher alternates={alternates} />
     </div>
   </div>

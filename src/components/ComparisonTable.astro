@@ -13,7 +13,7 @@ interface Props {
   rows?: { without: string; with_: string }[];
 }
 
-const { t } = useI18n(Astro.url.pathname);
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
 
 const { rows = [
   { without: t('comparisonTable.row1.without'), with_: t('comparisonTable.row1.with') },

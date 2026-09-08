@@ -7,8 +7,10 @@ import Icon from '@components/Icon.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { docsUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('for-developers.title');
 const description = t('for-developers.description');
@@ -24,13 +26,13 @@ const jsonLd = [
     '@type': 'WebPage',
     name: title,
     description,
-    url: new URL(l('/for-developers/'), 'https://1platform.pro').toString(),
+    url: new URL(l('/for-developers/'), siteOrigin(Astro.locals)).toString(),
   },
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), 'https://1platform.pro').toString() },
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), siteOrigin(Astro.locals)).toString() },
       { '@type': 'ListItem', position: 2, name: forDevelopersLabel },
     ],
   },
@@ -106,7 +108,7 @@ const related: { icon: IconName; title: string; description: string; href: strin
     headline={t('for-developers.hero.headline')}
     subheadline={t('for-developers.hero.subheadline')}
     badge={t('for-developers.hero.badge')}
-    primaryCta={{ label: t('for-developers.cta.readApiDocs'), href: 'https://developer.1platform.pro/' }}
+    primaryCta={ctaTo(t('for-developers.cta.readApiDocs'), docsUrl(Astro.locals))}
     secondaryCta={{ label: t('for-developers.hero.secondaryCta'), href: l('/solutions/whitelabel/') }}
   />
 
@@ -201,8 +203,12 @@ const related: { icon: IconName; title: string; description: string; href: strin
           <p>{t('for-developers.reference.body')}</p>
         </div>
         <div class="panel__actions">
-          <a href="https://developer.1platform.pro/" class="btn btn--primary">{t('for-developers.cta.readApiDocs')}</a>
-          <a href="https://developer.1platform.pro/api-docs" class="btn btn--ghost">{t('for-developers.cta.apiReference')}</a>
+          {docsUrl(Astro.locals) && (
+            <a href={docsUrl(Astro.locals)} class="btn btn--primary">{t('for-developers.cta.readApiDocs')}</a>
+          )}
+          {docsUrl(Astro.locals, 'api-docs') && (
+            <a href={docsUrl(Astro.locals, 'api-docs')} class="btn btn--ghost">{t('for-developers.cta.apiReference')}</a>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 ---
 import { useI18n } from '@i18n';
 
-const { l } = useI18n(Astro.url.pathname);
+const { l } = useI18n(Astro.url.pathname, Astro.locals);
 ---
 
 <h2>1. Aceptación de los términos</h2>

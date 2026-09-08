@@ -9,6 +9,7 @@ import { getLocalized } from '@i18n/collections';
 import { localizedOgImage } from '@i18n/og';
 import '@styles/global.css';
 import '@styles/components.css';
+import { siteOrigin } from '@lib/site-origin';
 
 interface Props {
   title: string;
@@ -37,9 +38,26 @@ const {
   alternates = alternatesForPath(Astro.url.pathname),
 } = Astro.props;
 
-const { locale, t, l } = useI18n(Astro.url.pathname);
+const { locale, t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const tenant = Astro.locals.tenant;
+
+/**
+ * Whether crawlers are welcome — the TENANT's answer, not just the page's.
+ *
+ * `noIndex` was a prop with a default of `false` and, measured, ZERO callers in
+ * the entire tree. So `indexable: false` on a manifest blocked exactly one
+ * thing (the sitemap answered 404) while every page of that tenant was served
+ * without a robots meta and remained perfectly crawlable. The comment in
+ * `src/data/site-tenants.ts` asserting that it "puts noindex on every page" was
+ * simply false, and reading the comment instead of the code is how a
+ * provisional domain gets indexed.
+ *
+ * The page-level prop is kept and ORed rather than replaced: a page may have
+ * its own reason to stay out of the index, and a tenant-level `false` must not
+ * be able to overrule it.
+ */
+const noIndexEffective = noIndex || !tenant.indexable;
 
 /**
  * JSON for a `<script>` block, which is NOT the same as JSON.
@@ -61,13 +79,13 @@ const tenant = Astro.locals.tenant;
 const jsonLdScript = (value: unknown) =>
   JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const canonicalURL = new URL(Astro.url.pathname, siteOrigin(Astro.locals));
 // The share card follows the page's language. A Spanish page pointing at an
 // English card was issue #59: the headline of the card is the reader's first
 // contact with the product, and it arrived in a language they did not pick.
 // Cards with nothing to translate (the wordmark fallback) are left alone —
 // `localizedOgImage` only swaps names it knows were drawn in that language.
-const ogImageURL = new URL(localizedOgImage(ogImage, locale), Astro.site);
+const ogImageURL = new URL(localizedOgImage(ogImage, locale), siteOrigin(Astro.locals));
 
 // hreflang must be absolute, and reciprocal: if English names Spanish, Spanish
 // has to name English with the identical pair, or Google discards the whole
@@ -80,13 +98,13 @@ const ogImageURL = new URL(localizedOgImage(ogImage, locale), Astro.site);
 // would return null, the guard would bail every time, and auto-detection would
 // silently never fire.
 const alternateLinks = (Object.entries(alternates) as [Locale, string][]).map(
-  ([code, path]) => ({ code, href: new URL(path, Astro.site).toString() }),
+  ([code, path]) => ({ code, href: new URL(path, siteOrigin(Astro.locals)).toString() }),
 );
 
 // x-default points at the unprefixed English URL: it is the already-indexed
 // canonical, and pointing it at /es/ would have Google serve Spanish to en-AU
 // and en-CA readers — exactly what the language rule says must not happen.
-const xDefault = alternates.en ? new URL(alternates.en, Astro.site).toString() : null;
+const xDefault = alternates.en ? new URL(alternates.en, siteOrigin(Astro.locals)).toString() : null;
 
 const rssPath = l('/rss.xml');
 
@@ -136,12 +154,14 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/logo-oauth-120x120.png" />
     <link rel="canonical" href={canonicalURL} />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    {/* Not advertised by a tenant whose sitemap answers 404: every page of a
+        non-indexable site used to announce a sitemap that does not exist. */}
+    {tenant.indexable && <link rel="sitemap" href="/sitemap-index.xml" />}
 
     <title>{title}</title>
     <meta name="description" content={description} />
 
-    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    {noIndexEffective && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Language alternates -->
     {alternateLinks.map(({ code, href }) => (

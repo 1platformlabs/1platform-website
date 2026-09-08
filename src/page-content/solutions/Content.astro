@@ -8,8 +8,10 @@ import ProcessSpine from '@components/ProcessSpine.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { appUrl, docsUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('solutions-content.title');
 const description = t('solutions-content.description');
@@ -19,16 +21,16 @@ const jsonLd = [
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: t('solutions-content.serviceName'),
-    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    provider: { '@type': 'Organization', name: t('org.legalName'), url: siteOrigin(Astro.locals) },
     description,
-    url: new URL(l('/solutions/content/'), Astro.site).toString(),
+    url: new URL(l('/solutions/content/'), siteOrigin(Astro.locals)).toString(),
   },
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), Astro.site).toString() },
-      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), siteOrigin(Astro.locals)).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), siteOrigin(Astro.locals)).toString() },
       { '@type': 'ListItem', position: 3, name: t('solutions-content.breadcrumb.content') },
     ],
   },
@@ -137,7 +139,7 @@ const related: { icon: IconName; title: string; description: string; href: strin
     headline={t('solutions-content.hero.headline')}
     subheadline={t('solutions-content.hero.subheadline')}
     badge={t('solutions-content.serviceName')}
-    primaryCta={{ label: t('solutions-content.hero.cta.primary'), href: 'https://app.1platform.pro/app/?intent=content' }}
+    primaryCta={ctaTo(t('solutions-content.hero.cta.primary'), appUrl(Astro.locals, 'content'))}
     secondaryCta={{ label: t('solutions-content.hero.cta.secondary'), href: l('/pricing/') }}
   />
 
@@ -217,13 +219,17 @@ const related: { icon: IconName; title: string; description: string; href: strin
           <p class="next__desc">
             {t('solutions-content.next.desc')}
           </p>
-          <a href="https://developer.1platform.pro/" class="link-cue">
-            {t('solutions-content.next.linkCue')}
-            <Icon name="arrow-right" size={15} />
-          </a>
+          {docsUrl(Astro.locals) && (
+            <a href={docsUrl(Astro.locals)} class="link-cue">
+              {t('solutions-content.next.linkCue')}
+              <Icon name="arrow-right" size={15} />
+            </a>
+          )}
         </div>
         <div class="next__actions">
-          <a href="https://app.1platform.pro/app/?intent=content" class="btn btn--primary">{t('solutions-content.hero.cta.primary')}</a>
+          {appUrl(Astro.locals, 'content') && (
+            <a href={appUrl(Astro.locals, 'content')} class="btn btn--primary">{t('solutions-content.hero.cta.primary')}</a>
+          )}
           <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions-content.next.actions.viewPricing')}</a>
         </div>
       </div>

@@ -3,18 +3,39 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Icon from '@components/Icon.astro';
 import { useI18n } from '@i18n';
 import type { IconName } from '@components/icons';
+import { docsUrl } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('notFound.title');
 const description = t('notFound.description');
 
-const destinations: { icon: IconName; label: string; detail: string; href: string }[] = [
-  { icon: 'home', label: t('breadcrumb.home'), detail: t('notFound.destination.home.detail'), href: l('/') },
-  { icon: 'layers', label: t('nav.solutions'), detail: t('notFound.destination.solutions.detail'), href: l('/solutions/') },
-  { icon: 'logs', label: t('nav.docs'), detail: t('notFound.destination.docs.detail'), href: 'https://developer.1platform.pro/' },
-  { icon: 'content', label: t('nav.blog'), detail: t('notFound.destination.blog.detail'), href: l('/blog/') },
+/**
+ * Where to send someone who is lost — and ONLY where this tenant actually goes.
+ *
+ * Every entry is filtered, and this page is the reason it matters more here
+ * than anywhere else: it is one of the two pages EVERY tenant renders (the
+ * other is the home), so an unfiltered list is a leak on a page no page-set
+ * gate can hide. Before this, a clinic's 404 offered "Solutions", "Blog" and a
+ * link to the platform's developer portal — three routes it does not publish
+ * and one product it does not have.
+ *
+ * Internal routes are checked against the published set; the docs entry is
+ * dropped when the tenant declares no documentation (D-7).
+ */
+const published = new Set(Astro.locals.tenant.pages);
+const internal = (route: string) => (published.has(route) ? l(route) : null);
+
+const candidates: { icon: IconName; label: string; detail: string; href: string | null }[] = [
+  { icon: 'home', label: t('breadcrumb.home'), detail: t('notFound.destination.home.detail'), href: internal('/') },
+  { icon: 'layers', label: t('nav.solutions'), detail: t('notFound.destination.solutions.detail'), href: internal('/solutions/') },
+  { icon: 'logs', label: t('nav.docs'), detail: t('notFound.destination.docs.detail'), href: docsUrl(Astro.locals) },
+  { icon: 'content', label: t('nav.blog'), detail: t('notFound.destination.blog.detail'), href: internal('/blog/') },
 ];
+
+const destinations = candidates.filter(
+  (d): d is { icon: IconName; label: string; detail: string; href: string } => d.href !== null,
+);
 ---
 
 <!--

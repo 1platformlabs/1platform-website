@@ -2,7 +2,10 @@
 import Logo from '@components/Logo.astro';
 import { useI18n } from '@i18n';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
+
+/** The chrome's outbound links, as DATA (D-7). Absent means not rendered. */
+const { app: appUrl, docs: docsUrl } = Astro.locals.tenant.destinations;
 type Column = { key: string; title: string; links: { label: string; href: string }[] };
 
 const columns: Column[] = [
@@ -28,9 +31,17 @@ const columns: Column[] = [
   },
   {
     key: 'resources', title: t('footer.col.resources'), links: [
-      { label: t('footer.link.documentation'), href: 'https://developer.1platform.pro/' },
-      { label: t('footer.link.apiReference'), href: 'https://developer.1platform.pro/api-docs' },
-      { label: t('footer.link.codeExamples'), href: 'https://developer.1platform.pro/' },
+      // The three documentation links only exist when the tenant HAS docs
+      // (D-7). A tenant without a developer portal gets a Resources column with
+      // just its changelog — not three dead links, and emphatically not three
+      // links into the platform's own portal.
+      ...(docsUrl
+        ? [
+            { label: t('footer.link.documentation'), href: docsUrl },
+            { label: t('footer.link.apiReference'), href: new URL('api-docs', docsUrl).toString() },
+            { label: t('footer.link.codeExamples'), href: docsUrl },
+          ]
+        : []),
       { label: t('footer.link.changelog'), href: l('/changelog/') },
     ],
   },
@@ -49,7 +60,7 @@ const year = new Date().getFullYear();
     <div class="site-footer__intro">
       <Logo class="site-footer__logo" />
       <p>{t('footer.cta.body')}</p>
-      <a class="btn btn--footer" href="https://app.1platform.pro/app/">{t('cta.getStarted')}</a>
+      {appUrl && <a class="btn btn--footer" href={appUrl}>{t('cta.getStarted')}</a>}
     </div>
 
     <div class="site-footer__content">

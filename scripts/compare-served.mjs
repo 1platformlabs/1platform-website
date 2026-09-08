@@ -73,6 +73,59 @@ const NORMALISERS = [
         },
       ),
   },
+  {
+    name: 'scoped-style-order',
+    why:
+      'F3 added one import (the tenant origin helper) to fourteen components, and Astro ' +
+      'concatenates every component\'s scoped CSS into ONE <style> block in module-graph ' +
+      'order — so eighteen pages changed only in WHERE each component\'s rules sit inside ' +
+      'that block. Measured on /about/: 9485 bytes of CSS on both sides, 69 rules on both ' +
+      'sides, identical as a sorted set, and all 69 carry a data-astro-cid across 6 ' +
+      'component scopes — so no two components\' rules can match the same element and ' +
+      'their relative order cannot change the cascade.\n' +
+      'It therefore sorts by SCOPE and keeps each scope\'s rules in their original order, ' +
+      'which is stronger than sorting rules outright: a component that emits a base rule ' +
+      'and then its :hover keeps that order, so an intra-component cascade change is still ' +
+      'visible.\n' +
+      'WHAT IT CANNOT SEE, stated rather than discovered later: two components whose rules ' +
+      'genuinely do collide, if Astro ever emitted an UNSCOPED rule. That is why an ' +
+      'unscoped rule makes this normaliser decline to touch the document at all rather ' +
+      'than sort around it.',
+    apply: (s) =>
+      s.replace(/<style>([\s\S]*?)<\/style>/g, (whole, css) => {
+        // Top-level rules, by brace depth — a regex cannot do this because
+        // @media blocks nest.
+        const rules = []
+        let depth = 0
+        let start = 0
+        for (let i = 0; i < css.length; i++) {
+          if (css[i] === '{') depth++
+          else if (css[i] === '}') {
+            depth--
+            if (depth === 0) {
+              const r = css.slice(start, i + 1).trim()
+              if (r) rules.push(r)
+              start = i + 1
+            }
+          }
+        }
+        if (depth !== 0 || rules.length === 0) return whole
+
+        // Every rule must name a component scope, or this normaliser declines:
+        // an unscoped rule is the one case where order could matter across
+        // components, and silently sorting around it is how a tolerance starts
+        // forgiving a real regression.
+        const groups = new Map()
+        for (const rule of rules) {
+          const m = rule.match(/data-astro-cid-([a-z0-9]+)/)
+          if (!m) return whole
+          if (!groups.has(m[1])) groups.set(m[1], [])
+          groups.get(m[1]).push(rule)
+        }
+        const ordered = [...groups.keys()].sort().map((cid) => groups.get(cid).join(''))
+        return `<style>${ordered.join('')}</style>`
+      }),
+  },
 ]
 
 function normalise(html) {
@@ -145,6 +198,54 @@ if (process.argv.includes('--self-test')) {
       mustMatch: false,
     },
   ]
+  const S = (...rules) => `<head><style>${rules.join('')}</style></head>`
+  const A1 = '.a[data-astro-cid-aaa]{color:red}'
+  const A2 = '.a[data-astro-cid-aaa]:hover{color:pink}'
+  const B1 = '.b[data-astro-cid-bbb]{color:blue}'
+  const styleCases = [
+    {
+      name: 'forgives two component SCOPES in a different order',
+      a: S(A1, A2, B1),
+      b: S(B1, A1, A2),
+      mustMatch: true,
+    },
+    {
+      name: 'does NOT forgive a CHANGED declaration',
+      a: S(A1, B1),
+      b: S('.a[data-astro-cid-aaa]{color:green}', B1),
+      mustMatch: false,
+    },
+    {
+      name: 'does NOT forgive a REMOVED rule',
+      a: S(A1, A2, B1),
+      b: S(A1, B1),
+      mustMatch: false,
+    },
+    {
+      name: 'does NOT forgive an ADDED rule',
+      a: S(A1, B1),
+      b: S(A1, B1, '.c[data-astro-cid-ccc]{display:none}'),
+      mustMatch: false,
+    },
+    {
+      name: 'does NOT forgive reordering INSIDE one component (base vs :hover)',
+      a: S(A1, A2),
+      b: S(A2, A1),
+      mustMatch: false,
+    },
+    {
+      name: 'declines to touch a block holding an UNSCOPED rule',
+      a: S(A1, 'h1{color:red}'),
+      b: S('h1{color:red}', A1),
+      mustMatch: false,
+    },
+    {
+      name: 'does NOT forgive markup changing outside the style block',
+      a: `<style>${A1}</style><h1>Title</h1>`,
+      b: `<style>${A1}</style><h1>Other</h1>`,
+      mustMatch: false,
+    },
+  ]
   let bad = 0
   for (const c of cases) {
     const matched = sha(normalise(base)) === sha(normalise(c.other))
@@ -158,7 +259,13 @@ if (process.argv.includes('--self-test')) {
     if (!ok) bad++
     console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${c.name} (matched=${matched}, expected=${c.mustMatch})`)
   }
-  const total = cases.length + ldCases.length
+  for (const c of styleCases) {
+    const matched = sha(normalise(c.a)) === sha(normalise(c.b))
+    const ok = matched === c.mustMatch
+    if (!ok) bad++
+    console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${c.name} (matched=${matched}, expected=${c.mustMatch})`)
+  }
+  const total = cases.length + ldCases.length + styleCases.length
   console.log(
     bad === 0
       ? `compare-served --self-test: OK — ${total} assertions, normalisers: ${NORMALISERS.map((n) => n.name).join(', ') || '(none)'}`

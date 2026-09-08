@@ -6,6 +6,7 @@ import ShareButtons from '@components/ShareButtons.astro';
 import RelatedPosts from '@components/RelatedPosts.astro';
 import { formatDate, useI18n, type Locale } from '@i18n';
 import { localizedOgImage } from '@i18n/og';
+import { siteOrigin } from '@lib/site-origin';
 
 interface Props {
   frontmatter: {
@@ -27,16 +28,17 @@ interface Props {
 }
 
 const { frontmatter, headings = [], slug, alternates } = Astro.props;
-const { t, l, locale } = useI18n(Astro.url.pathname);
+const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 const categoryLabel = t(`blog.category.${frontmatter.category}`);
+const brandName = Astro.locals.tenant.brand_name;
 
 // Built from the page's own locale so the canonical, the share URL and the
 // Article @id all point at the language being read. These used to be pinned to
 // the English origin, so a Spanish post advertised the English URL as its
 // canonical identity.
 const postPath = l(`/blog/${slug}/`);
-const postURL = new URL(postPath, 'https://1platform.pro').href;
+const postURL = new URL(postPath, siteOrigin(Astro.locals)).href;
 
 /** Only worth showing when it actually says something new. */
 const showUpdated =
@@ -48,7 +50,7 @@ const ogImage = frontmatter.ogImage || frontmatter.image || '/og/default.png';
 // goes into the Article JSON-LD `image`, which search engines read separately
 // from the `og:image` meta. Leaving one of the two in English would make the
 // page describe itself in two languages at once.
-const ogImageURL = new URL(localizedOgImage(ogImage, locale), 'https://1platform.pro').href;
+const ogImageURL = new URL(localizedOgImage(ogImage, locale), siteOrigin(Astro.locals)).href;
 
 const articleJsonLd = {
   '@context': 'https://schema.org',
@@ -62,13 +64,19 @@ const articleJsonLd = {
   },
   datePublished: frontmatter.pubDate.toISOString(),
   dateModified: (frontmatter.updatedDate || frontmatter.pubDate).toISOString(),
+  // ⚠️ THE SECOND Organization BLOCK. `BaseLayout` has one too, and only that
+  // one was made tenant-aware — so a blog post kept publishing the platform's
+  // name, domain and logo under a client's domain long after the home page
+  // stopped. It is the reason a post left 27 brand mentions against the home
+  // page's 13, and a sweep for `Astro.site` never found it: every value here
+  // was a literal.
   publisher: {
     '@type': 'Organization',
-    name: '1Platform',
-    url: 'https://1platform.pro',
+    name: brandName,
+    url: siteOrigin(Astro.locals),
     logo: {
       '@type': 'ImageObject',
-      url: 'https://1platform.pro/favicon.svg',
+      url: new URL('/favicon.svg', siteOrigin(Astro.locals)).href,
     },
   },
   inLanguage: locale,

@@ -11,7 +11,7 @@ interface Props {
 }
 
 const { title, description, lastUpdated } = Astro.props;
-const { t, l, locale } = useI18n(Astro.url.pathname);
+const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 /**
  * The three policies are one document set and are read as one — a reader

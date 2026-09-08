@@ -8,8 +8,10 @@ import ProcessSpine from '@components/ProcessSpine.astro';
 import CodeBlock from '@components/CodeBlock.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { docsUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('solutions-whitelabel.title');
 const description = t('solutions-whitelabel.description');
@@ -19,16 +21,16 @@ const jsonLd = [
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: t('nav.solutions.whitelabel'),
-    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    provider: { '@type': 'Organization', name: t('org.legalName'), url: siteOrigin(Astro.locals) },
     description,
-    url: new URL(l('/solutions/whitelabel/'), Astro.site).toString(),
+    url: new URL(l('/solutions/whitelabel/'), siteOrigin(Astro.locals)).toString(),
   },
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), Astro.site).toString() },
-      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), siteOrigin(Astro.locals)).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), siteOrigin(Astro.locals)).toString() },
       { '@type': 'ListItem', position: 3, name: t('solutions-whitelabel.breadcrumb.whitelabel') },
     ],
   },
@@ -107,7 +109,7 @@ const related: { icon: IconName; title: string; description: string; href: strin
     subheadline={t('solutions-whitelabel.hero.subheadline')}
     badge={t('nav.solutions.whitelabel')}
     primaryCta={{ label: t('solutions-whitelabel.hero.cta.primary'), href: l('/contact/?topic=whitelabel') }}
-    secondaryCta={{ label: t('solutions-whitelabel.hero.cta.secondary'), href: 'https://developer.1platform.pro/' }}
+    secondaryCta={ctaTo(t('solutions-whitelabel.hero.cta.secondary'), docsUrl(Astro.locals))}
   />
 
   <!-- The subject of the page is one request, so it opens with the request -->
@@ -120,10 +122,12 @@ const related: { icon: IconName; title: string; description: string; href: strin
           <p>
             {t('solutions-whitelabel.bootstrap.desc')}
           </p>
-          <a href="https://developer.1platform.pro/" class="link-cue">
-            {t('solutions-whitelabel.bootstrap.linkCue')}
-            <Icon name="arrow-right" size={15} />
-          </a>
+          {docsUrl(Astro.locals) && (
+            <a href={docsUrl(Astro.locals)} class="link-cue">
+              {t('solutions-whitelabel.bootstrap.linkCue')}
+              <Icon name="arrow-right" size={15} />
+            </a>
+          )}
         </div>
 
         <div class="split__demo">
@@ -203,7 +207,9 @@ const related: { icon: IconName; title: string; description: string; href: strin
         </div>
         <div class="next__actions">
           <a href={l('/contact/?topic=whitelabel')} class="btn btn--primary">{t('solutions-whitelabel.hero.cta.primary')}</a>
-          <a href="https://developer.1platform.pro/" class="btn btn--ghost">{t('solutions-whitelabel.hero.cta.secondary')}</a>
+          {docsUrl(Astro.locals) && (
+            <a href={docsUrl(Astro.locals)} class="btn btn--ghost">{t('solutions-whitelabel.hero.cta.secondary')}</a>
+          )}
         </div>
       </div>
     </div>

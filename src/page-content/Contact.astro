@@ -4,8 +4,10 @@ import Breadcrumb from '@components/Breadcrumb.astro';
 import Icon from '@components/Icon.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { appUrl, docsUrl } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('contact.title');
 const description = t('contact.description');
@@ -15,11 +17,11 @@ const jsonLd = {
   '@type': 'ContactPage',
   name: title,
   description,
-  url: new URL(l('/contact/'), 'https://1platform.pro').toString(),
+  url: new URL(l('/contact/'), siteOrigin(Astro.locals)).toString(),
   breadcrumb: {
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), 'https://1platform.pro').toString() },
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), siteOrigin(Astro.locals)).toString() },
       { '@type': 'ListItem', position: 2, name: t('contact.breadcrumb') },
     ],
   },
@@ -86,7 +88,9 @@ const expectations: { icon: IconName; term: string; detail: string }[] = [
               </dt>
               <dd class="expectations__detail">
                 {t('contact.expectations.technical.detailBefore')}{' '}
-                <a href="https://developer.1platform.pro/">{t('contact.expectations.technical.linkText')}</a>{' '}
+                {docsUrl(Astro.locals) && (
+                  <a href={docsUrl(Astro.locals)}>{t('contact.expectations.technical.linkText')}</a>
+                )}{' '}
                 {t('contact.expectations.technical.detailAfter')}
               </dd>
             </div>
@@ -129,7 +133,9 @@ const expectations: { icon: IconName; term: string; detail: string }[] = [
 
           <p class="panel__hint">
             {t('contact.panel.hint.pre')}
-            <a href="https://app.1platform.pro/app/">app.1platform.pro</a>
+            {appUrl(Astro.locals) && (
+              <a href={appUrl(Astro.locals)}>{new URL(appUrl(Astro.locals)!).host}</a>
+            )}
             {t('contact.panel.hint.post')}
           </p>
         </div>

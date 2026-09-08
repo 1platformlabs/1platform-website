@@ -60,11 +60,48 @@ const ONEPLATFORM: SiteTenant = {
     support: null,
     status: null,
   },
-  // Left empty on purpose while the page set still comes from the file router.
-  // It becomes the tenant's published route list when the content moves to the
-  // API; declaring a partial list here would be a second source of truth for
-  // which pages exist, and the two would drift.
-  pages: [],
+  // The canonical routes this tenant publishes — the SAME list the API is
+  // seeded with, which is why it is not hand-written: it is the
+  // `published_routes` of `scripts/fixtures/site_pages_oneplatform.json`, which
+  // `scripts/export-site-content.mjs` derives from this repository's own
+  // catalogues and blog collection. `tests/tenant-pages-match-export.spec.ts`
+  // compares the two and fails when they drift, which is the only thing
+  // stopping this copy from becoming a second source of truth.
+  //
+  // Locale-independent by design: `/pricing/` covers `/pricing/` and
+  // `/es/precios/` both, because the URL is derived through the tenant's own
+  // topology (`makeLocalizePath`). Storing the translated address here would
+  // give one page two entries and make "did this tenant publish it?"
+  // ambiguous.
+  google_site_verification: 'google1dd96c2b1cc5f482',
+  pages: [
+    '/',
+    '/about/',
+    '/blog/',
+    '/blog/1platform-vs-custom-toolchain/',
+    '/blog/ai-content-best-practices/',
+    '/blog/automate-seo-pipeline/',
+    '/blog/electronic-invoicing-online-business/',
+    '/blog/getting-started-5-minutes/',
+    '/blog/integrating-payments-into-your-saas/',
+    '/blog/launch-online-store-30-minutes/',
+    '/blog/programmatic-link-building/',
+    '/changelog/',
+    '/contact/',
+    '/cookies/',
+    '/for-agencies/',
+    '/for-developers/',
+    '/payments-invoicing/',
+    '/pricing/',
+    '/privacy/',
+    '/solutions/',
+    '/solutions/ads/',
+    '/solutions/content/',
+    '/solutions/deliveries/',
+    '/solutions/online-store/',
+    '/solutions/whitelabel/',
+    '/terms/',
+  ],
   indexable: true,
 }
 
@@ -99,7 +136,18 @@ const CLINICAS: SiteTenant = {
     support: null,
     status: null,
   },
-  pages: [],
+  // No Search Console property of its own yet. Absent is the right answer:
+  // the platform's token is emphatically NOT a fallback here — serving it would
+  // hand ownership of the clinic's domain to whoever holds that property.
+  google_site_verification: null,
+  // Its home, and only its home, until F7 writes the vertical's pages.
+  //
+  // NOT left empty, and the reason is a false green that was measured: with an
+  // empty page list the middleware answers 404 for every address of this
+  // tenant, so `tests/tenant-brand-is-data.spec.ts` would count ZERO brand
+  // mentions on a 10-byte "Not Found" body and report the leak closed. A guard
+  // whose subject disappeared is not a guard that passed.
+  pages: ['/'],
   indexable: false,
 }
 

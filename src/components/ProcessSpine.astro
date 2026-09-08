@@ -22,7 +22,7 @@ interface Props {
   label?: string;
 }
 
-const { t } = useI18n(Astro.url.pathname);
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
 
 // Only the caller-less usage (the home page's bare `<ProcessSpine />`) ever
 // renders these — every other page passes its own `steps`/`label`, which live

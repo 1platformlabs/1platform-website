@@ -6,8 +6,10 @@ import Icon from '@components/Icon.astro';
 import type { IconName } from '@components/icons';
 import platformModules from '@assets/editorial/platform-modules.png';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { appUrl } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 const title = t('home.title');
 const description = t('home.description');
 
@@ -63,12 +65,12 @@ const audiences = [
 ];
 
 const jsonLd = [
-  { '@context': 'https://schema.org', '@type': 'WebSite', name: t('home.jsonld.name'), url: new URL(l('/'), Astro.site).toString(), description },
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: t('home.jsonld.name'), url: new URL(l('/'), siteOrigin(Astro.locals)).toString(), description },
   {
     '@context': 'https://schema.org', '@type': 'Product', name: t('home.jsonld.name'), description,
     brand: { '@type': 'Brand', name: t('home.jsonld.brandName') },
     offers: {
-      '@type': 'Offer', url: new URL(l('/pricing/'), Astro.site).toString(), priceCurrency: 'USD',
+      '@type': 'Offer', url: new URL(l('/pricing/'), siteOrigin(Astro.locals)).toString(), priceCurrency: 'USD',
       priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'PayPerUse' }, availability: 'https://schema.org/InStock',
     },
   },
@@ -83,7 +85,9 @@ const jsonLd = [
         <h1>{t('home.hero.headline')}</h1>
         <p class="commerce-hero__lead">{t('home.hero.lead')}</p>
         <div class="product-hero__actions commerce-hero__actions">
-          <a href="https://app.1platform.pro/app/" class="btn btn--primary">{t('home.hero.cta')}</a>
+          {appUrl(Astro.locals) && (
+            <a href={appUrl(Astro.locals)} class="btn btn--primary">{t('home.hero.cta')}</a>
+          )}
         </div>
         <p class="commerce-hero__note">{t('home.hero.ctaNote')}</p>
       </div>

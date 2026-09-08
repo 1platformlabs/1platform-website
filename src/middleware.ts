@@ -1,6 +1,15 @@
 import type { MiddlewareHandler } from 'astro'
 
+import { manifestSource } from './data/site-tenants'
+import { dictionaryFor } from './i18n'
 import { resolveTenant } from './lib/resolve-tenant'
+import { resolveContent } from './lib/site-content'
+import { isPublishedRequest } from './lib/site-routes'
+import {
+  UnsupportedTenantLocale,
+  localeForRequest,
+  makeLocalizePath,
+} from './lib/site-locale'
 
 /**
  * Request-scoped middleware.
@@ -117,7 +126,104 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     })
   }
 
-  context.locals.tenant = resolution.tenant
+  const tenant = resolution.tenant
+  context.locals.tenant = tenant
+
+  /** Age of the cached COPY, when it is being served stale. Reported separately
+   *  from the manifest's age: the two are fetched independently and either can
+   *  be stale on its own, so one header for both would hide which. */
+  let contentAgeMs: number | null = null
+
+  // ── The tenant's language, and then the tenant's words ─────────────────
+  //
+  // Both go in `locals` and nowhere else, for the reason D-27 gives about the
+  // tenant itself: this process serves concurrent requests for different hosts,
+  // and the damage from a module-level "current" value is not a wrong render —
+  // it is a cache write under the wrong key, poisoning later responses for a
+  // tenant nobody was looking at.
+  let locale
+  try {
+    locale = localeForRequest(url.pathname, tenant)
+    context.locals.localizePath = makeLocalizePath(tenant)
+  } catch (err) {
+    // A manifest this build cannot render. 503 and not a fallback to English:
+    // serving the wrong language under a customer's domain, and reporting
+    // success, is the failure this epic exists to stop shipping.
+    const reason = err instanceof UnsupportedTenantLocale ? err.message : String(err)
+    console.error('[tenant] unserveable manifest host=%s reason=%s', host, reason)
+    return new Response('Service Unavailable\n', {
+      status: 503,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'x-content-type-options': 'nosniff',
+        'retry-after': '30',
+        'cache-control': 'no-store',
+      },
+    })
+  }
+  context.locals.locale = locale
+
+  // ── The page set is a datum, and this is where it bites ────────────────
+  //
+  // `SiteTenant.pages` only ever reached the sitemap before this. So a tenant
+  // that published six pages still SERVED all of 1Platform's — `/pricing/`
+  // with the platform's prices, `/for-developers/`, the whole blog — to anyone
+  // who asked for the URL. The sitemap omitting them changed nothing: a file
+  // router does not consult a manifest.
+  //
+  // A route this tenant does not publish is a 404, and deliberately the SAME
+  // 404 an unknown host gets: distinguishing "this page exists for somebody
+  // else" from "this page does not exist" would tell a stranger which pages
+  // other tenants have.
+  if (!isPublishedRequest(url.pathname, tenant)) {
+    // The site's own 404 PAGE, not a bare body — rewritten rather than
+    // hand-written. The first version of this returned plain text and it was a
+    // real regression the browser suite caught: every address a tenant does not
+    // publish, `/404.html` included, lost the rendered page with its chrome and
+    // its language control.
+    //
+    // The status has to be restored explicitly: a rewrite renders the target
+    // route, and that route answers 200 on its own. A soft 404 would be worse
+    // than the plain text — it poisons the index instead of merely looking bad.
+    const rendered = await next('/404')
+    return new Response(rendered.body, {
+      status: 404,
+      headers: rendered.headers,
+    })
+  }
+
+  if (manifestSource() === 'repo') {
+    // The repo catalogues, for a laptop and the browser suite. Explicitly
+    // chosen, never a fallback — see `src/data/site-tenants.ts`.
+    context.locals.messages = dictionaryFor(locale)
+  } else {
+    const content = await resolveContent(tenant.slug, locale)
+    if (content.outcome === 'unavailable') {
+      // No copy and no way to fetch it. A page rendered without its dictionary
+      // does not degrade gracefully — `t()` throws by design — so the choice is
+      // between an honest 503 and a stack trace in a visitor's browser.
+      console.warn(
+        '[content] unavailable host=%s slug=%s locale=%s reason=%s',
+        host,
+        tenant.slug,
+        locale,
+        content.reason,
+      )
+      return new Response('Service Unavailable\n', {
+        status: 503,
+        headers: {
+          'content-type': 'text/plain; charset=utf-8',
+          'x-content-type-options': 'nosniff',
+          'retry-after': '30',
+          'cache-control': 'no-store',
+        },
+      })
+    }
+    context.locals.messages = content.content.messages
+    if (content.stale && content.ageMs !== null) {
+      contentAgeMs = content.ageMs
+    }
+  }
 
   const response = await next()
 
@@ -126,6 +232,9 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   // which is the only way anyone finds out the API has been down for an hour.
   if (resolution.stale && resolution.ageMs !== null) {
     response.headers.set('x-site-manifest-age', String(Math.round(resolution.ageMs / 1000)))
+  }
+  if (contentAgeMs !== null) {
+    response.headers.set('x-site-content-age', String(Math.round(contentAgeMs / 1000)))
   }
   return response
 }
