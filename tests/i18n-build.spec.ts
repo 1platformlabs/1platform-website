@@ -1,103 +1,119 @@
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { translateToEs } from '../src/i18n/routes';
+import {
+  publishedPages,
+  publishedPagesByLocale,
+  publishedRoutes,
+  servedHead,
+  servedHtml,
+  servedText,
+} from './helpers/served';
 
 /**
- * Assertions about the built artefact.
+ * Assertions about the artefact the reader actually receives.
  *
- * These read `dist/` rather than driving a browser, because what is being
- * checked is a property of the thing that gets deployed: which files exist,
- * what the crawler will read, and whether either language leaked into the
- * other. The build itself is produced by the shared webServer.
+ * These used to read `dist/` and walk it for `index.html` files, and the
+ * justification was honest at the time: every page was a file, so the tree on
+ * disk was byte-for-byte the tree production served, and walking it measured
+ * the deployed thing rather than a simulation of it.
+ *
+ * The Node adapter ended that. The build now emits `dist/client` (assets plus
+ * the handful of pages that are still prerendered) and `dist/server` (the code
+ * that renders everything else on demand), so a page is no longer a file and
+ * `dist/` is no longer the site. Keeping the walker and repointing it at
+ * `dist/client` would have been the worst outcome available: it would have
+ * found a fraction of the pages, and every "for every page" assertion below
+ * would have gone on passing over that fraction, silently, forever. A
+ * neighbouring spec was measured doing exactly that — 98 pages before, 16
+ * after, green throughout.
+ *
+ * So the subject moved and the spec moved with it. Pages come from
+ * `tests/helpers/served.ts`, which enumerates them from the served sitemap and
+ * fetches each one over HTTP. Nothing here was relaxed to make that work: what
+ * these tests assert about language, hreflang, canonicals, feeds and the shape
+ * of the two trees means exactly what it meant when it was read off disk, and
+ * in three places it now means MORE (see the notes on redirects, hreflang
+ * targets and feed items). The build and the server are produced by the shared
+ * webServer in `playwright.config.ts`.
+ *
+ * One consequence worth stating: the fetches happen at test time, not at
+ * import time. Nothing may be computed at module scope any more — module scope
+ * runs before the server is listening — so each test does its own enumeration.
  */
 
-const DIST = 'dist';
+/** The Spanish tree, minus the one page that is allowed to name providers. */
+const PRIVACY_ES = '/es/privacidad/';
 
-function pagesUnder(dir: string): string[] {
-  const out: string[] = [];
-  const walk = (d: string) => {
-    for (const name of readdirSync(d)) {
-      const full = join(d, name);
-      if (statSync(full).isDirectory()) walk(full);
-      else if (name === 'index.html') out.push(full);
-    }
-  };
-  walk(dir);
-  return out;
-}
-
-const englishPages = () =>
-  pagesUnder(DIST).filter((p) => !relative(DIST, p).startsWith('es/'));
-const spanishPages = () => pagesUnder(join(DIST, 'es'));
-
-test('no page renders an unresolved key or placeholder', () => {
+test('no page renders an unresolved key or placeholder', async () => {
   // Catalogue parity itself is enforced twice before this runs — by the type of
   // defineMessages, and by an assertion in src/i18n that throws during the
   // build — so it is not re-checked here. What that cannot catch is a key that
   // exists but was called without its variables: `t('blog.readingTime')` with
   // no `n` renders the literal "{n}" onto the page. That is only visible in the
   // output, which is where this looks.
+  //
+  // The floor lives in `publishedRoutes`: an enumeration that finds fewer than
+  // 40 pages fails there rather than letting this loop pass over nothing.
   const offenders: string[] = [];
 
-  for (const file of pagesUnder(DIST)) {
-    const html = readFileSync(file, 'utf8');
+  for (const { route, html } of await publishedPages()) {
     // Scripts and styles are stripped first. Minified JS is full of `${n}`
     // template literals, and matching those would make this fail on every page
     // for a reason that has nothing to do with copy — a test that cries wolf on
-    // all 72 pages gets deleted rather than read.
+    // all 52 pages gets deleted rather than read.
     const body = html
       .slice(html.indexOf('<body'))
       .replace(/<script[\s\S]*?<\/script>/g, '')
       .replace(/<style[\s\S]*?<\/style>/g, '');
 
     for (const [placeholder] of body.matchAll(/\{(n|author|year|label|category|language)\}/g)) {
-      offenders.push(`${relative(DIST, file)}: rendered ${placeholder}`);
+      offenders.push(`${route}: rendered ${placeholder}`);
     }
     // A dotted key rendered as visible text means a t() call leaked its
     // argument instead of its value.
     for (const [, key] of body.matchAll(/>\s*((?:nav|footer|blog|changelog|cta)\.[a-z.]+)\s*</gi)) {
-      offenders.push(`${relative(DIST, file)}: rendered key "${key}"`);
+      offenders.push(`${route}: rendered key "${key}"`);
     }
   }
 
   expect(offenders, offenders.join('\n')).toEqual([]);
 });
 
-test('every English page has a Spanish counterpart', () => {
-  // The 404 is the one deliberate exception: the origin never serves it as an
-  // error document, so a Spanish copy would be a file nobody can reach.
-  //
-  // The counterpart is no longer "the same path under /es/": the Spanish tree
+test('every English page has a Spanish counterpart', async () => {
+  // The counterpart is not "the same path under /es/": the Spanish tree
   // publishes Spanish slugs, so the address comes from the route map. Asking
   // the map rather than reproducing it here is the point — a copy of the map
   // inside its own guard would agree with itself while both were wrong.
-  // Redirect stubs are excluded: a stub is an address, not a page, and its
-  // Spanish counterpart is declared in the same `redirects` table rather than
-  // derived from the route map. Including them asked for a Spanish twin of a
-  // retired English URL at the translated address of a page that no longer
-  // exists — a demand nothing could satisfy.
-  const expected = englishPages()
-    .map((p) => relative(DIST, p))
-    .filter((p) => !p.startsWith('why-1platform/'))
-    .filter((p) => !readFileSync(join(DIST, p), 'utf8').includes('http-equiv="refresh"'));
+  //
+  // Two exclusions used to be spelled out here and no longer need to be. The
+  // 404 was one: it is not a published address, and the sitemap never listed
+  // it. Redirect stubs were the other — a stub is an address, not a page, and
+  // asking for a Spanish twin of a retired English URL demanded something
+  // nothing could satisfy. Under the adapter a retirement is a real 301 with no
+  // document at all, so it cannot appear in this set by construction. That is
+  // strictly better than the old `http-equiv="refresh"` sniff, which had to
+  // recognise a stub by its body.
+  const { en, all } = await publishedPagesByLocale();
+  const published = new Set(all.map((p) => p.route));
 
-  const missing = expected.filter((p) => {
-    const canonical = `/${p.replace(/index\.html$/, '')}`;
-    return !existsSync(join(DIST, translateToEs(canonical).slice(1), 'index.html'));
-  });
+  const missing = en.map((p) => p.route).filter((route) => !published.has(translateToEs(route)));
   expect(missing, `Spanish pages missing: ${missing.join(', ')}`).toEqual([]);
-  // Floor against a stale crawl, not an inventory. It was 30 while redirect
-  // stubs were counted as pages; excluding them leaves 26 real English pages,
-  // so the floor sits below that and still goes red if the walk finds nothing.
-  expect(expected.length).toBeGreaterThan(20);
+
+  // Floor against a stale enumeration, not an inventory, and it counts PAGES —
+  // the unit that would shrink if the probe broke. There are 26 real English
+  // pages; the floor sits below that and still goes red if the walk finds a
+  // handful. `publishedPagesByLocale` only guarantees this side is non-empty,
+  // which is not enough: sixteen prerendered blog posts would clear that.
+  expect(
+    en.length,
+    `only ${en.length} English pages were enumerated — a broken probe is not a pass`,
+  ).toBeGreaterThan(20);
 });
 
-test('every page declares its language and every hreflang is reciprocal', () => {
+test('every page declares its language and every hreflang is reciprocal', async () => {
   const byCanonical = new Map<string, Record<string, string>>();
 
-  for (const file of pagesUnder(DIST)) {
-    const html = readFileSync(file, 'utf8');
+  for (const { route, html } of await publishedPages()) {
     const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
     const alts = Object.fromEntries(
       [...html.matchAll(/<link rel="alternate" hreflang="([a-z-]+)" href="([^"]+)"/g)].map(
@@ -108,8 +124,8 @@ test('every page declares its language and every hreflang is reciprocal', () => 
 
     const lang = /<html lang="([a-z]+)"/.exec(html)?.[1];
     if (lang) {
-      const expected = relative(DIST, file).startsWith('es/') ? 'es' : 'en';
-      expect(lang, `${relative(DIST, file)} declares lang="${lang}"`).toBe(expected);
+      const expected = route === '/es/' || route.startsWith('/es/') ? 'es' : 'en';
+      expect(lang, `${route} declares lang="${lang}"`).toBe(expected);
     }
   }
 
@@ -126,94 +142,151 @@ test('every page declares its language and every hreflang is reciprocal', () => 
   expect(broken, broken.join('\n')).toEqual([]);
   // A floor against the selector going stale, not a page count. It was 60 when
   // the tree held 74 indexable pages; retiring /features/, the three
-  // comparisons and the twelve blog-category pages took that to 54, so the old
-  // floor now fails on a healthy build. Kept well clear of the real number in
-  // both directions: a broken regex still reports ~0 and still goes red.
+  // comparisons and the twelve blog-category pages took that to 54, and the
+  // adapter's move of the remaining retirements out of the page set takes it to
+  // 52 — every published page carries both a canonical and its alternates.
+  // Kept well clear of the real number in both directions: a broken selector
+  // still reports ~0 and still goes red.
   expect(byCanonical.size).toBeGreaterThan(45);
 });
 
-test('no hreflang points at a page that was not built', () => {
+test('no hreflang points at a page that is not published', async () => {
   // This is what makes "redirect to a translation" safe: the auto-detect script
   // navigates to whatever hreflang="es" says, so a link to a page that does not
   // exist would be a 404 delivered by our own script.
+  //
+  // "Not built" used to mean "no index.html on disk", which a redirect stub
+  // satisfied — an hreflang aimed at a retired URL passed. The published set is
+  // the honest replacement and a stricter one: it holds real pages only, so an
+  // hreflang pointing at a 301 is now caught instead of excused.
+  const routes = new Set(await publishedRoutes());
   const missing: string[] = [];
+  let declared = 0;
 
-  for (const file of pagesUnder(DIST)) {
-    const html = readFileSync(file, 'utf8');
+  for (const { route, html } of await publishedPages()) {
     for (const [, href] of html.matchAll(
       /<link rel="alternate" hreflang="[a-z-]+" href="https:\/\/1platform\.pro([^"]*)"/g,
     )) {
-      const target = href === '/' ? join(DIST, 'index.html') : join(DIST, href, 'index.html');
-      if (!existsSync(target)) missing.push(`${relative(DIST, file)} -> ${href}`);
+      declared++;
+      if (!routes.has(href)) missing.push(`${route} -> ${href}`);
     }
   }
 
   expect(missing, missing.join('\n')).toEqual([]);
+  // The derived set is hreflang links, not pages, so it gets its own floor:
+  // every page emits en + es + x-default, which is 156 across the 52 pages. A
+  // regex that stops matching would leave `missing` empty and this test green
+  // over nothing.
+  expect(
+    declared,
+    `only ${declared} hreflang links were found across the site — a broken probe is not a pass`,
+  ).toBeGreaterThan(100);
 });
 
-test('Spanish pages carry Spanish Open Graph locales', () => {
-  const html = readFileSync(join(DIST, 'es', 'precios', 'index.html'), 'utf8');
+test('Spanish pages carry Spanish Open Graph locales', async () => {
+  const html = await servedHtml('/es/precios/');
   expect(html).toContain('<meta property="og:locale" content="es_ES">');
   expect(html).toContain('<meta property="og:locale:alternate" content="en_US">');
 
-  const en = readFileSync(join(DIST, 'pricing', 'index.html'), 'utf8');
+  const en = await servedHtml('/pricing/');
   expect(en).toContain('<meta property="og:locale" content="en_US">');
   expect(en).toContain('<meta property="og:locale:alternate" content="es_ES">');
 });
 
-test('Spanish pages canonicalise to themselves', () => {
-  const html = readFileSync(join(DIST, 'es', 'precios', 'index.html'), 'utf8');
+test('Spanish pages canonicalise to themselves', async () => {
+  const html = await servedHtml('/es/precios/');
   expect(html).toContain('<link rel="canonical" href="https://1platform.pro/es/precios/">');
 });
 
-test('the sitemap exists and carries alternates', () => {
+test('the sitemap exists and carries alternates', async () => {
   // @astrojs/sitemap validates its own options and, when they are wrong, logs a
   // warning and emits nothing while the build stays green. A missing sitemap is
-  // therefore invisible unless something asserts the file is there.
-  const index = join(DIST, 'sitemap-index.xml');
-  expect(existsSync(index), 'sitemap-index.xml was not generated').toBe(true);
+  // therefore invisible unless something asserts it is there.
+  //
+  // It is still written to disk, under `dist/client`, but checking the file
+  // would now check the wrong thing: the whole suite reads the sitemap to find
+  // out what the site publishes, so what matters is that the SERVER hands it
+  // over. A file that exists and 404s would leave every other test in this file
+  // enumerating nothing.
+  const index = await servedHead('/sitemap-index.xml');
+  expect(index.status, 'sitemap-index.xml was not served').toBe(200);
+  expect(index.body, 'sitemap-index.xml does not point at sitemap-0.xml').toContain(
+    'https://1platform.pro/sitemap-0.xml',
+  );
 
-  const body = readFileSync(join(DIST, 'sitemap-0.xml'), 'utf8');
+  const body = await servedText('/sitemap-0.xml');
   const alternates = [...body.matchAll(/xhtml:link/g)].length;
   expect(alternates).toBeGreaterThan(100);
   expect(body).toContain('https://1platform.pro/es/precios/');
 });
 
-test('neither RSS feed carries the other language', () => {
-  const es = readFileSync(join(DIST, 'es', 'rss.xml'), 'utf8');
-  const en = readFileSync(join(DIST, 'rss.xml'), 'utf8');
+test('neither RSS feed carries the other language', async () => {
+  // The feeds are endpoints now rather than files, which is why they are read
+  // over HTTP: `@astrojs/rss` runs per request, so a feed that throws is a 500
+  // a reader would see and a file check could never have found.
+  const es = await servedText('/es/rss.xml');
+  const en = await servedText('/rss.xml');
 
   const items = (xml: string) => [...xml.matchAll(/<link>([^<]+)<\/link>/g)].map((m) => m[1]);
-  // The channel's own <link> is the site root in both feeds; item links are
-  // what must not cross.
+  // The channel's own <link> is dropped; item links are what must not cross.
+  // Note that this only removes it from the English feed: the Spanish channel
+  // links to `/es/`, not to the bare root, and so survives the filter. That is
+  // harmless — it satisfies the same predicate the Spanish items must satisfy —
+  // and it is left in deliberately rather than filtered away, because removing
+  // an element from an `every` can only make this weaker.
   const esItems = items(es).filter((l) => l !== 'https://1platform.pro/');
   const enItems = items(en).filter((l) => l !== 'https://1platform.pro/');
 
-  expect(esItems.length).toBeGreaterThan(0);
   expect(esItems.every((l) => l.includes('/es/')), esItems.join('\n')).toBe(true);
   expect(enItems.every((l) => !l.includes('/es/')), enItems.join('\n')).toBe(true);
+
+  // The floor was `> 0`, which a feed reduced to its channel element would have
+  // cleared. Tie it to the published set instead: a feed carrying fewer links
+  // than the blog has posts is either a broken feed or a broken read, and
+  // either way it is not a pass.
+  const routes = await publishedRoutes();
+  const enPosts = routes.filter((r) => r.startsWith('/blog/') && r !== '/blog/');
+  const esPosts = routes.filter((r) => r.startsWith('/es/blog/') && r !== '/es/blog/');
+  expect(enPosts.length, 'no English blog posts were enumerated').toBeGreaterThan(5);
+  expect(esPosts.length, 'no Spanish blog posts were enumerated').toBeGreaterThan(5);
+  expect(
+    enItems.length,
+    `the English feed lists ${enItems.length} links for ${enPosts.length} published posts`,
+  ).toBeGreaterThanOrEqual(enPosts.length);
+  expect(
+    esItems.length,
+    `the Spanish feed lists ${esItems.length} links for ${esPosts.length} published posts`,
+  ).toBeGreaterThanOrEqual(esPosts.length);
 
   expect(es).toContain('<title>Blog de 1Platform</title>');
 });
 
-test('no provider name appears under /es/ outside the privacy policy', () => {
+test('no provider name appears under /es/ outside the privacy policy', async () => {
   const banned =
     /openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b/i;
 
-  const leaks = spanishPages()
-    .filter((p) => !relative(DIST, p).startsWith('es/privacidad/'))
-    .filter((p) => banned.test(readFileSync(p, 'utf8')))
-    .map((p) => relative(DIST, p));
+  const { es } = await publishedPagesByLocale();
+  const scanned = es.filter((p) => !p.route.startsWith(PRIVACY_ES));
 
+  const leaks = scanned.filter((p) => banned.test(p.html)).map((p) => p.route);
   expect(leaks, `provider names leaked into: ${leaks.join(', ')}`).toEqual([]);
+
+  // The scanned set is narrower than "every page", so it carries its own floor.
+  // There are 25 Spanish pages once the privacy policy is set aside; a probe
+  // that returned two of them would report no leaks and look identical to a
+  // clean site.
+  expect(
+    scanned.length,
+    `only ${scanned.length} Spanish pages were scanned for provider names — a broken probe is not a pass`,
+  ).toBeGreaterThan(20);
 
   // The privacy policy must still contain them — the disclosure is the point,
   // and a test that only checks for absence would pass on an empty page.
-  const privacy = readFileSync(join(DIST, 'es', 'privacidad', 'index.html'), 'utf8');
+  const privacy = await servedHtml(PRIVACY_ES);
   expect(banned.test(privacy)).toBe(true);
 });
 
-test('none of the shell English survives in the Spanish tree', () => {
+test('none of the shell English survives in the Spanish tree', async () => {
   const englishOnly = [
     'Get Started Free',
     'Keep reading',
@@ -227,20 +300,28 @@ test('none of the shell English survives in the Spanish tree', () => {
     'Last updated',
   ];
 
+  const { es } = await publishedPagesByLocale();
   const found: string[] = [];
-  for (const file of spanishPages()) {
-    const html = readFileSync(file, 'utf8');
+  for (const { route, html } of es) {
     for (const phrase of englishOnly) {
-      if (html.includes(phrase)) found.push(`${relative(DIST, file)}: "${phrase}"`);
+      if (html.includes(phrase)) found.push(`${route}: "${phrase}"`);
     }
   }
 
   expect(found, found.join('\n')).toEqual([]);
+  // Same reasoning as the provider scan: this walks only the Spanish half, so
+  // the half gets its own floor. `publishedPagesByLocale` guarantees it is
+  // non-empty, which the sixteen still-prerendered blog pages would satisfy on
+  // their own while the other ten pages went unread.
+  expect(
+    es.length,
+    `only ${es.length} Spanish pages were enumerated — a broken probe is not a pass`,
+  ).toBeGreaterThan(20);
 });
 
-test('dates render in the language of the page', () => {
-  const en = readFileSync(join(DIST, 'changelog', 'index.html'), 'utf8');
-  const es = readFileSync(join(DIST, 'es', 'novedades', 'index.html'), 'utf8');
+test('dates render in the language of the page', async () => {
+  const en = await servedHtml('/changelog/');
+  const es = await servedHtml('/es/novedades/');
 
   expect(en).toMatch(/(January|March|April|May) \d{1,2}, \d{4}/);
   expect(es).toMatch(/\d{1,2} de (enero|marzo|abril|mayo) de \d{4}/);
@@ -248,36 +329,65 @@ test('dates render in the language of the page', () => {
   expect(es).not.toMatch(/(January|March|April|May) \d{1,2}, \d{4}/);
 });
 
-test('the English tree kept every page it had before the epic', () => {
-  // Compatibility is the hardest requirement here: the ~26 English URLs are
-  // already indexed and none of them may move.
-  const paths = englishPages().map((p) => relative(DIST, p).replace(/index\.html$/, ''));
+test('the English tree kept every address it had before the epic', async () => {
+  // Compatibility is the hardest requirement here: these English URLs are
+  // already indexed and none of them may stop answering.
+  //
+  // "Kept" used to be checked as "there is still an index.html at that path",
+  // which conflated two different things — a page, and a redirect stub standing
+  // in for a page that had been retired. Under the adapter the retirements are
+  // real 301s with no document, so the disk check would now fail on five of
+  // these addresses that are perfectly healthy.
+  //
+  // The requirement was never "there is a file"; it was "a reader who follows
+  // an indexed link lands somewhere real". So each address must either BE a
+  // published page, or redirect to one — and the redirect's target is resolved
+  // against the published set rather than taken on trust, which the old stub
+  // check could not do at all.
+  const published = new Set(await publishedRoutes());
 
-  for (const expected of [
-    '',
-    'pricing/',
-    'features/',
-    'solutions/',
-    'solutions/online-store/',
-    'solutions/website/',
-    'solutions/whitelabel/',
-    'solutions/content/',
-    'solutions/deliveries/',
-    'solutions/ads/',
-    'payments-invoicing/',
-    'for-agencies/',
-    'for-developers/',
-    'about/',
-    'contact/',
-    'terms/',
-    'privacy/',
-    'cookies/',
-    'blog/',
-    'changelog/',
-    'compare/1platform-vs-wp-auto-pro/',
-    'compare/1platform-vs-ai-writing-tools/',
-    'compare/1platform-vs-custom-integration/',
-  ]) {
-    expect(paths, `English URL disappeared: /${expected}`).toContain(expected);
+  const legacy = [
+    '/',
+    '/pricing/',
+    '/features/',
+    '/solutions/',
+    '/solutions/online-store/',
+    '/solutions/website/',
+    '/solutions/whitelabel/',
+    '/solutions/content/',
+    '/solutions/deliveries/',
+    '/solutions/ads/',
+    '/payments-invoicing/',
+    '/for-agencies/',
+    '/for-developers/',
+    '/about/',
+    '/contact/',
+    '/terms/',
+    '/privacy/',
+    '/cookies/',
+    '/blog/',
+    '/changelog/',
+    '/compare/1platform-vs-wp-auto-pro/',
+    '/compare/1platform-vs-ai-writing-tools/',
+    '/compare/1platform-vs-custom-integration/',
+  ];
+
+  const gone: string[] = [];
+  for (const address of legacy) {
+    if (published.has(address)) continue;
+
+    const { status, location } = await servedHead(address);
+    if (status !== 301 && status !== 308) {
+      gone.push(`${address}: is not published and answered ${status} instead of a redirect`);
+      continue;
+    }
+    // A 301 to a page that is itself gone is the same broken link with an extra
+    // hop, so the target is checked against the published set too.
+    const target = location ? new URL(location, 'https://1platform.pro').pathname : null;
+    if (!target || !published.has(target)) {
+      gone.push(`${address}: redirects to ${target ?? 'nowhere'}, which is not a published page`);
+    }
   }
+
+  expect(gone, gone.join('\n')).toEqual([]);
 });

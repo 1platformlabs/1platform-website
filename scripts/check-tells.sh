@@ -232,12 +232,29 @@ report "no untranslated literal attributes" \
 # 14. The public-site JavaScript budget: motion is CSS-first and the build must
 #     stay under 64 KB gzip across all emitted chunks. The Playwright test
 #     measures the same budget over the network; this is the cheap static gate.
+#
+#     The site gained a Node adapter, so the build no longer writes pages next
+#     to assets: it emits `dist/client/` (what visitors download) and
+#     `dist/server/` (what renders). The visitor-facing JS this rule is about is
+#     therefore under `dist/client/_astro/`.
+#
+#     Worth recording how this rule behaved through that change, because the
+#     worry was reasonable and the answer was measured: pointed at the old path
+#     it did NOT quietly pass. It has two independent guards — a sentinel that
+#     the build ran, and a floor that refuses to call an empty scan a pass — and
+#     either one alone catches the move. It failed loudly. Both are kept, and
+#     the sentinel is now the asset directory itself rather than a page, since
+#     under an adapter the home page is not a file at all.
 m=$({
-  if [ ! -f dist/index.html ]; then
-    echo "dist/index.html not found — run 'npm run build' before 'npm run check'"
+  client_dir=""
+  for candidate in dist/client dist; do
+    if [ -d "$candidate/_astro" ]; then client_dir="$candidate"; break; fi
+  done
+  if [ -z "$client_dir" ]; then
+    echo "no _astro asset directory under dist/client or dist — run 'npm run build' before 'npm run check'"
   else
     total=0
-    for f in dist/_astro/*.js; do
+    for f in "$client_dir"/_astro/*.js; do
       [ -f "$f" ] || continue
       size=$(gzip -c "$f" | wc -c | tr -d ' ')
       total=$((total + size))

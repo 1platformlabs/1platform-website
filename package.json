@@ -23,6 +23,7 @@
     "test:deploy:activator": "bash deploy/cpanel/publish-activator.test.sh"
   },
   "dependencies": {
+    "@astrojs/node": "^11.1.5",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
     "astro": "^7.2.10",

@@ -1,11 +1,25 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
 import sitemap from '@astrojs/sitemap';
 import { movedEsPaths, translateFromEs, translateToEs } from './src/i18n/routes.ts';
 
 export default defineConfig({
   site: 'https://1platform.pro',
   trailingSlash: 'always',
+
+  // A long-lived server, because a tenant is resolved per request and cannot be
+  // known at build time. This is the ONE thing F1 changes: where the content
+  // comes from does not move until F4. If the served HTML differs from the
+  // frozen baseline, the conversion is the only thing that can have caused it —
+  // which is what makes the no-regression of 1platform.pro attributable, and
+  // therefore checkable at all.
+  //
+  // `standalone` gives us a Node process that listens on its own. nginx stays in
+  // front of it and keeps the serving contract (see deploy/docker/nginx.conf);
+  // the adapter is not asked to reimplement it.
+  output: 'server',
+  adapter: node({ mode: 'standalone' }),
 
   // English stays at the root because its ~26 URLs are already indexed; Spanish
   // lives under /es/. Note that this block does NOT generate the Spanish tree —

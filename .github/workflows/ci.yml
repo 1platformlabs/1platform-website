@@ -56,9 +56,15 @@ jobs:
           npm run typecheck
 
       # El build va ANTES del guard a propósito: dos de sus reglas —el
-      # presupuesto de 64 KB de JS público y el «motion CSS-first»— miden
-      # `dist/`, y sin él el guard aborta con «dist/index.html not found»
-      # (medido: `npm run check` sobre un árbol limpio sale 1 por eso solo).
+      # presupuesto de 64 KB de JS público y el «motion CSS-first»— miden lo que
+      # el build emite, y sin él el guard aborta diciendo que no encuentra el
+      # directorio de assets (medido: `npm run check` sobre un árbol limpio sale
+      # 1 por eso solo).
+      #
+      # Con el adapter de Node ese directorio pasó a ser `dist/client/_astro`.
+      # La regla resuelve las dos ubicaciones, así que sigue midiendo lo mismo;
+      # lo que NO cambió, y es lo que importa, es que ante un árbol sin construir
+      # falla en vez de contar cero y llamarlo pase.
       - name: Build
         shell: bash
         run: |
@@ -102,8 +108,13 @@ jobs:
           set -euo pipefail
           npx playwright install --with-deps chromium
 
-      # El `webServer` del config corre `npm run build && astro preview`, así
-      # que esta suite mide el `dist/` real, el mismo artefacto que se rsyncea.
+      # El `webServer` del config corre `npm run build && node
+      # dist/server/entry.mjs`, así que esta suite mide el SERVIDOR real, que es
+      # el artefacto que corre en producción detrás de nginx. Antes medía el
+      # `dist/` estático que se rsynceaba; con el adapter esa frase dejó de ser
+      # cierta, y la suite se reescribió para seguir al sujeto en vez de
+      # ablandarse. Mide más que antes: los 301, el 404 y el endpoint de
+      # imágenes los contesta ahora el mismo código que producción.
       # La línea base visual queda fuera a propósito (`testIgnore`): compara
       # renders de Linux por contenedor y es su propio comando.
       - name: Tests de navegador

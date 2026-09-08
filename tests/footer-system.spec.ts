@@ -1,9 +1,7 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { translateToEs } from '../src/i18n/routes';
+import { servedHtml } from './helpers/served';
 
-const dist = 'dist';
 const stableLinks = [
   '/solutions/online-store/', '/solutions/content/', '/solutions/deliveries/',
   '/solutions/ads/', '/solutions/whitelabel/', '/payments-invoicing/', '/for-agencies/',
@@ -19,9 +17,30 @@ function footerLinks(html: string) {
 // The Spanish footer no longer carries `/es` + the English path: each entry
 // sits at its own translated address, so the expectation is read from the route
 // map instead of concatenated.
-for (const [file, locale] of [['index.html', 'en'], [join('es', 'index.html'), 'es']] as const) {
-  test(`the ${locale === 'en' ? 'English' : '/es'} footer preserves every public destination`, () => {
-    const links = footerLinks(readFileSync(join(dist, file), 'utf8'));
+//
+// This used to read `dist/index.html` and `dist/es/index.html` off disk, back
+// when the static build wrote every page to a file and that file was
+// byte-for-byte what production served. The Node adapter ended that: the two
+// home pages are rendered on demand by `dist/server`, so there is no file left
+// to read and the disk walk would have found nothing. The subject moved to the
+// served HTML, so the spec moved with it — and it now measures the exact bytes
+// the adapter emits, which is strictly closer to what a visitor gets than the
+// artefact on disk ever was.
+for (const [route, locale] of [['/', 'en'], ['/es/', 'es']] as const) {
+  test(`the ${locale === 'en' ? 'English' : '/es'} footer preserves every public destination`, async () => {
+    const links = footerLinks(await servedHtml(route));
+
+    // The enumeration gets its own floor. Every assertion below is of the form
+    // "this destination is among the links we found", so a footer regex that
+    // matched nothing — a renamed element, a page served without its chrome —
+    // would produce an empty list, and an empty list is a broken probe, not a
+    // footer that legitimately lost sixteen links at once.
+    expect(
+      links.length,
+      `the footer of ${route} yielded ${links.length} links, fewer than the ${stableLinks.length} ` +
+        `destinations asserted below. That is a probe that stopped seeing the footer, not a pass.`,
+    ).toBeGreaterThanOrEqual(stableLinks.length);
+
     for (const link of stableLinks) {
       expect(links).toContain(locale === 'en' ? link : translateToEs(link));
     }
