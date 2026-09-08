@@ -40,20 +40,13 @@ const PAGES_DIR = join('src', 'pages')
  * debt, not a design — it is here so the debt has an address.
  */
 const DECLARED_PRERENDERS: Record<string, { why: string; until?: string }> = {
-  'blog/[...slug].astro': {
-    why:
-      'In server mode Astro ignores getStaticPaths, so Astro.props.post arrives undefined and the ' +
-      'render dies mid-stream. Prerendering restores the exact HTML the static build produced and ' +
-      'keeps the 16 blog URLs in the sitemap, which otherwise vanish silently with the build green.',
-    until:
-      'F4 — the blog belongs to tenant #1 (D-18). While it is prerendered it is served to every ' +
-      'host, so F4 must make these routes dynamic and gate them on the resolved tenant. Middleware ' +
-      'cannot do it while they stay prerendered: measured, the static handler answers first.',
-  },
-  'es/blog/[...slug].astro': {
-    why: 'The Spanish twin of the above, same mechanism, same measurement.',
-    until: 'F4 — see the English entry.',
-  },
+  // Empty, and that is the correct state.
+  //
+  // Two blog routes lived here for one commit. They came out when the chrome
+  // started reading the tenant, because the build itself said why: a prerendered
+  // page renders with no request, so `Astro.request.headers` is unavailable and
+  // the tenant never resolves. The list did its job — it carried the debt with
+  // an address instead of letting it settle in.
 }
 
 function pageFiles(dir: string, acc: string[] = []): string[] {

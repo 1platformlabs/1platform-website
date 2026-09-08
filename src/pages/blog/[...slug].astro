@@ -2,17 +2,30 @@
 import BlogPost from '@page-content/BlogPost.astro';
 import { postPaths } from '@i18n/collections';
 
-// Built ahead of time, not per request: in server mode Astro IGNORES getStaticPaths
-// unless the route says so, and Astro.props.post then arrives undefined — the
-// render dies mid-stream with RenderUndefinedEntryError. Measured in F1.
-// The blog belongs to tenant #1 (D-18); gating these by host is F4's job.
-export const prerender = true;
-
-export async function getStaticPaths() {
-  return postPaths('en');
-}
-
-const { post } = Astro.props;
+// Resolved PER REQUEST, not built ahead of time.
+//
+// This route was prerendered for exactly one commit, because in server mode
+// Astro ignores getStaticPaths and `Astro.props.post` arrived undefined, which
+// killed the render mid-stream. That fixed the symptom and was wrong for a
+// reason the build then said out loud, once the chrome started reading the
+// tenant: a prerendered page renders ONCE, at build time, with no request — so
+// `Astro.request.headers` is unavailable, the tenant never resolves, and the
+// wordmark renders from `undefined`.
+//
+// It is also a cross-tenant leak by construction. A prerendered page lives in
+// `dist/client/` and the adapter's static handler answers it BEFORE the
+// application runs, so no middleware can gate it — measured: a middleware
+// returning 403 for this exact path still served 200. Under one container and N
+// brands, that is the platform's blog served under a client's domain.
+//
+// So the post is looked up from the slug on each request. The blog belongs to
+// tenant #1 (D-18); making a tenant that does not publish it get a 404 instead
+// of somebody else's writing is F6's gate, and this is the shape that allows it.
+const { slug } = Astro.params;
+const paths = await postPaths('en');
+const match = paths.find((p) => p.params.slug === slug);
+if (!match) return new Response(null, { status: 404 });
+const { post } = match.props;
 ---
 
 <BlogPost post={post} />

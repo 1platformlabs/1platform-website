@@ -41,6 +41,8 @@
 
 import { expect } from '@playwright/test'
 
+import { getWithHost } from './http-host'
+
 /** Fewer than this many pages means the enumeration broke, not that the site shrank. */
 const MIN_EXPECTED_ROUTES = 40
 
@@ -55,10 +57,29 @@ export interface ServedOptions {
   host?: string
 }
 
+/**
+ * ⚠️ When a host is given the request goes through `node:http`, NOT `fetch`.
+ *
+ * `Host` is a forbidden header name for `fetch` and is dropped SILENTLY — the
+ * request goes out with the origin's own host instead. On this server `Host` is
+ * what selects the TENANT, so a test that passes one here and uses `fetch`
+ * would quietly measure whichever tenant answers for 127.0.0.1, twice, and
+ * pass. Measured: `fetch` with `host: clinicas...` served the platform tenant;
+ * the same header through `node:http` served the clinic.
+ */
 async function get(path: string, opts: ServedOptions = {}): Promise<Response> {
-  const headers: Record<string, string> = { connection: 'close' }
-  if (opts.host) headers.host = opts.host
-  return fetch(base() + path, { headers, redirect: 'manual' })
+  if (opts.host) {
+    const raw = await getWithHost(base() + path, opts.host)
+    return new Response(raw.body, {
+      status: raw.status,
+      headers: Object.fromEntries(
+        Object.entries(raw.headers)
+          .filter(([, v]) => typeof v === 'string')
+          .map(([k, v]) => [k, v as string]),
+      ),
+    })
+  }
+  return fetch(base() + path, { headers: { connection: 'close' }, redirect: 'manual' })
 }
 
 /** The HTML a visitor receives for `path`. Throws on any non-200 — a spec that

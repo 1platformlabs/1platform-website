@@ -1,8 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
-import sitemap from '@astrojs/sitemap';
-import { movedEsPaths, translateFromEs, translateToEs } from './src/i18n/routes.ts';
+import { movedEsPaths } from './src/i18n/routes.ts';
 
 export default defineConfig({
   site: 'https://1platform.pro',
@@ -33,58 +32,20 @@ export default defineConfig({
     },
   },
 
-  integrations: [
-    sitemap({
-      // `locales` is a RECORD, not an array, and the schema is `.strict()`.
-      // Pass an array — or one key too many — and @astrojs/sitemap catches its
-      // own validation error, logs a warning, and emits nothing: the build goes
-      // green with no sitemap at all. A test asserts the file exists for exactly
-      // this reason.
-      // Bare language tags, matching the <head> block exactly. Regional tags
-      // would say two different things in two channels: `en-US` narrows the
-      // root to American English while the head declares it x-default for all
-      // English, and `es-ES` targets Spain — the one Spanish-speaking market
-      // this product does not serve (payments and FEL invoicing are Guatemala).
-      i18n: {
-        defaultLocale: 'en',
-        locales: { en: 'en', es: 'es' },
-      },
-
-      /**
-       * The language pairing, rebuilt from the route map.
-       *
-       * `i18n` above cannot do it any more. The integration pairs two URLs by
-       * literal string equality of the path with the locale prefix removed
-       * (`parse-i18n-url.js`), so the moment `/solutions/deliveries/` is
-       * published in Spanish as `/es/soluciones/envios/` the two stop matching
-       * and it emits NO `<xhtml:link rel="alternate">` for EITHER of them —
-       * not a wrong pair, no pair at all, silently, on every translated page.
-       *
-       * `serialize` runs after the sitemap is generated (`index.js:96-110`),
-       * so what we set here is what ships. The option above is kept because it
-       * still gets the untranslated pairs right on its own, and because
-       * removing it would also drop the `hreflang` naming this file relies on.
-       *
-       * `tests/sitemap-alternates.spec.ts` asserts every alternate emitted
-       * here names a URL the sitemap also lists, which is the failure this
-       * hand-rolled pairing could otherwise introduce.
-       */
-      serialize(item) {
-        const { pathname } = new URL(item.url);
-        const canonical = pathname.startsWith('/es/') || pathname === '/es'
-          ? translateFromEs(pathname)
-          : pathname;
-        const site = 'https://1platform.pro';
-        return {
-          ...item,
-          links: [
-            { lang: 'en', url: `${site}${canonical}` },
-            { lang: 'es', url: `${site}${translateToEs(canonical)}` },
-          ],
-        };
-      },
-    }),
-  ],
+  // `@astrojs/sitemap` is gone, and its replacement is `src/pages/sitemap-0.xml.ts`.
+  //
+  // It is a BUILD-time integration that enumerates the route table, and neither
+  // half survives this epic: under one build serving N brands the page set is a
+  // property of the tenant asking, and the moment the blog routes became
+  // dynamic the integration dropped all sixteen of them — measured, 52 `<loc>`
+  // to 36, with the build printing success and exiting 0.
+  //
+  // The `serialize()` hook that used to live here rebuilt the hreflang pairing
+  // from the route map, because the integration pairs two URLs by string
+  // equality of the path minus its locale prefix, so a TRANSLATED slug matched
+  // nothing and it emitted no pair for EITHER side. That logic moved to
+  // `src/lib/site-routes.ts`, where the same reasoning is written out again.
+  integrations: [],
 
   // `/why-1platform/` is a legacy English URL that really was published. There
   // is no Spanish equivalent to retire, and adding one out of symmetry was a

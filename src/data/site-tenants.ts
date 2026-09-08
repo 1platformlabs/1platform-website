@@ -69,7 +69,42 @@ const ONEPLATFORM: SiteTenant = {
 }
 
 /**
- * Hosts that resolve to tenant #1 while the manifest lives here.
+ * The clinics tenant — a second brand, and the reason the engine is worth having.
+ *
+ * Provisional domain, so it is NOT indexed: `indexable: false` puts `noindex` on
+ * every page and keeps it out of the sitemap, until the manifest says the domain
+ * is final. That is the whole cost of a provisional name being carried as DATA —
+ * renaming later is editing one value, not a migration with 301s across a site
+ * search engines already learned.
+ *
+ * It has no `docs` destination, and that is the point of D-7: a tenant without
+ * developer documentation does not get an empty link, a disabled link, or a link
+ * to the platform's docs. The element is not rendered.
+ */
+const CLINICAS: SiteTenant = {
+  slug: 'clinicas',
+  brand_name: 'Clínica Delta',
+  brand_mark: 'Clínica Delta',
+  domain: 'clinicas.1platform.dev',
+  locales: ['es'],
+  default_locale: 'es',
+  theme: {
+    accent: '#0f766e',
+    accent_contrast: '#ffffff',
+    display_font: 'system-serif',
+  },
+  destinations: {
+    docs: null,
+    app: null,
+    support: null,
+    status: null,
+  },
+  pages: [],
+  indexable: false,
+}
+
+/**
+ * Hosts that resolve to a tenant while the manifest lives here.
  *
  * `localhost` and `127.0.0.1` are in the list so a laptop and the browser suite
  * have a tenant. They are NOT in the API's manifest and must never be: they are
@@ -80,6 +115,7 @@ const REPO_TENANTS: ReadonlyArray<readonly [string, SiteTenant]> = [
   ['www.1platform.pro', ONEPLATFORM],
   ['localhost', ONEPLATFORM],
   ['127.0.0.1', ONEPLATFORM],
+  ['clinicas.1platform.dev', CLINICAS],
 ]
 
 /** Which source the manifest comes from. The API unless someone said otherwise. */

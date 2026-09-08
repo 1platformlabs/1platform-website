@@ -39,6 +39,28 @@ const {
 
 const { locale, t, l } = useI18n(Astro.url.pathname);
 
+const tenant = Astro.locals.tenant;
+
+/**
+ * JSON for a `<script>` block, which is NOT the same as JSON.
+ *
+ * `set:html` turns OFF Astro's escaping on purpose, and `JSON.stringify` does
+ * not escape `<` — so a brand containing `</script>` closes the block early and
+ * everything after it is parsed as markup. With the brand now coming from the
+ * manifest, that string is operator-supplied and lands directly here.
+ *
+ * `<` and `>` become their unicode escapes, which JSON parsers read as the same
+ * characters and an HTML parser cannot see. `&` goes too, so the payload cannot
+ * be reassembled through entity decoding.
+ *
+ * Note this is specific to `set:html`. The `{title}` interpolation and the
+ * `<meta content=...>` attributes below DO go through Astro's escaper and are
+ * already safe — verified, and worth saying so nobody "hardens" them into
+ * double-escaped mojibake.
+ */
+const jsonLdScript = (value: unknown) =>
+  JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
+
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 // The share card follows the page's language. A Spanish page pointing at an
 // English card was issue #59: the headline of the card is the reader's first
@@ -213,7 +235,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageURL} />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:site_name" content="1Platform" />
+    <meta property="og:site_name" content={tenant.brand_name} />
     <meta property="og:locale" content={OG_LOCALES[locale]} />
     {(Object.keys(alternates) as Locale[])
       .filter((code) => code !== locale)
@@ -237,18 +259,30 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <ClientRouter />
 
     {jsonLd && (
-      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+      <script type="application/ld+json" set:html={jsonLdScript(jsonLd)} />
     )}
 
-    <script is:inline type="application/ld+json">
-    {
+    {/*
+      The organisation is the TENANT, not the platform. This block used to be an
+      inline literal naming 1Platform and its apex on every page — which under N
+      brands means every client's site telling search engines it belongs to us.
+      It goes through the same escaper as the block above for the same reason.
+    */}
+    <script type="application/ld+json" set:html={jsonLdScript({
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "1Platform",
-      "url": "https://1platform.pro",
-      "logo": "https://1platform.pro/favicon.svg"
-    }
-    </script>
+      name: tenant.brand_name,
+      // No trailing slash: this is an ORIGIN, and the literal it replaced did not
+      // carry one either. Matching it keeps the page byte-identical to the frozen
+      // baseline, which is what makes 'no regression' a measurement instead of a
+      // judgement call.
+      url: `https://${tenant.domain}`,
+      // The favicon is still a file in public/, so it is still the platform's
+      // drawing — but the URL must at least be the TENANT's origin, or this
+      // block tells a search engine the client's logo is hosted by us. Serving
+      // a per-tenant icon is D-17 work (public/ files become routes).
+      logo: `https://${tenant.domain}/favicon.svg`,
+    })} />
   </head>
   <body>
     <a href="#main-content" class="skip-link">{t('layout.skipToContent')}</a>

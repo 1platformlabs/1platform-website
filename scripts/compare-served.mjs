@@ -50,6 +50,29 @@ const NORMALISERS = [
     why: 'The static writer terminates a file; an HTTP body has no such convention. Not observable by a reader.',
     apply: (s) => s.replace(/\n+$/, ''),
   },
+  {
+    name: 'json-ld-whitespace',
+    why:
+      'The Organization block stopped being an inline literal and became a value the ' +
+      'layout serialises, because under N brands a literal named the platform on every ' +
+      "client's page. A literal is pretty-printed and a serialiser is not, so the bytes " +
+      'differ on every page while the JSON is the same document. This normaliser reformats ' +
+      'BOTH sides through the same parser, so a difference in VALUE still fails — proven ' +
+      'by the self-test case below, which changes a name and must not be forgiven.',
+    apply: (s) =>
+      s.replace(
+        /(<script type="application\/ld\+json"[^>]*>)([\s\S]*?)(<\/script>)/g,
+        (whole, open_, body, close) => {
+          try {
+            return open_ + JSON.stringify(JSON.parse(body)) + close
+          } catch {
+            // Unparseable JSON-LD is a real defect (D-32), not noise. Left
+            // untouched so it shows up as a difference instead of being tidied away.
+            return whole
+          }
+        },
+      ),
+  },
 ]
 
 function normalise(html) {
@@ -95,6 +118,33 @@ if (process.argv.includes('--self-test')) {
       mustMatch: false,
     },
   ]
+  const LD = (body) => `<script type="application/ld+json">${body}</script>`
+  const ldCases = [
+    {
+      name: 'forgives JSON-LD reformatting (same document, different whitespace)',
+      a: LD('\n  {\n    "@type": "Organization",\n    "name": "X"\n  }\n  '),
+      b: LD('{"@type":"Organization","name":"X"}'),
+      mustMatch: true,
+    },
+    {
+      name: 'does NOT forgive a changed JSON-LD VALUE',
+      a: LD('{"@type":"Organization","name":"X"}'),
+      b: LD('{"@type":"Organization","name":"Y"}'),
+      mustMatch: false,
+    },
+    {
+      name: 'does NOT forgive a REMOVED JSON-LD field',
+      a: LD('{"@type":"Organization","name":"X","logo":"/a.svg"}'),
+      b: LD('{"@type":"Organization","name":"X"}'),
+      mustMatch: false,
+    },
+    {
+      name: 'does NOT forgive unparseable JSON-LD (the D-32 failure)',
+      a: LD('{"name":"X"}'),
+      b: LD('{"name":"</script><script>"}'.replace('</script>', '<\/script>')),
+      mustMatch: false,
+    },
+  ]
   let bad = 0
   for (const c of cases) {
     const matched = sha(normalise(base)) === sha(normalise(c.other))
@@ -102,9 +152,16 @@ if (process.argv.includes('--self-test')) {
     if (!ok) bad++
     console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${c.name} (matched=${matched}, expected=${c.mustMatch})`)
   }
+  for (const c of ldCases) {
+    const matched = sha(normalise(c.a)) === sha(normalise(c.b))
+    const ok = matched === c.mustMatch
+    if (!ok) bad++
+    console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${c.name} (matched=${matched}, expected=${c.mustMatch})`)
+  }
+  const total = cases.length + ldCases.length
   console.log(
     bad === 0
-      ? `compare-served --self-test: OK — ${cases.length} assertions, normalisers: ${NORMALISERS.map((n) => n.name).join(', ') || '(none)'}`
+      ? `compare-served --self-test: OK — ${total} assertions, normalisers: ${NORMALISERS.map((n) => n.name).join(', ') || '(none)'}`
       : `compare-served --self-test: FAIL — ${bad} assertion(s) wrong`,
   )
   process.exit(bad === 0 ? 0 : 1)
@@ -131,6 +188,11 @@ const bodiesIdx = argv.indexOf('--bodies')
 const HTML_DIR = bodiesIdx >= 0 ? argv[bodiesIdx + 1] : join('tests', 'baseline', 'html')
 const haveBodies = existsSync(HTML_DIR)
 
+function readBaselineBody(file) {
+  const p = join(HTML_DIR, file)
+  return existsSync(p) ? readFileSync(p, 'utf8') : null
+}
+
 const same = []
 const differs = []
 const failed = []
@@ -152,7 +214,23 @@ for (const entry of routes) {
     failed.push({ route: entry.route, why: `fetch failed: ${err.message}${cause}` })
     continue
   }
-  if (sha(normalise(served)) === entry.sha256 || sha(served) === entry.sha256) {
+  // Raw bytes first: an exact match needs no tolerance and is the strongest
+  // answer available.
+  if (sha(served) === entry.sha256) {
+    same.push(entry.route)
+    continue
+  }
+
+  // Then the normalised comparison — but only when the baseline BODY is on hand,
+  // because a normaliser has to be applied to BOTH sides to mean anything.
+  // Comparing a normalised served page against a raw baseline HASH would just be
+  // a second way to miss, and would quietly make every normaliser useless.
+  const baselineBody = haveBodies ? readBaselineBody(entry.file) : null
+  if (baselineBody !== null && sha(normalise(baselineBody)) === sha(normalise(served))) {
+    same.push(entry.route)
+    continue
+  }
+  if (baselineBody === null && sha(normalise(served)) === entry.sha256) {
     same.push(entry.route)
     continue
   }
