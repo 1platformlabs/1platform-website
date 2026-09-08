@@ -48,7 +48,16 @@ export default defineConfig({
     // runs behind nginx. It stays in the foreground as Playwright's owned child,
     // so there is no detached process to leak between runs.
     command: `npm run build && node dist/server/entry.mjs`,
-    env: { HOST: '127.0.0.1', PORT: String(port) },
+    env: {
+      HOST: '127.0.0.1',
+      PORT: String(port),
+      // The manifest comes from the repository here, EXPLICITLY. A browser test
+      // drives `Host: localhost`, which is not a routable domain and resolves to
+      // no tenant, and CI has no API to ask — so without this the readiness
+      // probe gets a 404 and the whole suite waits out the timeout. Production
+      // sets nothing and therefore reads the API.
+      SITE_MANIFEST_SOURCE: 'repo',
+    },
     url: `${baseURL}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

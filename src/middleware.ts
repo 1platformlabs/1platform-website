@@ -1,14 +1,25 @@
 import type { MiddlewareHandler } from 'astro'
 
+import { resolveTenant } from './lib/resolve-tenant'
+
 /**
  * Request-scoped middleware.
  *
- * This file exists because the site became a server. In F1 it carries exactly
- * one guard — the image endpoint below. From F4 it is also where the tenant
- * resolved from `Host` will live (`context.locals`), which is the only place it
- * may live: a module-level variable would let two concurrent requests for two
+ * This file exists because the site became a server. It carries two things: the
+ * image guard below, and the tenant resolved from `Host`.
+ *
+ * The tenant goes in `context.locals` and nowhere else. That is the only place
+ * it may live: a module-level variable would let two concurrent requests for two
  * different hosts overwrite each other, and the damage would not be a wrong
- * render but a cache write under the wrong key.
+ * render — which someone would notice — but a cache write under the wrong key,
+ * which poisons later responses for a tenant nobody was looking at.
+ *
+ * ⚠️ What middleware CANNOT gate, measured on this build: anything the adapter
+ * serves from `dist/client/` — every file in `public/`, and every route carrying
+ * `export const prerender = true`. The static handler answers before the
+ * application runs, so a 403 returned from here never reaches them. That is why
+ * per-tenant files have to become ROUTES, and why `tests/prerender-is-declared.
+ * spec.ts` makes every prerendered route a decision somebody signed.
  */
 
 /**
@@ -74,5 +85,47 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     }
   }
 
-  return next()
+  // The tenant for THIS request. `context.locals` is per request by
+  // construction, which is the entire reason the answer is put there.
+  const host = context.request.headers.get('host') ?? url.host
+  const resolution = await resolveTenant(host)
+
+  if (resolution.outcome === 'unknown-host') {
+    // A real 404, and deliberately not another tenant's page. The front door
+    // today answers 200 with an unrelated product's panel for an unrouted
+    // domain; serving someone else's site here would be that same defect.
+    return new Response('Not Found\n', {
+      status: 404,
+      headers: { 'content-type': 'text/plain; charset=utf-8', 'x-content-type-options': 'nosniff' },
+    })
+  }
+
+  if (resolution.outcome === 'unavailable') {
+    // No copy and the API could not be asked. 503 is the honest answer: the
+    // site exists, we cannot render it right now, come back. A 404 here would
+    // tell crawlers the page is gone, and a half-rendered page would be worse
+    // than either.
+    console.warn('[tenant] unavailable host=%s reason=%s', host, resolution.reason)
+    return new Response('Service Unavailable\n', {
+      status: 503,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'x-content-type-options': 'nosniff',
+        'retry-after': '30',
+        'cache-control': 'no-store',
+      },
+    })
+  }
+
+  context.locals.tenant = resolution.tenant
+
+  const response = await next()
+
+  // How old the manifest behind this page is. A header rather than a comment so
+  // that "we are serving a stale copy" is observable from outside the process,
+  // which is the only way anyone finds out the API has been down for an hour.
+  if (resolution.stale && resolution.ageMs !== null) {
+    response.headers.set('x-site-manifest-age', String(Math.round(resolution.ageMs / 1000)))
+  }
+  return response
 }
