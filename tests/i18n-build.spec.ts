@@ -45,12 +45,22 @@ import {
 const PRIVACY_ES = '/es/privacidad/';
 
 test('no page renders an unresolved key or placeholder', async () => {
-  // Catalogue parity itself is enforced twice before this runs — by the type of
-  // defineMessages, and by an assertion in src/i18n that throws during the
-  // build — so it is not re-checked here. What that cannot catch is a key that
-  // exists but was called without its variables: `t('blog.readingTime')` with
-  // no `n` renders the literal "{n}" onto the page. That is only visible in the
-  // output, which is where this looks.
+  // Catalogue parity is enforced elsewhere, not re-checked here — but not
+  // where an earlier version of this comment said. It used to be a
+  // `src/i18n` assertion that threw during the build; that stopped being true
+  // for the same reason the file-level comment above moved this whole spec
+  // off `dist/`: with `output: 'server'` and no prerendered route, `astro
+  // build` never executes a page module, so nothing at module scope in
+  // `src/i18n` runs at build time any more (see `src/i18n/index.ts`, which
+  // documents the move in full). The guarantee didn't disappear, it moved: by
+  // the type of `defineMessages` at compile time, by the API's write path
+  // (`SitePageService.assert_content_parity`, which refuses to persist an
+  // out-of-parity tenant catalogue) for the copy tenants actually serve, and
+  // by `tests/i18n-parity.spec.ts` in CI for the repo catalogues this site
+  // falls back to under `SITE_MANIFEST_SOURCE=repo`. What none of those three
+  // catch is a key that exists but was called without its variables:
+  // `t('blog.readingTime')` with no `n` renders the literal "{n}" onto the
+  // page. That is only visible in the output, which is only where this looks.
   //
   // The floor lives in `publishedRoutes`: an enumeration that finds fewer than
   // 40 pages fails there rather than letting this loop pass over nothing.
