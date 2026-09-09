@@ -144,7 +144,10 @@ function tenantFor(host: string): SiteTenantFixture | null {
       slug: 'service-probe',
       brand_name: 'Consultorio Aurora',
       brand_mark: 'A',
-      brand_wordmark: 'Consultorio Aurora',
+      // Deliberately longer than the clinic wordmark. It is valid manifest
+      // data and exercises the mobile rail's real contention: the brand may
+      // yield, but the only actionable CTA may never be clipped.
+      brand_wordmark: 'Consultorio Aurora y Centro Médico Familiar',
       domain: PROBE_HOST,
     }
   }
@@ -397,6 +400,49 @@ test('a third tenant slug reuses service-lead without a layout or selector of it
   expect(response.body).toContain('data-home-template="service-lead"')
   expect(response.body).toContain('Consultorio Aurora')
   expect(response.body).not.toContain('Clínica Delta')
+})
+
+test('a long valid tenant wordmark yields to the complete mobile support CTA', async ({ browser }) => {
+  const isolatedBrowser = await browser.browserType().launch({
+    args: [`--host-resolver-rules=MAP ${PROBE_HOST} 127.0.0.1`],
+  })
+  const context = await isolatedBrowser.newContext({ viewport: { width: 390, height: 844 } })
+  const page = await context.newPage()
+
+  try {
+    const port = new URL(appBaseUrl).port
+    const response = await page.goto(`http://${PROBE_HOST}:${port}/`)
+    expect(response?.status()).toBe(200)
+    await expect(page.locator('.site-header .logo__text')).toHaveText(
+      'Consultorio Aurora y Centro Médico Familiar',
+    )
+
+    const geometry = await page.locator('.site-header__rail').evaluate((rail) => {
+      const cta = rail.querySelector<HTMLElement>('.site-header__cta')
+      const wordmark = rail.querySelector<HTMLElement>('.logo__text')
+      if (!cta || !wordmark) throw new Error('header needs both wordmark and support CTA')
+      const ctaBox = cta.getBoundingClientRect()
+      const wordmarkBox = wordmark.getBoundingClientRect()
+      return {
+        viewportRight: document.documentElement.clientWidth,
+        ctaLeft: ctaBox.left,
+        ctaRight: ctaBox.right,
+        wordmarkRight: wordmarkBox.right,
+        wordmarkOverflow: wordmark.scrollWidth > wordmark.clientWidth,
+      }
+    })
+
+    expect(geometry.ctaRight, 'the whole CTA must remain inside the viewport').toBeLessThanOrEqual(
+      geometry.viewportRight,
+    )
+    expect(geometry.wordmarkRight, 'the wordmark must not paint under the CTA').toBeLessThanOrEqual(
+      geometry.ctaLeft,
+    )
+    expect(geometry.wordmarkOverflow, 'the valid long wordmark should truncate, not the CTA').toBe(true)
+  } finally {
+    await context.close()
+    await isolatedBrowser.close()
+  }
 })
 
 test('the physical service template route is never a public tenant URL', async () => {
