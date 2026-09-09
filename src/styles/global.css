@@ -162,11 +162,13 @@ ul, ol {
   --color-text-inverse:   var(--surface);
 
   /* Accent */
-  --color-accent:       var(--cobalt);
-  --color-accent-hover: var(--cobalt-deep);
-  --color-accent-soft:  var(--cobalt-wash);
-  --color-accent-glow:  rgba(31, 79, 224, 0.07);
-  --color-accent-ring:  rgba(31, 79, 224, 0.28);
+  --color-accent:        var(--cobalt);
+  --color-accent-hover:  var(--cobalt-deep);
+  --color-accent-soft:   var(--cobalt-wash);
+  --color-accent-glow:   rgba(31, 79, 224, 0.07);
+  --color-accent-ring:   rgba(31, 79, 224, 0.28);
+  /* On dark chrome (the footer) — see Footer.astro's .logo__mark and .btn--footer. */
+  --color-accent-bright: var(--cobalt-bright);
 
   /* Functional status only — never decoration */
   --color-success:    #0F7B4F;
