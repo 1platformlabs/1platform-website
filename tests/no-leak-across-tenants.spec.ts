@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test'
 import { repoTenants } from '../src/data/site-tenants'
 import { localesOf, makeLocalizePath } from '../src/lib/site-locale'
 import { getWithHost } from './helpers/http-host'
+import { surface } from './helpers/site-surface'
 
 /**
  * The provider and cross-brand scan, over the SERVED HTML of EVERY tenant.
@@ -46,26 +47,9 @@ function bannedProviders(): RegExp {
 const PORT = process.env.PLAYWRIGHT_PORT ?? '4321'
 const BASE = `http://127.0.0.1:${PORT}`
 
-/**
- * Every (tenant, locale, url) this estate publishes.
- *
- * Derived from `SiteTenant.pages` rather than from the sitemap, and that is not
- * a style choice: a tenant with `indexable: false` answers 404 for its sitemap
- * on purpose, so a sitemap-driven enumerator returns ZERO routes for exactly the
- * tenant most worth scanning — a provisional brand — and reports it clean.
- */
-function surface(): { slug: string; host: string; locale: string; url: string }[] {
-  const out: { slug: string; host: string; locale: string; url: string }[] = []
-  for (const tenant of repoTenants()) {
-    const localise = makeLocalizePath(tenant)
-    for (const locale of localesOf(tenant)) {
-      for (const route of tenant.pages) {
-        out.push({ slug: tenant.slug, host: tenant.domain, locale, url: localise(route, locale) })
-      }
-    }
-  }
-  return out
-}
+// `surface()` moved to ./helpers/site-surface — issue #101 needed the same
+// (tenant, locale, url) enumeration for a second guard and a hand-written
+// second copy is exactly the drift this file's own derivation exists to avoid.
 
 /** Routes where naming a processor is the legally required disclosure. */
 const DISCLOSURE = /\/(privacy|privacidad)\//
