@@ -328,11 +328,17 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     })} />
 
     {/*
-      Los tokens del inquilino van AL FINAL del <head>, después de las hojas de
-      estilo, y eso es deliberado: `global.css` declara los mismos nombres en
-      `:root`, así que con igual especificidad gana el que se declara último.
-      Subir la especificidad (`html:root`) habría funcionado también y habría
-      dejado una regla que nadie puede sobrescribir después.
+      Este bloque se escribe AL FINAL del <head> — pero eso NO es lo que le
+      gana la cascada a `global.css`, aunque el comentario original de este
+      archivo lo daba por sentado. Astro inyecta el `<link rel="stylesheet">`
+      de `global.css` (y de cada componente) en un punto que decide SU PROPIO
+      runtime de bundling, no la posición del `import` ni la del template —
+      medido: en el HTML servido ese `<link>` aparece DESPUÉS de este
+      `<style>`, así que por orden de fuente `global.css` ganaba siempre y el
+      acento del inquilino nunca llegaba a un elemento (issues #93/#94). Por
+      eso `themeDeclarations` devuelve `:root:root`, no `:root`: una
+      especificidad que gana pase lo que pase con el orden, sin depender de
+      dónde Astro decida colocar la hoja de estilos.
 
       `set:html` apaga el escapado de Astro. Es seguro porque el contenido no es
       texto libre: `themeDeclarations` sólo emite colores que casan `#` + 6
