@@ -41,8 +41,10 @@ import type { SiteTenant } from '../lib/site-api'
 const ONEPLATFORM: SiteTenant = {
   slug: 'oneplatform',
   brand_name: '1Platform',
-  // The wordmark is drawn with its leading character boxed, so the logo needs
-  // the mark as its own datum rather than re-deriving it from the name.
+  // `Logo.astro` boxes the wordmark's leading character ONLY when it is a
+  // digit — the "1" is a glyph, not the initial of a word (issue #92) — so the
+  // mark still needs to be its own datum rather than re-derived from the name,
+  // exactly as before.
   brand_mark: '1Platform',
   domain: '1platform.pro',
   locales: ['en', 'es'],
@@ -65,7 +67,14 @@ const ONEPLATFORM: SiteTenant = {
     // against live production: `1platform.pro` serves `--cobalt:#1748a7`.
     accent: '#1748a7',
     accent_contrast: '#ffffff',
-    display_font: 'instrument-serif',
+    // ⚠️ This said `instrument-serif` and that is NOT what the site draws.
+    // `global.css` sets `--font-display` to Space Grotesk; Instrument Serif is
+    // loaded and used, but as `--font-serif`, never as the heading font. The
+    // same class of bug as the accent's glow above, and the same fix: read
+    // what the site actually ships (issue #94) rather than invent a mapping
+    // that would have repainted 1platform.pro's headings the moment
+    // `tenant-theme.ts` started honouring this field.
+    display_font: 'space-grotesk',
   },
   destinations: {
     docs: 'https://developer.1platform.pro/',
