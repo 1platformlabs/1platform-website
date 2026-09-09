@@ -1,0 +1,515 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
+const tenant = Astro.locals.tenant;
+const supportUrl = tenant.destinations.support;
+
+if (!supportUrl || new URL(supportUrl).protocol !== 'https:') {
+  throw new Error(`service-lead tenant ${tenant.slug} has no valid support destination`);
+}
+
+const title = t('serviceLead.title');
+const description = t('serviceLead.description');
+const ctaLabel = t('cta.scheduleDemo');
+const ctaAria = t('cta.scheduleDemoAria');
+
+type NamedItem = {
+  icon: IconName;
+  title: string;
+  body?: string;
+};
+
+const capabilities: NamedItem[] = [
+  { icon: 'terminal', title: t('serviceLead.hero.card') },
+  { icon: 'paylink', title: t('serviceLead.hero.link') },
+  { icon: 'invoice', title: t('serviceLead.hero.invoice') },
+];
+
+const flow: (NamedItem & { label: string })[] = [
+  {
+    icon: 'card',
+    label: t('serviceLead.flow.charge.label'),
+    title: t('serviceLead.flow.charge.title'),
+    body: t('serviceLead.flow.charge.body'),
+  },
+  {
+    icon: 'clipboard',
+    label: t('serviceLead.flow.receipt.label'),
+    title: t('serviceLead.flow.receipt.title'),
+    body: t('serviceLead.flow.receipt.body'),
+  },
+  {
+    icon: 'invoice',
+    label: t('serviceLead.flow.invoice.label'),
+    title: t('serviceLead.flow.invoice.title'),
+    body: t('serviceLead.flow.invoice.body'),
+  },
+];
+
+const process = [
+  {
+    label: t('serviceLead.process.consultation.label'),
+    title: t('serviceLead.process.consultation.title'),
+    body: t('serviceLead.process.consultation.body'),
+  },
+  {
+    label: t('serviceLead.process.confirmation.label'),
+    title: t('serviceLead.process.confirmation.title'),
+    body: t('serviceLead.process.confirmation.body'),
+  },
+  {
+    label: t('serviceLead.process.closing.label'),
+    title: t('serviceLead.process.closing.title'),
+    body: t('serviceLead.process.closing.body'),
+  },
+];
+
+const benefits = [
+  {
+    title: t('serviceLead.benefits.clarity.title'),
+    body: t('serviceLead.benefits.clarity.body'),
+  },
+  {
+    title: t('serviceLead.benefits.manual.title'),
+    body: t('serviceLead.benefits.manual.body'),
+  },
+  {
+    title: t('serviceLead.benefits.tracking.title'),
+    body: t('serviceLead.benefits.tracking.body'),
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: tenant.brand_name,
+  url: new URL('/', siteOrigin(Astro.locals)).toString(),
+  description,
+};
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd} showAnnouncement={false}>
+  <div class="service-lead-home" data-home-template="service-lead">
+    <section class="service-lead-hero" id="hero" aria-labelledby="service-lead-title">
+      <div class="container service-lead-hero__grid">
+        <div class="service-lead-hero__copy">
+          <p class="eyebrow eyebrow--accent">{t('serviceLead.hero.eyebrow')}</p>
+          <h1 id="service-lead-title">{t('serviceLead.hero.title')}</h1>
+          <p class="service-lead-hero__lead">{t('serviceLead.hero.lead')}</p>
+          <ul
+            class="service-lead-capabilities"
+            aria-label={t('serviceLead.hero.capabilitiesLabel')}
+          >
+            {capabilities.map((capability) => (
+              <li>
+                <span aria-hidden="true"><Icon name={capability.icon} size={19} /></span>
+                <span>{capability.title}</span>
+              </li>
+            ))}
+          </ul>
+          <a
+            class="btn btn--primary service-lead-cta"
+            href={supportUrl}
+            aria-label={ctaAria}
+            data-support-cta="hero"
+          >
+            {ctaLabel}<span aria-hidden="true"><Icon name="arrow-right" size={17} /></span>
+          </a>
+        </div>
+
+        <aside class="service-lead-flow" aria-labelledby="service-lead-flow-title">
+          <p class="eyebrow" id="service-lead-flow-title">{t('serviceLead.flow.eyebrow')}</p>
+          <ol aria-label={t('serviceLead.flow.aria')}>
+            {flow.map((step, index) => (
+              <li class="service-lead-flow__step">
+                <div class="service-lead-flow__marker" aria-hidden="true">
+                  <Icon name={step.icon} size={21} />
+                </div>
+                <div>
+                  <span class="service-lead-flow__label">
+                    {String(index + 1).padStart(2, '0')} · {step.label}
+                  </span>
+                  <h2>{step.title}</h2>
+                  <p>{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      </div>
+    </section>
+
+    <section class="service-lead-process section" aria-labelledby="service-lead-process-title">
+      <div class="container">
+        <div class="service-lead-section-heading">
+          <p class="eyebrow">{t('serviceLead.process.eyebrow')}</p>
+          <h2 id="service-lead-process-title">{t('serviceLead.process.title')}</h2>
+        </div>
+        <ol class="service-lead-process__grid">
+          {process.map((step, index) => (
+            <li>
+              <span class="service-lead-process__number" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <p class="service-lead-process__label">{step.label}</p>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="service-lead-benefits section" aria-labelledby="service-lead-benefits-title">
+      <div class="container service-lead-benefits__grid">
+        <div class="service-lead-section-heading">
+          <p class="eyebrow">{t('serviceLead.benefits.eyebrow')}</p>
+          <h2 id="service-lead-benefits-title">{t('serviceLead.benefits.title')}</h2>
+        </div>
+        <ul class="service-lead-benefits__list">
+          {benefits.map((benefit) => (
+            <li>
+              <span aria-hidden="true"><Icon name="globe-check" size={20} /></span>
+              <div><h3>{benefit.title}</h3><p>{benefit.body}</p></div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="service-lead-closing section" aria-labelledby="service-lead-closing-title">
+      <div class="container service-lead-closing__inner">
+        <div>
+          <p class="eyebrow">{t('serviceLead.closing.eyebrow')}</p>
+          <h2 id="service-lead-closing-title">{t('serviceLead.closing.title')}</h2>
+          <p>{t('serviceLead.closing.body')}</p>
+        </div>
+        <a
+          class="btn service-lead-closing__cta"
+          href={supportUrl}
+          aria-label={ctaAria}
+          data-support-cta="closing"
+        >
+          {ctaLabel}<span aria-hidden="true"><Icon name="arrow-right" size={17} /></span>
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style is:inline>
+  .service-lead-hero {
+    padding: calc(var(--header-offset) + var(--space-20)) 0 var(--space-20);
+    overflow: hidden;
+    background: var(--color-accent-soft);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .service-lead-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.02fr) minmax(28rem, .98fr);
+    gap: clamp(3rem, 7vw, 7rem);
+    align-items: center;
+  }
+
+  .service-lead-hero__copy {
+    max-width: 42rem;
+  }
+
+  .service-lead-hero h1 {
+    max-width: 12ch;
+    margin: var(--space-5) 0 var(--space-6);
+    font-size: clamp(3.5rem, 6.3vw, 6.4rem);
+    font-weight: 400;
+    line-height: .91;
+    letter-spacing: -.055em;
+  }
+
+  .service-lead-hero__lead {
+    max-width: 39rem;
+    font-size: clamp(1.05rem, 1.4vw, 1.22rem);
+    line-height: 1.65;
+  }
+
+  .service-lead-capabilities {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+  }
+
+  .service-lead-capabilities li {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .service-lead-capabilities li > span:first-child {
+    display: inline-flex;
+    flex: 0 0 auto;
+    color: var(--color-accent);
+  }
+
+  .service-lead-cta {
+    min-height: 52px;
+    margin-top: var(--space-8);
+    padding-inline: var(--space-8);
+    border-radius: var(--border-radius-pill);
+  }
+
+  .service-lead-flow {
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .service-lead-flow > .eyebrow {
+    display: block;
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .service-lead-flow ol {
+    margin-top: var(--space-2);
+  }
+
+  .service-lead-flow__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-block: var(--space-6);
+  }
+
+  .service-lead-flow__step + .service-lead-flow__step {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .service-lead-flow__marker {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--color-accent-ink);
+    background: var(--color-accent);
+  }
+
+  .service-lead-flow__label,
+  .service-lead-process__number,
+  .service-lead-process__label {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .service-lead-flow h2 {
+    margin: var(--space-2) 0 var(--space-2);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  .service-lead-flow p {
+    font-size: var(--text-sm);
+  }
+
+  .service-lead-section-heading {
+    display: grid;
+    max-width: 48rem;
+    gap: var(--space-5);
+    margin-bottom: var(--space-12);
+  }
+
+  .service-lead-section-heading h2,
+  .service-lead-closing h2 {
+    font-size: clamp(2.35rem, 4.2vw, 4.5rem);
+    font-weight: 400;
+    line-height: .98;
+    letter-spacing: -.04em;
+  }
+
+  .service-lead-process__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .service-lead-process__grid li {
+    min-width: 0;
+    padding: var(--space-8) var(--space-8) 0 0;
+  }
+
+  .service-lead-process__grid li + li {
+    padding-left: var(--space-8);
+    border-left: 1px solid var(--color-border);
+  }
+
+  .service-lead-process__number {
+    display: block;
+    margin-bottom: var(--space-12);
+  }
+
+  .service-lead-process__label {
+    margin-bottom: var(--space-3);
+  }
+
+  .service-lead-process h3 {
+    margin-bottom: var(--space-3);
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  .service-lead-benefits {
+    background: var(--color-bg-muted);
+    border-block: 1px solid var(--color-border);
+  }
+
+  .service-lead-benefits__grid {
+    display: grid;
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    gap: clamp(3rem, 8vw, 8rem);
+    align-items: start;
+  }
+
+  .service-lead-benefits__list {
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .service-lead-benefits__list li {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-block: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .service-lead-benefits__list li > span {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .service-lead-benefits h3 {
+    margin-bottom: var(--space-2);
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  .service-lead-closing {
+    background: var(--color-accent);
+  }
+
+  .service-lead-closing__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-12);
+    align-items: end;
+  }
+
+  .service-lead-closing .eyebrow,
+  .service-lead-closing h2,
+  .service-lead-closing p {
+    color: var(--color-accent-ink);
+  }
+
+  .service-lead-closing h2 {
+    max-width: 14ch;
+    margin: var(--space-5) 0 var(--space-5);
+  }
+
+  .service-lead-closing p {
+    max-width: 42rem;
+  }
+
+  .service-lead-closing__cta {
+    min-height: 52px;
+    padding-inline: var(--space-8);
+    border-color: var(--color-accent-ink);
+    border-radius: var(--border-radius-pill);
+    color: var(--color-accent);
+    background: var(--color-accent-ink);
+  }
+
+  .service-lead-closing__cta:hover {
+    color: var(--color-accent-hover);
+  }
+
+  .service-lead-closing__cta:focus-visible {
+    outline: 2px solid var(--color-accent-ink);
+    outline-offset: 4px;
+    box-shadow: none;
+  }
+
+  @media (max-width: 900px) {
+    .service-lead-hero {
+      padding-top: calc(var(--header-offset) + var(--space-16));
+    }
+
+    .service-lead-hero__grid,
+    .service-lead-benefits__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+    }
+
+    .service-lead-hero__copy {
+      max-width: 46rem;
+    }
+
+    .service-lead-process__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .service-lead-process__grid li {
+      padding: var(--space-8) 0;
+    }
+
+    .service-lead-process__grid li + li {
+      padding-left: 0;
+      border-top: 1px solid var(--color-border);
+      border-left: 0;
+    }
+
+    .service-lead-process__number {
+      margin-bottom: var(--space-6);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .service-lead-hero {
+      padding: calc(var(--header-offset) + var(--space-10)) 0 var(--space-12);
+    }
+
+    .service-lead-hero h1 {
+      font-size: clamp(3rem, 15vw, 4.6rem);
+    }
+
+    .service-lead-cta,
+    .service-lead-closing__cta {
+      width: 100%;
+    }
+
+    .service-lead-closing__inner {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .service-lead-flow,
+    .service-lead-process__grid,
+    .service-lead-benefits__list {
+      border-color: CanvasText;
+    }
+  }
+</style>

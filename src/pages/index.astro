@@ -1,5 +1,10 @@
 ---
-import Home from '@page-content/Home.astro';
+const homeByTemplate = {
+  'platform-commerce': () => import('@page-content/Home.astro'),
+  'service-lead': () => import('@page-content/ServiceLeadHome.astro'),
+} as const;
+
+const { default: Home } = await homeByTemplate[Astro.locals.tenant.home_template]();
 ---
 
 <Home />

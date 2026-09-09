@@ -2,6 +2,7 @@
 import Logo from '@components/Logo.astro';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
 import { useI18n, type Locale } from '@i18n';
+import { isMultilingual } from '@lib/site-locale';
 
 /**
  * An internal menu entry, or nothing when this tenant does not publish it.
@@ -32,7 +33,7 @@ const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
  * rendered at all. Absence is a first-class answer here, and every use below
  * is guarded on it — which is why these are `| null` rather than defaulted.
  */
-const { app: appUrl, docs: docsUrl } = Astro.locals.tenant.destinations;
+const { app: appUrl, docs: docsUrl, support: supportUrl } = Astro.locals.tenant.destinations;
 
 /**
  * Ordered the way a merchant meets them: sell, get paid, deliver, then the
@@ -56,8 +57,9 @@ const solutions: SubItem[] = (
     ['nav.solutions.content', '/solutions/content/'],
   ] as const
 )
-  .map(([key, route]) => ({ label: t(key), href: published(route) }))
-  .filter((item): item is SubItem => item.href !== null);
+  .map(([key, route]) => ({ key, href: published(route) }))
+  .filter((item): item is typeof item & { href: string } => item.href !== null)
+  .map(({ key, href }) => ({ label: t(key), href }));
 
 const solutionsHref = published('/solutions/');
 const pricingHref = published('/pricing/');
@@ -81,15 +83,36 @@ const navItems: NavItem[] = [
   ...(blogHref ? [{ label: t('nav.blog'), href: blogHref }] : []),
 ];
 
-const currentPath = Astro.url.pathname;
+const hasNavigation = navItems.length > 0;
+// The switcher belongs to the tenant's language capacity, not to this page's
+// SEO graph. The bilingual 404 deliberately has no hreflang alternates, but it
+// must keep the established EN/ES control (both disabled there); a
+// monolingual tenant must not render the control at all.
+const hasLanguageChoices = isMultilingual(Astro.locals.tenant);
+const hasMenuContent = hasNavigation || hasLanguageChoices;
+const headerCtaHref = supportUrl ?? appUrl;
+const headerCtaLabel = supportUrl
+  ? t('cta.scheduleDemo')
+  : appUrl
+    ? t('cta.getStarted')
+    : null;
+const headerCtaAria = supportUrl ? t('cta.scheduleDemoAria') : undefined;
+const hasActions = Boolean(appUrl || headerCtaHref || hasMenuContent);
+const hasMobileFooter = Boolean(headerCtaHref || hasLanguageChoices);
+
+const currentPath = Astro.originPathname;
 const isActive = (href: string) => href.startsWith('/') && currentPath.startsWith(href);
 ---
 
-<header class="site-header" id="site-header">
+<header
+  class="site-header"
+  id="site-header"
+  data-header-layout={hasNavigation ? undefined : 'compact'}
+>
   <div class="site-header__rail">
     <Logo class="site-header__logo" />
 
-    <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
+    {hasNavigation && <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
       {/* The dropdown is rendered only when the tenant publishes the hub it
           opens. Without this it drew for EVERY tenant, and for one that
           publishes a single page the result was the worst possible shape: a
@@ -115,12 +138,19 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
           {item.label}
         </a>
       ))}
-    </nav>
+    </nav>}
 
-    <div class="site-header__actions">
+    {hasActions && <div class="site-header__actions">
       {appUrl && <a href={appUrl} class="site-header__signin">{t('cta.signIn')}</a>}
-      {appUrl && <a href={appUrl} class="btn btn--primary site-header__cta">{t('cta.getStarted')}</a>}
-      <button
+      {headerCtaHref && headerCtaLabel && (
+        <a
+          href={headerCtaHref}
+          class="btn btn--primary site-header__cta"
+          aria-label={headerCtaAria}
+          data-support-cta={supportUrl ? 'header' : undefined}
+        >{headerCtaLabel}</a>
+      )}
+      {hasMenuContent && <button
         class="site-header__menu-toggle"
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -128,12 +158,12 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
         id="menu-toggle"
       >
         <span aria-hidden="true"></span><span aria-hidden="true"></span>
-      </button>
-    </div>
+      </button>}
+    </div>}
   </div>
 
-  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <nav aria-label={t('nav.aria.main')}>
+  {hasMenuContent && <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    {hasNavigation && <nav aria-label={t('nav.aria.main')}>
       <ul class="mobile-menu__links">
         {navItems.map((item) => (
           <li>
@@ -151,12 +181,19 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
           </li>
         ))}
       </ul>
-    </nav>
-    <div class="mobile-menu__footer">
-      {appUrl && <a href={appUrl} class="btn btn--primary btn--full">{t('cta.getStarted')}</a>}
-      <LanguageSwitcher alternates={alternates} />
-    </div>
-  </div>
+    </nav>}
+    {hasMobileFooter && <div class="mobile-menu__footer">
+      {headerCtaHref && headerCtaLabel && (
+        <a
+          href={headerCtaHref}
+          class="btn btn--primary btn--full"
+          aria-label={headerCtaAria}
+          data-support-cta={supportUrl ? 'mobile-menu' : undefined}
+        >{headerCtaLabel}</a>
+      )}
+      {hasLanguageChoices && <LanguageSwitcher alternates={alternates} />}
+    </div>}
+  </div>}
 </header>
 
 <script>
@@ -229,6 +266,6 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
     .mobile-menu__sublist a:hover { color: var(--color-accent); }
     .mobile-menu__footer { display: grid; gap: var(--space-4); margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--color-border); }
   }
-  @media (max-width: 520px) { .site-header { padding-inline: var(--space-3); } .site-header__rail { min-height: 54px; padding: 5px 5px 5px 14px; } .site-header__cta { min-height: 42px; padding-inline: 12px; font-size: var(--text-xs); } .mobile-menu { right: var(--space-3); left: var(--space-3); padding: var(--space-5); } }
+  @media (max-width: 520px) { .site-header { padding-inline: var(--space-3); } .site-header__rail { min-height: 54px; padding: 5px 5px 5px 14px; } .site-header__cta { min-height: 44px; padding-inline: 12px; font-size: var(--text-xs); } .mobile-menu { right: var(--space-3); left: var(--space-3); padding: var(--space-5); } }
   @media (scripting: none) { .site-header { position: relative; top: auto; pointer-events: auto; } .site-header__menu-toggle { display: none; } .mobile-menu { display: block; position: static; width: min(620px, calc(100% - 32px)); margin: var(--space-3) auto 0; pointer-events: auto; } }
 </style>
