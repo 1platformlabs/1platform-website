@@ -163,35 +163,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   }
   context.locals.locale = locale
 
-  // ── The page set is a datum, and this is where it bites ────────────────
-  //
-  // `SiteTenant.pages` only ever reached the sitemap before this. So a tenant
-  // that published six pages still SERVED all of 1Platform's — `/pricing/`
-  // with the platform's prices, `/for-developers/`, the whole blog — to anyone
-  // who asked for the URL. The sitemap omitting them changed nothing: a file
-  // router does not consult a manifest.
-  //
-  // A route this tenant does not publish is a 404, and deliberately the SAME
-  // 404 an unknown host gets: distinguishing "this page exists for somebody
-  // else" from "this page does not exist" would tell a stranger which pages
-  // other tenants have.
-  if (!isPublishedRequest(url.pathname, tenant)) {
-    // The site's own 404 PAGE, not a bare body — rewritten rather than
-    // hand-written. The first version of this returned plain text and it was a
-    // real regression the browser suite caught: every address a tenant does not
-    // publish, `/404.html` included, lost the rendered page with its chrome and
-    // its language control.
-    //
-    // The status has to be restored explicitly: a rewrite renders the target
-    // route, and that route answers 200 on its own. A soft 404 would be worse
-    // than the plain text — it poisons the index instead of merely looking bad.
-    const rendered = await next('/404')
-    return new Response(rendered.body, {
-      status: 404,
-      headers: rendered.headers,
-    })
-  }
-
   if (manifestSource() === 'repo') {
     // The repo catalogues, for a laptop and the browser suite. Explicitly
     // chosen, never a fallback — see `src/data/site-tenants.ts`.
@@ -225,7 +196,47 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     }
   }
 
-  const response = await next()
+  // ── The page set is a datum, and this is where it bites ────────────────
+  //
+  // `SiteTenant.pages` only ever reached the sitemap before this. So a tenant
+  // that published six pages still SERVED all of 1Platform's — `/pricing/`
+  // with the platform's prices, `/for-developers/`, the whole blog — to anyone
+  // who asked for the URL. The sitemap omitting them changed nothing: a file
+  // router does not consult a manifest.
+  //
+  // A route this tenant does not publish is a 404, and deliberately the SAME
+  // 404 an unknown host gets: distinguishing "this page exists for somebody
+  // else" from "this page does not exist" would tell a stranger which pages
+  // other tenants have.
+  //
+  // ⚠️ ESTA COMPROBACIÓN VA DESPUÉS DEL DICCIONARIO, y el orden es el arreglo.
+  // Cuando devolvía aquí mismo, `locals.messages` todavía no estaba puesto: el
+  // render del /404 caía al `?? DICTIONARIES[locale]` de `useI18n` y contestaba
+  // con las palabras del REPO —las de la plataforma— bajo el dominio del
+  // inquilino. Medido: misma petición, mismo Host, `/` decía «© 2026 Clínica
+  // Delta» y `/pricing/` decía «© 2026 1Platform Labs».
+  //
+  // No es un borde: un inquilino que publica una sola ruta sirve esta página en
+  // TODAS las demás direcciones de su dominio.
+  let response: Response
+  if (!isPublishedRequest(url.pathname, tenant)) {
+    // The site's own 404 PAGE, not a bare body — rewritten rather than
+    // hand-written. The first version of this returned plain text and it was a
+    // real regression the browser suite caught: every address a tenant does not
+    // publish, `/404.html` included, lost the rendered page with its chrome and
+    // its language control.
+    //
+    // The status has to be restored explicitly: a rewrite renders the target
+    // route, and that route answers 200 on its own. A soft 404 would be worse
+    // than the plain text — it poisons the index instead of merely looking bad.
+    const rendered = await next('/404')
+    response = new Response(rendered.body, {
+      status: 404,
+      headers: rendered.headers,
+    })
+  } else {
+    response = await next()
+  }
 
   // How old the manifest behind this page is. A header rather than a comment so
   // that "we are serving a stale copy" is observable from outside the process,

@@ -200,3 +200,87 @@ test('a tenant page never carries the ownership token of another', async () => {
     }
   }
 })
+
+/**
+ * ── THE PAGE THIS SWEEP COULD NEVER REACH ──────────────────────────────────
+ *
+ * `surface()` above derives itself from `SiteTenant.pages`, and that is the
+ * right call for everything it does. But it has a structural consequence worth
+ * naming, because it hid a real leak for the length of this epic:
+ *
+ *   the 404 page is, BY DEFINITION, what a tenant serves at the addresses it
+ *   does NOT publish — so no enumeration of published routes can ever reach it.
+ *
+ * And it is not a rare page. A tenant that publishes one route (the clinic
+ * publishes `['/']`) serves this page at every other address on its domain: it
+ * is the majority of that tenant's URL space, not a corner of it.
+ *
+ * What was actually found there, with the sweep above green the whole time:
+ *   · nine platform-brand strings — <title>, og:title, twitter:title, the
+ *     description, both logo aria-labels, the footer copyright — because
+ *     `locals.messages` was populated AFTER the route gate, so the render fell
+ *     back to the repo catalogues (fixed in `src/middleware.ts`; the
+ *     discriminating test is `tenant-404-is-the-tenants.spec.ts`, which needs
+ *     `api` mode because in `repo` mode both sources are the same object);
+ *   · the platform's changelog strip (`announcement-bar.spec.ts`).
+ *
+ * This test adds that page to the swept surface for every tenant, so the class
+ * cannot come back through a page nobody enumerates.
+ */
+test('no provider or foreign brand reaches a tenant’s 404 — the page no page list enumerates', async () => {
+  const banned = bannedProviders()
+  expect(banned.test('we bill through Str' + 'ipe'), 'the blocklist must still catch a seeded name').toBe(true)
+
+  const tenants = repoTenants()
+  expect(tenants.length, 'a cross-tenant assertion needs at least two tenants').toBeGreaterThanOrEqual(2)
+
+  const leaks: string[] = []
+  let scanned = 0
+
+  for (const tenant of tenants) {
+    const others = tenants.filter((o) => o.slug !== tenant.slug)
+    for (const locale of localesOf(tenant)) {
+      const localise = makeLocalizePath(tenant)
+      // An address no tenant publishes, in this tenant's language.
+      const url = localise('/no-existe-esta-ruta/', locale)
+      const res = await getWithHost(BASE + url, tenant.domain)
+
+      // The refusal must still be the rendered PAGE. A bare body would make
+      // every assertion below pass over 10 bytes — the vacuous green this file
+      // exists to refuse.
+      expect(res.status, `${tenant.domain}${url} must answer 404`).toBe(404)
+      expect(res.body, `${tenant.domain}${url} answered a bare body, not the 404 page`).toContain('<html')
+      expect(
+        res.body.length,
+        `${tenant.domain}${url} rendered almost nothing — scanning it proves nothing`,
+      ).toBeGreaterThan(2000)
+      scanned += 1
+
+      if (banned.test(res.body)) leaks.push(`${tenant.domain}${url}: a provider name`)
+
+      const body = res.body.toLowerCase()
+      for (const other of others) {
+        if (body.includes(other.domain.toLowerCase())) {
+          leaks.push(`${tenant.domain}${url}: contains ${other.domain}`)
+        }
+      }
+
+      // ⚠️ NO SE PUEDE ASERTAR LA MARCA AJENA AQUÍ, y conviene decir por qué.
+      //
+      // Este servidor corre `SITE_MANIFEST_SOURCE=repo`, donde la copia de
+      // TODOS los inquilinos es —a propósito— el catálogo del repositorio, o
+      // sea la de 1Platform. Medido en este mismo árbol: la HOME de la clínica
+      // trae 11 menciones de la plataforma en modo `repo` y 0 en modo `api`.
+      //
+      // Así que una aserción de marca sería roja para siempre por el motivo
+      // equivocado. El dominio ajeno sí discrimina (sale del manifiesto, no del
+      // catálogo), y el aislamiento de la MARCA lo prueba
+      // `tenant-404-is-the-tenants.spec.ts`, que levanta el modo `api` contra
+      // una API doble justamente porque es el único modo donde la pregunta
+      // tiene sentido.
+    }
+  }
+
+  expect(scanned, 'no 404 page was scanned — a broken probe is not a pass').toBeGreaterThanOrEqual(3)
+  expect(leaks, `a tenant’s 404 page is serving somebody else’s words: ${leaks.join(', ')}`).toEqual([])
+})

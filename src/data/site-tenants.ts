@@ -50,7 +50,20 @@ const ONEPLATFORM: SiteTenant = {
   theme: {
     // The values the site ships today, read from src/styles/global.css so the
     // conversion changes the SOURCE of the tokens and not the tokens.
-    accent: '#1f4fe0',
+    //
+    // ⚠️ This said `#1f4fe0` and that was NOT what the site ships. `global.css`
+    // sets `--color-accent: var(--cobalt)` and `--cobalt: #1748A7`; the wrong
+    // value came from the neighbouring `--color-accent-glow: rgba(31, 79, 224,
+    // …)`, which is `#1f4fe0` and disagrees with the accent it is supposedly
+    // derived from — a pre-existing inconsistency in the stylesheet, still
+    // there.
+    //
+    // It went unnoticed because nothing rendered this field. The moment
+    // `tenant-theme.ts` started honouring it, the manifest being wrong about
+    // tenant #1's own colour would have REPAINTED 1platform.pro — the exact
+    // regression the epic's byte-for-byte criterion exists to catch. Verified
+    // against live production: `1platform.pro` serves `--cobalt:#1748a7`.
+    accent: '#1748a7',
     accent_contrast: '#ffffff',
     display_font: 'instrument-serif',
   },

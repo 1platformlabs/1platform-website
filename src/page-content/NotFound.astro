@@ -26,16 +26,26 @@ const description = t('notFound.description');
 const published = new Set(Astro.locals.tenant.pages);
 const internal = (route: string) => (published.has(route) ? l(route) : null);
 
-const candidates: { icon: IconName; label: string; detail: string; href: string | null }[] = [
-  { icon: 'home', label: t('breadcrumb.home'), detail: t('notFound.destination.home.detail'), href: internal('/') },
-  { icon: 'layers', label: t('nav.solutions'), detail: t('notFound.destination.solutions.detail'), href: internal('/solutions/') },
-  { icon: 'logs', label: t('nav.docs'), detail: t('notFound.destination.docs.detail'), href: docsUrl(Astro.locals) },
-  { icon: 'content', label: t('nav.blog'), detail: t('notFound.destination.blog.detail'), href: internal('/blog/') },
+/**
+ * ⚠️ LAS ETIQUETAS SE TRADUCEN DESPUÉS DE FILTRAR, y ése es el punto.
+ *
+ * Construidas con la lista —`label: t('nav.docs')` dentro del literal— las
+ * cuatro se traducían SIEMPRE, incluidas las que el filtro descarta una línea
+ * más abajo. Y `t()` no cae a nada por diseño: lanza. Así que un inquilino sin
+ * documentación quedaba obligado a redactar el rótulo de una documentación que
+ * no tiene, o su 404 era un 500. Medido sobre la clínica: pedía `nav.docs` y
+ * los cuatro `notFound.destination.*.detail` para dibujar UN solo destino.
+ */
+const candidates: { icon: IconName; label: () => string; detail: () => string; href: string | null }[] = [
+  { icon: 'home', label: () => t('breadcrumb.home'), detail: () => t('notFound.destination.home.detail'), href: internal('/') },
+  { icon: 'layers', label: () => t('nav.solutions'), detail: () => t('notFound.destination.solutions.detail'), href: internal('/solutions/') },
+  { icon: 'logs', label: () => t('nav.docs'), detail: () => t('notFound.destination.docs.detail'), href: docsUrl(Astro.locals) },
+  { icon: 'content', label: () => t('nav.blog'), detail: () => t('notFound.destination.blog.detail'), href: internal('/blog/') },
 ];
 
-const destinations = candidates.filter(
-  (d): d is { icon: IconName; label: string; detail: string; href: string } => d.href !== null,
-);
+const destinations = candidates
+  .filter((d): d is (typeof candidates)[number] & { href: string } => d.href !== null)
+  .map((d) => ({ icon: d.icon, label: d.label(), detail: d.detail(), href: d.href }));
 ---
 
 <!--
