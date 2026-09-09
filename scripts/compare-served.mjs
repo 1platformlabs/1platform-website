@@ -194,7 +194,12 @@ if (process.argv.includes('--self-test')) {
     {
       name: 'does NOT forgive unparseable JSON-LD (the D-32 failure)',
       a: LD('{"name":"X"}'),
-      b: LD('{"name":"</script><script>"}'.replace('</script>', '<\/script>')),
+      // Built by concatenation so this FILE never contains the literal
+      // sequence, which is the whole point of the case. The previous form was
+      // `.replace('</script>', '<\/script>')` — and in JavaScript `'<\/script>'`
+      // IS `'</script>'`, so it replaced the string with itself and the literal
+      // stayed in the source anyway. A no-op that looked like an escape.
+      b: LD('{"name":"<' + '/script><script>"}'),
       mustMatch: false,
     },
   ]

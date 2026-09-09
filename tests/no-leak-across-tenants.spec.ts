@@ -136,13 +136,24 @@ test('no tenant serves another tenant’s domain', async () => {
   // count F3 drove from 19 to 0 on the clinic's home; asserting it across the
   // whole estate is what stops it climbing back one page at a time.
   const tenants = repoTenants()
-  const foreign = new Map<string, RegExp[]>()
+
+  // Plain substring matching, NOT a regex built from the domain.
+  //
+  // The first version compiled `new RegExp(domain.replace(/\./g, '\\.'))`, and
+  // CodeQL was right to call it incomplete sanitisation: escaping only dots
+  // leaves every other metacharacter — a backslash above all — to change what
+  // the pattern means. The values here come from our own manifest, so it was
+  // not exploitable; it was still a pattern that goes wrong the day a domain
+  // arrives from somewhere else.
+  //
+  // A hostname has no case and no metacharacters worth honouring, so
+  // `includes` on a lowercased body answers the same question with nothing to
+  // escape.
+  const foreign = new Map<string, string[]>()
   for (const t of tenants) {
     foreign.set(
       t.slug,
-      tenants
-        .filter((o) => o.slug !== t.slug)
-        .map((o) => new RegExp(o.domain.replace(/\./g, '\\.'), 'i')),
+      tenants.filter((o) => o.slug !== t.slug).map((o) => o.domain.toLowerCase()),
     )
   }
   // Floor: with one tenant there is nothing to cross, and every assertion below
@@ -153,13 +164,14 @@ test('no tenant serves another tenant’s domain', async () => {
   let scanned = 0
 
   for (const page of surface()) {
-    const patterns = foreign.get(page.slug) ?? []
-    if (patterns.length === 0) continue
+    const others = foreign.get(page.slug) ?? []
+    if (others.length === 0) continue
     const res = await getWithHost(BASE + page.url, page.host)
     expect(res.status).toBe(200)
     scanned += 1
-    for (const pattern of patterns) {
-      if (pattern.test(res.body)) leaks.push(`${page.host}${page.url} contains ${pattern.source}`)
+    const body = res.body.toLowerCase()
+    for (const domain of others) {
+      if (body.includes(domain)) leaks.push(`${page.host}${page.url} contains ${domain}`)
     }
   }
 

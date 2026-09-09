@@ -85,6 +85,37 @@ function decode(s: string): string {
     .trim();
 }
 
+/**
+ * Drop the parts of a page that are not prose, for TEXT EXTRACTION.
+ *
+ * ⚠️ THIS IS NOT SANITISATION and must never be reused as such. It runs over
+ * HTML this very suite just rendered, and its only job is to stop the shared
+ * chrome from counting as a repeated paragraph. Nothing here is written back to
+ * a page or shown to anybody.
+ *
+ * It repeats each pass until the string stops changing, and that is not
+ * defensive dressing: a single non-greedy pass leaves the outer element of a
+ * NESTED pair behind (`<header>…<header>…</header>…</header>` loses the inner
+ * one and keeps the outer). CodeQL flagged exactly that shape, and while the
+ * input here is our own markup rather than an attacker's, the incompleteness
+ * was real — it would have let chrome through and inflated a count.
+ */
+function withoutChrome(raw: string): string {
+  const passes = [
+    /<(script|style|svg)\b[^>]*>[\s\S]*?<\/\1>/gi,
+    /<(header|footer)\b[\s\S]*?<\/\1>/gi,
+  ];
+  let html = raw;
+  for (const pass of passes) {
+    let previous: string;
+    do {
+      previous = html;
+      html = html.replace(pass, '');
+    } while (html !== previous);
+  }
+  return html;
+}
+
 test('no page renders the same paragraph twice', async () => {
   const offences: string[] = [];
   let inspected = 0;
@@ -94,8 +125,7 @@ test('no page renders the same paragraph twice', async () => {
   const pages = await publishedPages();
 
   for (const { route, html: raw } of pages) {
-    let html = raw.replace(/<(script|style|svg)\b[^>]*>[\s\S]*?<\/\1>/g, '');
-    html = html.replace(/<(header|footer)\b[\s\S]*?<\/\1>/g, '');
+    const html = withoutChrome(raw);
 
     const counts = new Map<string, number>();
     for (const m of html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/g)) {
