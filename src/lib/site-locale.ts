@@ -136,7 +136,26 @@ export function makeLocalizePath(
   return (href: string, locale: Locale) => {
     if (!href.startsWith('/')) return href
     const canonical = stripLocale(href)
-    if (locale === fallback) return canonical
-    return localizePath(canonical, locale)
+
+    if (locale !== fallback) return localizePath(canonical, locale)
+
+    // The default locale owns the root — but "the root" is not the same as "the
+    // English slug". A route is stored canonically (`/contact/`) because that is
+    // its IDENTITY across languages; the address a visitor sees is a separate
+    // question. For a tenant whose default is Spanish, returning the canonical
+    // unchanged would publish `/contact/` on a Spanish-only site: an English
+    // word in the one place a searcher reads before clicking.
+    //
+    // So the translation is applied and only the PREFIX is dropped, because the
+    // prefix is what marks a non-default language and this locale is the
+    // default.
+    //
+    // ⚠️ Limitation, stated rather than hidden: `translateToEs` is the only
+    // route map this build has, so this branch is correct for `es` and would
+    // need a map of its own for a third language. `localesOf` already refuses
+    // any locale outside `LOCALES`, so that case cannot arrive silently.
+    if (fallback === 'es') return localizePath(canonical, 'es').replace(/^\/es(?=\/|$)/, '') || '/'
+
+    return canonical
   }
 }

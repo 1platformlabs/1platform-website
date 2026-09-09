@@ -3,6 +3,18 @@ import Logo from '@components/Logo.astro';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
 import { useI18n, type Locale } from '@i18n';
 
+/**
+ * An internal menu entry, or nothing when this tenant does not publish it.
+ *
+ * The menu used to be a fixed list, so a tenant publishing one page still
+ * offered eighteen — every one of them a 404, because the middleware refuses a
+ * route the manifest does not publish. The page set became a datum and the
+ * navigation did not.
+ */
+function published(route: string): string | null {
+  return Astro.locals.tenant.pages.includes(route) ? l(route) : null;
+}
+
 type SubItem = { label: string; href: string };
 type NavItem = { label: string; href: string; subItems?: SubItem[] };
 
@@ -35,25 +47,38 @@ const { app: appUrl, docs: docsUrl } = Astro.locals.tenant.destinations;
  * after the three protagonists, so a menu entry aimed at agencies was occupying
  * a slot on the page that speaks to shopkeepers.
  */
-const solutions: SubItem[] = [
-  { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
-  { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
-  { label: t('nav.solutions.deliveries'), href: l('/solutions/deliveries/') },
-  { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
-  { label: t('nav.solutions.content'), href: l('/solutions/content/') },
-];
+const solutions: SubItem[] = (
+  [
+    ['nav.solutions.onlineStore', '/solutions/online-store/'],
+    ['nav.solutions.payments', '/payments-invoicing/'],
+    ['nav.solutions.deliveries', '/solutions/deliveries/'],
+    ['nav.solutions.ads', '/solutions/ads/'],
+    ['nav.solutions.content', '/solutions/content/'],
+  ] as const
+)
+  .map(([key, route]) => ({ label: t(key), href: published(route) }))
+  .filter((item): item is SubItem => item.href !== null);
+
+const solutionsHref = published('/solutions/');
+const pricingHref = published('/pricing/');
+const blogHref = published('/blog/');
 
 const navItems: NavItem[] = [
-  { label: t('nav.solutions'), href: l('/solutions/'), subItems: solutions },
+  // The parent entry survives only if the tenant publishes the hub itself; the
+  // children are filtered on their own, so a tenant with two solutions gets a
+  // menu of two rather than a menu of five pointing at three 404s.
+  ...(solutionsHref
+    ? [{ label: t('nav.solutions'), href: solutionsHref, subItems: solutions }]
+    : []),
   // "Features" is gone: it was a smaller copy of /solutions/ — twelve of its
   // twenty-one headings appeared there verbatim, every destination it linked
   // was already linked there, and no page body on the site pointed at it.
-  { label: t('nav.pricing'), href: l('/pricing/') },
+  ...(pricingHref ? [{ label: t('nav.pricing'), href: pricingHref }] : []),
   // Docs only when the tenant HAS docs. A clinic has no developer portal, and
   // the wrong answers are all worse than absence: an empty href, a dead link,
   // or — the one this epic exists to prevent — a link to the platform's own.
   ...(docsUrl ? [{ label: t('nav.docs'), href: docsUrl }] : []),
-  { label: t('nav.blog'), href: l('/blog/') },
+  ...(blogHref ? [{ label: t('nav.blog'), href: blogHref }] : []),
 ];
 
 const currentPath = Astro.url.pathname;
@@ -65,19 +90,26 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
     <Logo class="site-header__logo" />
 
     <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
-      <details class="site-header__solutions">
-        <summary class:list={['site-header__link', 'nav-link', { 'is-active': isActive(l('/solutions/')) }]}>
-          {t('nav.solutions')}<span class="site-header__chevron" aria-hidden="true"></span>
-        </summary>
-        <div class="solutions-menu">
-          <ul>
-            {solutions.map((item) => (
-              <li><a href={item.href}>{item.label}</a></li>
-            ))}
-          </ul>
-          <a href={l('/solutions/')} class="solutions-menu__all">{t('nav.solutions.viewAll')}</a>
-        </div>
-      </details>
+      {/* The dropdown is rendered only when the tenant publishes the hub it
+          opens. Without this it drew for EVERY tenant, and for one that
+          publishes a single page the result was the worst possible shape: a
+          "Soluciones" menu with an EMPTY list and a "Ver todas las soluciones"
+          link straight to a 404. Measured on the clinic's home. */}
+      {solutionsHref && (
+        <details class="site-header__solutions">
+          <summary class:list={['site-header__link', 'nav-link', { 'is-active': isActive(solutionsHref) }]}>
+            {t('nav.solutions')}<span class="site-header__chevron" aria-hidden="true"></span>
+          </summary>
+          <div class="solutions-menu">
+            <ul>
+              {solutions.map((item) => (
+                <li><a href={item.href}>{item.label}</a></li>
+              ))}
+            </ul>
+            <a href={solutionsHref} class="solutions-menu__all">{t('nav.solutions.viewAll')}</a>
+          </div>
+        </details>
+      )}
       {navItems.slice(1).map((item) => (
         <a href={item.href} class:list={['site-header__link', { 'is-active': isActive(item.href) }]}>
           {item.label}
@@ -109,7 +141,11 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
             {item.subItems && (
               <ul class="mobile-menu__sublist">
                 {item.subItems.map((sub) => <li><a href={sub.href}>{sub.label}</a></li>)}
-                <li><a href={l('/solutions/')}>{t('nav.solutions.viewAll')}</a></li>
+                {/* Only reachable when `item.subItems` exists, which only
+                    happens when the hub is published — but spelled out rather
+                    than inferred, because that coupling lives in another
+                    variable and a future edit could break it silently. */}
+                {solutionsHref && <li><a href={solutionsHref}>{t('nav.solutions.viewAll')}</a></li>}
               </ul>
             )}
           </li>

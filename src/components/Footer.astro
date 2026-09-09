@@ -6,31 +6,41 @@ const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 /** The chrome's outbound links, as DATA (D-7). Absent means not rendered. */
 const { app: appUrl, docs: docsUrl } = Astro.locals.tenant.destinations;
+
+/** An internal footer link, or nothing when this tenant does not publish it. */
+function published(route: string): string | null {
+  return Astro.locals.tenant.pages.includes(route) ? l(route) : null;
+}
+
+/** Drop the entries whose destination this tenant does not have. */
+function kept(links: { label: string; href: string | null }[]) {
+  return links.filter((x): x is { label: string; href: string } => x.href !== null);
+}
 type Column = { key: string; title: string; links: { label: string; href: string }[] };
 
-const columns: Column[] = [
+const allColumns: Column[] = [
   {
-    key: 'product', title: t('footer.col.product'), links: [
-      { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
-      { label: t('nav.solutions.content'), href: l('/solutions/content/') },
-      { label: t('nav.solutions.deliveries'), href: l('/solutions/deliveries/') },
-      { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
-      { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
-      { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
-      { label: t('footer.link.allSolutions'), href: l('/solutions/') },
-    ],
+    key: 'product', title: t('footer.col.product'), links: kept([
+      { label: t('nav.solutions.onlineStore'), href: published('/solutions/online-store/') },
+      { label: t('nav.solutions.content'), href: published('/solutions/content/') },
+      { label: t('nav.solutions.deliveries'), href: published('/solutions/deliveries/') },
+      { label: t('nav.solutions.ads'), href: published('/solutions/ads/') },
+      { label: t('nav.solutions.whitelabel'), href: published('/solutions/whitelabel/') },
+      { label: t('nav.solutions.payments'), href: published('/payments-invoicing/') },
+      { label: t('footer.link.allSolutions'), href: published('/solutions/') },
+    ]),
   },
   {
-    key: 'company', title: t('footer.col.company'), links: [
-      { label: t('footer.link.about'), href: l('/about/') },
-      { label: t('nav.pricing'), href: l('/pricing/') },
-      { label: t('footer.link.forAgencies'), href: l('/for-agencies/') },
-      { label: t('footer.link.forDevelopers'), href: l('/for-developers/') },
-      { label: t('nav.blog'), href: l('/blog/') },
-    ],
+    key: 'company', title: t('footer.col.company'), links: kept([
+      { label: t('footer.link.about'), href: published('/about/') },
+      { label: t('nav.pricing'), href: published('/pricing/') },
+      { label: t('footer.link.forAgencies'), href: published('/for-agencies/') },
+      { label: t('footer.link.forDevelopers'), href: published('/for-developers/') },
+      { label: t('nav.blog'), href: published('/blog/') },
+    ]),
   },
   {
-    key: 'resources', title: t('footer.col.resources'), links: [
+    key: 'resources', title: t('footer.col.resources'), links: kept([
       // The three documentation links only exist when the tenant HAS docs
       // (D-7). A tenant without a developer portal gets a Resources column with
       // just its changelog — not three dead links, and emphatically not three
@@ -42,16 +52,23 @@ const columns: Column[] = [
             { label: t('footer.link.codeExamples'), href: docsUrl },
           ]
         : []),
-      { label: t('footer.link.changelog'), href: l('/changelog/') },
-    ],
+      { label: t('footer.link.changelog'), href: published('/changelog/') },
+    ]),
   },
 ];
 
-const legal = [
-  { label: t('footer.link.terms'), href: l('/terms/') },
-  { label: t('footer.link.privacy'), href: l('/privacy/') },
-  { label: t('footer.link.cookiePreferences'), href: l('/cookies/') },
-];
+// A column whose every destination this tenant lacks is dropped whole: an
+// empty column with a heading reads as a broken page, not as a shorter site.
+const columns = allColumns.filter((c) => c.links.length > 0);
+
+// A tenant with no legal pages of its own gets no legal row at all. The wrong
+// answer here is not an empty row — it is linking a visitor to the PLATFORM's
+// terms as if they governed the client's site.
+const legal = kept([
+  { label: t('footer.link.terms'), href: published('/terms/') },
+  { label: t('footer.link.privacy'), href: published('/privacy/') },
+  { label: t('footer.link.cookiePreferences'), href: published('/cookies/') },
+]);
 const year = new Date().getFullYear();
 ---
 

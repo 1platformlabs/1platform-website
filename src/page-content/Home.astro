@@ -10,6 +10,21 @@ import { siteOrigin } from '@lib/site-origin';
 import { appUrl } from '@lib/site-destinations';
 
 const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
+
+/**
+ * An internal destination, or nothing when this tenant does not publish it.
+ *
+ * The tables below are the composition's STRUCTURE and are shared by every
+ * tenant (D-20 forbids a composition per brand). Their destinations are not
+ * structure: a tenant that publishes one page had this home offering nine
+ * links, every one of them a 404 from the middleware. Filtering here keeps one
+ * composition and still lets the page set be a datum.
+ */
+const published = (route: string): string | null =>
+  Astro.locals.tenant.pages.includes(route) ? l(route) : null;
+
+const withHref = <T extends { href: string | null }>(rows: T[]) =>
+  rows.filter((r): r is T & { href: string } => r.href !== null);
 const title = t('home.title');
 const description = t('home.description');
 
@@ -25,44 +40,44 @@ type JourneyStep = {
  * share a product destination but remain separate moments in the story: that
  * distinction is what makes automatic invoicing visible at first glance.
  */
-const journey: JourneyStep[] = [
+const journey: JourneyStep[] = withHref([
   {
     icon: 'store',
     title: t('home.flow.store.title'),
     body: t('home.flow.store.description'),
-    href: l('/solutions/online-store/'),
+    href: published('/solutions/online-store/'),
   },
   {
     icon: 'card',
     title: t('home.flow.payment.title'),
     body: t('home.flow.payment.description'),
-    href: l('/payments-invoicing/'),
+    href: published('/payments-invoicing/'),
   },
   {
     icon: 'invoice',
     title: t('home.flow.invoice.title'),
     body: t('home.flow.invoice.description'),
-    href: l('/payments-invoicing/'),
+    href: published('/payments-invoicing/'),
   },
   {
     icon: 'truck',
     title: t('home.flow.delivery.title'),
     body: t('home.flow.delivery.description'),
-    href: l('/solutions/deliveries/'),
+    href: published('/solutions/deliveries/'),
   },
-];
+]);
 
 /** Ordered by distance from the sale, nearest first. */
-const tools = [
-  { label: t('home.tools.ads'), href: l('/solutions/ads/') },
-  { label: t('home.tools.content'), href: l('/solutions/content/') },
-];
+const tools = withHref([
+  { label: t('home.tools.ads'), href: published('/solutions/ads/') },
+  { label: t('home.tools.content'), href: published('/solutions/content/') },
+]);
 
-const audiences = [
-  { title: t('home.useCase.merchants.title'), body: t('home.useCase.merchants.description'), href: l('/solutions/online-store/') },
-  { title: t('home.useCase.agencies.title'), body: t('home.useCase.agencies.description'), href: l('/for-agencies/') },
-  { title: t('home.useCase.developers.title'), body: t('home.useCase.developers.description'), href: l('/for-developers/') },
-];
+const audiences = withHref([
+  { title: t('home.useCase.merchants.title'), body: t('home.useCase.merchants.description'), href: published('/solutions/online-store/') },
+  { title: t('home.useCase.agencies.title'), body: t('home.useCase.agencies.description'), href: published('/for-agencies/') },
+  { title: t('home.useCase.developers.title'), body: t('home.useCase.developers.description'), href: published('/for-developers/') },
+]);
 
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: t('home.jsonld.name'), url: new URL(l('/'), siteOrigin(Astro.locals)).toString(), description },
@@ -137,7 +152,9 @@ const jsonLd = [
             </a>
           ))}
         </div>
-        <a href={l('/solutions/')} class="product-text-link">{t('nav.solutions.viewAll')}<Icon name="arrow-right" size={16} /></a>
+        {published('/solutions/') && (
+          <a href={published('/solutions/')} class="product-text-link">{t('nav.solutions.viewAll')}<Icon name="arrow-right" size={16} /></a>
+        )}
       </div>
     </div>
   </section>

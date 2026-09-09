@@ -106,7 +106,10 @@ const alternateLinks = (Object.entries(alternates) as [Locale, string][]).map(
 // and en-CA readers — exactly what the language rule says must not happen.
 const xDefault = alternates.en ? new URL(alternates.en, siteOrigin(Astro.locals)).toString() : null;
 
-const rssPath = l('/rss.xml');
+// The feed follows the section it describes. A tenant that does not publish a
+// blog has no feed — `/rss.xml` answers 404 for it by design — so advertising
+// one in every page's <head> pointed readers and crawlers at nothing.
+const rssPath = tenant.pages.includes('/blog/') ? l('/rss.xml') : null;
 
 // The announcement bar shows the newest changelog entry of this language, or
 // nothing at all (D-9). The layout decides here, because the bar's 40 px move
@@ -269,12 +272,14 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
 
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title={t('layout.rssTitle')}
-      href={rssPath}
-    />
+    {rssPath && (
+      <link
+        rel="alternate"
+        type="application/rss+xml"
+        title={t('layout.rssTitle')}
+        href={rssPath}
+      />
+    )}
 
     <ClientRouter />
 

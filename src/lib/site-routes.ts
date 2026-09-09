@@ -1,3 +1,4 @@
+import type { Locale } from '@i18n/ui'
 import { translateFromEs, translateToEs } from '@i18n/routes'
 import type { SiteTenant } from './site-api'
 import { localesOf, makeLocalizePath } from './site-locale'
@@ -278,4 +279,34 @@ export function isPublishedRequest(pathname: string, tenant: SiteTenant): boolea
   if (pathname === '/404' || pathname === '/404/') return true
 
   return published.has(canonicalRouteOf(pathname, tenant))
+}
+
+/**
+ * An internal link, or `null` when this tenant does not publish that page.
+ *
+ * ⚠️ THE CHROME'S LINKS ARE NOT DERIVED FROM ANYTHING ELSE, and that was a
+ * measured defect: `Header.astro` and `Footer.astro` build their menus from
+ * hard-coded lists, so the clinic's home — a tenant publishing exactly ONE
+ * page — linked to eighteen it does not have:
+ *
+ *   /precios/  /soluciones/  /soluciones/envios/  /soluciones/publicidad/
+ *   /soluciones/tienda-online/  /soluciones/marca-blanca/  /blog/  /nosotros/
+ *   /novedades/  /para-agencias/  /para-desarrolladores/  /pagos-y-facturacion/
+ *   /privacidad/  /terminos/  /cookies/  …
+ *
+ * Every one of them answers 404, because the middleware refuses a route the
+ * manifest does not publish. So the page set became a datum and the NAVIGATION
+ * did not, which produces the worst version of both: a site that refuses the
+ * page and still invites the visitor to it.
+ *
+ * Takes the canonical route and returns the tenant's own address for it, so a
+ * caller cannot accidentally check one spelling and link another.
+ */
+export function publishedLink(
+  tenant: SiteTenant,
+  canonicalRoute: string,
+  localise: (href: string, locale: Locale) => string,
+  locale: Locale,
+): string | null {
+  return tenant.pages.includes(canonicalRoute) ? localise(canonicalRoute, locale) : null
 }
