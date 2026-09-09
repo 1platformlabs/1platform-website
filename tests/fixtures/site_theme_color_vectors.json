@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "color_space": "srgb",
+  "rounding": "floor(channel * source_weight + target * (1 - source_weight) + 0.5)",
+  "weights": {
+    "hover": 0.84,
+    "soft": 0.1,
+    "bright": 0.44
+  },
+  "surfaces": {
+    "page": "#ffffff",
+    "card": "#f7f7f5",
+    "footer": "#111720",
+    "footer_ink": "#13151a"
+  },
+  "minimum_ratios": {
+    "accent_contrast_on_accent": 4.5,
+    "accent_on_page": 3.0,
+    "accent_on_card": 3.0,
+    "bright_on_footer": 3.0,
+    "footer_ink_on_bright": 4.5
+  },
+  "vectors": [
+    {
+      "name": "oneplatform",
+      "accent": "#1748a7",
+      "accent_contrast": "#ffffff",
+      "tokens": {
+        "accent": "#1748a7",
+        "hover": "#133c8c",
+        "soft": "#e8edf6",
+        "bright": "#99aed8",
+        "glow": "rgba(23, 72, 167, 0.07)",
+        "ring": "rgba(23, 72, 167, 0.28)"
+      },
+      "ratios": {
+        "accent_contrast_on_accent": 8.328767,
+        "accent_on_page": 8.328767,
+        "accent_on_card": 7.764652,
+        "bright_on_footer": 8.05351,
+        "footer_ink_on_bright": 8.17522
+      }
+    },
+    {
+      "name": "clinicas",
+      "accent": "#0f766e",
+      "accent_contrast": "#ffffff",
+      "tokens": {
+        "accent": "#0f766e",
+        "hover": "#0d635c",
+        "soft": "#e7f1f1",
+        "bright": "#95c3bf",
+        "glow": "rgba(15, 118, 110, 0.07)",
+        "ring": "rgba(15, 118, 110, 0.28)"
+      },
+      "ratios": {
+        "accent_contrast_on_accent": 5.47325,
+        "accent_on_page": 5.47325,
+        "accent_on_card": 5.102542,
+        "bright_on_footer": 9.283596,
+        "footer_ink_on_bright": 9.423896
+      }
+    },
+    {
+      "name": "round-half-up",
+      "accent": "#0a0a0a",
+      "accent_contrast": "#ffffff",
+      "tokens": {
+        "accent": "#0a0a0a",
+        "hover": "#080808",
+        "soft": "#e7e7e7",
+        "bright": "#939393",
+        "glow": "rgba(10, 10, 10, 0.07)",
+        "ring": "rgba(10, 10, 10, 0.28)"
+      },
+      "ratios": {
+        "accent_contrast_on_accent": 19.798146,
+        "accent_on_page": 19.798146,
+        "accent_on_card": 18.4572,
+        "bright_on_footer": 5.856,
+        "footer_ink_on_bright": 5.9445
+      }
+    }
+  ]
+}

@@ -38,7 +38,14 @@
  * stop shipping.
  */
 
-import { LOCALES, localizePath, stripLocale, type Locale } from '@i18n/ui'
+import {
+  LOCALES,
+  alternatesForPath,
+  localizePath,
+  stripLocale,
+  type Locale,
+} from '@i18n/ui'
+import { translateFromEs } from '@i18n/routes'
 import type { SiteTenant } from './site-api'
 
 export class UnsupportedTenantLocale extends Error {
@@ -117,6 +124,113 @@ export function isMultilingual(tenant: SiteTenant): boolean {
 }
 
 /**
+ * The locale-independent route identity for one tenant URL.
+ *
+ * `stripLocale` deliberately understands only 1Platform's public topology
+ * (English at the root, Spanish below `/es/`). A tenant whose default is
+ * Spanish reverses that topology: `/contacto/` is its Spanish root URL and
+ * `/en/contact/` is the English twin. Treating the former as an English
+ * canonical route silently drops both alternates because the manifest stores
+ * `/contact/`.
+ */
+export function canonicalPathForTenant(pathname: string, tenant: SiteTenant): string {
+  const fallback = defaultLocaleOf(tenant)
+  if (fallback === 'en') return stripLocale(pathname)
+
+  if (pathname === '/en' || pathname === '/en/') return '/'
+  if (pathname.startsWith('/en/')) return pathname.slice('/en'.length)
+
+  // `translateFromEs` expects the established `/es/…` topology. Add that
+  // prefix only for the lookup, then keep the canonical route it returns.
+  const spanish = pathname === '/' ? '/es/' : `/es${pathname}`
+  return translateFromEs(spanish)
+}
+
+function withoutLocalePrefix(pathname: string, locale: Locale): string {
+  const prefix = `/${locale}`
+  if (pathname === prefix || pathname === `${prefix}/`) return '/'
+  return pathname.startsWith(`${prefix}/`) ? pathname.slice(prefix.length) : pathname
+}
+
+/** Canonical identity of a locale-labelled candidate, independent of topology. */
+function canonicalCandidate(locale: Locale, pathname: string): string {
+  if (locale === 'es') {
+    const spanish =
+      pathname === '/es' || pathname.startsWith('/es/')
+        ? pathname
+        : pathname === '/'
+          ? '/es/'
+          : `/es${pathname}`
+    return translateFromEs(spanish)
+  }
+
+  return withoutLocalePrefix(pathname, 'en')
+}
+
+/** Move a locale-labelled candidate under this tenant's prefix convention. */
+function candidateForTenant(
+  pathname: string,
+  locale: Locale,
+  fallback: Locale,
+): string {
+  const unprefixed = withoutLocalePrefix(pathname, locale)
+  if (locale === fallback) return unprefixed
+  return unprefixed === '/' ? `/${locale}/` : `/${locale}${unprefixed}`
+}
+
+/**
+ * Language destinations this tenant can truthfully advertise for one page.
+ *
+ * `alternatesForPath` remains the source of the established 1Platform pairing
+ * (including translated slugs and insertion order). This boundary narrows that
+ * candidate map by the tenant's declared locales and published canonical page
+ * set. A monolingual tenant therefore returns an empty object: no alternate,
+ * no `x-default`, no language selector and no detector destination can point
+ * at a tree it does not publish.
+ *
+ * Content pages may pass a narrower candidate map (for example, a blog post
+ * whose translation does not exist). The same filtering is applied, so an
+ * explicit map cannot bypass the tenant manifest.
+ */
+export function alternatesForTenantPath(
+  tenant: SiteTenant,
+  pathname: string,
+  candidates?: Partial<Record<Locale, string>>,
+): Partial<Record<Locale, string>> {
+  const locales = localesOf(tenant)
+  if (locales.length < 2) return {}
+
+  const fallback = locales[0]
+  const supplied = candidates !== undefined
+  const candidateMap = supplied
+    ? candidates
+    : fallback === 'en'
+      // Keep the established map — including property order — byte-for-byte
+      // for tenant #1. The other branch needs the tenant's reversed topology.
+      ? alternatesForPath(pathname)
+      : Object.fromEntries(
+          locales.map((locale) => [
+            locale,
+            makeLocalizePath(tenant)(canonicalPathForTenant(pathname, tenant), locale),
+          ]),
+        )
+
+  const published = new Set(tenant.pages)
+  const result: Partial<Record<Locale, string>> = {}
+  for (const locale of locales) {
+    const path = candidateMap[locale]
+    if (!path?.startsWith('/')) continue
+    if (!published.has(canonicalCandidate(locale, path))) continue
+    // Explicit content alternates are built by the established i18n helpers,
+    // so adapt their prefix while preserving their locale-specific slug. This
+    // matters for translated blog slugs, which cannot be regenerated from the
+    // current URL alone.
+    result[locale] = supplied ? candidateForTenant(path, locale, fallback) : path
+  }
+  return result
+}
+
+/**
  * The path localiser for one tenant.
  *
  * `localizePath` in `src/i18n/ui.ts` bakes in 1Platform's topology: the DEFAULT
@@ -137,7 +251,12 @@ export function makeLocalizePath(
     if (!href.startsWith('/')) return href
     const canonical = stripLocale(href)
 
-    if (locale !== fallback) return localizePath(canonical, locale)
+    if (locale !== fallback) {
+      if (fallback === 'es' && locale === 'en') {
+        return canonical === '/' ? '/en/' : `/en${canonical}`
+      }
+      return localizePath(canonical, locale)
+    }
 
     // The default locale owns the root — but "the root" is not the same as "the
     // English slug". A route is stored canonically (`/contact/`) because that is

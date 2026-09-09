@@ -1,26 +1,24 @@
----import { useI18n } from '@i18n';
+---
+import { useI18n } from '@i18n';
 const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
-
 
 /**
  * The wordmark, drawn from the tenant's own brand.
  *
- * The first character is set as a node — a rounded square in the tenant's
- * accent, the same shape the interconnect schematic uses for a capability —
- * but ONLY when that character is a digit. `1Platform`'s `1` is a numeral
- * doing the work of a glyph, not the initial of a word; boxing it and running
- * the rest as text is a deliberate motif for that one brand. Applying the same
- * cut to a brand that starts with a letter does not draw a motif, it cuts a
- * word in half — measured on the clinic tenant, `Clínica Delta` render as a
- * boxed "C" and the text "línica Delta" on every page (issue #92). So a
- * letter-led wordmark gets no box at all: the mark is empty and the full name
- * runs as text.
+ * The tenant's explicit mark is set as a node: a rounded square in its accent,
+ * the same shape the interconnect schematic uses for a capability. The wordmark
+ * and the motif are the same drawing at two scales.
  *
  * ⚠️ This file used to paint `1` and `Platform` as two literals, and Header AND
  * Footer both mount it — so on a client's domain every page carried the
  * platform's name. That is not an aesthetic detail: it is the acceptance
  * criterion of this epic (cero marca de plataforma en el HTML del inquilino)
  * failing on the chrome before anyone looked at the content.
+ *
+ * Mark and wordmark are separate manifest fields. This component must not infer
+ * their relationship from `brand_name`: `C` + `Clínica Delta` is a valid lockup,
+ * while cutting the name would produce the broken `C` + `línica Delta`. A tenant
+ * without a mark degrades to the complete wordmark with no empty box.
  */
 interface Props {
   /** Accessible label for the logo link. */
@@ -30,21 +28,40 @@ interface Props {
 }
 
 const { label, class: className } = Astro.props;
-const accessibleLabel = label ?? t('layout.logoLabel');
-
 const tenant = Astro.locals.tenant;
-const wordmark = tenant.brand_mark ?? tenant.brand_name;
-// A leading digit reads as a glyph (1Platform's "1"); a leading letter is the
-// start of a word, and chopping it off breaks the word instead of drawing a
-// motif — see the comment above.
-const boxesLeadingGlyph = /^[0-9]/.test(wordmark);
-const mark = boxesLeadingGlyph ? wordmark.slice(0, 1) : '';
-const rest = boxesLeadingGlyph ? wordmark.slice(1) : wordmark;
+const translatedLabel = t('layout.logoLabel');
+// Keep tenant #1's historical, localised label byte-for-byte. A tenant whose
+// catalogue accidentally carries somebody else's label still gets its own
+// complete name instead of leaking that copy into the accessible surface.
+const accessibleLabel =
+  label ?? (translatedLabel.includes(tenant.brand_name) ? translatedLabel : tenant.brand_name);
+const mark = tenant.brand_mark?.trim() || null;
+const wordmark = tenant.brand_wordmark?.trim() || tenant.brand_name;
+const wordmarkStyle = tenant.theme.display_font === 'instrument-serif'
+  ? 'font-weight:400'
+  : undefined;
+const homeHref = tenant.pages.includes('/') ? l('/') : null;
 ---
 
-<a href={l('/')} class:list={['logo', className]} aria-label={accessibleLabel}>
-  {mark && <span class="logo__mark" aria-hidden="true">{mark}</span>}<span class="logo__text">{rest}</span>
-</a>
+{homeHref ? (
+  <a
+    href={homeHref}
+    class:list={['logo', className]}
+    aria-label={accessibleLabel}
+    style={wordmarkStyle}
+  >
+    {mark && <span class="logo__mark" aria-hidden="true">{mark}</span>}<span class="logo__text">{wordmark}</span>
+  </a>
+) : (
+  <span
+    class:list={['logo', className]}
+    role="img"
+    aria-label={tenant.brand_name}
+    style={wordmarkStyle}
+  >
+    {mark && <span class="logo__mark" aria-hidden="true">{mark}</span>}<span class="logo__text" aria-hidden="true">{wordmark}</span>
+  </span>
+)}
 
 <style>
   .logo {

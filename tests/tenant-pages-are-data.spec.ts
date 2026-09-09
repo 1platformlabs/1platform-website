@@ -145,6 +145,7 @@ interface SiteRoutesModule {
   publishedUrls(tenant: SiteTenant): Promise<Array<{ path: string; alternates: Array<{ lang: string; path: string }> }>>
   unservedRoutes(tenant: SiteTenant): string[]
   canonicalRouteOf(pathname: string, tenant: SiteTenant): string
+  physicalRouteOf(pathname: string, tenant: SiteTenant): string
   isPublishedRequest(pathname: string, tenant: SiteTenant): boolean
 }
 
@@ -216,9 +217,11 @@ function fakeTenant(over: Partial<SiteTenant>): SiteTenant {
     slug: 'fake',
     brand_name: 'Fake',
     brand_mark: null,
+    brand_wordmark: 'Fake',
     domain: 'fake.example',
     locales: ['en'],
     default_locale: 'en',
+    home_template: 'platform-commerce',
     theme: { accent: '#000000', accent_contrast: '#ffffff', display_font: 'system-sans' },
     destinations: { docs: null, app: null, support: null, status: null },
     pages: ['/'],
@@ -264,9 +267,9 @@ test('canonicalRouteOf reads the tenant topology, not a hard-coded /es/', async 
   expect(routes.canonicalRouteOf('/es/soluciones/envios/', platform)).toBe('/solutions/deliveries/')
   expect(routes.canonicalRouteOf('/pricing/', platform)).toBe('/pricing/')
 
-  // Default `es`: this tenant's Spanish IS the root, so there is no prefix to
-  // strip and no translation to undo. Stripping one here would map every address
-  // to a route the manifest does not list, and 404 the tenant's whole site.
+  // Default `es`: Spanish owns the root. An untranslated slug keeps its
+  // spelling; a translated one maps back to the locale-independent route that
+  // `tenant.pages` stores.
   expect(routes.canonicalRouteOf('/servicios/', clinic)).toBe('/servicios/')
   expect(routes.canonicalRouteOf('/', clinic)).toBe('/')
   expect(
@@ -283,6 +286,14 @@ test('canonicalRouteOf reads the tenant topology, not a hard-coded /es/', async 
     hardCoded('/es/precios/'),
     'the hard-coded rule agrees with the tenant-aware one, so this control cannot detect the bug',
   ).not.toBe(routes.canonicalRouteOf('/es/precios/', clinic))
+
+  const bilingualSpanish = fakeTenant({
+    locales: ['es', 'en'],
+    default_locale: 'es',
+    pages: ['/contact/'],
+  })
+  expect(routes.canonicalRouteOf('/contacto/', bilingualSpanish)).toBe('/contact/')
+  expect(routes.canonicalRouteOf('/en/contact/', bilingualSpanish)).toBe('/contact/')
 })
 
 test('publishedUrls enumerates 52 URLs for oneplatform, and every alternate is one of them', async () => {
@@ -327,6 +338,103 @@ test('publishedUrls enumerates 52 URLs for oneplatform, and every alternate is o
     clinicUrls.reduce((n, u) => n + u.alternates.length, 0),
     'a monolingual tenant announced language alternates',
   ).toBe(0)
+})
+
+test('default-es middleware gate and sitemap share translated route identities', async () => {
+  const { routes } = await loaded()
+  const tenant = fakeTenant({
+    locales: ['es', 'en'],
+    default_locale: 'es',
+    pages: ['/', '/contact/', '/solutions/deliveries/', '/blog/'],
+  })
+
+  const urls = await routes.publishedUrls(tenant)
+  expect(urls.map(({ path }) => path)).toEqual([
+    '/',
+    '/blog/',
+    '/contacto/',
+    '/en/',
+    '/en/blog/',
+    '/en/contact/',
+    '/en/solutions/deliveries/',
+    '/soluciones/envios/',
+  ])
+
+  const expectedAlternates = new Map([
+    ['/', { es: '/', en: '/en/' }],
+    ['/contacto/', { es: '/contacto/', en: '/en/contact/' }],
+    ['/en/', { es: '/', en: '/en/' }],
+    ['/en/blog/', { es: '/blog/', en: '/en/blog/' }],
+    ['/en/contact/', { es: '/contacto/', en: '/en/contact/' }],
+    [
+      '/en/solutions/deliveries/',
+      { es: '/soluciones/envios/', en: '/en/solutions/deliveries/' },
+    ],
+    ['/blog/', { es: '/blog/', en: '/en/blog/' }],
+    [
+      '/soluciones/envios/',
+      { es: '/soluciones/envios/', en: '/en/solutions/deliveries/' },
+    ],
+  ])
+  for (const url of urls) {
+    expect(
+      Object.fromEntries(url.alternates.map(({ lang, path }) => [lang, path])),
+      `${url.path}: wrong language pair`,
+    ).toEqual(expectedAlternates.get(url.path))
+    expect(
+      routes.isPublishedRequest(url.path, tenant),
+      `${url.path}: the sitemap nominates a URL the middleware refuses`,
+    ).toBe(true)
+  }
+
+  const published = new Set(urls.map(({ path }) => path))
+  expect(
+    urls.flatMap(({ alternates }) => alternates).filter(({ path }) => !published.has(path)),
+    'a default-es alternate points outside its own sitemap',
+  ).toEqual([])
+
+  expect(routes.isPublishedRequest('/pricing/', tenant)).toBe(false)
+  expect(routes.isPublishedRequest('/en/pricing/', tenant)).toBe(false)
+  expect(
+    routes.isPublishedRequest('/contact/', tenant),
+    'the canonical route identity must not become a second public URL',
+  ).toBe(false)
+  expect(
+    routes.isPublishedRequest('/es/contacto/', tenant),
+    'the platform /es topology must not become an alias under a Spanish-default tenant',
+  ).toBe(false)
+
+  expect(routes.physicalRouteOf('/contacto/', tenant)).toBe('/es/contacto/')
+  expect(routes.physicalRouteOf('/en/contact/', tenant)).toBe('/contact/')
+  expect(routes.physicalRouteOf('/rss.xml', tenant)).toBe('/es/rss.xml')
+  expect(routes.physicalRouteOf('/en/rss.xml', tenant)).toBe('/rss.xml')
+
+  const tenantWithChangelog = fakeTenant({
+    ...tenant,
+    pages: [...tenant.pages, '/changelog/'],
+  })
+  expect(routes.physicalRouteOf('/novedades/feed.xml', tenantWithChangelog)).toBe(
+    '/es/novedades/feed.xml',
+  )
+  expect(routes.physicalRouteOf('/en/changelog/feed.xml', tenantWithChangelog)).toBe(
+    '/changelog/feed.xml',
+  )
+
+  const platform = fakeTenant({
+    locales: ['en', 'es'],
+    default_locale: 'en',
+    pages: ['/', '/contact/', '/blog/'],
+  })
+  expect(
+    routes.isPublishedRequest('/es/contact/', platform),
+    'the existing Spanish moved-route must still reach Astro\'s 301',
+  ).toBe(true)
+  for (const path of ['/', '/contact/', '/es/contacto/', '/rss.xml', '/es/rss.xml']) {
+    expect(
+      routes.physicalRouteOf(path, platform),
+      `tenant #1 must not rewrite its established physical path ${path}`,
+    ).toBe(path)
+  }
 })
 
 test('the repo page list is the exporter’s list, byte for byte', async () => {

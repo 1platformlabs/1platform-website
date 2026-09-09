@@ -1,7 +1,12 @@
-import type { Locale } from '@i18n/ui'
-import { translateFromEs, translateToEs } from '@i18n/routes'
+import { LOCALES, localizePath, type Locale } from '@i18n/ui'
 import type { SiteTenant } from './site-api'
-import { localesOf, makeLocalizePath } from './site-locale'
+import {
+  canonicalPathForTenant,
+  defaultLocaleOf,
+  localeForRequest,
+  localesOf,
+  makeLocalizePath,
+} from './site-locale'
 
 /**
  * Every URL this site publishes, enumerated at request time.
@@ -111,29 +116,17 @@ export async function publishedUrls(tenant: SiteTenant): Promise<SiteUrl[]> {
 
   return all.map((path) => {
     if (!bilingual) return { path, alternates: [] }
-    // The canonical (English) address of this page, and its Spanish twin. The
-    // pairing is rebuilt from the route map rather than by stripping a prefix,
-    // because a translated slug (`/solutions/deliveries/` ->
-    // `/es/soluciones/envios/`) does not match by string equality and the naive
-    // version emits NO pair for either side, silently, on every translated page.
-    const canonical = path.startsWith('/es/') || path === '/es/' ? englishOf(path) : path
+    // Recover the locale-independent identity through THIS tenant's topology,
+    // then rebuild every twin through the same topology. Checking `/es/` here
+    // would work only while English is always the default: a Spanish-default
+    // tenant publishes `/contacto/` plus `/en/contact/`, neither of which has
+    // the platform's `/es/` marker.
+    const canonical = canonicalPathForTenant(path, tenant)
     return {
       path,
-      alternates: [
-        { lang: 'en', path: canonical },
-        { lang: 'es', path: translateToEs(canonical) },
-      ],
+      alternates: locales.map((locale) => ({ lang: locale, path: localise(canonical, locale) })),
     }
   })
-}
-
-/** The English address a Spanish one translates back to. */
-function englishOf(spanish: string): string {
-  // The route map owns the translated slugs; anything it does not know is an
-  // untranslated address whose English twin is the same path without the
-  // prefix — which is right for blog posts, whose slugs differ per language and
-  // are paired by the collection rather than by the map.
-  return translateFromEs(spanish)
 }
 
 /**
@@ -209,20 +202,71 @@ const SELF_GATED = new Set([
 ])
 
 /**
- * The canonical (default-locale) route a request address maps to.
+ * The locale-independent route a request address maps to.
  *
- * `/es/precios/` -> `/pricing/` for a tenant whose default is English; for a
- * tenant whose default IS Spanish there is no prefix to strip and the address
- * is already canonical.
+ * `/es/precios/` -> `/pricing/` for a tenant whose default is English;
+ * `/contacto/` and `/en/contact/` -> `/contact/` when Spanish is the default.
+ * This is the identity stored in `tenant.pages`, not necessarily the spelling
+ * visible at the tenant's root.
  */
 export function canonicalRouteOf(pathname: string, tenant: SiteTenant): string {
   const withSlash = pathname.endsWith('/') || pathname.includes('.') ? pathname : `${pathname}/`
-  const locales = localesOf(tenant)
-  const fallback = locales[0]
-  if (fallback === 'es') return withSlash
-  return withSlash.startsWith('/es/') || withSlash === '/es/'
-    ? translateFromEs(withSlash)
-    : withSlash
+  return canonicalPathForTenant(withSlash, tenant)
+}
+
+/** A locale prefix is public only for a declared, non-default locale. */
+function hasInvalidLocalePrefix(pathname: string, tenant: SiteTenant): boolean {
+  const declared = new Set(localesOf(tenant))
+  const fallback = defaultLocaleOf(tenant)
+
+  for (const locale of LOCALES) {
+    if (pathname !== `/${locale}` && !pathname.startsWith(`/${locale}/`)) continue
+    return locale === fallback || !declared.has(locale)
+  }
+  return false
+}
+
+/** The canonical content route behind a public URL, if this tenant publishes it. */
+function publishedContentRouteOf(pathname: string, tenant: SiteTenant): string | null {
+  if (hasInvalidLocalePrefix(pathname, tenant)) return null
+
+  const canonical = canonicalRouteOf(pathname, tenant)
+  const published = new Set(tenant.pages)
+
+  // The reversed topology has no legacy redirect table, so accept only the
+  // spelling that this tenant actually publishes. The default-English branch
+  // deliberately keeps accepting the platform's historical `/es/...` inputs;
+  // Astro's existing redirect map turns those into the established 301s.
+  if (defaultLocaleOf(tenant) === 'es') {
+    const requested = pathname.endsWith('/') || pathname.includes('.')
+      ? pathname
+      : `${pathname}/`
+    const expected = makeLocalizePath(tenant)(canonical, localeForRequest(pathname, tenant))
+    if (requested !== expected) return null
+  }
+
+  if (canonical === '/rss.xml') return published.has('/blog/') ? canonical : null
+  if (canonical === '/changelog/feed.xml') {
+    return published.has('/changelog/') ? canonical : null
+  }
+  return published.has(canonical) ? canonical : null
+}
+
+/**
+ * The fixed Astro file-router path that renders a tenant's public URL.
+ *
+ * The browser-facing topology can put Spanish at the root and English under
+ * `/en/`, while this build's physical files remain English at the root and
+ * Spanish under `/es/`. The middleware rewrites only when those topologies
+ * differ. Keeping the default-English branch byte-for-byte identical is
+ * deliberate: tenant #1 must never enter a rewrite it did not need before.
+ */
+export function physicalRouteOf(pathname: string, tenant: SiteTenant): string {
+  if (defaultLocaleOf(tenant) === 'en') return pathname
+
+  const canonical = publishedContentRouteOf(pathname, tenant)
+  if (canonical === null) return pathname
+  return localizePath(canonical, localeForRequest(pathname, tenant))
 }
 
 /**
@@ -268,17 +312,10 @@ export function isPublishedRequest(pathname: string, tenant: SiteTenant): boolea
     return true
   }
 
-  const published = new Set(tenant.pages)
-
-  // The feeds follow their section. `/rss.xml` and `/es/rss.xml` both describe
-  // the blog; the changelog feeds describe the changelog.
-  if (pathname.endsWith('/rss.xml') || pathname === '/rss.xml') return published.has('/blog/')
-  if (pathname.endsWith('feed.xml')) return published.has('/changelog/')
-
   // 404 is reachable by definition — it is what a refusal renders.
   if (pathname === '/404' || pathname === '/404/') return true
 
-  return published.has(canonicalRouteOf(pathname, tenant))
+  return publishedContentRouteOf(pathname, tenant) !== null
 }
 
 /**

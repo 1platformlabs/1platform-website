@@ -41,14 +41,15 @@ import type { SiteTenant } from '../lib/site-api'
 const ONEPLATFORM: SiteTenant = {
   slug: 'oneplatform',
   brand_name: '1Platform',
-  // `Logo.astro` boxes the wordmark's leading character ONLY when it is a
-  // digit — the "1" is a glyph, not the initial of a word (issue #92) — so the
-  // mark still needs to be its own datum rather than re-derived from the name,
-  // exactly as before.
-  brand_mark: '1Platform',
+  // Lockup parts are explicit. `Logo.astro` does not cut the brand name to
+  // guess where the boxed symbol ends, so a multi-character mark and a normal
+  // wordmark cannot corrupt each other.
+  brand_mark: '1',
+  brand_wordmark: 'Platform',
   domain: '1platform.pro',
   locales: ['en', 'es'],
   default_locale: 'en',
+  home_template: 'platform-commerce',
   theme: {
     // The values the site ships today, read from src/styles/global.css so the
     // conversion changes the SOURCE of the tokens and not the tokens.
@@ -67,13 +68,10 @@ const ONEPLATFORM: SiteTenant = {
     // against live production: `1platform.pro` serves `--cobalt:#1748a7`.
     accent: '#1748a7',
     accent_contrast: '#ffffff',
-    // ⚠️ This said `instrument-serif` and that is NOT what the site draws.
-    // `global.css` sets `--font-display` to Space Grotesk; Instrument Serif is
-    // loaded and used, but as `--font-serif`, never as the heading font. The
-    // same class of bug as the accent's glow above, and the same fix: read
-    // what the site actually ships (issue #94) rather than invent a mapping
-    // that would have repainted 1platform.pro's headings the moment
-    // `tenant-theme.ts` started honouring this field.
+    // This is the family `global.css` already compiles. The former
+    // `instrument-serif` value described loaded-but-unused data and would have
+    // repainted tenant #1 once the manifest started driving the document.
+    // Matching the real default lets the request-scoped emitter stay silent.
     display_font: 'space-grotesk',
   },
   destinations: {
@@ -143,14 +141,20 @@ const ONEPLATFORM: SiteTenant = {
 const CLINICAS: SiteTenant = {
   slug: 'clinicas',
   brand_name: 'Clínica Delta',
-  brand_mark: 'Clínica Delta',
+  brand_mark: 'C',
+  brand_wordmark: 'Clínica Delta',
   domain: 'clinicas.1platform.dev',
   locales: ['es'],
   default_locale: 'es',
+  // The repository catalogue is a published-manifest harness. Until the
+  // clinic supplies its real HTTPS support destination it cannot truthfully
+  // satisfy the `service-lead` publication invariant, so that strategy is
+  // exercised by the API-mode contractual fixture instead of inventing a URL.
+  home_template: 'platform-commerce',
   theme: {
     accent: '#0f766e',
     accent_contrast: '#ffffff',
-    display_font: 'system-serif',
+    display_font: 'instrument-serif',
   },
   destinations: {
     docs: null,

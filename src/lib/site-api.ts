@@ -10,18 +10,35 @@
  * silently and the reviewer sees a lockfile.
  */
 
+/** Closed values accepted by the API and safe to map to local code. */
+export const DISPLAY_FONTS = [
+  'space-grotesk',
+  'instrument-serif',
+  'system-serif',
+  'system-sans',
+  'system-mono',
+] as const
+
+export type DisplayFont = (typeof DISPLAY_FONTS)[number]
+
+export const HOME_TEMPLATES = ['platform-commerce', 'service-lead'] as const
+
+export type HomeTemplate = (typeof HOME_TEMPLATES)[number]
+
 /** The manifest, exactly as `GET /api/v1/sites/by-host` projects it. */
 export interface SiteTenant {
   slug: string
   brand_name: string
   brand_mark: string | null
+  brand_wordmark: string | null
   domain: string
   locales: string[]
   default_locale: string
+  home_template: HomeTemplate
   theme: {
     accent: string
     accent_contrast: string
-    display_font: string
+    display_font: DisplayFont
   }
   destinations: {
     docs: string | null
@@ -146,15 +163,17 @@ function isTenant(value: unknown): value is SiteTenant {
   const strOrNull = (v: unknown) => v === null || typeof v === 'string'
 
   if (!str(t.slug) || !str(t.brand_name) || !str(t.domain)) return false
-  if (!strOrNull(t.brand_mark)) return false
+  if (!strOrNull(t.brand_mark) || !strOrNull(t.brand_wordmark)) return false
   if (!strOrNull(t.google_site_verification)) return false
   if (!Array.isArray(t.locales) || t.locales.length === 0 || !t.locales.every(str)) return false
   if (!str(t.default_locale)) return false
+  if (!(HOME_TEMPLATES as readonly unknown[]).includes(t.home_template)) return false
   if (typeof t.indexable !== 'boolean') return false
   if (!Array.isArray(t.pages) || !t.pages.every((p) => typeof p === 'string')) return false
 
   const theme = t.theme as Record<string, unknown> | undefined
-  if (!theme || !str(theme.accent) || !str(theme.accent_contrast) || !str(theme.display_font)) return false
+  if (!theme || !str(theme.accent) || !str(theme.accent_contrast)) return false
+  if (!(DISPLAY_FONTS as readonly unknown[]).includes(theme.display_font)) return false
 
   const dest = t.destinations as Record<string, unknown> | undefined
   if (!dest) return false

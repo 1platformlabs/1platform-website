@@ -47,10 +47,12 @@ const TENANT_ONLY = 'COPY-DEL-INQUILINO-NO-DEL-REPO'
 const TENANT = {
   slug: 'stub',
   brand_name: 'Stub Brand',
-  brand_mark: 'Stub Brand',
+  brand_mark: 'S',
+  brand_wordmark: 'Stub Brand',
   domain: 'stub.example',
   locales: ['es'],
   default_locale: 'es',
+  home_template: 'platform-commerce',
   theme: { accent: '#0f766e', accent_contrast: '#ffffff', display_font: 'system-serif' },
   destinations: { docs: null, app: null, support: null, status: null },
   // One published route, which is exactly the shape that makes the 404 the
