@@ -91,3 +91,26 @@ export function themeDeclarations(tenant: SiteTenant): string {
 
   return out.length ? `:root{${out.join(';')}}` : ''
 }
+
+/**
+ * The tenant's mark as a short chip — two characters at most.
+ *
+ * Used where a drawing needs a stand-in for a logo (the invoice mockup in the
+ * hero scene, which had `1P` written into it as a literal). That literal was
+ * the platform's mark rendered on a client's landing page: `aria-hidden`, so
+ * no screen reader announced it, but plainly visible, and invisible to the
+ * brand sweep too — "1P" is far too short to put in a blocklist without
+ * matching half the dictionary.
+ *
+ * The rule is chosen so tenant #1 is unchanged, which is what keeps the
+ * byte-for-byte baseline: one word gives its first two characters
+ * (`1Platform` -> `1P`), several give the initial of the first two
+ * (`Clínica Delta` -> `CD`).
+ */
+export function brandChip(tenant: SiteTenant): string {
+  const source = (tenant.brand_mark ?? tenant.brand_name).trim()
+  const words = source.split(/\s+/).filter(Boolean)
+  if (words.length === 0) return ''
+  if (words.length === 1) return words[0].slice(0, 2)
+  return (words[0][0] ?? '') + (words[1][0] ?? '')
+}

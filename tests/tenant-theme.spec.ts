@@ -128,3 +128,37 @@ test('the SERVED page carries the tenant’s accent, and tenant #1 is untouched'
   const accents = new Set(repoTenants().map((t) => t.theme.accent.toLowerCase()))
   expect(accents.size, 'two tenants with the same accent cannot show that the theme is per-tenant').toBeGreaterThan(1)
 })
+
+/**
+ * The brand chip in the hero's invoice mockup.
+ *
+ * It was the literal `1P` — the platform's mark drawn onto a client's landing
+ * page. `aria-hidden`, so nothing announced it, but plainly visible, and no
+ * sweep could have caught it: "1P" is far too short to blocklist.
+ */
+test('the invoice mockup carries the TENANT’s mark, not the platform’s', async () => {
+  const { brandChip } = await import('../src/lib/tenant-theme')
+
+  // Tenant #1 must be unchanged — `1P` is what the frozen baseline holds, and
+  // every page carries this scene.
+  const platform = repoTenants().find((t) => t.slug === 'oneplatform')!
+  expect(brandChip(platform), 'tenant #1’s chip changed — that is the byte-for-byte baseline').toBe('1P')
+
+  const clinic = repoTenants().find((t) => t.slug === 'clinicas')!
+  expect(brandChip(clinic)).toBe('CD')
+
+  // Both shapes of the rule, so neither branch is untested.
+  expect(brandChip({ ...clinic, brand_mark: null, brand_name: 'Acme' })).toBe('Ac')
+  expect(brandChip({ ...clinic, brand_mark: null, brand_name: 'Acme Health Group' })).toBe('AH')
+  expect(brandChip({ ...clinic, brand_mark: null, brand_name: 'X' })).toBe('X')
+
+  // And in the SERVED page, which is the only place it matters.
+  for (const tenant of repoTenants()) {
+    if (!tenant.pages.includes('/')) continue
+    const res = await getWithHost(`${BASE}/`, tenant.domain)
+    expect(res.status).toBe(200)
+    const rendered = /invoice-preview__number"[^>]*>([^<]*)</.exec(res.body)?.[1]
+    expect(rendered, `${tenant.slug}: the invoice mockup rendered no chip at all`).toBeTruthy()
+    expect(rendered, `${tenant.slug} is serving somebody else’s mark`).toBe(brandChip(tenant))
+  }
+})
