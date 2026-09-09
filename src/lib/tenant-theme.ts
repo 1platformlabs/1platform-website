@@ -27,13 +27,16 @@ import type { SiteTenant } from './site-api'
  * compiled. A tenant whose theme is the default gets no block at all, and the
  * baseline holds.
  *
- * ── What is deliberately NOT here: `display_font` ───────────────────────────
- * `theme.display_font` is carried by the manifest and is NOT rendered, on
- * purpose. Tenant #1 declares `instrument-serif` while `global.css` sets
- * `--font-display` to Space Grotesk — they have never agreed — so there is no
- * established mapping from that field to a token, and inventing one would
- * change 1Platform's typography under cover of a bug fix. It needs a decision,
- * not a guess.
+ * ── `display_font` reaches the document too ─────────────────────────────────
+ * `theme.display_font` used to be carried by the manifest and never rendered.
+ * Tenant #1 declared `instrument-serif` while `global.css` set `--font-display`
+ * to Space Grotesk — they had never agreed, which was the manifest being wrong
+ * about tenant #1's own typography, the same class of bug the accent had. It
+ * is corrected the same way the accent's mismeasured glow was: by reading what
+ * the site actually draws (`space-grotesk`) and fixing the DATA, not by
+ * inventing a mapping that would have repainted 1platform.pro under cover of a
+ * bug fix. See `FONT_STACKS` for the closed set of families this build can
+ * safely put inside a `<style>` element.
  */
 
 const HEX = /^#[0-9a-fA-F]{6}$/
@@ -49,12 +52,35 @@ const HEX = /^#[0-9a-fA-F]{6}$/
  */
 export const COMPILED_DEFAULTS = {
   accent: '#1748a7',
+  display_font: 'space-grotesk',
 } as const
 
 /** `#rrggbb` -> `r, g, b`, for the translucent accent derivatives. */
 function channels(hex: string): string {
   const n = Number.parseInt(hex.slice(1), 16)
   return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`
+}
+
+/**
+ * The closed set of display-font families this build can put inside a
+ * `<style>` element, keyed by the manifest's `display_font` value.
+ *
+ * Closed rather than free text for the same reason the accent is a `#rrggbb`
+ * pattern and not any string: this is interpolated into a document, so an
+ * unrecognised value is refused (see `themeDeclarations`) rather than reaching
+ * the page — a wrong-but-safe font beats a stylesheet a manifest can write.
+ *
+ * `space-grotesk` is `COMPILED_DEFAULTS.display_font`'s stack, restated here
+ * (not just skipped) so a tenant that names it explicitly still resolves to a
+ * real value if this map is ever consulted outside the "differs" check.
+ * `instrument-serif` reuses `global.css`'s own `--font-serif` stack — the face
+ * is already self-hosted and `@font-face`d there — rather than repeating the
+ * font list a second place it could drift from.
+ */
+const FONT_STACKS: Record<string, string> = {
+  'space-grotesk': "'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif",
+  'instrument-serif': 'var(--font-serif)',
+  'system-serif': "Georgia, 'Times New Roman', serif",
 }
 
 /**
@@ -86,10 +112,22 @@ export function themeDeclarations(tenant: SiteTenant): string {
       out.push(`--color-accent-soft:color-mix(in srgb, ${accent} 10%, white)`)
       out.push(`--color-accent-glow:rgba(${rgb}, 0.07)`)
       out.push(`--color-accent-ring:rgba(${rgb}, 0.28)`)
+      // The footer's dark chrome needs a lighter derivative than the plain
+      // accent to read against it — see Footer.astro's .logo__mark and
+      // .btn--footer. Same `color-mix` construction as the others, so it stays
+      // in the tenant's hue rather than becoming a second, disagreeing brand.
+      out.push(`--color-accent-bright:color-mix(in srgb, ${accent} 60%, white)`)
     }
   }
 
-  return out.length ? `:root{${out.join(';')}}` : ''
+  const font = tenant.theme?.display_font
+  if (typeof font === 'string' && font !== COMPILED_DEFAULTS.display_font && FONT_STACKS[font]) {
+    out.push(`--font-display:${FONT_STACKS[font]}`)
+  }
+
+  // `:root:root`, not `:root` — see BaseLayout.astro's comment at the call
+  // site for why source order cannot be trusted to make this block win.
+  return out.length ? `:root:root{${out.join(';')}}` : ''
 }
 
 /**
