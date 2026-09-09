@@ -102,6 +102,35 @@ async function loadI18n(replacement?: Catalogue): Promise<Load> {
     logLevel: 'silent',
     appType: 'custom',
     server: { middlewareMode: true, hmr: false, watch: null },
+    // `ssrLoadModule` is the only thing this file ever calls, so the `client`
+    // environment Vite provisions by default has nothing to bundle for. Left on
+    // the default `cacheDir` (`<root>/node_modules/.vite`), it still runs a
+    // background dependency-optimizer commit on `onCrawlEnd` that renames into
+    // that SAME, process-external directory — `noDiscovery: true` was tried
+    // first and does NOT stop this: the commit step still runs (and still
+    // renames into the shared dir) even when the crawl finds nothing to add.
+    // Under Playwright's `fullyParallel`, several of this file's tests run in
+    // DIFFERENT WORKER PROCESSES at once, each creating its own
+    // `createServer()` against the same `root` — so their commits race on the
+    // same `deps_temp_xxxx -> deps` rename. Measured, not assumed: `CI=1 npx
+    // playwright test --workers=5` in a loop repeatedly hit `[vite] (client)
+    // error while updating dependencies: Error: ENOTEMPTY: directory not
+    // empty, rename '.../deps_temp_xxxx' -> '.../deps'` — a real cross-worker
+    // race on filesystem state, not the in-process `CACHE` this file used to
+    // suspect (each `createServer()` call already gets its own module graph;
+    // nothing here shares memory across a process boundary).
+    //
+    // The fix scopes the cache directory to the WORKER, not to this call:
+    // `TEST_WORKER_INDEX` is the id Playwright assigns each worker PROCESS for
+    // its whole lifetime, so two calls in the SAME worker (sequential, never
+    // concurrent — a worker runs one test at a time) still share and warm one
+    // cache, while two calls in DIFFERENT workers never touch the same
+    // directory and cannot race. A per-CALL cache dir was tried first and also
+    // removes the race, but pays a full cold optimizer start on every one of
+    // this file's ~14 `loadI18n()` invocations — measured 9 passed (43.7s) vs
+    // 9 passed (11.7s) with the default shared dir. Falls back to `main` so a
+    // direct `node --test`-style invocation outside Playwright still works.
+    cacheDir: resolvePath(ROOT, `node_modules/.vite-i18n-parity-w${process.env.TEST_WORKER_INDEX ?? 'main'}`),
     resolve: {
       alias: [
         { find: /^@i18n$/, replacement: resolvePath(ROOT, 'src/i18n/index.ts') },
@@ -140,6 +169,9 @@ async function loadI18n(replacement?: Catalogue): Promise<Load> {
     error = thrown as Error;
   } finally {
     await server.close();
+    // The cache dir is per-worker, not per-call (see above), so it stays for
+    // the next test in this same worker and is left for `node_modules` cleanup
+    // to handle like the rest of Vite's own cache.
   }
 
   return { module, error, applied };
