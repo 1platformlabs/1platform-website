@@ -116,12 +116,42 @@ jobs:
       # ablandarse. Mide más que antes: los 301, el 404 y el endpoint de
       # imágenes los contesta ahora el mismo código que producción.
       # La línea base visual queda fuera a propósito (`testIgnore`): compara
-      # renders de Linux por contenedor y es su propio comando.
+      # renders de Linux por contenedor y es su propio comando (job `visual`).
       - name: Tests de navegador
         shell: bash
         run: |
           set -euo pipefail
           npm test
+
+
+  visual:
+    name: Línea base visual
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: ".nvmrc"
+
+      # `npm run test:visual` decide por sí solo correr dentro del contenedor
+      # (`mcr.microsoft.com/playwright:v1.61.1-jammy`, la misma imagen que
+      # generó las líneas base committeadas) en cuanto encuentra un daemon de
+      # Docker — el runner de GitHub Actions lo trae activo por defecto. El
+      # propio comando instala node_modules DENTRO del contenedor: no hace
+      # falta `npm ci` en el host, sólo el binario de `npm` para invocar el
+      # script. `playwright.visual.config.ts` apunta al mismo adapter que la
+      # suite de navegador (`node dist/server/entry.mjs`), así que esto compara
+      # el sitio que corre en producción — nunca lo regenera.
+      - name: Comparar contra la línea base visual (Linux, sin regenerar)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run test:visual
 
   baseline:
     name: No-regresión byte a byte
