@@ -69,7 +69,16 @@ test('a tenant with its own accent emits it, with its derivatives', () => {
   expect(css).toContain(`--color-accent:${clinic!.theme.accent}`)
   // The derivatives too: shipping the accent alone leaves hover and ring on the
   // platform's blue, which is a two-colour brand nobody asked for.
-  for (const token of ['--color-accent-hover', '--color-accent-soft', '--color-accent-glow', '--color-accent-ring']) {
+  for (const token of [
+    '--color-accent-hover',
+    '--color-accent-soft',
+    '--color-accent-glow',
+    '--color-accent-ring',
+    // Issue #93: this one carries the accent onto the footer's dark chrome
+    // (Footer.astro's .logo__mark and .btn--footer) — without it those two
+    // elements stay on the platform's --cobalt-bright regardless of accent.
+    '--color-accent-bright',
+  ]) {
     expect(css, `${token} was not derived — the palette would be half one brand and half the other`).toContain(token)
   }
 })
@@ -89,7 +98,10 @@ test('a manifest cannot write a stylesheet through the accent', () => {
   for (const accent of hostile) {
     const css = themeDeclarations({
       ...(repoTenants().find((t) => t.slug === 'clinicas')!),
-      theme: { accent, accent_contrast: '#ffffff', display_font: 'system-serif' },
+      // The compiled default font, so a hostile ACCENT is what is under test
+      // here — a non-default font would add its own --font-display block and
+      // the assertion below would fail for the wrong reason.
+      theme: { accent, accent_contrast: '#ffffff', display_font: COMPILED_DEFAULTS.display_font },
     })
     expect(css, `"${accent}" reached the document`).toBe('')
   }
@@ -101,6 +113,55 @@ test('a manifest cannot write a stylesheet through the accent', () => {
     theme: { accent: '#0f766e', accent_contrast: '#ffffff', display_font: 'system-serif' },
   })
   expect(ok, 'the emitter refuses everything — the hostile cases prove nothing').toContain('#0f766e')
+})
+
+/**
+ * Issue #94 — `display_font` reaches the document too.
+ *
+ * The manifest declared it, the API validated it, and nothing rendered it:
+ * tenant #1 declared `instrument-serif` while the site drew Space Grotesk, and
+ * every tenant titled the same regardless of what it declared.
+ */
+test('tenant #1’s corrected font IS the compiled default, so it stays untouched', () => {
+  // This is the other half of the byte-for-byte guarantee: fixing the DATA
+  // (site-tenants.ts) rather than inventing a mapping is only safe if the
+  // corrected value actually resolves to what global.css compiles.
+  const platform = repoTenants().find((t) => t.slug === 'oneplatform')!
+  expect(
+    platform.theme.display_font,
+    'tenant #1 must declare the family its own site draws, or this test would not catch a re-introduced mismatch',
+  ).toBe(COMPILED_DEFAULTS.display_font)
+  expect(themeDeclarations(platform)).toBe('')
+})
+
+test('a tenant with its own display_font emits --font-display', () => {
+  const clinic = repoTenants().find((t) => t.slug === 'clinicas')!
+  expect(
+    clinic.theme.display_font,
+    'this test needs a tenant whose font differs from the compiled default',
+  ).not.toBe(COMPILED_DEFAULTS.display_font)
+
+  const css = themeDeclarations(clinic)
+  expect(css, 'display_font differs from the default but no --font-display was emitted').toContain('--font-display:')
+})
+
+test('display_font is a closed enum, not free text, inside the <style>', () => {
+  // Same injection-sink reasoning as the accent: this string is interpolated
+  // into a document. Unlike the accent there is no format to validate against
+  // (a font family is not a fixed grammar), so the whole value must come from
+  // a fixed set instead — anything else is refused rather than reaching the
+  // page, exactly like a malformed accent.
+  const clinic = repoTenants().find((t) => t.slug === 'clinicas')!
+  const hostile = ['Arial', 'system-serif; } body { display:none', 'javascript:alert(1)', '']
+  for (const display_font of hostile) {
+    const css = themeDeclarations({ ...clinic, theme: { ...clinic.theme, display_font } })
+    expect(css, `"${display_font}" reached the document via --font-display`).not.toContain('--font-display:')
+  }
+
+  // CONTROL: a recognised, non-default value DOES get through, or the
+  // assertions above would pass on an emitter that refuses every font.
+  const ok = themeDeclarations({ ...clinic, theme: { ...clinic.theme, display_font: 'instrument-serif' } })
+  expect(ok, 'the emitter refuses every font — the hostile cases above prove nothing').toContain('--font-display:')
 })
 
 test('the SERVED page carries the tenant’s accent, and tenant #1 is untouched', async () => {

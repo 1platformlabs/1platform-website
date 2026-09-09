@@ -123,6 +123,7 @@ jobs:
           set -euo pipefail
           npm test
 
+
   visual:
     name: Línea base visual
     runs-on: ubuntu-latest
@@ -151,3 +152,58 @@ jobs:
         run: |
           set -euo pipefail
           npm run test:visual
+
+  baseline:
+    name: No-regresión byte a byte
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # ⚠️ NO BLOQUEANTE A PROPÓSITO (issue #99 la cablea; no le pide bloquear).
+    # Documentado en epics/website-multitenant/PROGRESO-website-multitenant.md
+    # §3: HOY el comparador da 51 idénticas / 2 con diferencia (atribuidas al
+    # endpoint de imágenes) / 47 redirecciones-o-404 — rutas que F4b/F6/F7
+    # renombraron DESPUÉS de que F0 congelara tests/baseline/baseline.json, que
+    # nunca se re-congeló. El script no distingue "una ruta retirada sigue
+    # redirigiendo, a propósito" de "una ruta que se rompió": enseñarle esa
+    # distinción es una decisión de diseño (qué redirecciones son legítimas)
+    # que el alcance de #99 no pidió y que compare-served.mjs evita a propósito
+    # en el resto de sus reglas ("normalisation is EARNED, never assumed").
+    # Sin esta salvedad este job estaría SIEMPRE en rojo por causas ya
+    # conocidas, no por lo que cambie cada PR — entrenaría a ignorarlo, que es
+    # exactamente lo que un gate no debe hacer. `continue-on-error` lo deja
+    # correr y ser VISIBLE (el número, en el log, en cada PR) sin bloquear el
+    # merge por un gap preexistente. Medido en esta misma corrida: sabotear
+    # BaseLayout.astro (una plantilla compartida) mueve «differing» de 2 a 52
+    # — el gate SÍ discrimina un regresión nueva; sólo no exige partir de cero.
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+        with:
+          # scripts/check-no-regression.sh necesita historia completa: ubica el
+          # commit del que se congeló tests/baseline/baseline.json (su propio
+          # padre) y lo construye en un worktree separado para conseguir los
+          # bodies estáticos que el comparador exige.
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Instalar dependencias
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+
+      # `check-no-regression.sh` build dos veces (el árbol actual y el de la
+      # línea base) y sirve el actual en modo `repo`, que es el único que este
+      # job puede servir sin una API. Ver scripts/compare-served.mjs para por
+      # qué `--bodies` no es opcional.
+      - name: No-regresión byte a byte de 1platform.pro
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run check:baseline -- --explain

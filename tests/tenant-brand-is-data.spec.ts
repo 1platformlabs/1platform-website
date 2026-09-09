@@ -62,13 +62,17 @@ test('the wordmark is the tenant\'s, not the platform\'s', async () => {
   const mark = (html: string) => html.match(/logo__mark"[^>]*>([^<]*)</)?.[1] ?? null
   const text = (html: string) => html.match(/logo__text"[^>]*>([^<]*)</)?.[1] ?? null
 
-  // POSITIVE CONTROL: the platform draws its own, or the scan is broken.
+  // POSITIVE CONTROL: the platform draws its own, or the scan is broken. Its
+  // "1" is a numeral doing the work of a glyph, so it still gets boxed.
   expect(mark(platform), 'the platform wordmark should still be boxed "1"').toBe('1')
   expect(text(platform)).toBe('Platform')
 
-  // The same component, the same page, a different tenant.
-  expect(mark(clinic), 'the clinic wordmark should box its own first character').toBe('C')
-  expect(text(clinic)).toBe('línica Delta')
+  // The same component, the same page, a two-word tenant whose name starts
+  // with a LETTER. Boxing its first character used to cut the word in half —
+  // "C" boxed, "línica Delta" as text (issue #92). A letter-led wordmark gets
+  // no box at all, and the full two-word name must come through intact.
+  expect(mark(clinic), 'a letter-led brand must not be boxed — that is the bug this pins against').toBe(null)
+  expect(text(clinic), 'the clinic\'s two-word name must render whole, not missing its first letter').toBe('Clínica Delta')
 })
 
 test('the leak that is LEFT is content, and its size is pinned', async () => {

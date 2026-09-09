@@ -28,15 +28,39 @@
  * and fails if either verdict is wrong. A normaliser that forgives everything
  * is caught there.
  *
+ * ON `Host` (issue #95)
+ * ----------------------
+ * This used `fetch()`, which cannot set `Host`: it is a forbidden header name
+ * and fetch drops it SILENTLY, sending the request under whatever hostname
+ * `--base` connects to. In `api` mode that hostname is how this server decides
+ * which TENANT a request belongs to (`src/lib/resolve-tenant.ts`), so a bare
+ * `fetch` against `--base` can only ever measure the tenant that happens to own
+ * that address — never `1platform.pro` behind a loopback `--base`, and never
+ * any other tenant. Measured, same binary, same baseline, only the mode
+ * changed: `SITE_MANIFEST_SOURCE=repo` gave 51 identical/2 differing; `api`
+ * mode (production's default) gave 53 UNFETCHED — every route 404, because the
+ * server saw `Host: 127.0.0.1` and no tenant owns that host.
+ * `--host <hostname>` sends an explicit `Host` header over `node:http`
+ * (the same technique as `tests/helpers/http-host.ts`, which documents the
+ * `fetch` failure for the browser suite) instead of the one `--base`'s own
+ * address would produce, so the comparator can measure a specific tenant
+ * regardless of which address it connects to.
+ *
  * USAGE
- *   node scripts/compare-served.mjs --base http://127.0.0.1:4331
- *   node scripts/compare-served.mjs --base ... --explain
+ *   node scripts/compare-served.mjs --base http://127.0.0.1:4331 --bodies <dir>
+ *   node scripts/compare-served.mjs --base ... --bodies <dir> --host 1platform.pro
+ *   node scripts/compare-served.mjs --base ... --bodies <dir> --explain
  *   node scripts/compare-served.mjs --self-test
+ *
+ * `npm run check:baseline` wraps the first form with the correct arguments —
+ * see scripts/check-no-regression.sh for why `--bodies` is not optional.
  */
 
 import { createHash } from 'node:crypto'
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { request as httpRequest } from 'node:http'
+import { request as httpsRequest } from 'node:https'
 
 const BASELINE = join('tests', 'baseline', 'baseline.json')
 
@@ -144,6 +168,37 @@ function firstDivergence(a, b) {
     baseline: JSON.stringify(a.slice(from, i + 90)),
     served: JSON.stringify(b.slice(from, i + 90)),
   }
+}
+
+/**
+ * A GET that can actually choose `Host` — see the "ON `Host`" note above.
+ * `manual` redirect handling comes for free: `node:http`/`node:https` never
+ * follow a redirect on their own, so a 301/302 surfaces as `res.statusCode`
+ * exactly like `fetch(url, { redirect: 'manual' })` used to.
+ */
+function getWithHost(url, host) {
+  const target = new URL(url)
+  const transport = target.protocol === 'https:' ? httpsRequest : httpRequest
+  return new Promise((resolve, reject) => {
+    const req = transport(
+      {
+        hostname: target.hostname,
+        port: target.port,
+        path: target.pathname + target.search,
+        method: 'GET',
+        headers: { host, connection: 'close' },
+      },
+      (res) => {
+        const chunks = []
+        res.on('data', (c) => chunks.push(c))
+        res.on('end', () =>
+          resolve({ status: res.statusCode ?? 0, body: Buffer.concat(chunks).toString('utf8') }),
+        )
+      },
+    )
+    req.on('error', reject)
+    req.end()
+  })
 }
 
 // ---------------------------------------------------------------- self-test
@@ -284,6 +339,8 @@ const argv = process.argv.slice(2)
 const baseIdx = argv.indexOf('--base')
 const BASE = baseIdx >= 0 ? argv[baseIdx + 1] : 'http://127.0.0.1:4331'
 const EXPLAIN = argv.includes('--explain')
+const hostIdx = argv.indexOf('--host')
+const HOST_OVERRIDE = hostIdx >= 0 ? argv[hostIdx + 1] : null
 
 if (!existsSync(BASELINE)) {
   console.error(`compare-served: ${BASELINE} missing — run scripts/freeze-baseline.mjs on a static build first`)
@@ -292,13 +349,33 @@ if (!existsSync(BASELINE)) {
 const baseline = JSON.parse(readFileSync(BASELINE, 'utf8'))
 const routes = baseline.entries.filter((e) => e.route)
 
-// The baseline stores hashes of file BYTES, which is the contract. To EXPLAIN a
-// difference we also need the bytes, and an SSR build no longer emits them — so
-// `--bodies <dir>` points at a static dist/ built from the baseline commit
-// (a detached worktree at origin/main does this without disturbing anything).
+// The baseline stores hashes of file BYTES, which is the contract. To compare
+// at all we also need the bytes, and an SSR build no longer emits them — so
+// `--bodies <dir>` points at a static dist/ built from the commit
+// tests/baseline/baseline.json was frozen from (scripts/check-no-regression.sh
+// does this with a detached worktree, without disturbing anything).
+//
+// `--bodies` is REQUIRED (issue #99), not merely accepted. It used to default
+// to tests/baseline/html/, a directory this repository never commits, so the
+// default run always fell through to comparing a NORMALISED served page
+// against the baseline's RAW hash — which cannot match unless a normaliser is
+// a no-op, so every route a normaliser was supposed to forgive is misreported
+// as a regression. Measured on a clean tree: 1 identical / 52 differing,
+// which reads as a catastrophe and is not one. Refusing to run without bodies
+// is what makes that reading impossible instead of merely unlikely.
 const bodiesIdx = argv.indexOf('--bodies')
-const HTML_DIR = bodiesIdx >= 0 ? argv[bodiesIdx + 1] : join('tests', 'baseline', 'html')
-const haveBodies = existsSync(HTML_DIR)
+const HTML_DIR = bodiesIdx >= 0 ? argv[bodiesIdx + 1] : null
+if (!HTML_DIR || !existsSync(HTML_DIR)) {
+  console.error(
+    'compare-served: --bodies <dir> is required and must point at a static dist/ built from the ' +
+      'commit tests/baseline/baseline.json was frozen from. Without it, a legitimate normalisation ' +
+      '(see NORMALISERS above) cannot be told from a real regression, and a clean tree reports most ' +
+      'routes as differing (issue #99). Run `npm run check:baseline` instead of invoking this script ' +
+      'bare — it builds that tree and passes --bodies for you.',
+  )
+  process.exit(2)
+}
+const haveBodies = true
 
 function readBaselineBody(file) {
   const p = join(HTML_DIR, file)
@@ -313,17 +390,21 @@ for (const entry of routes) {
   // Per-route try/catch on purpose: a route whose render dies mid-stream closes
   // the socket, and without this one bad route aborts the whole run and hides
   // the other 99 verdicts. An unfetchable route is a RESULT, not a crash.
-  let res, served
+  let served
   try {
-    res = await fetch(BASE + entry.route, { redirect: 'manual', headers: { connection: 'close' } })
+    const url = BASE + entry.route
+    // The Host `--base`'s own address would produce, unless `--host` names a
+    // specific tenant — see the "ON `Host`" note above.
+    const host = HOST_OVERRIDE ?? new URL(url).host
+    const res = await getWithHost(url, host)
     if (res.status !== 200) {
       failed.push({ route: entry.route, why: `status ${res.status}` })
       continue
     }
-    served = await res.text()
+    served = res.body
   } catch (err) {
     const cause = err.cause ? ` (${err.cause.code || err.cause.message})` : ''
-    failed.push({ route: entry.route, why: `fetch failed: ${err.message}${cause}` })
+    failed.push({ route: entry.route, why: `request failed: ${err.message}${cause}` })
     continue
   }
   // Raw bytes first: an exact match needs no tolerance and is the strongest
