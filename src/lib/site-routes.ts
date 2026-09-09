@@ -1,5 +1,5 @@
 import { LOCALES, localizePath, type Locale } from '@i18n/ui'
-import type { SiteTenant } from './site-api'
+import type { HomeTemplate, SiteTenant } from './site-api'
 import {
   canonicalPathForTenant,
   defaultLocaleOf,
@@ -261,10 +261,19 @@ function publishedContentRouteOf(pathname: string, tenant: SiteTenant): string |
  * differ. Keeping the default-English branch byte-for-byte identical is
  * deliberate: tenant #1 must never enter a rewrite it did not need before.
  */
-export function physicalRouteOf(pathname: string, tenant: SiteTenant): string {
-  if (defaultLocaleOf(tenant) === 'en') return pathname
+export const HOME_RENDER_ROUTES = {
+  'platform-commerce': null,
+  'service-lead': '/render/service-lead/',
+} as const satisfies Record<HomeTemplate, string | null>
 
+export function physicalRouteOf(pathname: string, tenant: SiteTenant): string {
   const canonical = publishedContentRouteOf(pathname, tenant)
+  if (canonical === '/') {
+    const templateRoute = HOME_RENDER_ROUTES[tenant.home_template]
+    if (templateRoute) return templateRoute
+  }
+
+  if (defaultLocaleOf(tenant) === 'en') return pathname
   if (canonical === null) return pathname
   return localizePath(canonical, localeForRequest(pathname, tenant))
 }

@@ -273,7 +273,7 @@ English browsers stay; the `1p_lang` cookie always wins; and **`/es/` is never r
 protects shared links and keeps Googlebot — which renders JS as en-US — from being bounced out of
 the Spanish tree.
 
-Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm run check`
+Verify with `npm test` (the complete Playwright suite against the real `dist/server/entry.mjs`) and `npm run check`
 (design-system guard plus its 24 self-tests).
 
 ## Accessibility Requirements
@@ -290,7 +290,7 @@ Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm r
 ## Performance Rules
 
 - Images: Use Astro's `<Image />` component from `astro:assets` (auto WebP, srcset, lazy loading)
-- Fonts: self-host WOFF2 in `public/fonts/`, preload the critical two in `BaseLayout.astro`, `font-display: swap`, **3 families max** (display / text / mono), latin subsets, weights kept to what is actually used
+- Fonts: self-host WOFF2 in `public/fonts/`, preload the critical faces in `BaseLayout.astro`, `font-display: swap`, **4 families max** (display / text / mono / editorial serif), latin subsets, weights kept to what is actually used
 - JS: zero by default on every page but the home — never add `client:*` to
   presentational components (the guard rejects it). The home has a **64 KB
   gzip** public-JS ceiling, enforced statically and by
@@ -313,7 +313,7 @@ Verify with `npm test` (36 Playwright tests against the real `dist/`) and `npm r
 
 - **Core message:** "One platform. Every solution."
 - **Pillars:** Unified Platform, AI-Powered Pipeline, End-to-End Ecosystem, Scalable by Design, Interconnected Services
-- **Pattern:** Comparison framed as unified vs fragmented — by capability and experience, never by invented competitor pricing. Since the home redesign the footer carries no closing CTA: the header's two CTAs and the pricing section do that work
+- **Pattern:** Comparison framed as unified vs fragmented — by capability and experience, never by invented competitor pricing. Header, page and footer CTAs are derived from the tenant's configured destinations; omit them when the destination is absent rather than inventing a link.
 - **"Replaces" positioning:** Each solution names generic tool categories it replaces (never competitor brand names)
 - **Interconnection narrative:** Emphasize that all services work together (keywords → content → images → publish → index → backlinks → payments → invoicing)
 
@@ -340,7 +340,7 @@ Run the same gates locally before opening a PR:
 
 ```bash
 npm run build            # Must succeed, zero errors — BEFORE check (rule 14 measures dist/)
-npm run check            # Design-system guard (15 rules) + its 43 self-tests
+npm run check            # Design-system/provider guard + its negative self-tests
 npm test                 # Playwright tests against dist/server/entry.mjs
 npm run typecheck        # astro check
 npm run test:visual      # visual baseline, compared in the Playwright container

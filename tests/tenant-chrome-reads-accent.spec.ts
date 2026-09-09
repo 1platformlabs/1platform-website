@@ -24,15 +24,11 @@ import { openTenantPage, computedProperty } from './helpers/tenant-browser'
  * WHY SOME OF THE TEN ARE CROSS-TENANT AND SOME ARE PLATFORM-ONLY
  * ------------------------------------------------------------------
  * The clinic (the only non-platform fixture) does not render every one of the
- * ten sites issue #93 lists, for reasons that have nothing to do with this
- * fix: its brand starts with a letter, so #92's fix correctly draws no boxed
- * mark at all (`.logo__mark` in the header AND the footer); and its manifest
- * has no `destinations.app`, so D-7 correctly renders no `.btn--footer`.
- * Those three sites are verified as a NO-REGRESSION on the platform instead —
- * the same `--color-accent`/`--color-accent-bright` custom properties the
- * cross-tenant elements below prove carry a tenant's accent, referenced from
- * a selector that happens to have no second tenant to contrast against right
- * now. `ProcessSpine.astro` and `Changelog.astro` get the same treatment: the
+ * ten sites issue #93 lists. Its explicit mark now exercises `.logo__mark` in
+ * both header and footer, but its manifest has no `destinations.app`, so D-7
+ * correctly renders no `.btn--footer`. That site is verified as a
+ * NO-REGRESSION on the platform instead. `ProcessSpine.astro` and
+ * `Changelog.astro` get the same treatment: the
  * clinic's repo-manifest fixture publishes only `/` (`site-tenants.ts` —
  * deliberately, until a later phase writes its vertical's pages), and neither
  * component is mounted on that route.
@@ -109,17 +105,23 @@ test.describe('cross-tenant: elements reachable on both tenants\' home page', ()
   })
 })
 
-test.describe('platform-only regression: sites the clinic fixture cannot reach', () => {
+test.describe('explicit tenant mark and platform-only regression sites', () => {
   /**
-   * The clinic renders neither the header nor the footer's boxed mark: its
-   * brand is letter-led (#92) and has no `.logo__mark` at all. Asserted here
-   * as an explicit control, not an assumption — a selector that silently
-   * stopped matching would make every "identical" comparison meaningless.
+   * Mark and wordmark are separate manifest data. A letter-led brand may
+   * deliberately declare a symbol; the component must render that complete
+   * lockup without cutting the first character out of the wordmark.
    */
-  test('the clinic draws no boxed mark, in the header or the footer', async () => {
+  test('the clinic draws its declared mark with its own header and footer palette', async () => {
     const { browser, page } = await openTenantPage(CLINIC_HOST, '/')
     try {
-      expect(await page.locator('.logo__mark').count(), 'a letter-led brand must not get a boxed mark').toBe(0)
+      const marks = page.locator('.logo__mark')
+      expect(await marks.allTextContents()).toEqual(['C', 'C'])
+      expect(await computedProperty(page, '.site-header .logo__mark', 'background-color')).toBe(
+        'rgb(15, 118, 110)',
+      )
+      expect(await computedProperty(page, '.site-footer .logo__mark', 'background-color')).toBe(
+        'rgb(149, 195, 191)',
+      )
     } finally {
       await browser.close()
     }
@@ -155,15 +157,24 @@ test.describe('platform-only regression: sites the clinic fixture cannot reach',
   })
 })
 
-test('the interconnect motif is unreachable code, not a fourth live site — measured, not assumed', () => {
+test('the unreachable interconnect motif stays on the bridged primitive — measured, not assumed', async () => {
   // No page passes `motif` to Hero, so `.motif__spine` renders nowhere and no
   // computed-style probe above can reach it. This is the only one of the ten
   // sites verified by reading the component's OWN source rather than a
   // rendered page — the exception rule 5 warns about (a <style> is not
   // verified by reading its source) does not apply to code nothing builds.
   const css = readFileSync('src/components/InterconnectDiagram.astro', 'utf8')
-  expect(css, 'InterconnectDiagram still reads the raw palette instead of the semantic accent').not.toContain('var(--cobalt)')
-  expect(css).toContain('var(--color-accent)')
+  expect(css, 'the platform component must retain its byte-stable primitive').toContain(
+    'var(--cobalt)',
+  )
+
+  const { repoTenants } = await import('../src/data/site-tenants')
+  const { themeDeclarations } = await import('../src/lib/tenant-theme')
+  const clinic = repoTenants().find((tenant) => tenant.slug === 'clinicas')!
+  expect(
+    themeDeclarations(clinic),
+    'a non-default tenant must rebind the primitive used by unreachable legacy chrome',
+  ).toContain(`--cobalt:${clinic.theme.accent}`)
 })
 
 /**

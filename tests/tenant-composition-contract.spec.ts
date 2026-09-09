@@ -325,18 +325,37 @@ test.afterAll(async () => {
 })
 
 test('the route edge selects a closed template catalogue and contains no tenant branch', () => {
-  const routeFiles = ['src/pages/index.astro', 'src/pages/es/index.astro']
   const sources: CompositionSource[] = []
-  for (const routeFile of routeFiles) {
-    const source = readFileSync(join(ROOT, routeFile), 'utf8')
-    sources.push({ path: routeFile, source })
-    const templates = [...source.matchAll(/^\s*'([^']+)': \(\) => import\(/gm)].map((match) => match[1])
-    expect(templates, `${routeFile} must expose exactly the approved strategies`).toEqual([
-      'platform-commerce',
-      'service-lead',
-    ])
-    expect(source).toContain('Astro.locals.tenant.home_template')
+  const routingFile = 'src/lib/site-routes.ts'
+  const routingSource = readFileSync(join(ROOT, routingFile), 'utf8')
+  sources.push({ path: routingFile, source: routingSource })
+  const catalogue = routingSource.match(
+    /export const HOME_RENDER_ROUTES = \{([\s\S]*?)\}\s+as const/,
+  )?.[1]
+  expect(catalogue, 'the home render catalogue must be explicit').toBeTruthy()
+  const templates = [...catalogue!.matchAll(/^\s*'([^']+)':/gm)].map((match) => match[1])
+  expect(templates, 'the route edge must expose exactly the approved strategies').toEqual([
+    'platform-commerce',
+    'service-lead',
+  ])
+  expect(routingSource).toContain('HOME_RENDER_ROUTES[tenant.home_template]')
+
+  // The historical platform entrypoints remain static so importing a second
+  // composition cannot move their CSS asset hashes. The middleware rewrites
+  // only a service-lead home to the isolated physical route.
+  for (const platformRoute of ['src/pages/index.astro', 'src/pages/es/index.astro']) {
+    const source = readFileSync(join(ROOT, platformRoute), 'utf8')
+    sources.push({ path: platformRoute, source })
+    expect(source).toContain("import Home from '@page-content/Home.astro'")
+    expect(source).not.toContain('ServiceLeadHome')
   }
+
+  const serviceRoute = 'src/pages/render/service-lead.astro'
+  const serviceRouteSource = readFileSync(join(ROOT, serviceRoute), 'utf8')
+  sources.push({ path: serviceRoute, source: serviceRouteSource })
+  expect(serviceRouteSource).toContain(
+    "import ServiceLeadHome from '@page-content/ServiceLeadHome.astro'",
+  )
 
   const serviceSource = readFileSync(join(ROOT, 'src/page-content/ServiceLeadHome.astro'), 'utf8')
   sources.push({ path: 'src/page-content/ServiceLeadHome.astro', source: serviceSource })
@@ -346,11 +365,11 @@ test('the route edge selects a closed template catalogue and contains no tenant 
 })
 
 test('control: a clinic-specific component or slug branch turns the composition guard red', () => {
-  const routeSource = readFileSync(join(ROOT, 'src/pages/index.astro'), 'utf8')
+  const routeSource = readFileSync(join(ROOT, 'src/lib/site-routes.ts'), 'utf8')
   const componentSource = readFileSync(join(ROOT, 'src/page-content/ServiceLeadHome.astro'), 'utf8')
   const mutant = [
     {
-      path: 'src/pages/index.astro',
+      path: 'src/lib/site-routes.ts',
       source: `${routeSource}\nif (Astro.locals.tenant.slug === 'clinicas') {}`,
     },
     {
@@ -360,7 +379,7 @@ test('control: a clinic-specific component or slug branch turns the composition 
   ]
 
   expect(compositionViolations(mutant)).toEqual([
-    'src/pages/index.astro: tenant-specific selector or copy',
+    'src/lib/site-routes.ts: tenant-specific selector or copy',
     'src/page-content/ClinicasHome.astro: tenant-specific component path',
   ])
 })
@@ -378,6 +397,15 @@ test('a third tenant slug reuses service-lead without a layout or selector of it
   expect(response.body).toContain('data-home-template="service-lead"')
   expect(response.body).toContain('Consultorio Aurora')
   expect(response.body).not.toContain('Clínica Delta')
+})
+
+test('the physical service template route is never a public tenant URL', async () => {
+  const response = await getWithHost(
+    `${appBaseUrl}/render/service-lead/`,
+    fixture.tenant.domain,
+  )
+  expect(response.status).toBe(404)
+  expect(response.body).not.toContain('data-home-template="service-lead"')
 })
 
 test('the home shares one actionable support destination across header, hero and close', async ({ page }) => {
@@ -650,13 +678,17 @@ test('home and compact 404 pass Axe and reflow at mobile, desktop and 200% equiv
         const targets = await page.locator('[data-support-cta]').evaluateAll((elements) =>
           elements.map((element) => {
             const box = element.getBoundingClientRect()
-            return { width: box.width, height: box.height }
+            return {
+              name: element.getAttribute('data-support-cta') ?? 'unnamed',
+              width: box.width,
+              height: box.height,
+            }
           }),
         )
         expect(targets.length).toBeGreaterThan(0)
         for (const target of targets) {
-          expect(target.width).toBeGreaterThanOrEqual(44)
-          expect(target.height).toBeGreaterThanOrEqual(44)
+          expect(target.width, `${target.name} support target width`).toBeGreaterThanOrEqual(44)
+          expect(target.height, `${target.name} support target height`).toBeGreaterThanOrEqual(44)
         }
       }
     }

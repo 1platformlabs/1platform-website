@@ -206,7 +206,10 @@ test('display_font is a closed enum, not free text, inside the <style>', () => {
   const clinic = repoTenants().find((t) => t.slug === 'clinicas')!
   const hostile = ['Arial', 'system-serif; } body { display:none', 'javascript:alert(1)', '']
   for (const display_font of hostile) {
-    const css = themeDeclarations({ ...clinic, theme: { ...clinic.theme, display_font } })
+    const css = themeDeclarations({
+      ...clinic,
+      theme: { ...clinic.theme, display_font: display_font as DisplayFont },
+    })
     expect(css, `"${display_font}" reached the document via --font-display`).not.toContain('--font-display:')
   }
 

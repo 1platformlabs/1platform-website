@@ -512,4 +512,13 @@ const jsonLd = {
       border-color: CanvasText;
     }
   }
+
+  /* The historical platform header keeps its exact 42 px mobile CSS for the
+     byte baseline. This route-only style raises the service action to the
+     44 px touch target required by the adaptive composition. */
+  @media (max-width: 520px) {
+    html .site-header .site-header__cta {
+      min-height: 44px;
+    }
+  }
 </style>

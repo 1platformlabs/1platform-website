@@ -109,11 +109,10 @@ export function deriveAccentRamp(accent: string): AccentRamp | null {
 }
 
 /**
- * Existing chrome that still consumes raw `--cobalt*` also hard-codes its ink
- * through an inherited semantic. Rebinding that semantic ON the painted node
- * keeps dark-on-bright footer roles separate from ink-on-accent roles without
- * changing the shared stylesheet (and therefore without changing tenant #1's
- * asset hash).
+ * The compiled stylesheet still exposes the historical `--cobalt*` primitives,
+ * and some painted nodes inherit ink from surface semantics. Rebinding those
+ * request-locally keeps dark-on-bright footer roles separate from
+ * ink-on-accent roles without changing tenant #1's shared asset bytes.
  */
 const LEGACY_INK_BRIDGE =
   '.logo__mark,.spine__node,.motif__spine{--surface:var(--color-accent-ink)}' +
@@ -160,9 +159,10 @@ export function themeDeclarations(tenant: SiteTenant): string {
     out.push(`--color-accent:${ramp.accent}`)
     out.push(`--color-accent-hover:${ramp.hover}`)
     out.push(`--color-accent-soft:${ramp.soft}`)
+    out.push(`--color-accent-bright:${ramp.bright}`)
     out.push(`--color-accent-glow:${ramp.glow}`)
     out.push(`--color-accent-ring:${ramp.ring}`)
-    // Bridge the ten remaining legacy consumers without changing the shared
+    // Keep the primitive aliases coherent without changing the shared
     // stylesheet and therefore without changing tenant #1's asset bytes.
     out.push(`--cobalt:${ramp.accent}`)
     out.push(`--cobalt-deep:${ramp.hover}`)

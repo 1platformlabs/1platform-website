@@ -197,14 +197,17 @@ test('an unpublished route renders the 404 with the TENANT’s copy, not the rep
   ).toBe(TENANT_ONLY)
 })
 
-test('CONTROL: a published route was already getting it right', async () => {
+test('CONTROL: a published route keeps the tenant copy through its physical-locale rewrite', async () => {
   // The other half. Without this, a fix that simply stopped rewriting — or a
   // middleware that 503s everything — would satisfy the test above by making
   // the interesting path unreachable.
   const served = await localsAtRender('/')
 
   expect(served.status, 'the one published route must be served').toBe(200)
-  expect(served.rewrittenTo, 'a published route is not a rewrite').toBeUndefined()
+  expect(
+    served.rewrittenTo,
+    'a default-es public root is rendered by the fixed Astro /es/ route',
+  ).toBe('/es/')
   expect(served.messages?.['probe.marker'], 'the published route always had the tenant’s copy').toBe(
     TENANT_ONLY,
   )
