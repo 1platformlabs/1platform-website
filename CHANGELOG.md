@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **A tenant's own brand and colour now reach its site.** Three E2E findings
+  from the `website-multitenant` epic: a two-word brand starting with a letter
+  (e.g. a clinic's) had its first letter boxed and cut off from the rest of the
+  name — the logotype only boxes a leading numeral now, which is what "1" in
+  "1Platform" actually is. Ten chrome elements (the logotype, the footer, the
+  interconnect motif, the process spine, the home's commerce scene, and the
+  changelog) read the platform's raw palette instead of the tenant's declared
+  accent; they now read the semantic token, and a tenant's declared heading
+  font (`display_font`) is rendered too, from a closed set of families. Along
+  the way, the tenant's theme block was losing the CSS cascade to the
+  platform's own stylesheet regardless of source order — fixed at the root
+  (`:root:root`), which is what makes the ten elements above actually work
+  rather than merely reference the right variable name.
+
 ### Changed
 - **The home now explains the complete commerce cycle on first view.** Its
   original CSS scene keeps Online Store, online payment, electronic invoicing
