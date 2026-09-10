@@ -1114,6 +1114,14 @@ jobs:
       contents: read
 
     steps:
+      # ⚠️ VA PRIMERO Y NO ES DECORADO. Este job NUNCA clonó el repo: con el
+      # sitio estático le bastaba el artefacto `dist/`. Ahora necesita
+      # `package-lock.json` para el `npm ci` de abajo, y `actions/checkout`
+      # LIMPIA el workspace, así que tiene que correr ANTES de bajar el
+      # artefacto o se lo lleva puesto.
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+
       - name: Download build artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
@@ -1124,6 +1132,9 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "24"
+          # Con `cache: npm` y sin checkout, `setup-node` muere antes de nada:
+          # «Dependencies lock file is not found». Es la falla que destapó que
+          # este job no clonaba — medida en la corrida 34435428147.
           cache: "npm"
 
       # ⚠️ ESTE PASO ES NUEVO Y SIN ÉL EL JOB NO ARRANCA. Con el sitio estático
