@@ -30,7 +30,41 @@ import { MissBudget, TenantCache } from './tenant-cache'
  * ANSWER for a particular request: which tenant is being served right now.
  */
 const cache = new TenantCache<SiteTenant>()
-const budget = new MissBudget(Number(process.env?.SITE_MISS_BUDGET_PER_MINUTE ?? 120))
+
+/** Misses per minute allowed to reach the API when nothing is configured. */
+export const DEFAULT_MISS_BUDGET_PER_MINUTE = 120
+
+/**
+ * Read the budget, and treat anything that is not a usable number as ABSENT.
+ *
+ * ⚠️ THIS TOOK PRODUCTION DOWN, so the reason is written out. `??` only steps
+ * in for `null`/`undefined`, and the value that arrives here is neither: the
+ * deploy writes an EMPTY `.env.prod` (correct — production wants the defaults),
+ * and `docker-compose.prod.yml` then sets the variable anyway from
+ * `${SITE_MISS_BUDGET_PER_MINUTE:-}`. So the process sees `''`, `'' ?? 120` is
+ * `''`, and `Number('')` is **0** — a budget of zero, which refuses the FIRST
+ * miss on a cold cache. And a refused miss never reaches the API, so the cache
+ * it would have filled stays empty: every request afterwards is a miss too.
+ * `1platform.pro` answered 503 to everything, including its own healthcheck,
+ * from the second the container started.
+ *
+ * Its two neighbours survived the same empty string by accident of syntax —
+ * `apiBaseUrl()` uses `||` and `manifestSource()` compares to `'repo'`. This is
+ * the one that read it as a number, so this is the one that fell over.
+ *
+ * Zero and negatives are refused too: a budget of zero is not a configuration,
+ * it is an outage with a value in it.
+ */
+export function configuredMissBudget(): number {
+  const raw = process.env?.SITE_MISS_BUDGET_PER_MINUTE
+  const parsed = Number(raw)
+  if (raw === undefined || raw === null || String(raw).trim() === '') {
+    return DEFAULT_MISS_BUDGET_PER_MINUTE
+  }
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_MISS_BUDGET_PER_MINUTE
+}
+
+const budget = new MissBudget(configuredMissBudget())
 
 /** Same canonicalisation the API stores with: lowercase, no port, no root dot. */
 export function normalizeHost(host: string): string {
