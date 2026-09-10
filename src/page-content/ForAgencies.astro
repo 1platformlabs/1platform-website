@@ -7,8 +7,10 @@ import Icon from '@components/Icon.astro';
 import ProcessSpine from '@components/ProcessSpine.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { docsUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('for-agencies.title');
 const description = t('for-agencies.description');
@@ -24,13 +26,13 @@ const jsonLd = [
     '@type': 'WebPage',
     name: title,
     description,
-    url: new URL(l('/for-agencies/'), 'https://1platform.pro').toString(),
+    url: new URL(l('/for-agencies/'), siteOrigin(Astro.locals)).toString(),
   },
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), 'https://1platform.pro').toString() },
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), siteOrigin(Astro.locals)).toString() },
       { '@type': 'ListItem', position: 2, name: forAgenciesLabel },
     ],
   },
@@ -104,7 +106,7 @@ const related: { icon: IconName; title: string; description: string; href: strin
     subheadline={t('for-agencies.hero.subheadline')}
     badge={forAgenciesLabel}
     primaryCta={{ label: t('for-agencies.cta.contactSales'), href: l('/contact/?topic=agency') }}
-    secondaryCta={{ label: t('for-agencies.cta.readApiDocs'), href: 'https://developer.1platform.pro/' }}
+    secondaryCta={ctaTo(t('for-agencies.cta.readApiDocs'), docsUrl(Astro.locals))}
   />
 
   <!-- What you get -->
@@ -151,7 +153,9 @@ const related: { icon: IconName; title: string; description: string; href: strin
         </div>
         <div class="panel__actions">
           <a href={l('/contact/?topic=agency')} class="btn btn--primary">{t('for-agencies.cta.contactSales')}</a>
-          <a href="https://developer.1platform.pro/" class="btn btn--ghost">{t('for-agencies.cta.readApiDocs')}</a>
+          {docsUrl(Astro.locals) && (
+            <a href={docsUrl(Astro.locals)} class="btn btn--ghost">{t('for-agencies.cta.readApiDocs')}</a>
+          )}
         </div>
       </div>
     </div>

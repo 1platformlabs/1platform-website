@@ -14,7 +14,7 @@ import { useI18n } from '@i18n';
 import BodyEn from './legal/terms.en.astro';
 import BodyEs from './legal/terms.es.astro';
 
-const { t, locale } = useI18n(Astro.url.pathname);
+const { t, locale } = useI18n(Astro.url.pathname, Astro.locals);
 const Body = locale === 'es' ? BodyEs : BodyEn;
 ---
 

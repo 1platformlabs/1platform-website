@@ -14,6 +14,35 @@ services:
     # hardcodeaba `bower-dashboard-prod` y lo borraba en cada corrida.
     container_name: 1platform-website-prod
     restart: unless-stopped
+
+    # ⚠️ ESTE BLOQUE ES NUEVO Y ES EL CANAL QUE F3 NECESITA.
+    #
+    # Antes no había ni `environment:` ni `env_file:`, y el sitio era estático
+    # así que no hacía falta. Ahora el proceso lee su configuración de
+    # `process.env` y sin esto NADA se la da: `deploy.sh` pasa `--env-file` a
+    # `docker compose`, que alimenta la INTERPOLACIÓN de este archivo y no el
+    # entorno del contenedor. Es la clase de fallo que no da error — el archivo
+    # se escribe bien, con chmod 600, y el proceso nunca lo ve.
+    #
+    # `${VAR:-}` con default vacío en vez de `${VAR}` a secas: sin el default,
+    # `docker compose` ADVIERTE y sustituye vacío igual, así que el ruido no
+    # compra nada. El default real de cada valor vive en el código, junto a la
+    # razón de ser ese y no otro.
+    env_file:
+      - .env.prod
+    environment:
+      # Dónde vive la API que sirve el manifiesto y la copia. Sin esto el sitio
+      # cae al host público (correcto en PROD, inservible en QA, que necesita
+      # apuntar a `api-qa`).
+      SITE_API_BASE_URL: "${SITE_API_BASE_URL:-}"
+      # `repo` o `api`. Producción NUNCA pone `repo`: sería servir la marca de
+      # 1Platform bajo el dominio de un cliente y llamarlo resiliencia.
+      SITE_MANIFEST_SOURCE: "${SITE_MANIFEST_SOURCE:-}"
+      # Fallos de caché por minuto que el sitio se permite pedirle a la API. Es
+      # el techo que acota el ataque que el límite por IP de la API no puede
+      # ver, porque todo el tráfico legítimo llega desde esta única dirección.
+      SITE_MISS_BUDGET_PER_MINUTE: "${SITE_MISS_BUDGET_PER_MINUTE:-}"
+
     ports:
       # ⚠️ ENTRECOMILLADO a propósito: el verificador del pipeline deriva el
       # puerto de este archivo con un `awk` que busca `"NNNN:NN"` entre comillas.
@@ -23,12 +52,24 @@ services:
     healthcheck:
       # `wget`, NO `curl`: `nginx:alpine` no trae curl (ver Dockerfile).
       #
-      # La cabecera `Host` es OBLIGATORIA: el nginx de la imagen tiene un
-      # `default_server` que devuelve 444 a cualquier Host ajeno, y `wget` a
-      # `127.0.0.1` manda `Host: 127.0.0.1`. Sin esta cabecera el contenedor
-      # quedaría `unhealthy` para siempre con el sitio sirviendo perfecto.
+      # La cabecera `Host` es OBLIGATORIA, y ahora por una razón distinta de la
+      # anterior. Antes el nginx de la imagen tenía un `default_server` que
+      # devolvía 444 a cualquier Host ajeno; ese bloque ya no existe (D-24), y
+      # sin embargo la cabecera sigue haciendo falta: `wget` a `127.0.0.1` manda
+      # `Host: 127.0.0.1`, que no resuelve a ningún inquilino, y la aplicación
+      # contesta un 404 correcto. Sin la cabecera el contenedor quedaría
+      # `unhealthy` para siempre con el sitio sirviendo perfecto.
+      #
+      # ⚠️ Lo que este probe SÍ ata, y hay que decirlo: con SSR, `/` depende de
+      # `1platform-api`. Una caída larga de la API deja el contenedor
+      # `unhealthy`, y eso es HONESTO — el sitio no está sirviendo. No dispara
+      # reinicios: `restart: unless-stopped` reacciona a que el proceso TERMINE,
+      # no a `unhealthy`, y menos mal: reiniciar vaciaría la caché que es
+      # justamente lo que mantiene el sitio en pie mientras la API vuelve.
       test: ["CMD", "wget", "-qO-", "--header=Host: 1platform.pro", "http://127.0.0.1/"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s
+      # Node arranca, lee el manifiesto y calienta la caché; 10 s era el
+      # presupuesto de un nginx que sólo abría un socket.
+      start_period: 30s

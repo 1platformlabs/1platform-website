@@ -85,3 +85,59 @@ test('the offset the bar adds reaches every anchor: a hash navigation leaves the
   const top = await page.evaluate((i) => document.getElementById(i)!.getBoundingClientRect().top, id);
   expect(top).toBeGreaterThanOrEqual(130);
 });
+
+/**
+ * ── The bar is 1Platform's changelog, so it is 1Platform's bar ──────────────
+ *
+ * `BaseLayout` reads the changelog through `getLocalized('changelog', …)`: the
+ * content collection in THIS REPOSITORY. That is the platform's own product
+ * news — its title, its voice, its link to `/changelog/`.
+ *
+ * Until this gate, that strip rendered inside every tenant's chrome. Measured
+ * on the clinic's 404 page, whose home is exempt only because it happens to
+ * pass `showAnnouncement={false}`:
+ *
+ *   "El sitio web se reenfocó en la tienda online, los pagos y la plataforma
+ *    para desarrolladores"  →  /novedades/
+ *
+ * …under a clinic's domain, linking to a route that clinic does not publish
+ * and which therefore answers 404.
+ *
+ * ⚠️ THE PROVIDER/BRAND SWEEP CANNOT SEE THIS. A changelog title need not
+ * contain the string "1Platform" — the current one does not — so
+ * `no-leak-across-tenants.spec.ts` reads the strip and finds nothing banned.
+ * The rule has to be about PROVENANCE, not about spelling, which is what this
+ * test asserts: the bar appears only for a tenant that publishes the changelog.
+ */
+test('the changelog strip appears only for a tenant that publishes the changelog', async () => {
+  const { getWithHost } = await import('./helpers/http-host')
+  const { repoTenants } = await import('../src/data/site-tenants')
+  const base = `http://127.0.0.1:${process.env.PLAYWRIGHT_PORT ?? '4321'}`
+
+  const tenants = repoTenants()
+  expect(tenants.length, 'a cross-tenant assertion needs at least two tenants').toBeGreaterThanOrEqual(2)
+
+  for (const tenant of tenants) {
+    const publishes = tenant.pages.includes('/changelog/')
+    // The 404 page is the one page EVERY tenant renders, and the only one a
+    // page-set enumeration can never reach — which is exactly where the leak
+    // was found. Asking for a route nobody publishes is how we get it.
+    const res = await getWithHost(`${base}/no-existe-esta-ruta/`, tenant.domain)
+    expect(res.status, `${tenant.domain} must answer 404 for an unpublished route`).toBe(404)
+
+    const hasBar = res.body.includes('class="announcement"')
+    expect(
+      hasBar,
+      publishes
+        ? `${tenant.slug} publishes /changelog/ and must still get its strip — a gate that hides it from everyone is not a fix`
+        : `${tenant.slug} does not publish /changelog/, yet the platform's changelog strip is rendering on its page`,
+    ).toBe(publishes)
+  }
+
+  // Floor: with every tenant on the same side of the branch this proves nothing.
+  const publishing = tenants.filter((t) => t.pages.includes('/changelog/')).length
+  expect(publishing, 'at least one tenant must publish the changelog').toBeGreaterThan(0)
+  expect(publishing, 'at least one tenant must NOT publish it, or there is no gate to test').toBeLessThan(
+    tenants.length,
+  )
+})

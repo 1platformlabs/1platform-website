@@ -7,8 +7,10 @@ import Check from '@components/Check.astro';
 import ProcessSpine from '@components/ProcessSpine.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { appUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('pricing.title');
 const description = t('pricing.description');
@@ -62,8 +64,8 @@ const faqJsonLd = {
   })),
 };
 
-const pageUrl = new URL(l('/pricing/'), 'https://1platform.pro').toString();
-const homeUrl = new URL(l('/'), 'https://1platform.pro').toString();
+const pageUrl = new URL(l('/pricing/'), siteOrigin(Astro.locals)).toString();
+const homeUrl = new URL(l('/'), siteOrigin(Astro.locals)).toString();
 
 const pageJsonLd = [
   faqJsonLd,
@@ -241,7 +243,7 @@ const quoted = [
   <Hero
     headline={t('pricing.hero.headline')}
     subheadline={t('pricing.hero.subheadline')}
-    primaryCta={{ label: t('pricing.cta.startFree'), href: 'https://app.1platform.pro/app/' }}
+    primaryCta={ctaTo(t('pricing.cta.startFree'), appUrl(Astro.locals))}
     secondaryCta={{ label: t('pricing.cta.contactSales'), href: l('/contact/') }}
     badge={t('nav.pricing')}
   />
@@ -364,7 +366,9 @@ const quoted = [
           <p class="panel__body">
             {t('pricing.start.panel1.body')}
           </p>
-          <a href="https://app.1platform.pro/app/" class="btn btn--primary panel__cta">{t('pricing.cta.startFree')}</a>
+          {appUrl(Astro.locals) && (
+            <a href={appUrl(Astro.locals)} class="btn btn--primary panel__cta">{t('pricing.cta.startFree')}</a>
+          )}
         </div>
 
         <div class="panel card reveal">

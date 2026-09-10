@@ -3,7 +3,7 @@ import BlogPostCard from './BlogPostCard.astro';
 import { bareSlug, getLocalized } from '@i18n/collections';
 
 import { useI18n } from '@i18n';
-const { t, locale } = useI18n(Astro.url.pathname);
+const { t, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 interface Props {
   currentSlug: string;

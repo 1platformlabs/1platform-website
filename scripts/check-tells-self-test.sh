@@ -114,6 +114,8 @@ assert_red "Spanish count, noun first" "numbered replace-count"     "$CATALOG" \
 printf '\n%sColour and token discipline%s\n' "$DIM" "$RESET"
 assert_red "hardcoded brand hex"  "hardcoded brand colours" "$PAGE" \
   '<style>.x { color: #2c5fd6; }</style>'
+assert_red "hardcoded brand hex in lib" "hardcoded brand colours" "src/lib/tenant-brand-assets.ts" \
+  'const seededBrandColour = "#2c5fd6";'
 assert_red "token hex fallback"   "var(--token, #fallback)" "$PAGE" \
   '<style>.x { color: var(--color-accent, #2c5fd6); }</style>'
 

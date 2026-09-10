@@ -2,6 +2,19 @@
 import Logo from '@components/Logo.astro';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
 import { useI18n, type Locale } from '@i18n';
+import { isMultilingual } from '@lib/site-locale';
+
+/**
+ * An internal menu entry, or nothing when this tenant does not publish it.
+ *
+ * The menu used to be a fixed list, so a tenant publishing one page still
+ * offered eighteen — every one of them a 404, because the middleware refuses a
+ * route the manifest does not publish. The page set became a datum and the
+ * navigation did not.
+ */
+function published(route: string): string | null {
+  return Astro.locals.tenant.pages.includes(route) ? l(route) : null;
+}
 
 type SubItem = { label: string; href: string };
 type NavItem = { label: string; href: string; subItems?: SubItem[] };
@@ -11,8 +24,16 @@ interface Props {
 }
 
 const { alternates } = Astro.props;
-const { t, l } = useI18n(Astro.url.pathname);
-const appUrl = 'https://app.1platform.pro/app/';
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
+/**
+ * The chrome's outbound links, as DATA (D-7).
+ *
+ * A tenant without a product to sign into does not get an empty link, a
+ * disabled link, or a link to the platform's own app: the element is not
+ * rendered at all. Absence is a first-class answer here, and every use below
+ * is guarded on it — which is why these are `| null` rather than defaulted.
+ */
+const { app: appUrl, docs: docsUrl, support: supportUrl } = Astro.locals.tenant.destinations;
 
 /**
  * Ordered the way a merchant meets them: sell, get paid, deliver, then the
@@ -27,57 +48,114 @@ const appUrl = 'https://app.1platform.pro/app/';
  * after the three protagonists, so a menu entry aimed at agencies was occupying
  * a slot on the page that speaks to shopkeepers.
  */
-const solutions: SubItem[] = [
-  { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
-  { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
-  { label: t('nav.solutions.deliveries'), href: l('/solutions/deliveries/') },
-  { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
-  { label: t('nav.solutions.content'), href: l('/solutions/content/') },
-];
+const solutions: SubItem[] = (
+  [
+    ['nav.solutions.onlineStore', '/solutions/online-store/'],
+    ['nav.solutions.payments', '/payments-invoicing/'],
+    ['nav.solutions.deliveries', '/solutions/deliveries/'],
+    ['nav.solutions.ads', '/solutions/ads/'],
+    ['nav.solutions.content', '/solutions/content/'],
+  ] as const
+)
+  .map(([key, route]) => ({ key, href: published(route) }))
+  .filter((item): item is typeof item & { href: string } => item.href !== null)
+  .map(({ key, href }) => ({ label: t(key), href }));
+
+const solutionsHref = published('/solutions/');
+const pricingHref = published('/pricing/');
+const blogHref = published('/blog/');
 
 const navItems: NavItem[] = [
-  { label: t('nav.solutions'), href: l('/solutions/'), subItems: solutions },
+  // The parent entry survives only if the tenant publishes the hub itself; the
+  // children are filtered on their own, so a tenant with two solutions gets a
+  // menu of two rather than a menu of five pointing at three 404s.
+  ...(solutionsHref
+    ? [{ label: t('nav.solutions'), href: solutionsHref, subItems: solutions }]
+    : []),
   // "Features" is gone: it was a smaller copy of /solutions/ — twelve of its
   // twenty-one headings appeared there verbatim, every destination it linked
   // was already linked there, and no page body on the site pointed at it.
-  { label: t('nav.pricing'), href: l('/pricing/') },
-  { label: t('nav.docs'), href: 'https://developer.1platform.pro/' },
-  { label: t('nav.blog'), href: l('/blog/') },
+  ...(pricingHref ? [{ label: t('nav.pricing'), href: pricingHref }] : []),
+  // Docs only when the tenant HAS docs. A clinic has no developer portal, and
+  // the wrong answers are all worse than absence: an empty href, a dead link,
+  // or — the one this epic exists to prevent — a link to the platform's own.
+  ...(docsUrl ? [{ label: t('nav.docs'), href: docsUrl }] : []),
+  ...(blogHref ? [{ label: t('nav.blog'), href: blogHref }] : []),
 ];
 
-const currentPath = Astro.url.pathname;
+const hasNavigation = navItems.length > 0;
+// The switcher belongs to the tenant's language capacity, not to this page's
+// SEO graph. The bilingual 404 deliberately has no hreflang alternates, but it
+// must keep the established EN/ES control (both disabled there); a
+// monolingual tenant must not render the control at all.
+const hasLanguageChoices = isMultilingual(Astro.locals.tenant);
+const hasMenuContent = hasNavigation || hasLanguageChoices;
+const headerCtaHref = supportUrl ?? appUrl;
+const headerCtaLabel = supportUrl
+  ? t('cta.scheduleDemo')
+  : appUrl
+    ? t('cta.getStarted')
+    : null;
+const headerCtaAria = supportUrl ? t('cta.scheduleDemoAria') : undefined;
+const hasActions = Boolean(appUrl || headerCtaHref || hasMenuContent);
+const hasMobileFooter = Boolean(headerCtaHref || hasLanguageChoices);
+// Keep the default tenant's serialized chrome byte-for-byte stable. The
+// containment CSS only exists for a tenant that actually combines the compact
+// support CTA with a wordmark that cannot fit the 390px rail.
+const longWordmarkNeedsMobileContainment = Boolean(supportUrl)
+  && Array.from(Astro.locals.tenant.brand_wordmark?.trim() ?? '').length > 28;
+
+const currentPath = Astro.originPathname;
 const isActive = (href: string) => href.startsWith('/') && currentPath.startsWith(href);
 ---
 
-<header class="site-header" id="site-header">
+<header
+  class="site-header"
+  id="site-header"
+  data-header-layout={hasNavigation ? undefined : 'compact'}
+>
   <div class="site-header__rail">
     <Logo class="site-header__logo" />
 
-    <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
-      <details class="site-header__solutions">
-        <summary class:list={['site-header__link', 'nav-link', { 'is-active': isActive(l('/solutions/')) }]}>
-          {t('nav.solutions')}<span class="site-header__chevron" aria-hidden="true"></span>
-        </summary>
-        <div class="solutions-menu">
-          <ul>
-            {solutions.map((item) => (
-              <li><a href={item.href}>{item.label}</a></li>
-            ))}
-          </ul>
-          <a href={l('/solutions/')} class="solutions-menu__all">{t('nav.solutions.viewAll')}</a>
-        </div>
-      </details>
+    {hasNavigation && <nav class="site-header__nav" aria-label={t('nav.aria.main')}>
+      {/* The dropdown is rendered only when the tenant publishes the hub it
+          opens. Without this it drew for EVERY tenant, and for one that
+          publishes a single page the result was the worst possible shape: a
+          "Soluciones" menu with an EMPTY list and a "Ver todas las soluciones"
+          link straight to a 404. Measured on the clinic's home. */}
+      {solutionsHref && (
+        <details class="site-header__solutions">
+          <summary class:list={['site-header__link', 'nav-link', { 'is-active': isActive(solutionsHref) }]}>
+            {t('nav.solutions')}<span class="site-header__chevron" aria-hidden="true"></span>
+          </summary>
+          <div class="solutions-menu">
+            <ul>
+              {solutions.map((item) => (
+                <li><a href={item.href}>{item.label}</a></li>
+              ))}
+            </ul>
+            <a href={solutionsHref} class="solutions-menu__all">{t('nav.solutions.viewAll')}</a>
+          </div>
+        </details>
+      )}
       {navItems.slice(1).map((item) => (
         <a href={item.href} class:list={['site-header__link', { 'is-active': isActive(item.href) }]}>
           {item.label}
         </a>
       ))}
-    </nav>
+    </nav>}
 
-    <div class="site-header__actions">
-      <a href={appUrl} class="site-header__signin">{t('cta.signIn')}</a>
-      <a href={appUrl} class="btn btn--primary site-header__cta">{t('cta.getStarted')}</a>
-      <button
+    {hasActions && <div class="site-header__actions">
+      {appUrl && <a href={appUrl} class="site-header__signin">{t('cta.signIn')}</a>}
+      {headerCtaHref && headerCtaLabel && (
+        <a
+          href={headerCtaHref}
+          class="btn btn--primary site-header__cta"
+          aria-label={headerCtaAria}
+          data-support-cta={supportUrl ? 'header' : undefined}
+        >{headerCtaLabel}</a>
+      )}
+      {hasMenuContent && <button
         class="site-header__menu-toggle"
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -85,12 +163,12 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
         id="menu-toggle"
       >
         <span aria-hidden="true"></span><span aria-hidden="true"></span>
-      </button>
-    </div>
+      </button>}
+    </div>}
   </div>
 
-  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <nav aria-label={t('nav.aria.main')}>
+  {hasMenuContent && <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    {hasNavigation && <nav aria-label={t('nav.aria.main')}>
       <ul class="mobile-menu__links">
         {navItems.map((item) => (
           <li>
@@ -98,19 +176,41 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
             {item.subItems && (
               <ul class="mobile-menu__sublist">
                 {item.subItems.map((sub) => <li><a href={sub.href}>{sub.label}</a></li>)}
-                <li><a href={l('/solutions/')}>{t('nav.solutions.viewAll')}</a></li>
+                {/* Only reachable when `item.subItems` exists, which only
+                    happens when the hub is published — but spelled out rather
+                    than inferred, because that coupling lives in another
+                    variable and a future edit could break it silently. */}
+                {solutionsHref && <li><a href={solutionsHref}>{t('nav.solutions.viewAll')}</a></li>}
               </ul>
             )}
           </li>
         ))}
       </ul>
-    </nav>
-    <div class="mobile-menu__footer">
-      <a href={appUrl} class="btn btn--primary btn--full">{t('cta.getStarted')}</a>
-      <LanguageSwitcher alternates={alternates} />
-    </div>
-  </div>
+    </nav>}
+    {hasMobileFooter && <div class="mobile-menu__footer">
+      {headerCtaHref && headerCtaLabel && (
+        <a
+          href={headerCtaHref}
+          class="btn btn--primary btn--full"
+          aria-label={headerCtaAria}
+          data-support-cta={supportUrl ? 'mobile-menu' : undefined}
+        >{headerCtaLabel}</a>
+      )}
+      {hasLanguageChoices && <LanguageSwitcher alternates={alternates} />}
+    </div>}
+  </div>}
 </header>
+
+{longWordmarkNeedsMobileContainment && (
+  <style is:inline set:html={`@media (max-width: 520px) {
+  .site-header__rail { gap: var(--space-2); }
+  .site-header .site-header__logo { min-width: 0; flex: 1 1 auto; overflow: hidden; }
+  .site-header .site-header__logo .logo__mark { flex: 0 0 auto; }
+  .site-header .site-header__logo .logo__text { overflow: hidden; text-overflow: ellipsis; }
+  .site-header__actions { flex: 0 0 auto; }
+  .site-header__cta { white-space: nowrap; }
+}`} />
+)}
 
 <script>
   function initMenu() {

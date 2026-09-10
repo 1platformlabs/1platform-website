@@ -3,18 +3,62 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import Icon from '@components/Icon.astro';
 import { useI18n } from '@i18n';
 import type { IconName } from '@components/icons';
+import { docsUrl } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('notFound.title');
 const description = t('notFound.description');
 
-const destinations: { icon: IconName; label: string; detail: string; href: string }[] = [
-  { icon: 'home', label: t('breadcrumb.home'), detail: t('notFound.destination.home.detail'), href: l('/') },
-  { icon: 'layers', label: t('nav.solutions'), detail: t('notFound.destination.solutions.detail'), href: l('/solutions/') },
-  { icon: 'logs', label: t('nav.docs'), detail: t('notFound.destination.docs.detail'), href: 'https://developer.1platform.pro/' },
-  { icon: 'content', label: t('nav.blog'), detail: t('notFound.destination.blog.detail'), href: l('/blog/') },
+/**
+ * Where to send someone who is lost — and ONLY where this tenant actually goes.
+ *
+ * Every entry is filtered, and this page is the reason it matters more here
+ * than anywhere else: it is one of the two pages EVERY tenant renders (the
+ * other is the home), so an unfiltered list is a leak on a page no page-set
+ * gate can hide. Before this, a clinic's 404 offered "Solutions", "Blog" and a
+ * link to the platform's developer portal — three routes it does not publish
+ * and one product it does not have.
+ *
+ * Internal routes are checked against the published set; the docs entry is
+ * dropped when the tenant declares no documentation (D-7).
+ */
+const published = new Set(Astro.locals.tenant.pages);
+const internal = (route: string) => (published.has(route) ? l(route) : null);
+
+/**
+ * ⚠️ LAS ETIQUETAS SE TRADUCEN DESPUÉS DE FILTRAR, y ése es el punto.
+ *
+ * Construidas con la lista —`label: t('nav.docs')` dentro del literal— las
+ * cuatro se traducían SIEMPRE, incluidas las que el filtro descarta una línea
+ * más abajo. Y `t()` no cae a nada por diseño: lanza. Así que un inquilino sin
+ * documentación quedaba obligado a redactar el rótulo de una documentación que
+ * no tiene, o su 404 era un 500. Medido sobre la clínica: pedía `nav.docs` y
+ * los cuatro `notFound.destination.*.detail` para dibujar UN solo destino.
+ */
+const candidates: { icon: IconName; label: () => string; detail: () => string; href: string | null }[] = [
+  { icon: 'home', label: () => t('breadcrumb.home'), detail: () => t('notFound.destination.home.detail'), href: internal('/') },
+  { icon: 'layers', label: () => t('nav.solutions'), detail: () => t('notFound.destination.solutions.detail'), href: internal('/solutions/') },
+  { icon: 'logs', label: () => t('nav.docs'), detail: () => t('notFound.destination.docs.detail'), href: docsUrl(Astro.locals) },
+  { icon: 'content', label: () => t('nav.blog'), detail: () => t('notFound.destination.blog.detail'), href: internal('/blog/') },
 ];
+
+const destinations = candidates
+  .filter((d): d is (typeof candidates)[number] & { href: string } => d.href !== null)
+  .map((d) => ({ icon: d.icon, label: d.label(), detail: d.detail(), href: d.href }));
+
+const isCompact = destinations.length < 2;
+const homeHref = internal('/');
+const primaryDestination = isCompact ? destinations[0] : undefined;
+const primaryHref = primaryDestination?.href ?? homeHref;
+const primaryLabel = !primaryHref
+  ? null
+  : primaryDestination && primaryDestination.href !== homeHref
+    ? primaryDestination.label
+    : t('notFound.cta');
+const compactLayout = isCompact
+  ? 'grid-template-columns:minmax(0,42rem);justify-content:center'
+  : undefined;
 ---
 
 <!--
@@ -27,17 +71,29 @@ const destinations: { icon: IconName; label: string; detail: string; href: strin
   nobody can navigate to should not be making claims to a crawler about what
   exists in which language.
 -->
-<BaseLayout title={title} description={description} alternates={{}}>
+<BaseLayout
+  title={title}
+  description={description}
+  alternates={{}}
+  canonical={false}
+  noIndex={true}
+>
   <section class="error">
-    <div class="container error__inner">
+    <div
+      class="container error__inner"
+      style={compactLayout}
+      data-not-found-layout={isCompact ? 'compact' : undefined}
+    >
       <div class="error__copy">
         <p class="eyebrow error__status">{t('notFound.status')}</p>
         <h1 class="error__headline">{t('notFound.headline')}</h1>
         <p class="error__message">{t('notFound.message')}</p>
-        <a href={l('/')} class="btn btn--primary error__cta">{t('notFound.cta')}</a>
+        {primaryHref && primaryLabel && (
+          <a href={primaryHref} class="btn btn--primary error__cta">{primaryLabel}</a>
+        )}
       </div>
 
-      <nav class="error__nav" aria-labelledby="error-nav-title">
+      {!isCompact && <nav class="error__nav" aria-labelledby="error-nav-title">
         <h2 class="eyebrow" id="error-nav-title">{t('notFound.tryTheseHeading')}</h2>
         <ul class="destinations">
           {destinations.map((destination) => (
@@ -55,7 +111,7 @@ const destinations: { icon: IconName; label: string; detail: string; href: strin
             </li>
           ))}
         </ul>
-      </nav>
+      </nav>}
     </div>
   </section>
 </BaseLayout>
@@ -89,6 +145,10 @@ const destinations: { icon: IconName; label: string; detail: string; href: strin
     font-size: var(--text-5xl);
     line-height: 1.06;
     margin: var(--space-8) 0 var(--space-5);
+  }
+
+  [data-not-found-layout='compact'] .error__headline {
+    font-weight: 400;
   }
 
   .error__message {
@@ -167,7 +227,7 @@ const destinations: { icon: IconName; label: string; detail: string; href: strin
   @media (max-width: 900px) {
     .error {
       min-height: 0;
-      padding-block: var(--space-16);
+      padding: calc(var(--header-offset) + var(--space-8)) 0 var(--space-16);
     }
 
     .error__inner {

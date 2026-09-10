@@ -1,8 +1,13 @@
 ---
 import Icon from '@components/Icon.astro';
 import { useI18n } from '@i18n';
+import { brandChip } from '@lib/tenant-theme';
 
-const { t } = useI18n(Astro.url.pathname);
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
+
+// El chip de la maqueta de factura decía `1P` como literal: la marca de la
+// plataforma dibujada en la landing de un cliente. Ver `brandChip`.
+const chip = brandChip(Astro.locals.tenant);
 ---
 
 <div class="commerce-orbit" role="img" aria-label={t('home.hero.scene.aria')}>
@@ -73,7 +78,7 @@ const { t } = useI18n(Astro.url.pathname);
       </header>
       <div class="invoice-preview" aria-hidden="true">
         <span class="invoice-preview__brand"></span>
-        <span class="invoice-preview__number">1P</span>
+        <span class="invoice-preview__number">{chip}</span>
         <span></span><span></span><span></span>
       </div>
       <div class="orbit-card__event">

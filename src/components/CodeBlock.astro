@@ -8,7 +8,7 @@ interface Props {
 import { useI18n } from '@i18n';
 
 const { language = 'bash', title, code } = Astro.props;
-const { t } = useI18n(Astro.url.pathname);
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
 ---
 
 <div class="code-block">

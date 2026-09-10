@@ -10,6 +10,7 @@
       "@i18n": ["src/i18n/index.ts"],
       "@i18n/*": ["src/i18n/*"],
       "@page-content/*": ["src/page-content/*"],
+      "@lib/*": ["src/lib/*"],
       "@styles/*": ["src/styles/*"],
       "@scripts/*": ["src/scripts/*"],
       "@content/*": ["src/content/*"],

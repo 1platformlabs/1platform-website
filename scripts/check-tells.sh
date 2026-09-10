@@ -22,7 +22,7 @@ FAILED=0
 # markup into src/page-content; leaving those out would have kept the script
 # green while it watched two directories that no longer held the content it
 # exists to police.
-SRC="src/pages src/components src/layouts src/i18n src/page-content"
+SRC="src/pages src/components src/layouts src/i18n src/page-content src/lib"
 
 # The content collections — 30 Markdown files, ~17,500 words of client-facing
 # prose in both languages — are scanned SEPARATELY, and only by the rules whose
@@ -135,7 +135,11 @@ report "no numbered replace-count claim" \
 # 5. Brand colour as a hex literal instead of a token. Neutral #fff/#000
 #    shorthand inside authored SVG is tolerated; brand colours are not.
 # (src/layouts stays out: BaseLayout legitimately carries the theme-color meta.)
-m=$(grep -rnE '#[0-9a-fA-F]{6}' src/pages src/components src/page-content src/i18n \
+# `tenant-theme.ts` carries the one compiled default solely to compare incoming
+# manifest data with the stylesheet it preserves; its dedicated test reads the
+# stylesheet and pins that relationship. It is not authored presentational CSS.
+m=$(grep -rnE '#[0-9a-fA-F]{6}' src/pages src/components src/page-content src/i18n src/lib \
+  | grep -vE '^src/lib/tenant-theme\.ts:[0-9]+:.*accent:' \
   | grep -viE '#(ffffff|000000)\b' | strip_comments)
 report "no hardcoded brand colours" \
        "colour decisions live in the token layer (global.css), not in pages" "$m"
@@ -232,12 +236,29 @@ report "no untranslated literal attributes" \
 # 14. The public-site JavaScript budget: motion is CSS-first and the build must
 #     stay under 64 KB gzip across all emitted chunks. The Playwright test
 #     measures the same budget over the network; this is the cheap static gate.
+#
+#     The site gained a Node adapter, so the build no longer writes pages next
+#     to assets: it emits `dist/client/` (what visitors download) and
+#     `dist/server/` (what renders). The visitor-facing JS this rule is about is
+#     therefore under `dist/client/_astro/`.
+#
+#     Worth recording how this rule behaved through that change, because the
+#     worry was reasonable and the answer was measured: pointed at the old path
+#     it did NOT quietly pass. It has two independent guards — a sentinel that
+#     the build ran, and a floor that refuses to call an empty scan a pass — and
+#     either one alone catches the move. It failed loudly. Both are kept, and
+#     the sentinel is now the asset directory itself rather than a page, since
+#     under an adapter the home page is not a file at all.
 m=$({
-  if [ ! -f dist/index.html ]; then
-    echo "dist/index.html not found — run 'npm run build' before 'npm run check'"
+  client_dir=""
+  for candidate in dist/client dist; do
+    if [ -d "$candidate/_astro" ]; then client_dir="$candidate"; break; fi
+  done
+  if [ -z "$client_dir" ]; then
+    echo "no _astro asset directory under dist/client or dist — run 'npm run build' before 'npm run check'"
   else
     total=0
-    for f in dist/_astro/*.js; do
+    for f in "$client_dir"/_astro/*.js; do
       [ -f "$f" ] || continue
       size=$(gzip -c "$f" | wc -c | tr -d ' ')
       total=$((total + size))

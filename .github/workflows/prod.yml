@@ -138,13 +138,45 @@ jobs:
         run: |
           set -euo pipefail
 
+          # ⚠️ ESTE PASO ERA EL QUE ROMPÍA EL DEPLOY DE ESTA ÉPICA, y por eso
+          # se reescribe entero en vez de aflojarse. Con `output: 'server'`
+          # `astro build` emite `dist/server/` + `dist/client/` y NI UN SOLO
+          # `.html`, así que `[ ! -f "dist/index.html" ]` fallaba, el job `build`
+          # salía en rojo y `deploy_hetzner` —cuyo `if:` exige
+          # `needs.build.result == 'success'`— quedaba SKIPPED. Nada se habría
+          # desplegado en el primer push a `main` después del merge.
+          #
+          # Y no había ninguna señal en el PR: `prod.yml` no dispara en
+          # `pull_request`, y `ci.yml` (que sí) corre `astro build`, que con el
+          # adapter sale perfecto. Verde en el PR, muerto al mergear.
+
           if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
             echo "::error::Build output directory dist/ is empty or missing"
             exit 1
           fi
 
-          if [ ! -f "dist/index.html" ]; then
-            echo "::error::dist/index.html not found"
+          # El punto de entrada del servidor. Es EL artefacto ahora: sin él la
+          # imagen arranca nginx contra nada y sirve 502 a todo.
+          if [ ! -f "dist/server/entry.mjs" ]; then
+            echo "::error::dist/server/entry.mjs not found — the adapter did not emit a server"
+            exit 1
+          fi
+
+          # Los assets con hash de contenido, que nginx sirve como inmutables.
+          if [ ! -d "dist/client/_astro" ] || [ -z "$(ls -A dist/client/_astro)" ]; then
+            echo "::error::dist/client/_astro is empty or missing"
+            exit 1
+          fi
+
+          # ⚠️ COMPUERTA EN EL SENTIDO CONTRARIO, y es la que importa a futuro:
+          # si `dist/index.html` REAPARECE, alguien revirtió `output: 'server'` o
+          # volvió a prerenderizar una ruta. Una página prerenderizada la sirve
+          # el handler estático ANTES que la aplicación, así que ningún
+          # middleware la puede gatear y la MISMA página se serviría a todos los
+          # inquilinos — que es la fuga que esta épica existe para cerrar. Sale
+          # en rojo acá antes que en producción.
+          if [ -f "dist/index.html" ]; then
+            echo "::error::dist/index.html exists — the build went back to static, or a route was prerendered. A prerendered route is served to EVERY tenant and no middleware can gate it."
             exit 1
           fi
 
@@ -154,14 +186,7 @@ jobs:
             exit 1
           fi
 
-          for page in features/index.html pricing/index.html about/index.html; do
-            if [ ! -f "dist/${page}" ]; then
-              echo "::error::Expected page dist/${page} not found"
-              exit 1
-            fi
-          done
-
-          echo "Build validation passed: ${TOTAL_SIZE}KB, key pages present"
+          echo "Build validation passed: ${TOTAL_SIZE}KB, server entry + client assets present"
 
       - name: Generate build checksum
         if: steps.skip_check.outputs.skip != 'true'
@@ -656,12 +681,29 @@ jobs:
           # Sin bump aterrizado cae al commit del merge, que es el código que se
           # acaba de aprobar. Mismo patrón que `bower-dashboard`.
           VERSION: ${{ needs.version_bump.outputs.push_sha || github.sha }}
+          # ── El canal de configuración del contenedor (F3/F5) ──────────────
+          # Tres eslabones, y el que falte se interpola VACÍO sin ningún error:
+          #   (1) acá, del secreto/variable al entorno del step;
+          #   (2) la allow-list `envs:` de abajo, que es lo que el ssh-action
+          #       realmente exporta en el host — una variable que esté acá y no
+          #       ahí llega vacía al script remoto;
+          #   (3) el escritor de `.env.prod` en el script, más el `env_file:` de
+          #       `docker-compose.prod.yml`, que es lo que finalmente se lo pasa
+          #       al PROCESO. `docker compose --env-file` NO alcanza: alimenta
+          #       la interpolación del compose, no el entorno del contenedor.
+          #
+          # `vars.` y no `secrets.` a propósito: ninguno de estos tres valores es
+          # secreto —son una URL pública, un modo y un número— y un secreto no se
+          # puede leer de vuelta para verificar qué quedó puesto.
+          SITE_API_BASE_URL: ${{ vars.SITE_API_BASE_URL }}
+          SITE_MANIFEST_SOURCE: ${{ vars.SITE_MANIFEST_SOURCE }}
+          SITE_MISS_BUDGET_PER_MINUTE: ${{ vars.SITE_MISS_BUDGET_PER_MINUTE }}
         with:
           host: ${{ secrets.HETZNER_SSH_HOST }}
           username: ${{ secrets.HETZNER_SSH_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
           port: ${{ vars.HETZNER_SSH_PORT }}
-          envs: DEPLOY_GH_TOKEN,VERSION
+          envs: DEPLOY_GH_TOKEN,VERSION,SITE_API_BASE_URL,SITE_MANIFEST_SOURCE,SITE_MISS_BUDGET_PER_MINUTE
           script: |
             set -euo pipefail
             APP_DIR="/home/apps/1platform-website"
@@ -718,12 +760,28 @@ jobs:
 
             git reset --hard "${VERSION}"
 
-            # `deploy.sh` aborta si falta `.env.prod`, antes de construir. La
-            # landing es un estático sin secretos de runtime, pero el archivo
-            # tiene que existir igual porque el contrato del helper lo exige.
+            # `deploy.sh` aborta si falta `.env.prod`, antes de construir.
+            #
+            # ⚠️ HASTA F3 ESTE ARCHIVO SE ESCRIBÍA VACÍO, y estaba bien: la
+            # landing era un estático sin nada que configurar. Ahora el proceso
+            # lee de `process.env` en cada render, y `docker-compose.prod.yml`
+            # lo toma de acá por `env_file:`. Un archivo vacío deja al sitio
+            # cayendo a sus defaults compilados: correcto en PROD por
+            # casualidad, e imposible de apuntar a `api-qa` en QA.
             umask 077
-            : > .env.prod
+            {
+              # Sólo se escribe la línea de la variable que TIENE valor. Una
+              # línea `SITE_API_BASE_URL=` (vacía) NO es lo mismo que ausente:
+              # el default del código es `?? 'https://api.1platform.pro'`, que
+              # una cadena vacía no dispara — dejaría la URL base en blanco y
+              # cada fetch iría a una URL relativa que no existe.
+              [ -n "${SITE_API_BASE_URL:-}" ] && echo "SITE_API_BASE_URL=${SITE_API_BASE_URL}"
+              [ -n "${SITE_MANIFEST_SOURCE:-}" ] && echo "SITE_MANIFEST_SOURCE=${SITE_MANIFEST_SOURCE}"
+              [ -n "${SITE_MISS_BUDGET_PER_MINUTE:-}" ] && echo "SITE_MISS_BUDGET_PER_MINUTE=${SITE_MISS_BUDGET_PER_MINUTE}"
+              true
+            } > .env.prod
             chmod 600 .env.prod
+            echo "config del contenedor: $(wc -l < .env.prod) variable(s) — $(cut -d= -f1 .env.prod | paste -sd, -)"
 
             ./deploy.sh prod build
             ./deploy.sh prod stop || true
@@ -1067,22 +1125,36 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Install and serve locally
+      # Node en vez de `serve`, y hay que decir por qué: el artefacto ya no es un
+      # sitio estático. `serve dist/ -s` serviría el PADRE de `client/` y
+      # `server/`, así que `/` daría 404, el sondeo de arranque fallaría a los 3
+      # intentos y este job saldría en rojo con el deploy perfectamente sano —
+      # arrastrando a `notify`, que lo tiene en sus `needs`.
+      #
+      # `SITE_MANIFEST_SOURCE=repo` es lo que le da un inquilino a `localhost`.
+      # El manifiesto del repo lo mapea explícitamente a 1Platform justamente
+      # para este caso y para la suite de navegador; en `api` el runner tendría
+      # que alcanzar a `1platform-api` y una caída de la API se leería como una
+      # regresión de rendimiento.
+      - name: Serve the built site locally
         shell: bash
         run: |
           set -euo pipefail
-          npm install -g serve@14.2.4
-          serve dist/ -l 8080 -s &
+          SITE_MANIFEST_SOURCE=repo HOST=127.0.0.1 PORT=8080 node dist/server/entry.mjs &
           SERVER_PID=$!
           echo "SERVER_PID=$SERVER_PID" >> "$GITHUB_ENV"
-          for attempt in 1 2 3; do
+          for attempt in 1 2 3 4 5 6; do
             sleep 2
             if curl -sSf http://localhost:8080/ > /dev/null 2>&1; then
               echo "Local server ready (attempt ${attempt})"
               break
             fi
-            if [ "$attempt" -eq 3 ]; then
-              echo "::error::Local server failed to start after 3 attempts"
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+              echo "::error::the Astro server exited during startup"
+              exit 1
+            fi
+            if [ "$attempt" -eq 6 ]; then
+              echo "::error::Local server failed to start after 6 attempts"
               exit 1
             fi
           done

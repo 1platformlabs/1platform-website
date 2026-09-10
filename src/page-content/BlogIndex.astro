@@ -6,7 +6,7 @@ import Icon from '@components/Icon.astro';
 import { useI18n } from '@i18n';
 import { bareSlug, getLocalized } from '@i18n/collections';
 
-const { t, l, locale } = useI18n(Astro.url.pathname);
+const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 // Filtered by locale: an unfiltered read here is what would have put English
 // posts on the Spanish index.

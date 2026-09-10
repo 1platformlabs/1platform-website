@@ -6,8 +6,10 @@ import Icon from '@components/Icon.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { appUrl, docsUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('about.title');
 const description = t('about.description');
@@ -17,11 +19,11 @@ const jsonLd = {
   '@type': 'AboutPage',
   name: title,
   description,
-  url: new URL(l('/about/'), 'https://1platform.pro').toString(),
+  url: new URL(l('/about/'), siteOrigin(Astro.locals)).toString(),
   breadcrumb: {
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), 'https://1platform.pro').toString() },
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), siteOrigin(Astro.locals)).toString() },
       { '@type': 'ListItem', position: 2, name: t('footer.link.about') },
     ],
   },
@@ -99,7 +101,7 @@ const capabilityGroups: { group: string; items: { label: string; icon: IconName 
     headline={t('about.hero.headline')}
     subheadline={t('about.hero.subheadline')}
     badge={t('about.hero.badge')}
-    primaryCta={{ label: t('cta.getStarted'), href: 'https://app.1platform.pro/app/' }}
+    primaryCta={ctaTo(t('cta.getStarted'), appUrl(Astro.locals))}
     secondaryCta={{ label: t('about.hero.secondaryCta'), href: l('/solutions/') }}
   />
 
@@ -159,10 +161,12 @@ const capabilityGroups: { group: string; items: { label: string; icon: IconName 
       </div>
 
       <p class="capabilities__docs">
-        <a href="https://developer.1platform.pro/" class="link-cue">
-          {t('about.capabilities.docsLink')}
-          <Icon name="arrow-right" size={15} />
-        </a>
+        {docsUrl(Astro.locals) && (
+          <a href={docsUrl(Astro.locals)} class="link-cue">
+            {t('about.capabilities.docsLink')}
+            <Icon name="arrow-right" size={15} />
+          </a>
+        )}
       </p>
     </div>
   </section>

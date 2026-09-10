@@ -2,57 +2,114 @@
 import Logo from '@components/Logo.astro';
 import { useI18n } from '@i18n';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
+
+/** The chrome's outbound links, as DATA (D-7). Absent means not rendered. */
+const { app: appUrl, docs: docsUrl, support: supportUrl } = Astro.locals.tenant.destinations;
+
+/** An internal footer link, or nothing when this tenant does not publish it. */
+function published(route: string): string | null {
+  return Astro.locals.tenant.pages.includes(route) ? l(route) : null;
+}
+
+/** Drop absent destinations before asking the tenant to translate their labels. */
+function kept(links: { label: () => string; href: string | null }[]) {
+  return links
+    .filter((x): x is typeof x & { href: string } => x.href !== null)
+    .map(({ label, href }) => ({ label: label(), href }));
+}
 type Column = { key: string; title: string; links: { label: string; href: string }[] };
+type ColumnCandidate = {
+  key: string;
+  title: () => string;
+  links: { label: () => string; href: string | null }[];
+};
 
-const columns: Column[] = [
+const allColumns: ColumnCandidate[] = [
   {
-    key: 'product', title: t('footer.col.product'), links: [
-      { label: t('nav.solutions.onlineStore'), href: l('/solutions/online-store/') },
-      { label: t('nav.solutions.content'), href: l('/solutions/content/') },
-      { label: t('nav.solutions.deliveries'), href: l('/solutions/deliveries/') },
-      { label: t('nav.solutions.ads'), href: l('/solutions/ads/') },
-      { label: t('nav.solutions.whitelabel'), href: l('/solutions/whitelabel/') },
-      { label: t('nav.solutions.payments'), href: l('/payments-invoicing/') },
-      { label: t('footer.link.allSolutions'), href: l('/solutions/') },
+    key: 'product', title: () => t('footer.col.product'), links: [
+      { label: () => t('nav.solutions.onlineStore'), href: published('/solutions/online-store/') },
+      { label: () => t('nav.solutions.content'), href: published('/solutions/content/') },
+      { label: () => t('nav.solutions.deliveries'), href: published('/solutions/deliveries/') },
+      { label: () => t('nav.solutions.ads'), href: published('/solutions/ads/') },
+      { label: () => t('nav.solutions.whitelabel'), href: published('/solutions/whitelabel/') },
+      { label: () => t('nav.solutions.payments'), href: published('/payments-invoicing/') },
+      { label: () => t('footer.link.allSolutions'), href: published('/solutions/') },
     ],
   },
   {
-    key: 'company', title: t('footer.col.company'), links: [
-      { label: t('footer.link.about'), href: l('/about/') },
-      { label: t('nav.pricing'), href: l('/pricing/') },
-      { label: t('footer.link.forAgencies'), href: l('/for-agencies/') },
-      { label: t('footer.link.forDevelopers'), href: l('/for-developers/') },
-      { label: t('nav.blog'), href: l('/blog/') },
+    key: 'company', title: () => t('footer.col.company'), links: [
+      { label: () => t('footer.link.about'), href: published('/about/') },
+      { label: () => t('nav.pricing'), href: published('/pricing/') },
+      { label: () => t('footer.link.forAgencies'), href: published('/for-agencies/') },
+      { label: () => t('footer.link.forDevelopers'), href: published('/for-developers/') },
+      { label: () => t('nav.blog'), href: published('/blog/') },
     ],
   },
   {
-    key: 'resources', title: t('footer.col.resources'), links: [
-      { label: t('footer.link.documentation'), href: 'https://developer.1platform.pro/' },
-      { label: t('footer.link.apiReference'), href: 'https://developer.1platform.pro/api-docs' },
-      { label: t('footer.link.codeExamples'), href: 'https://developer.1platform.pro/' },
-      { label: t('footer.link.changelog'), href: l('/changelog/') },
+    key: 'resources', title: () => t('footer.col.resources'), links: [
+      // The three documentation links only exist when the tenant HAS docs
+      // (D-7). A tenant without a developer portal gets a Resources column with
+      // just its changelog — not three dead links, and emphatically not three
+      // links into the platform's own portal.
+      ...(docsUrl
+        ? [
+            { label: () => t('footer.link.documentation'), href: docsUrl },
+            { label: () => t('footer.link.apiReference'), href: new URL('api-docs', docsUrl).toString() },
+            { label: () => t('footer.link.codeExamples'), href: docsUrl },
+          ]
+        : []),
+      { label: () => t('footer.link.changelog'), href: published('/changelog/') },
     ],
   },
 ];
 
-const legal = [
-  { label: t('footer.link.terms'), href: l('/terms/') },
-  { label: t('footer.link.privacy'), href: l('/privacy/') },
-  { label: t('footer.link.cookiePreferences'), href: l('/cookies/') },
-];
+// A column whose every destination this tenant lacks is dropped whole: an
+// empty column with a heading reads as a broken page, not as a shorter site.
+const columns: Column[] = allColumns
+  .map((column) => ({ ...column, links: kept(column.links) }))
+  .filter((column) => column.links.length > 0)
+  .map((column) => ({ ...column, title: column.title() }));
+
+// A tenant with no legal pages of its own gets no legal row at all. The wrong
+// answer here is not an empty row — it is linking a visitor to the PLATFORM's
+// terms as if they governed the client's site.
+const legal = kept([
+  { label: () => t('footer.link.terms'), href: published('/terms/') },
+  { label: () => t('footer.link.privacy'), href: published('/privacy/') },
+  { label: () => t('footer.link.cookiePreferences'), href: published('/cookies/') },
+]);
+const footerCtaHref = supportUrl ?? appUrl;
+const footerCtaLabel = supportUrl
+  ? t('cta.scheduleDemo')
+  : appUrl
+    ? t('cta.getStarted')
+    : null;
+const footerCtaAria = supportUrl ? t('cta.scheduleDemoAria') : undefined;
+const compactFooter = columns.length === 0;
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer">
+<footer
+  class="site-footer"
+  style={compactFooter ? 'margin-top:0' : undefined}
+  data-footer-layout={compactFooter ? 'compact' : undefined}
+>
   <div class="site-footer__inner">
     <div class="site-footer__intro">
       <Logo class="site-footer__logo" />
       <p>{t('footer.cta.body')}</p>
-      <a class="btn btn--footer" href="https://app.1platform.pro/app/">{t('cta.getStarted')}</a>
+      {footerCtaHref && footerCtaLabel && (
+        <a
+          class="btn btn--footer"
+          href={footerCtaHref}
+          aria-label={footerCtaAria}
+          data-support-cta={supportUrl ? 'footer' : undefined}
+        >{footerCtaLabel}</a>
+      )}
     </div>
 
-    <div class="site-footer__content">
+    {columns.length > 0 && <div class="site-footer__content">
       {/* The newsletter capture that used to sit here opened a `mailto:` to the
           public sales address on submit, so anything that filled it in — a bot
           included — produced a message aimed at that inbox. It was removed
@@ -68,11 +125,11 @@ const year = new Date().getFullYear();
           </details>
         ))}
       </div>
-    </div>
+    </div>}
 
     <div class="site-footer__bottom">
       <p>{t('footer.copyright', { year })}</p>
-      <ul>{legal.map((link) => <li><a href={link.href}>{link.label}</a></li>)}</ul>
+      {legal.length > 0 && <ul>{legal.map((link) => <li><a href={link.href}>{link.label}</a></li>)}</ul>}
     </div>
   </div>
 </footer>

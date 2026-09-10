@@ -10,6 +10,20 @@ import {
 
 export * from '@i18n/ui';
 
+/**
+ * The per-request state this module reads, structurally.
+ *
+ * Typed here rather than imported from `App.Locals` so this module keeps
+ * compiling in a unit test that has no Astro request — and so the dependency
+ * runs the right way round: the i18n layer states what it needs, the middleware
+ * satisfies it.
+ */
+export type I18nLocals = {
+  locale: Locale;
+  messages: Record<string, string>;
+  localizePath: (href: string, locale: Locale) => string;
+};
+
 type MessageModule = { en: Record<string, string>; es: Record<string, string> };
 
 /**
@@ -62,9 +76,45 @@ function buildDictionary(locale: Locale): Record<string, string> {
   return dictionary;
 }
 
+/**
+ * The repo catalogues, built ON FIRST USE and not at import.
+ *
+ * ⚠️ THIS LAZINESS IS THE OTHER HALF OF D-11, and it was found by measuring
+ * rather than by reasoning. Moving `assertParity()` out of module scope removed
+ * ONE of the three throws that could fire while this module loads; the other
+ * two live in `buildDictionary` itself, and both were still reachable:
+ *
+ *   a key defined by two modules       -> throws at IMPORT
+ *   a module missing one locale half   -> throws at IMPORT
+ *
+ * Built eagerly, either of those is an exception in the long-lived process that
+ * serves EVERY tenant — including the ones whose own copy is fine — on the first
+ * request that loads this chunk. Exactly the blast radius D-11 was moved to
+ * avoid.
+ *
+ * Built lazily, they cannot happen in production at all: with
+ * `SITE_MANIFEST_SOURCE` at its default (`api`) the tenant's copy comes from the
+ * API and NOTHING here is ever consulted, so the catalogues are never built. In
+ * `repo` mode — a laptop, the browser suite — they are built on first use and
+ * the two throws still fire, loudly, where a developer sees them.
+ *
+ * The type stays `Record<Locale, …>` through the accessor, so no caller changes.
+ */
+const CACHE: Partial<Record<Locale, Record<string, string>>> = {};
+
+function dictionary(locale: Locale): Record<string, string> {
+  const built = CACHE[locale] ?? buildDictionary(locale);
+  CACHE[locale] = built;
+  return built;
+}
+
 const DICTIONARIES: Record<Locale, Record<string, string>> = {
-  en: buildDictionary('en'),
-  es: buildDictionary('es'),
+  get en() {
+    return dictionary('en');
+  },
+  get es() {
+    return dictionary('es');
+  },
 };
 
 /**
@@ -76,7 +126,7 @@ const DICTIONARIES: Record<Locale, Record<string, string>> = {
  * guarantee that depends on remembering is not one. This runs on every build,
  * for everyone, and costs a set comparison.
  */
-function assertParity(): void {
+export function assertParity(): void {
   const en = Object.keys(DICTIONARIES.en);
   const es = Object.keys(DICTIONARIES.es);
 
@@ -104,7 +154,36 @@ function assertParity(): void {
   }
 }
 
-assertParity();
+/**
+ * ⚠️ `assertParity()` IS NO LONGER CALLED AT MODULE SCOPE, and that is the point.
+ *
+ * Its docstring above says it "runs on every build, for everyone". Both halves
+ * of that stopped being true, and the measurement is worth writing down because
+ * the comment survived the change that falsified it:
+ *
+ * · It does not run at build. With `output: 'server'` and no prerendered route,
+ *   Astro skips page generation entirely (`generatePages` returns early when
+ *   there is nothing to generate), so no page module is ever executed by
+ *   `astro build`. Verified on this tree: the built `dist/server/entry.mjs`
+ *   does not import the catalogue chunk at all — the route chunks do.
+ * · So where it DID run was production, at module scope, inside the long-lived
+ *   Node process that serves every tenant. A catalogue imbalance was not a red
+ *   build. It was a throw on the first request that loaded the chunk, for every
+ *   host at once, including tenants whose own copy was fine.
+ *
+ * D-11 therefore moves the guarantee rather than the code. Parity of the
+ * TENANT'S copy is enforced where it can still be REFUSED — the API's write
+ * path (`SitePageService.assert_content_parity`, and the seed's own check
+ * before it writes a byte). Parity of the repo catalogues, which are still the
+ * source in `SITE_MANIFEST_SOURCE=repo`, is asserted by
+ * `tests/i18n-parity.spec.ts`, in CI, where a failure is a red test instead of
+ * an outage.
+ *
+ * The function stays exported and unchanged. Its ONE caller is
+ * `tests/i18n-parity.spec.ts` — said plainly, because an earlier draft of this
+ * comment claimed there were two and a reader would have gone looking for a
+ * second one that does not exist.
+ */
 
 /** Every key defined across all modules, for the parity test. */
 export function dictionaryFor(locale: Locale): Record<string, string> {
@@ -123,18 +202,46 @@ export type PageI18n = {
 /**
  * The accessor every page and component uses.
  *
- * Pass a locale when the caller already knows it (page-content components take
- * it as a prop); pass `Astro.url.pathname` when it has to be derived.
+ * ⚠️ PASS `Astro.locals` AS THE SECOND ARGUMENT. It is what makes the copy
+ * belong to the tenant being served, and it is threaded EXPLICITLY through
+ * every call site rather than read from a module-level "current request".
+ *
+ * That explicitness is the decision, not an accident of refactoring. This is a
+ * long-lived process serving concurrent requests for different hosts, and D-27
+ * is unambiguous about where per-request state may live: `context.locals`, and
+ * nowhere else. `AsyncLocalStorage` would have avoided touching 44 call sites
+ * and would have been safe, but it hides the dependency exactly where a reader
+ * needs to see it — the question "whose words are these?" should be answerable
+ * from the line that renders them.
+ *
+ * With no `locals` the repo catalogues answer, which is what a unit test and
+ * `SITE_MANIFEST_SOURCE=repo` want. That is not a production fallback: the
+ * middleware always populates `locals`, and a request that could not get its
+ * tenant's copy is answered with a 503 before any component runs — never with
+ * the platform's own words under somebody else's domain.
+ *
+ * @param localeOrPath a `Locale` when the caller already knows it (page-content
+ *                     components take it as a prop), or `Astro.url.pathname`
+ * @param locals       `Astro.locals` — the tenant's resolved locale, dictionary
+ *                     and path localiser
  */
-export function useI18n(localeOrPath: Locale | string): PageI18n {
-  const locale: Locale = (LOCALES as readonly string[]).includes(localeOrPath)
+export function useI18n(localeOrPath: Locale | string, locals?: I18nLocals): PageI18n {
+  const explicit: Locale | null = (LOCALES as readonly string[]).includes(localeOrPath)
     ? (localeOrPath as Locale)
-    : localeFromPath(localeOrPath);
+    : null;
+
+  // The tenant's own locale wins over deriving one from the path: the path
+  // rule is a property of the TOPOLOGY (English at the root, Spanish under
+  // /es/), and a monolingual Spanish tenant has neither prefix nor English.
+  const locale: Locale = explicit ?? locals?.locale ?? localeFromPath(localeOrPath);
+
+  const dictionary = locals?.messages ?? DICTIONARIES[locale];
+  const localise = locals?.localizePath ?? localizePath;
 
   return {
     locale,
-    t: createTranslator(locale, DICTIONARIES[locale]),
-    l: (href: string) => localizePath(href, locale),
+    t: createTranslator(locale, dictionary),
+    l: (href: string) => localise(href, locale),
   };
 }
 

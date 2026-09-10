@@ -9,8 +9,10 @@ import ProcessSpine from '@components/ProcessSpine.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { appUrl, docsUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('solutions-deliveries.title');
 const description = t('solutions-deliveries.description');
@@ -20,17 +22,17 @@ const jsonLd = [
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: t('nav.solutions.deliveries'),
-    provider: { '@type': 'Organization', name: '1Platform Labs', url: 'https://1platform.pro' },
+    provider: { '@type': 'Organization', name: t('org.legalName'), url: siteOrigin(Astro.locals) },
     description,
-    url: new URL(l('/solutions/deliveries/'), Astro.site).toString(),
+    url: new URL(l('/solutions/deliveries/'), siteOrigin(Astro.locals)).toString(),
     areaServed: t('solutions-deliveries.jsonld.areaServed'),
   },
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), Astro.site).toString() },
-      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), Astro.site).toString() },
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), siteOrigin(Astro.locals)).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), siteOrigin(Astro.locals)).toString() },
       { '@type': 'ListItem', position: 3, name: t('nav.solutions.deliveries') },
     ],
   },
@@ -120,7 +122,7 @@ const related: { title: string; description: string; href: string }[] = [
     headline={t('solutions-deliveries.hero.headline')}
     subheadline={t('solutions-deliveries.hero.subheadline')}
     badge={t('solutions-deliveries.hero.badge')}
-    primaryCta={{ label: t('solutions-deliveries.hero.cta.primary'), href: 'https://app.1platform.pro/app/?intent=deliveries' }}
+    primaryCta={ctaTo(t('solutions-deliveries.hero.cta.primary'), appUrl(Astro.locals, 'deliveries'))}
     secondaryCta={{ label: t('solutions-deliveries.hero.cta.secondary'), href: l('/pricing/') }}
   />
 
@@ -260,13 +262,17 @@ const related: { title: string; description: string; href: string }[] = [
           <p class="next__desc">
             {t('solutions-deliveries.next.desc')}
           </p>
-          <a href="https://developer.1platform.pro/" class="link-cue">
-            {t('solutions-deliveries.next.linkCue')}
-            <Icon name="arrow-right" size={15} />
-          </a>
+          {docsUrl(Astro.locals) && (
+            <a href={docsUrl(Astro.locals)} class="link-cue">
+              {t('solutions-deliveries.next.linkCue')}
+              <Icon name="arrow-right" size={15} />
+            </a>
+          )}
         </div>
         <div class="next__actions">
-          <a href="https://app.1platform.pro/app/?intent=deliveries" class="btn btn--primary">{t('solutions-deliveries.hero.cta.primary')}</a>
+          {appUrl(Astro.locals, 'deliveries') && (
+            <a href={appUrl(Astro.locals, 'deliveries')} class="btn btn--primary">{t('solutions-deliveries.hero.cta.primary')}</a>
+          )}
           <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions-deliveries.next.actions.viewPricing')}</a>
         </div>
       </div>

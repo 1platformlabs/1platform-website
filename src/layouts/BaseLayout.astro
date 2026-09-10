@@ -4,11 +4,26 @@ import AnnouncementBar from '@components/AnnouncementBar.astro';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { pickAnnouncement } from '@components/announcement';
-import { OG_LOCALES, alternatesForPath, useI18n, type Locale } from '@i18n';
+import { OG_LOCALES, useI18n, type Locale } from '@i18n';
 import { getLocalized } from '@i18n/collections';
 import { localizedOgImage } from '@i18n/og';
 import '@styles/global.css';
 import '@styles/components.css';
+import { siteOrigin } from '@lib/site-origin';
+import {
+  alternatesForTenantPath,
+  defaultLocaleOf,
+  isMultilingual,
+} from '@lib/site-locale';
+import { themeDeclarations } from '@lib/tenant-theme';
+import {
+  appleTouchIconIsAvailable,
+  resolveAppleTouchIcon,
+  resolveIcon,
+  resolveLogo,
+  resolveSocial,
+  socialImageIsAvailable,
+} from '@lib/tenant-brand-assets';
 
 interface Props {
   title: string;
@@ -16,6 +31,8 @@ interface Props {
   ogImage?: string;
   noIndex?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Error responses must not canonize the unpublished URL that produced them. */
+  canonical?: boolean;
   /** The home uses a deliberately quiet opening composition. Other routes keep
    * the current-release strip in the shared chrome. */
   showAnnouncement?: boolean;
@@ -30,22 +47,90 @@ interface Props {
 const {
   title,
   description,
-  ogImage = '/og/default.png',
+  ogImage,
   noIndex = false,
   jsonLd,
+  canonical = true,
   showAnnouncement = true,
-  alternates = alternatesForPath(Astro.url.pathname),
+  alternates: requestedAlternates,
 } = Astro.props;
 
-const { locale, t, l } = useI18n(Astro.url.pathname);
+const { locale, t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const tenant = Astro.locals.tenant;
+// The manifest is the source of both declared and derived brand assets. Tenant
+// #1 declares the compiled paths, so these expressions render the same literal
+// bytes it historically carried without a branch on slug.
+const icon = resolveIcon(tenant);
+const brandSocial = resolveSocial(tenant);
+// The home-screen icon is the one asset a device KEEPS. It used to be the
+// platform's compiled PNG for every tenant (issue #107); it is now the
+// tenant's, and it is omitted rather than advertised broken when a derived
+// raster cannot be made.
+const appleTouchIcon = resolveAppleTouchIcon(tenant);
+const appleTouchIconAvailable = await appleTouchIconIsAvailable(tenant);
+const logo = await resolveLogo(tenant);
+// A page's own card (notably an article) remains authoritative. The tenant
+// card supplies only the old layout default; if its derived raster is not
+// deterministic, the absence is honest and no platform card is substituted.
+const effectiveOgImage = ogImage ?? brandSocial;
+const ogImageAvailable = ogImage !== undefined || await socialImageIsAvailable(tenant);
+const requestPathname = Astro.originPathname;
+const alternates = alternatesForTenantPath(
+  tenant,
+  requestPathname,
+  requestedAlternates,
+);
+const detectPreferredLocale = isMultilingual(tenant);
+
+/**
+ * Whether crawlers are welcome — the TENANT's answer, not just the page's.
+ *
+ * `noIndex` was a prop with a default of `false` and, measured, ZERO callers in
+ * the entire tree. So `indexable: false` on a manifest blocked exactly one
+ * thing (the sitemap answered 404) while every page of that tenant was served
+ * without a robots meta and remained perfectly crawlable. The comment in
+ * `src/data/site-tenants.ts` asserting that it "puts noindex on every page" was
+ * simply false, and reading the comment instead of the code is how a
+ * provisional domain gets indexed.
+ *
+ * The page-level prop is kept and ORed rather than replaced: a page may have
+ * its own reason to stay out of the index, and a tenant-level `false` must not
+ * be able to overrule it.
+ */
+const noIndexEffective = noIndex || !tenant.indexable;
+
+/**
+ * JSON for a `<script>` block, which is NOT the same as JSON.
+ *
+ * `set:html` turns OFF Astro's escaping on purpose, and `JSON.stringify` does
+ * not escape `<` — so a brand containing `</script>` closes the block early and
+ * everything after it is parsed as markup. With the brand now coming from the
+ * manifest, that string is operator-supplied and lands directly here.
+ *
+ * `<` and `>` become their unicode escapes, which JSON parsers read as the same
+ * characters and an HTML parser cannot see. `&` goes too, so the payload cannot
+ * be reassembled through entity decoding.
+ *
+ * Note this is specific to `set:html`. The `{title}` interpolation and the
+ * `<meta content=...>` attributes below DO go through Astro's escaper and are
+ * already safe — verified, and worth saying so nobody "hardens" them into
+ * double-escaped mojibake.
+ */
+const jsonLdScript = (value: unknown) =>
+  JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
+
+const canonicalURL = canonical
+  ? new URL(requestPathname, siteOrigin(Astro.locals))
+  : null;
 // The share card follows the page's language. A Spanish page pointing at an
 // English card was issue #59: the headline of the card is the reader's first
 // contact with the product, and it arrived in a language they did not pick.
 // Cards with nothing to translate (the wordmark fallback) are left alone —
 // `localizedOgImage` only swaps names it knows were drawn in that language.
-const ogImageURL = new URL(localizedOgImage(ogImage, locale), Astro.site);
+const ogImageURL = ogImageAvailable
+  ? new URL(localizedOgImage(effectiveOgImage, locale), siteOrigin(Astro.locals))
+  : null;
 
 // hreflang must be absolute, and reciprocal: if English names Spanish, Spanish
 // has to name English with the identical pair, or Google discards the whole
@@ -58,21 +143,43 @@ const ogImageURL = new URL(localizedOgImage(ogImage, locale), Astro.site);
 // would return null, the guard would bail every time, and auto-detection would
 // silently never fire.
 const alternateLinks = (Object.entries(alternates) as [Locale, string][]).map(
-  ([code, path]) => ({ code, href: new URL(path, Astro.site).toString() }),
+  ([code, path]) => ({ code, href: new URL(path, siteOrigin(Astro.locals)).toString() }),
 );
 
-// x-default points at the unprefixed English URL: it is the already-indexed
-// canonical, and pointing it at /es/ would have Google serve Spanish to en-AU
-// and en-CA readers — exactly what the language rule says must not happen.
-const xDefault = alternates.en ? new URL(alternates.en, Astro.site).toString() : null;
+// x-default belongs to the tenant's default locale — the one that owns its
+// unprefixed root. For tenant #1 that remains the existing English URL.
+const defaultAlternate = alternates[defaultLocaleOf(tenant)];
+const xDefault = defaultAlternate
+  ? new URL(defaultAlternate, siteOrigin(Astro.locals)).toString()
+  : null;
 
-const rssPath = l('/rss.xml');
+// The feed follows the section it describes. A tenant that does not publish a
+// blog has no feed — `/rss.xml` answers 404 for it by design — so advertising
+// one in every page's <head> pointed readers and crawlers at nothing.
+const rssPath = tenant.pages.includes('/blog/') ? l('/rss.xml') : null;
 
 // The announcement bar shows the newest changelog entry of this language, or
 // nothing at all (D-9). The layout decides here, because the bar's 40 px move
 // the fixed header and every offset under it: `has-announcement` on <html>
 // sets `--header-top`, and `--header-offset` (global.css) follows.
-const changelog = await getLocalized('changelog', locale);
+//
+// ⚠️ Y SÓLO SI ESTE INQUILINO PUBLICA EL CHANGELOG — misma regla que `rssPath`
+// dos líneas arriba, y por el mismo motivo. La tira lee la colección del REPO,
+// que es el changelog de 1Platform: sin este filtro, la novedad de producto de
+// la plataforma —su texto, su voz— se dibujaba dentro del cromo de un
+// inquilino, enlazando a una ruta que ese inquilino no publica y que por lo
+// tanto contesta 404. Medido en el 404 de la clínica.
+//
+// El barrido de marca no puede verlo: el título de una entrada del changelog
+// no tiene por qué contener la palabra «1Platform» — el de la entrada vigente
+// no la tiene.
+// El tema del inquilino, para ESTA petición. Ver `src/lib/tenant-theme.ts`:
+// el manifiesto ya traía `theme` validado y nadie lo leía, así que todos los
+// inquilinos se dibujaban con el cobalto de 1Platform.
+const themeCss = themeDeclarations(tenant);
+
+const publishesChangelog = tenant.pages.includes('/changelog/');
+const changelog = publishesChangelog ? await getLocalized('changelog', locale) : [];
 const announcement = pickAnnouncement(
   changelog.map((entry) => ({ title: entry.data.title, date: entry.data.date })),
 );
@@ -111,15 +218,17 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
       crossorigin
     />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/logo-oauth-120x120.png" />
-    <link rel="canonical" href={canonicalURL} />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" type="image/svg+xml" href={icon} />
+    {appleTouchIconAvailable && <link rel="apple-touch-icon" href={appleTouchIcon} />}
+    {canonicalURL && <link rel="canonical" href={canonicalURL} />}
+    {/* Not advertised by a tenant whose sitemap answers 404: every page of a
+        non-indexable site used to announce a sitemap that does not exist. */}
+    {tenant.indexable && <link rel="sitemap" href="/sitemap-index.xml" />}
 
     <title>{title}</title>
     <meta name="description" content={description} />
 
-    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    {noIndexEffective && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Language alternates -->
     {alternateLinks.map(({ code, href }) => (
@@ -127,7 +236,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     ))}
     {xDefault && <link rel="alternate" hreflang="x-default" href={xDefault} />}
 
-    <script is:inline>
+    {detectPreferredLocale && <script is:inline>
       /*
         First-visit language selection.
 
@@ -205,15 +314,15 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
 
         location.replace(target.pathname + location.search + location.hash);
       })();
-    </script>
+    </script>}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImageURL} />
-    <meta property="og:url" content={canonicalURL} />
-    <meta property="og:site_name" content="1Platform" />
+    {ogImageURL && <meta property="og:image" content={ogImageURL} />}
+    {canonicalURL && <meta property="og:url" content={canonicalURL} />}
+    <meta property="og:site_name" content={tenant.brand_name} />
     <meta property="og:locale" content={OG_LOCALES[locale]} />
     {(Object.keys(alternates) as Locale[])
       .filter((code) => code !== locale)
@@ -225,30 +334,56 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageURL} />
+    {ogImageURL && <meta name="twitter:image" content={ogImageURL} />}
 
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title={t('layout.rssTitle')}
-      href={rssPath}
-    />
+    {rssPath && (
+      <link
+        rel="alternate"
+        type="application/rss+xml"
+        title={t('layout.rssTitle')}
+        href={rssPath}
+      />
+    )}
 
     <ClientRouter />
 
     {jsonLd && (
-      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+      <script type="application/ld+json" set:html={jsonLdScript(jsonLd)} />
     )}
 
-    <script is:inline type="application/ld+json">
-    {
+    {/*
+      The organisation is the TENANT, not the platform. This block used to be an
+      inline literal naming 1Platform and its apex on every page — which under N
+      brands means every client's site telling search engines it belongs to us.
+      It goes through the same escaper as the block above for the same reason.
+    */}
+    <script type="application/ld+json" set:html={jsonLdScript({
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "1Platform",
-      "url": "https://1platform.pro",
-      "logo": "https://1platform.pro/favicon.svg"
-    }
-    </script>
+      name: tenant.brand_name,
+      // No trailing slash: this is an ORIGIN, and the literal it replaced did not
+      // carry one either. Matching it keeps the page byte-identical to the frozen
+      // baseline, which is what makes 'no regression' a measurement instead of a
+      // judgement call.
+      url: `https://${tenant.domain}`,
+      // Without a declared icon, a logo is emitted only after the derived
+      // social raster succeeds. Absence is more honest than a broken image or
+      // a platform fallback under a customer domain.
+      ...(logo ? { logo: `https://${tenant.domain}${logo}` } : {}),
+    })} />
+
+    {/*
+      Astro places compiled stylesheet links after this dynamic block in the
+      served HTML, even though the component appears at the end of `<head>`.
+      The emitter therefore uses `html:root`: a more specific selector than
+      the `:root` in `global.css`, without depending on Astro's output order.
+
+      `set:html` disables Astro's escaping. This is safe because the content is
+      not free-form text: `themeDeclarations` emits only colors matching `#`
+      plus six hex digits and font families from a closed enum, discarding all
+      other input.
+    */}
+    {themeCss && <style set:html={themeCss} />}
   </head>
   <body>
     <a href="#main-content" class="skip-link">{t('layout.skipToContent')}</a>

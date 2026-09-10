@@ -6,7 +6,7 @@ import { formatDate, useI18n } from '@i18n';
 import { getLocalized } from '@i18n/collections';
 import { render } from 'astro:content';
 
-const { t, l, locale } = useI18n(Astro.url.pathname);
+const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 const entries = await getLocalized('changelog', locale);
 

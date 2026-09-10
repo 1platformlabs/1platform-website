@@ -23,7 +23,8 @@ interface Props {
   motif?: boolean;
 }
 
-const { t } = useI18n(Astro.url.pathname);
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
+const destinations = Astro.locals.tenant.destinations;
 
 const {
   headline,
@@ -31,8 +32,16 @@ const {
   // Defaults reuse the shell's own CTA keys (`common.ts`) rather than
   // redefining them here — "Get Started Free" has exactly one Spanish
   // translation for the whole site, whichever page falls back to it.
-  primaryCta = { label: t('cta.getStarted'), href: 'https://app.1platform.pro/app/' },
-  secondaryCta = { label: t('cta.viewDocs'), href: 'https://developer.1platform.pro/' },
+  // The defaults come from the TENANT's manifest, and either can be absent.
+  // `?? undefined` rather than a literal fallback: a tenant with no app to sign
+  // into gets no primary button, which is what D-7 asks for. The markup below
+  // already guards both, so absence renders nothing rather than an empty href.
+  primaryCta = destinations.app
+    ? { label: t('cta.getStarted'), href: destinations.app }
+    : undefined,
+  secondaryCta = destinations.docs
+    ? { label: t('cta.viewDocs'), href: destinations.docs }
+    : undefined,
   badge,
   intentChips,
   motif = false,
@@ -48,10 +57,21 @@ const {
 
       <p class="hero__sub">{subheadline}</p>
 
-      <div class="hero__actions">
-        <a href={primaryCta.href} class="btn btn--primary">{primaryCta.label}</a>
-        <a href={secondaryCta.href} class="btn btn--ghost">{secondaryCta.label}</a>
-      </div>
+      {/* D-7: a destination the tenant does not have renders NO element — not
+          an empty href, not a disabled button, and not a link into the
+          platform's own product. The whole row goes when neither exists, so a
+          tenant with no outbound destinations does not ship an empty flex row
+          with its margins. */}
+      {(primaryCta || secondaryCta) && (
+        <div class="hero__actions">
+          {primaryCta && (
+            <a href={primaryCta.href} class="btn btn--primary">{primaryCta.label}</a>
+          )}
+          {secondaryCta && (
+            <a href={secondaryCta.href} class="btn btn--ghost">{secondaryCta.label}</a>
+          )}
+        </div>
+      )}
 
       {intentChips && intentChips.length > 0 && (
         <nav class="hero__chips" aria-label={t('hero.chips.aria')}>

@@ -27,7 +27,7 @@ interface Props {
 }
 
 const { alternates } = Astro.props;
-const { t, locale: current } = useI18n(Astro.url.pathname);
+const { t, locale: current } = useI18n(Astro.url.pathname, Astro.locals);
 
 const SHORT: Record<Locale, string> = { en: 'EN', es: 'ES' };
 ---

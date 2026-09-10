@@ -7,8 +7,10 @@ import Icon from '@components/Icon.astro';
 import ComparisonTable from '@components/ComparisonTable.astro';
 import type { IconName } from '@components/icons';
 import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { appUrl, docsUrl, ctaTo } from '@lib/site-destinations';
 
-const { t, l } = useI18n(Astro.url.pathname);
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const title = t('solutions.title');
 const description = t('solutions.description');
@@ -23,11 +25,11 @@ const jsonLd = {
   '@type': 'CollectionPage',
   name: title,
   description,
-  url: new URL(l('/solutions/'), Astro.site).toString(),
+  url: new URL(l('/solutions/'), siteOrigin(Astro.locals)).toString(),
   isPartOf: {
     '@type': 'WebSite',
     name: '1Platform',
-    url: 'https://1platform.pro',
+    url: siteOrigin(Astro.locals),
   },
 };
 
@@ -355,8 +357,8 @@ const intentChips = groups.map((group) => ({ label: group.eyebrow, href: `#${gro
     headline={t('solutions.hero.headline')}
     subheadline={t('solutions.hero.subheadline')}
     badge={t('solutions.hero.badge')}
-    primaryCta={{ label: t('cta.launchStore'), href: 'https://app.1platform.pro/app/?intent=store' }}
-    secondaryCta={{ label: t('solutions.hero.cta.secondary'), href: 'https://developer.1platform.pro/' }}
+    primaryCta={ctaTo(t('cta.launchStore'), appUrl(Astro.locals, 'store'))}
+    secondaryCta={ctaTo(t('solutions.hero.cta.secondary'), docsUrl(Astro.locals))}
     intentChips={intentChips}
   />
 
@@ -436,7 +438,9 @@ const intentChips = groups.map((group) => ({ label: group.eyebrow, href: `#${gro
           </p>
         </div>
         <div class="next__actions">
-          <a href="https://app.1platform.pro/app/?intent=store" class="btn btn--primary">{t('cta.launchStore')}</a>
+          {appUrl(Astro.locals, 'store') && (
+            <a href={appUrl(Astro.locals, 'store')} class="btn btn--primary">{t('cta.launchStore')}</a>
+          )}
           <a href={l('/pricing/')} class="btn btn--ghost">{t('solutions.next.actions.viewPricing')}</a>
         </div>
       </div>

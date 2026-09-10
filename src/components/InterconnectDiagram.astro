@@ -18,7 +18,7 @@ interface Props {
 }
 
 const { class: className } = Astro.props;
-const { t, locale } = useI18n(Astro.url.pathname);
+const { t, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 /* Geometry note: node widths and centres are chosen so the gaps between boxes
    are even (~17px in, ~16px out) across the 90..510 span of the spine. The

@@ -1,6 +1,5 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { publishedRoutes, servedHtml } from './helpers/served';
 import { translateToEs } from '../src/i18n/routes';
 
 /**
@@ -26,13 +25,25 @@ import { translateToEs } from '../src/i18n/routes';
  * Header and footer are stripped before looking: they are present on every
  * page, so counting them would make this pass by construction — the question
  * is whether the BODY names them.
+ *
+ * WHERE THE HOME PAGE COMES FROM NOW
+ * ----------------------------------
+ * This spec used to read `dist/index.html` and `dist/es/index.html`, and that
+ * was the honest thing to do while the build wrote every page to disk: the file
+ * it opened was byte-for-byte the file production served. The Node adapter
+ * ended that. `dist/` is now `dist/client` (assets plus the few prerendered
+ * pages) and `dist/server` (the code that renders the rest on demand), and the
+ * two home pages are rendered on demand — they are not files at all any more.
+ *
+ * So the subject moved to the served HTML, which is strictly closer to what a
+ * visitor gets: the same adapter, the same render path production runs. The
+ * assertion is unchanged. What it means is unchanged. Only the fetch changed,
+ * and with it these callbacks became async.
  */
 
-const DIST = 'dist';
-
 const LOCALES = [
-  { label: 'en', home: join(DIST, 'index.html'), prefix: '' },
-  { label: 'es', home: join(DIST, 'es', 'index.html'), prefix: '/es' },
+  { label: 'en' as const, home: '/' },
+  { label: 'es' as const, home: '/es/' },
 ];
 
 /**
@@ -64,9 +75,25 @@ function bodyLinks(html: string): Set<string> {
 }
 
 for (const { label, home } of LOCALES) {
-  test(`the ${label} home page names every solution the menu offers`, () => {
-    const html = readFileSync(home, 'utf8');
-    const destinations = menuDestinations(html, label as 'en' | 'es');
+  test(`the ${label} home page names every solution the menu offers`, async () => {
+    // The home used to be a path on disk, and opening a file that had been
+    // deleted was its own alarm. Fetching one is not: the enumeration has to
+    // say out loud that this locale still publishes a home, or a locale that
+    // silently stopped being built would leave this test asserting about
+    // whatever the server happened to answer with. `publishedRoutes` reads the
+    // served sitemap and carries its own floor, so this is a membership check
+    // on a list that is already known to be plausible.
+    const routes = await publishedRoutes();
+    expect(
+      routes,
+      `the served sitemap does not list ${home} — the ${label} home is not published, ` +
+        `so there is nothing here to hold to the menu's standard`,
+    ).toContain(home);
+
+    // Throws on any non-200, so a home that 404s or redirects fails here rather
+    // than quietly handing an error page to the parsers below.
+    const html = await servedHtml(home);
+    const destinations = menuDestinations(html, label);
 
     // Floor, not an inventory. A prefix typo or a renamed nav class would yield
     // an empty list, and "0 missing" over 0 destinations reads exactly like a

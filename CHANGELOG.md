@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **A tenant's home-screen icon is now its own** (issue #107). `apple-touch-icon`
+  was a literal in `BaseLayout` — `/logo-oauth-120x120.png`, 1Platform's compiled
+  drawing — so every tenant advertised the platform's mark as the icon a device
+  SAVES to its home screen and keeps after the tab is closed. It is now resolved
+  from the manifest like the other two brand assets: `brand_assets.apple_touch_icon`
+  is an optional third field (an API that does not project it means "derive", not
+  "tenant offline", exactly as for `icon` and `social_image`), and a tenant without
+  one gets `/brand/apple-touch-icon.png`, a same-origin 180x180 PNG derived from its
+  own mark and accent. It is deliberately not `icon` reused: `icon` may be an SVG —
+  tenant #1's is — and Safari does not accept SVG for a touch icon. Nor is it
+  `iconSvg` upscaled: the derived square is full-bleed, because iOS applies its own
+  mask and rounded corners underneath it render as transparent, and its type ramp is
+  keyed to the mark's GRAPHEME count so a three-glyph or emoji mark stays inside the
+  square. The raster shares the bounded, retry-after-failure LRU the social card
+  already used (`BrandRasterCache`), and an unrasterisable icon omits the element
+  rather than advertising a broken link — with no `apple-touch-icon` a device looks
+  for `/apple-touch-icon.png` at the root, which this server does not publish, so the
+  fallback ends in nothing instead of in the platform's drawing. Tenant #1 keeps its
+  compiled PNG by DECLARING it, not by a branch on slug, so its bytes are unchanged:
+  the byte-for-byte gate still reports 51 identical / 2 differing / 47 known
+  redirects, and the control negative — dropping that declaration — moves it to 1 / 52.
+  Verified inside the production Linux image: `fc-match` resolves DejaVu Sans and both
+  tenants' icons rasterise as real 180x180 PNGs with the symbol actually drawn (8.00%
+  and 6.70% ink), so a missing font would show as a blank square instead of passing.
+- **A tenant's own brand and colour now reach its site.** Three E2E findings
+  from the `website-multitenant` epic: a two-word brand starting with a letter
+  (e.g. a clinic's) had its first letter boxed and cut off from the rest of the
+  name — the logotype only boxes a leading numeral now, which is what "1" in
+  "1Platform" actually is. Ten chrome elements (the logotype, the footer, the
+  interconnect motif, the process spine, the home's commerce scene, and the
+  changelog) read the platform's raw palette instead of the tenant's declared
+  accent; they now read the semantic token, and a tenant's declared heading
+  font (`display_font`) is rendered too, from a closed set of families. Along
+  the way, the tenant's theme block was losing the CSS cascade to the
+  platform's own stylesheet regardless of source order — fixed at the root
+  (`:root:root`), which is what makes the ten elements above actually work
+  rather than merely reference the right variable name.
+- **The three website-multitenant verification gates that measured nothing now measure something** (issues #95, #99, #101). `scripts/compare-served.mjs` sent no `Host` header — `fetch()` cannot set one — so in `api` mode it could only ever hit the tenant that happens to own `--base`'s own address: every one of the 100 baseline routes came back 404. It now drives requests over `node:http` with an explicit, overridable `Host` (`--host <hostname>`), proven against a stub API seeded from `scripts/export-site-content.mjs`: `api` mode now reproduces the exact same 51 identical / 2 differing / 47 known-redirect result `repo` mode gives. The same script also REFUSES to run without `--bodies` (exit 2) instead of silently falling back to a raw-hash comparison that reports ~52 of 53 routes as regressed on a clean tree — that footgun is now structurally unreachable. `npm run check:baseline` (`scripts/check-no-regression.sh`, new) builds both trees, serves the current one, and runs the comparison with the correct arguments; it is wired into `.github/workflows/ci.yml` as a visible, non-blocking job (`continue-on-error`) until the pre-existing, already-attributed gap it measures (2 diffs from the image endpoint, 47 redirects from routes F4b/F6/F7 renamed after F0 froze the baseline — see `epics/website-multitenant/PROGRESO-website-multitenant.md` §3) is reconciled; measured discriminating in this same PR: sabotaging `BaseLayout.astro` moves "differing" from 2 to 52. Finally, `check-tells.sh` rules 3 (fabricated prices/vanity metrics) and 4 (numbered "replaces N tools" claims) scanned the source tree for content F3 moved into `1platform-api`, going green over an empty question the same way rule 10 (providers) did before `no-leak-across-tenants.spec.ts`. `tests/no-fabricated-claims-served.spec.ts` (new) is that same replacement for rules 3 and 4, reading their patterns out of `check-tells.sh` so the two can never drift and reusing the padrón-derived surface (extracted to `tests/helpers/site-surface.ts`) — both control negatives measured catching a seeded price on `/pricing/` and a seeded claim on `/`, editorial blog/changelog prose excluded exactly as rule 4's own tree scan already excludes it.
+
 ### Changed
 - **The home now explains the complete commerce cycle on first view.** Its
   original CSS scene keeps Online Store, online payment, electronic invoicing
