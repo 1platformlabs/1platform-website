@@ -42,6 +42,7 @@ function manifest(slug: string, domain: string, accent: string): SiteTenant {
     home_template: 'platform-commerce',
     theme: { accent, accent_contrast: '#ffffff', display_font: 'system-sans' },
     destinations: { docs: null, app: null, support: null, status: null },
+    brand_assets: null,
     pages: ['/'],
     // Widened by F3: the manifest now carries the tenant's Search Console
     // token, and `isTenant` verifies it structurally. A double that omits a

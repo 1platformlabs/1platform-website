@@ -224,6 +224,7 @@ function fakeTenant(over: Partial<SiteTenant>): SiteTenant {
     home_template: 'platform-commerce',
     theme: { accent: '#000000', accent_contrast: '#ffffff', display_font: 'system-sans' },
     destinations: { docs: null, app: null, support: null, status: null },
+    brand_assets: null,
     pages: ['/'],
     google_site_verification: null,
     indexable: true,

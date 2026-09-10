@@ -99,6 +99,11 @@ const headerCtaLabel = supportUrl
 const headerCtaAria = supportUrl ? t('cta.scheduleDemoAria') : undefined;
 const hasActions = Boolean(appUrl || headerCtaHref || hasMenuContent);
 const hasMobileFooter = Boolean(headerCtaHref || hasLanguageChoices);
+// Keep the default tenant's serialized chrome byte-for-byte stable. The
+// containment CSS only exists for a tenant that actually combines the compact
+// support CTA with a wordmark that cannot fit the 390px rail.
+const longWordmarkNeedsMobileContainment = Boolean(supportUrl)
+  && Array.from(Astro.locals.tenant.brand_wordmark?.trim() ?? '').length > 28;
 
 const currentPath = Astro.originPathname;
 const isActive = (href: string) => href.startsWith('/') && currentPath.startsWith(href);
@@ -196,6 +201,17 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
   </div>}
 </header>
 
+{longWordmarkNeedsMobileContainment && (
+  <style is:inline set:html={`@media (max-width: 520px) {
+  .site-header__rail { gap: var(--space-2); }
+  .site-header .site-header__logo { min-width: 0; flex: 1 1 auto; overflow: hidden; }
+  .site-header .site-header__logo .logo__mark { flex: 0 0 auto; }
+  .site-header .site-header__logo .logo__text { overflow: hidden; text-overflow: ellipsis; }
+  .site-header__actions { flex: 0 0 auto; }
+  .site-header__cta { white-space: nowrap; }
+}`} />
+)}
+
 <script>
   function initMenu() {
     const toggle = document.getElementById('menu-toggle');
@@ -231,9 +247,7 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
 <style>
   .site-header { position: fixed; z-index: 100; top: calc(var(--header-top) + 32px); left: 0; right: 0; padding-inline: var(--space-4); pointer-events: none; }
   .site-header__rail { display: flex; align-items: center; gap: var(--space-8); width: min(1480px, 100%); min-height: 78px; margin: 0 auto; padding: 8px 12px 8px 28px; background: color-mix(in srgb, var(--color-surface) 97%, transparent); border: 1px solid var(--color-border); border-radius: var(--border-radius-pill); box-shadow: 0 1px 3px rgba(20, 22, 27, 0.04); pointer-events: auto; }
-  .site-header :global(.site-header__logo) { min-width: 0; overflow: hidden; font-size: var(--text-lg); }
-  .site-header :global(.site-header__logo .logo__mark) { flex: 0 0 auto; }
-  .site-header :global(.site-header__logo .logo__text) { overflow: hidden; text-overflow: ellipsis; }
+  .site-header :global(.site-header__logo) { font-size: var(--text-lg); }
   .site-header__nav { display: flex; align-items: center; gap: var(--space-2); margin-left: var(--space-8); }
   .site-header__solutions { position: relative; }
   .site-header__solutions summary { list-style: none; }
@@ -247,7 +261,7 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
   .solutions-menu a { display: flex; min-height: 38px; align-items: center; padding: 7px 10px; border-radius: var(--border-radius); color: var(--color-text-secondary); font-size: var(--text-sm); }
   .solutions-menu a:hover, .solutions-menu a:focus-visible { background: var(--color-bg-muted); color: var(--color-text); }
   .solutions-menu__all { margin-top: 8px; border-top: 1px solid var(--color-border); padding-top: 12px !important; color: var(--color-accent) !important; }
-  .site-header__actions { display: flex; flex: 0 0 auto; align-items: center; gap: var(--space-2); margin-left: auto; }
+  .site-header__actions { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
   .site-header__cta { min-height: 56px; padding-inline: 25px; border-radius: var(--border-radius-pill); }
   .site-header__menu-toggle { display: none; width: 44px; height: 44px; padding: 0; place-content: center; gap: 5px; border: 0; border-radius: 50%; color: var(--color-text); background: var(--color-bg-muted); cursor: pointer; }
   .site-header__menu-toggle span { display: block; width: 16px; height: 1.5px; background: currentColor; }
@@ -268,6 +282,6 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
     .mobile-menu__sublist a:hover { color: var(--color-accent); }
     .mobile-menu__footer { display: grid; gap: var(--space-4); margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--color-border); }
   }
-  @media (max-width: 520px) { .site-header { padding-inline: var(--space-3); } .site-header__rail { gap: var(--space-2); min-height: 54px; padding: 5px 5px 5px 14px; } .site-header :global(.site-header__logo) { flex: 1 1 auto; } .site-header__cta { min-height: 42px; padding-inline: 12px; font-size: var(--text-xs); white-space: nowrap; } .mobile-menu { right: var(--space-3); left: var(--space-3); padding: var(--space-5); } }
+  @media (max-width: 520px) { .site-header { padding-inline: var(--space-3); } .site-header__rail { min-height: 54px; padding: 5px 5px 5px 14px; } .site-header__cta { min-height: 42px; padding-inline: 12px; font-size: var(--text-xs); } .mobile-menu { right: var(--space-3); left: var(--space-3); padding: var(--space-5); } }
   @media (scripting: none) { .site-header { position: relative; top: auto; pointer-events: auto; } .site-header__menu-toggle { display: none; } .mobile-menu { display: block; position: static; width: min(620px, calc(100% - 32px)); margin: var(--space-3) auto 0; pointer-events: auto; } }
 </style>

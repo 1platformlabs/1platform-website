@@ -55,6 +55,7 @@ const TENANT = {
   home_template: 'platform-commerce',
   theme: { accent: '#0f766e', accent_contrast: '#ffffff', display_font: 'system-serif' },
   destinations: { docs: null, app: null, support: null, status: null },
+  brand_assets: null,
   // One published route, which is exactly the shape that makes the 404 the
   // page this tenant serves almost everywhere.
   pages: ['/'],

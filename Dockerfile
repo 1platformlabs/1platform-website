@@ -51,7 +51,12 @@ RUN npm ci --omit=dev && npm i --no-save sharp@^0.35.4
 # con Node 22; son artefactos ESM planos, no binarios.
 FROM nginx:1.27-alpine AS runtime
 
-RUN apk add --no-cache nodejs
+# `sharp` rasterises the tenant social card from SVG at request time. Alpine's
+# nginx image carries neither a font nor fontconfig, which would let the PNG
+# encoder succeed while silently omitting the brand text. Keep a small,
+# deterministic sans face in the runtime image rather than relying on a build
+# dependency that `npm ci --omit=dev` removes.
+RUN apk add --no-cache nodejs fontconfig font-dejavu
 
 # El contrato de servido (www→apex, caché por familia, nosniff, 404 real) vive
 # versionado en el repo, no editado a mano en el host.

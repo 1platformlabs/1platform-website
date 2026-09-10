@@ -22,6 +22,7 @@ type SiteTenantFixture = {
   home_template: 'platform-commerce' | 'service-lead'
   theme: { accent: string; accent_contrast: string; display_font: string }
   destinations: { docs: string | null; app: string | null; support: string | null; status: string | null }
+  brand_assets: { icon: string | null; social_image: string | null } | null
   pages: string[]
   google_site_verification: string | null
   indexable: boolean

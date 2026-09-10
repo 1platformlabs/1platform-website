@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { CLIENT_DIR, publishedPages } from './helpers/served';
+import { getWithHost } from './helpers/http-host';
 
 /**
  * Every `og:image` a page advertises has to be a file that shipped.
@@ -92,3 +93,17 @@ test('every og:image a served page declares exists in the build output', async (
 
   expect(missing, `og:image files that do not exist:\n${missing.join('\n')}`).toEqual([]);
 });
+
+test('a tenant-derived og:image is accepted only when its route is actually servable', async () => {
+  const port = Number(process.env.PLAYWRIGHT_PORT ?? 4321)
+  const html = await getWithHost(`http://127.0.0.1:${port}/`, 'clinicas.1platform.dev')
+  expect(html.status).toBe(200)
+  const image = html.body.match(/property="og:image"\s+content="([^"]+)"/)?.[1]
+  expect(image, 'the derived tenant head must declare an OG route').toBe(
+    'https://clinicas.1platform.dev/brand/social.png',
+  )
+
+  const asset = await getWithHost(`http://127.0.0.1:${port}/brand/social.png`, 'clinicas.1platform.dev')
+  expect(asset.status, 'a route named in an og:image must be retrievable by a crawler').toBe(200)
+  expect(asset.headers['content-type']).toContain('image/png')
+})

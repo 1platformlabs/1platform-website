@@ -25,6 +25,16 @@ export const HOME_TEMPLATES = ['platform-commerce', 'service-lead'] as const
 
 export type HomeTemplate = (typeof HOME_TEMPLATES)[number]
 
+/**
+ * Published, tenant-owned brand assets.  These are deliberately separate from
+ * `theme`: colours are tokens, while an icon or social card is a resource.
+ * `null` means derive both assets from the tenant's existing brand fields.
+ */
+export interface SiteBrandAssets {
+  icon?: string | null
+  social_image?: string | null
+}
+
 /** The manifest, exactly as `GET /api/v1/sites/by-host` projects it. */
 export interface SiteTenant {
   slug: string
@@ -46,6 +56,9 @@ export interface SiteTenant {
     support: string | null
     status: string | null
   }
+  // Optional during a rolling deploy: an API from before this additive field
+  // means exactly the same as null (derive), not "take every tenant offline".
+  brand_assets?: SiteBrandAssets | null
   pages: string[]
   /**
    * The Search Console ownership token, without the `.html` suffix, or null.
@@ -165,6 +178,13 @@ function isTenant(value: unknown): value is SiteTenant {
   if (!str(t.slug) || !str(t.brand_name) || !str(t.domain)) return false
   if (!strOrNull(t.brand_mark) || !strOrNull(t.brand_wordmark)) return false
   if (!strOrNull(t.google_site_verification)) return false
+  const assets = t.brand_assets
+  if (assets !== undefined && assets !== null) {
+    if (!assets || typeof assets !== 'object') return false
+    const a = assets as Record<string, unknown>
+    if ('icon' in a && !strOrNull(a.icon)) return false
+    if ('social_image' in a && !strOrNull(a.social_image)) return false
+  }
   if (!Array.isArray(t.locales) || t.locales.length === 0 || !t.locales.every(str)) return false
   if (!str(t.default_locale)) return false
   if (!(HOME_TEMPLATES as readonly unknown[]).includes(t.home_template)) return false

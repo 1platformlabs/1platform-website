@@ -7,6 +7,7 @@ import RelatedPosts from '@components/RelatedPosts.astro';
 import { formatDate, useI18n, type Locale } from '@i18n';
 import { localizedOgImage } from '@i18n/og';
 import { siteOrigin } from '@lib/site-origin';
+import { resolveLogo } from '@lib/tenant-brand-assets';
 
 interface Props {
   frontmatter: {
@@ -32,6 +33,7 @@ const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 const categoryLabel = t(`blog.category.${frontmatter.category}`);
 const brandName = Astro.locals.tenant.brand_name;
+const tenantLogo = await resolveLogo(Astro.locals.tenant);
 
 // Built from the page's own locale so the canonical, the share URL and the
 // Article @id all point at the language being read. These used to be pinned to
@@ -74,10 +76,14 @@ const articleJsonLd = {
     '@type': 'Organization',
     name: brandName,
     url: siteOrigin(Astro.locals),
-    logo: {
-      '@type': 'ImageObject',
-      url: new URL('/favicon.svg', siteOrigin(Astro.locals)).href,
-    },
+    ...(tenantLogo
+      ? {
+          logo: {
+            '@type': 'ImageObject',
+            url: new URL(tenantLogo, siteOrigin(Astro.locals)).href,
+          },
+        }
+      : {}),
   },
   inLanguage: locale,
   mainEntityOfPage: {

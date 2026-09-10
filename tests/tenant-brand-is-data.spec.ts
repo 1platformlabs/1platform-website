@@ -123,6 +123,35 @@ test('the clinic tenant serves its OWN brand', async () => {
   expect(html).toMatch(/og:site_name"\s+content="Clínica Delta"/)
 })
 
+test('the tenant head owns its icon, social card and structured-data logo', async () => {
+  const { html: clinic } = await serve(CLINIC_HOST)
+  const { html: platform } = await serve(PLATFORM_HOST)
+  const head = (html: string) => html.match(/<head>([\s\S]*?)<\/head>/)?.[1] ?? ''
+
+  const clinicHead = head(clinic)
+  const platformHead = head(platform)
+  expect(clinicHead, 'the tenant head must be present before it is scanned').not.toBe('')
+  expect(platformHead, 'the positive-control head must be present').not.toBe('')
+
+  // Positive control: the source host is expected to identify itself. Without
+  // it, a missing head or a failed Host override would look like a clean scan.
+  expect(platformHead).toContain('1Platform')
+  expect(platformHead).toContain('1platform.pro')
+
+  // The derived assets are same-origin routes, not static platform paths.
+  const assetSurface = [
+    ...clinicHead.matchAll(/<link rel="icon"[^>]*>/g),
+    ...clinicHead.matchAll(/<meta (?:property|name)="(?:og|twitter):image"[^>]*>/g),
+    ...clinicHead.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g),
+  ].map((match) => match[0]).join('\n')
+  expect(assetSurface, 'the icon, share-card and JSON-LD surfaces must be present').toContain('/brand/icon.svg')
+  expect(assetSurface).toContain('https://clinicas.1platform.dev/brand/social.png')
+  expect(assetSurface).toContain('https://clinicas.1platform.dev/brand/social.png')
+  expect(assetSurface).not.toContain('/favicon.svg')
+  expect(assetSurface).not.toContain('/og/default.png')
+  expect(assetSurface).not.toContain('1platform.pro')
+})
+
 test('the JSON-LD names the tenant, not the platform', async () => {
   const { html: clinic } = await serve(CLINIC_HOST)
 

@@ -182,7 +182,9 @@ export function unservedRoutes(tenant: SiteTenant): string[] {
  * never meant to express.
  *
  * `/_image` and `/_astro/` are the adapter's; `/og/`, `/fonts/`, the favicon and
- * the touch icon are static assets. The sitemap, robots and feeds ARE gated,
+ * the touch icon are static assets. `/brand/` is rendered per tenant, but it is
+ * infrastructure rather than a page and must not be listed in every manifest.
+ * The sitemap, robots and feeds ARE gated,
  * but on their own terms and by their own handlers — see `isPublishedRequest`.
  */
 const INFRASTRUCTURE_PREFIXES = [
@@ -192,6 +194,7 @@ const INFRASTRUCTURE_PREFIXES = [
   '/fonts/',
   '/favicon.svg',
   '/logo-oauth-120x120.png',
+  '/brand/',
 ]
 
 /** Routes whose handler applies its own tenant rule. */

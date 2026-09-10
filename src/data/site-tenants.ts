@@ -80,6 +80,12 @@ const ONEPLATFORM: SiteTenant = {
     support: null,
     status: null,
   },
+  // Data, not a branch for tenant #1: these are exactly the compiled assets
+  // the historical page emitted, so resolving them preserves its HTML bytes.
+  brand_assets: {
+    icon: '/favicon.svg',
+    social_image: '/og/default.png',
+  },
   // The canonical routes this tenant publishes — the SAME list the API is
   // seeded with, which is why it is not hand-written: it is the
   // `published_routes` of `scripts/fixtures/site_pages_oneplatform.json`, which
@@ -162,6 +168,9 @@ const CLINICAS: SiteTenant = {
     support: null,
     status: null,
   },
+  // `null` is intentional. This tenant exercises the derived icon and social
+  // card rather than falling back to any asset belonging to 1Platform.
+  brand_assets: null,
   // No Search Console property of its own yet. Absent is the right answer:
   // the platform's token is emphatically NOT a fallback here — serving it would
   // hand ownership of the clinic's domain to whoever holds that property.

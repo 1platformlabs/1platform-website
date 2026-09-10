@@ -16,6 +16,7 @@ import {
   isMultilingual,
 } from '@lib/site-locale';
 import { themeDeclarations } from '@lib/tenant-theme';
+import { resolveIcon, resolveLogo, resolveSocial, socialImageIsAvailable } from '@lib/tenant-brand-assets';
 
 interface Props {
   title: string;
@@ -39,7 +40,7 @@ interface Props {
 const {
   title,
   description,
-  ogImage = '/og/default.png',
+  ogImage,
   noIndex = false,
   jsonLd,
   canonical = true,
@@ -50,6 +51,17 @@ const {
 const { locale, t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const tenant = Astro.locals.tenant;
+// The manifest is the source of both declared and derived brand assets. Tenant
+// #1 declares the compiled paths, so these expressions render the same literal
+// bytes it historically carried without a branch on slug.
+const icon = resolveIcon(tenant);
+const brandSocial = resolveSocial(tenant);
+const logo = await resolveLogo(tenant);
+// A page's own card (notably an article) remains authoritative. The tenant
+// card supplies only the old layout default; if its derived raster is not
+// deterministic, the absence is honest and no platform card is substituted.
+const effectiveOgImage = ogImage ?? brandSocial;
+const ogImageAvailable = ogImage !== undefined || await socialImageIsAvailable(tenant);
 const requestPathname = Astro.originPathname;
 const alternates = alternatesForTenantPath(
   tenant,
@@ -103,7 +115,9 @@ const canonicalURL = canonical
 // contact with the product, and it arrived in a language they did not pick.
 // Cards with nothing to translate (the wordmark fallback) are left alone —
 // `localizedOgImage` only swaps names it knows were drawn in that language.
-const ogImageURL = new URL(localizedOgImage(ogImage, locale), siteOrigin(Astro.locals));
+const ogImageURL = ogImageAvailable
+  ? new URL(localizedOgImage(effectiveOgImage, locale), siteOrigin(Astro.locals))
+  : null;
 
 // hreflang must be absolute, and reciprocal: if English names Spanish, Spanish
 // has to name English with the identical pair, or Google discards the whole
@@ -191,7 +205,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
       crossorigin
     />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={icon} />
     <link rel="apple-touch-icon" href="/logo-oauth-120x120.png" />
     {canonicalURL && <link rel="canonical" href={canonicalURL} />}
     {/* Not advertised by a tenant whose sitemap answers 404: every page of a
@@ -293,7 +307,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImageURL} />
+    {ogImageURL && <meta property="og:image" content={ogImageURL} />}
     {canonicalURL && <meta property="og:url" content={canonicalURL} />}
     <meta property="og:site_name" content={tenant.brand_name} />
     <meta property="og:locale" content={OG_LOCALES[locale]} />
@@ -307,7 +321,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageURL} />
+    {ogImageURL && <meta name="twitter:image" content={ogImageURL} />}
 
     {rssPath && (
       <link
@@ -339,11 +353,10 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
       // baseline, which is what makes 'no regression' a measurement instead of a
       // judgement call.
       url: `https://${tenant.domain}`,
-      // The favicon is still a file in public/, so it is still the platform's
-      // drawing — but the URL must at least be the TENANT's origin, or this
-      // block tells a search engine the client's logo is hosted by us. Serving
-      // a per-tenant icon is D-17 work (public/ files become routes).
-      logo: `https://${tenant.domain}/favicon.svg`,
+      // Without a declared icon, a logo is emitted only after the derived
+      // social raster succeeds. Absence is more honest than a broken image or
+      // a platform fallback under a customer domain.
+      ...(logo ? { logo: `https://${tenant.domain}${logo}` } : {}),
     })} />
 
     {/*
