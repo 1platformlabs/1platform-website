@@ -4,7 +4,7 @@ import { manifestSource } from './data/site-tenants'
 import { dictionaryFor } from './i18n'
 import { resolveTenant } from './lib/resolve-tenant'
 import { resolveContent } from './lib/site-content'
-import { isPublishedRequest } from './lib/site-routes'
+import { isPublishedRequest, physicalRouteOf } from './lib/site-routes'
 import {
   UnsupportedTenantLocale,
   localeForRequest,
@@ -235,7 +235,11 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
       headers: rendered.headers,
     })
   } else {
-    response = await next()
+    const physicalPath = physicalRouteOf(url.pathname, tenant)
+    response =
+      physicalPath === url.pathname
+        ? await next()
+        : await next(`${physicalPath}${url.search}`)
   }
 
   // How old the manifest behind this page is. A header rather than a comment so

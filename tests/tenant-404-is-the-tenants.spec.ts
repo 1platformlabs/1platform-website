@@ -47,12 +47,15 @@ const TENANT_ONLY = 'COPY-DEL-INQUILINO-NO-DEL-REPO'
 const TENANT = {
   slug: 'stub',
   brand_name: 'Stub Brand',
-  brand_mark: 'Stub Brand',
+  brand_mark: 'S',
+  brand_wordmark: 'Stub Brand',
   domain: 'stub.example',
   locales: ['es'],
   default_locale: 'es',
+  home_template: 'platform-commerce',
   theme: { accent: '#0f766e', accent_contrast: '#ffffff', display_font: 'system-serif' },
   destinations: { docs: null, app: null, support: null, status: null },
+  brand_assets: null,
   // One published route, which is exactly the shape that makes the 404 the
   // page this tenant serves almost everywhere.
   pages: ['/'],
@@ -195,14 +198,17 @@ test('an unpublished route renders the 404 with the TENANT’s copy, not the rep
   ).toBe(TENANT_ONLY)
 })
 
-test('CONTROL: a published route was already getting it right', async () => {
+test('CONTROL: a published route keeps the tenant copy through its physical-locale rewrite', async () => {
   // The other half. Without this, a fix that simply stopped rewriting — or a
   // middleware that 503s everything — would satisfy the test above by making
   // the interesting path unreachable.
   const served = await localsAtRender('/')
 
   expect(served.status, 'the one published route must be served').toBe(200)
-  expect(served.rewrittenTo, 'a published route is not a rewrite').toBeUndefined()
+  expect(
+    served.rewrittenTo,
+    'a default-es public root is rendered by the fixed Astro /es/ route',
+  ).toBe('/es/')
   expect(served.messages?.['probe.marker'], 'the published route always had the tenant’s copy').toBe(
     TENANT_ONLY,
   )

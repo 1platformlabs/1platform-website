@@ -24,7 +24,7 @@ const documents = [
   { label: t('legal.doc.cookies'), href: l('/cookies/') },
 ];
 
-const currentPath = Astro.url.pathname;
+const currentPath = Astro.originPathname;
 ---
 
 <BaseLayout title={`${title} | 1Platform`} description={description}>

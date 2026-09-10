@@ -46,6 +46,19 @@ const candidates: { icon: IconName; label: () => string; detail: () => string; h
 const destinations = candidates
   .filter((d): d is (typeof candidates)[number] & { href: string } => d.href !== null)
   .map((d) => ({ icon: d.icon, label: d.label(), detail: d.detail(), href: d.href }));
+
+const isCompact = destinations.length < 2;
+const homeHref = internal('/');
+const primaryDestination = isCompact ? destinations[0] : undefined;
+const primaryHref = primaryDestination?.href ?? homeHref;
+const primaryLabel = !primaryHref
+  ? null
+  : primaryDestination && primaryDestination.href !== homeHref
+    ? primaryDestination.label
+    : t('notFound.cta');
+const compactLayout = isCompact
+  ? 'grid-template-columns:minmax(0,42rem);justify-content:center'
+  : undefined;
 ---
 
 <!--
@@ -58,17 +71,29 @@ const destinations = candidates
   nobody can navigate to should not be making claims to a crawler about what
   exists in which language.
 -->
-<BaseLayout title={title} description={description} alternates={{}}>
+<BaseLayout
+  title={title}
+  description={description}
+  alternates={{}}
+  canonical={false}
+  noIndex={true}
+>
   <section class="error">
-    <div class="container error__inner">
+    <div
+      class="container error__inner"
+      style={compactLayout}
+      data-not-found-layout={isCompact ? 'compact' : undefined}
+    >
       <div class="error__copy">
         <p class="eyebrow error__status">{t('notFound.status')}</p>
         <h1 class="error__headline">{t('notFound.headline')}</h1>
         <p class="error__message">{t('notFound.message')}</p>
-        <a href={l('/')} class="btn btn--primary error__cta">{t('notFound.cta')}</a>
+        {primaryHref && primaryLabel && (
+          <a href={primaryHref} class="btn btn--primary error__cta">{primaryLabel}</a>
+        )}
       </div>
 
-      <nav class="error__nav" aria-labelledby="error-nav-title">
+      {!isCompact && <nav class="error__nav" aria-labelledby="error-nav-title">
         <h2 class="eyebrow" id="error-nav-title">{t('notFound.tryTheseHeading')}</h2>
         <ul class="destinations">
           {destinations.map((destination) => (
@@ -86,7 +111,7 @@ const destinations = candidates
             </li>
           ))}
         </ul>
-      </nav>
+      </nav>}
     </div>
   </section>
 </BaseLayout>
@@ -120,6 +145,10 @@ const destinations = candidates
     font-size: var(--text-5xl);
     line-height: 1.06;
     margin: var(--space-8) 0 var(--space-5);
+  }
+
+  [data-not-found-layout='compact'] .error__headline {
+    font-weight: 400;
   }
 
   .error__message {
@@ -198,7 +227,7 @@ const destinations = candidates
   @media (max-width: 900px) {
     .error {
       min-height: 0;
-      padding-block: var(--space-16);
+      padding: calc(var(--header-offset) + var(--space-8)) 0 var(--space-16);
     }
 
     .error__inner {

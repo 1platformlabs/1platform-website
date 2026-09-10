@@ -1,6 +1,6 @@
 name: CI — Pull Request
 
-# Las cuatro compuertas reales del repo, corriendo ANTES del merge.
+# The repository's five real gates, running BEFORE merge.
 #
 # Hasta que existió este archivo no corría ninguna: `prod.yml` dispara sólo en
 # `push: [main]` y su job de build ejecuta `astro build` y nada más. O sea que
@@ -15,8 +15,9 @@ name: CI — Pull Request
 #
 # Molde: el repo hermano `1platform-api-developer` (`.github/workflows/ci.yml`).
 on:
+  # Stacked PRs are first-class in this repo. Restricting this workflow to
+  # `main` leaves a PR against its feature dependency with no checks at all.
   pull_request:
-    branches: [main]
 
 # Ningún job necesita escribir nada.
 permissions: {}
@@ -123,10 +124,10 @@ jobs:
           set -euo pipefail
           npm test
 
-
   visual:
-    name: Línea base visual
+    name: Regresión visual SSR multitenant
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
@@ -138,16 +139,10 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      # `npm run test:visual` decide por sí solo correr dentro del contenedor
-      # (`mcr.microsoft.com/playwright:v1.61.1-jammy`, la misma imagen que
-      # generó las líneas base committeadas) en cuanto encuentra un daemon de
-      # Docker — el runner de GitHub Actions lo trae activo por defecto. El
-      # propio comando instala node_modules DENTRO del contenedor: no hace
-      # falta `npm ci` en el host, sólo el binario de `npm` para invocar el
-      # script. `playwright.visual.config.ts` apunta al mismo adapter que la
-      # suite de navegador (`node dist/server/entry.mjs`), así que esto compara
-      # el sitio que corre en producción — nunca lo regenera.
-      - name: Comparar contra la línea base visual (Linux, sin regenerar)
+      # The npm script owns the exact browser image used to write the committed
+      # Linux baselines. Running that same image here avoids approving a render
+      # merely because the runner image changed its fonts or text shaper.
+      - name: Comparar capturas Linux contra la línea base
         shell: bash
         run: |
           set -euo pipefail

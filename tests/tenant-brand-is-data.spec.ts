@@ -61,18 +61,23 @@ test('the wordmark is the tenant\'s, not the platform\'s', async () => {
 
   const mark = (html: string) => html.match(/logo__mark"[^>]*>([^<]*)</)?.[1] ?? null
   const text = (html: string) => html.match(/logo__text"[^>]*>([^<]*)</)?.[1] ?? null
+  const label = (html: string) =>
+    html.match(/class="logo[^"]*"[^>]*aria-label="([^"]+)"/)?.[1] ?? null
 
   // POSITIVE CONTROL: the platform draws its own, or the scan is broken. Its
   // "1" is a numeral doing the work of a glyph, so it still gets boxed.
   expect(mark(platform), 'the platform wordmark should still be boxed "1"').toBe('1')
   expect(text(platform)).toBe('Platform')
+  expect(label(platform)).toContain('1Platform')
 
-  // The same component, the same page, a two-word tenant whose name starts
-  // with a LETTER. Boxing its first character used to cut the word in half —
-  // "C" boxed, "línica Delta" as text (issue #92). A letter-led wordmark gets
-  // no box at all, and the full two-word name must come through intact.
-  expect(mark(clinic), 'a letter-led brand must not be boxed — that is the bug this pins against').toBe(null)
-  expect(text(clinic), 'the clinic\'s two-word name must render whole, not missing its first letter').toBe('Clínica Delta')
+  // The same component, the same page, a different tenant.
+  expect(mark(clinic), 'the clinic lockup should render its declared symbol').toBe('C')
+  expect(text(clinic), 'the wordmark must be explicit, not the brand name minus one character').toBe(
+    'Clínica Delta',
+  )
+  expect(label(clinic), 'the accessible name must use the complete semantic brand name').toBe(
+    'Clínica Delta',
+  )
 })
 
 test('the leak that is LEFT is content, and its size is pinned', async () => {
@@ -116,6 +121,35 @@ test('the clinic tenant serves its OWN brand', async () => {
   expect(html, 'the clinic tenant should carry its own name').toContain('Clínica Delta')
   expect(html).toContain('og:site_name')
   expect(html).toMatch(/og:site_name"\s+content="Clínica Delta"/)
+})
+
+test('the tenant head owns its icon, social card and structured-data logo', async () => {
+  const { html: clinic } = await serve(CLINIC_HOST)
+  const { html: platform } = await serve(PLATFORM_HOST)
+  const head = (html: string) => html.match(/<head>([\s\S]*?)<\/head>/)?.[1] ?? ''
+
+  const clinicHead = head(clinic)
+  const platformHead = head(platform)
+  expect(clinicHead, 'the tenant head must be present before it is scanned').not.toBe('')
+  expect(platformHead, 'the positive-control head must be present').not.toBe('')
+
+  // Positive control: the source host is expected to identify itself. Without
+  // it, a missing head or a failed Host override would look like a clean scan.
+  expect(platformHead).toContain('1Platform')
+  expect(platformHead).toContain('1platform.pro')
+
+  // The derived assets are same-origin routes, not static platform paths.
+  const assetSurface = [
+    ...clinicHead.matchAll(/<link rel="icon"[^>]*>/g),
+    ...clinicHead.matchAll(/<meta (?:property|name)="(?:og|twitter):image"[^>]*>/g),
+    ...clinicHead.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g),
+  ].map((match) => match[0]).join('\n')
+  expect(assetSurface, 'the icon, share-card and JSON-LD surfaces must be present').toContain('/brand/icon.svg')
+  expect(assetSurface).toContain('https://clinicas.1platform.dev/brand/social.png')
+  expect(assetSurface).toContain('https://clinicas.1platform.dev/brand/social.png')
+  expect(assetSurface).not.toContain('/favicon.svg')
+  expect(assetSurface).not.toContain('/og/default.png')
+  expect(assetSurface).not.toContain('1platform.pro')
 })
 
 test('the JSON-LD names the tenant, not the platform', async () => {

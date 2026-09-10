@@ -1,7 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const port = Number(process.env.PLAYWRIGHT_PORT ?? 4321);
-const baseURL = `http://localhost:${port}`;
+const platformPort = Number(process.env.PLAYWRIGHT_PLATFORM_PORT ?? 4321);
+const clinicPort = Number(process.env.PLAYWRIGHT_CLINIC_PORT ?? 4322);
+const apiPort = Number(process.env.PLAYWRIGHT_STUB_API_PORT ?? 4397);
+const readyPort = Number(process.env.PLAYWRIGHT_VISUAL_READY_PORT ?? 4398);
+const platformBaseURL = `http://localhost:${platformPort}`;
+const clinicHost = 'clinicas.1platform.dev';
 
 /**
  * The visual gate's own config: same server, same browser, but WITHOUT the
@@ -29,19 +33,44 @@ export default defineConfig({
   testDir: './tests/visual',
   fullyParallel: false,
   reporter: 'list',
-  use: {
-    baseURL,
-  },
   webServer: {
-    command: `npm run build && node dist/server/entry.mjs`,
+    // One build, then two copies of the actual Node adapter: the platform in
+    // repo mode and the clinic in API mode against the contractual HTTP stub.
+    // The helper exposes /ready only after both rendered roots answer, so a
+    // green clinic screenshot cannot be a race against a server that never ran.
+    command: `npm run build && node tests/visual/support/serve.mjs`,
     env: {
-      HOST: '127.0.0.1',
-      PORT: String(port),
-      SITE_MANIFEST_SOURCE: 'repo',
+      PLAYWRIGHT_PLATFORM_PORT: String(platformPort),
+      PLAYWRIGHT_CLINIC_PORT: String(clinicPort),
+      PLAYWRIGHT_STUB_API_PORT: String(apiPort),
+      PLAYWRIGHT_VISUAL_READY_PORT: String(readyPort),
     },
-    url: `${baseURL}/`,
+    url: `http://127.0.0.1:${readyPort}/ready`,
     reuseExistingServer: false,
     timeout: 240_000,
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    {
+      // Keep the historical project name so the four real platform baselines
+      // retain their filenames and are compared rather than regenerated.
+      name: 'chromium',
+      testMatch: 'home.spec.ts',
+      use: { ...devices['Desktop Chrome'], baseURL: platformBaseURL },
+    },
+    {
+      name: 'clinic-chromium',
+      testMatch: 'clinic.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Chromium supplies the real Host header. page.goto/fetch cannot fake
+        // it reliably, and Host is the tenant-isolation boundary.
+        baseURL: `http://${clinicHost}/`,
+        launchOptions: {
+          args: [
+            `--host-resolver-rules=MAP ${clinicHost}:80 127.0.0.1:${clinicPort}`,
+          ],
+        },
+      },
+    },
+  ],
 });

@@ -4,13 +4,26 @@ import AnnouncementBar from '@components/AnnouncementBar.astro';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { pickAnnouncement } from '@components/announcement';
-import { OG_LOCALES, alternatesForPath, useI18n, type Locale } from '@i18n';
+import { OG_LOCALES, useI18n, type Locale } from '@i18n';
 import { getLocalized } from '@i18n/collections';
 import { localizedOgImage } from '@i18n/og';
 import '@styles/global.css';
 import '@styles/components.css';
 import { siteOrigin } from '@lib/site-origin';
+import {
+  alternatesForTenantPath,
+  defaultLocaleOf,
+  isMultilingual,
+} from '@lib/site-locale';
 import { themeDeclarations } from '@lib/tenant-theme';
+import {
+  appleTouchIconIsAvailable,
+  resolveAppleTouchIcon,
+  resolveIcon,
+  resolveLogo,
+  resolveSocial,
+  socialImageIsAvailable,
+} from '@lib/tenant-brand-assets';
 
 interface Props {
   title: string;
@@ -18,6 +31,8 @@ interface Props {
   ogImage?: string;
   noIndex?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Error responses must not canonize the unpublished URL that produced them. */
+  canonical?: boolean;
   /** The home uses a deliberately quiet opening composition. Other routes keep
    * the current-release strip in the shared chrome. */
   showAnnouncement?: boolean;
@@ -32,16 +47,41 @@ interface Props {
 const {
   title,
   description,
-  ogImage = '/og/default.png',
+  ogImage,
   noIndex = false,
   jsonLd,
+  canonical = true,
   showAnnouncement = true,
-  alternates = alternatesForPath(Astro.url.pathname),
+  alternates: requestedAlternates,
 } = Astro.props;
 
 const { locale, t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const tenant = Astro.locals.tenant;
+// The manifest is the source of both declared and derived brand assets. Tenant
+// #1 declares the compiled paths, so these expressions render the same literal
+// bytes it historically carried without a branch on slug.
+const icon = resolveIcon(tenant);
+const brandSocial = resolveSocial(tenant);
+// The home-screen icon is the one asset a device KEEPS. It used to be the
+// platform's compiled PNG for every tenant (issue #107); it is now the
+// tenant's, and it is omitted rather than advertised broken when a derived
+// raster cannot be made.
+const appleTouchIcon = resolveAppleTouchIcon(tenant);
+const appleTouchIconAvailable = await appleTouchIconIsAvailable(tenant);
+const logo = await resolveLogo(tenant);
+// A page's own card (notably an article) remains authoritative. The tenant
+// card supplies only the old layout default; if its derived raster is not
+// deterministic, the absence is honest and no platform card is substituted.
+const effectiveOgImage = ogImage ?? brandSocial;
+const ogImageAvailable = ogImage !== undefined || await socialImageIsAvailable(tenant);
+const requestPathname = Astro.originPathname;
+const alternates = alternatesForTenantPath(
+  tenant,
+  requestPathname,
+  requestedAlternates,
+);
+const detectPreferredLocale = isMultilingual(tenant);
 
 /**
  * Whether crawlers are welcome — the TENANT's answer, not just the page's.
@@ -80,13 +120,17 @@ const noIndexEffective = noIndex || !tenant.indexable;
 const jsonLdScript = (value: unknown) =>
   JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026');
 
-const canonicalURL = new URL(Astro.url.pathname, siteOrigin(Astro.locals));
+const canonicalURL = canonical
+  ? new URL(requestPathname, siteOrigin(Astro.locals))
+  : null;
 // The share card follows the page's language. A Spanish page pointing at an
 // English card was issue #59: the headline of the card is the reader's first
 // contact with the product, and it arrived in a language they did not pick.
 // Cards with nothing to translate (the wordmark fallback) are left alone —
 // `localizedOgImage` only swaps names it knows were drawn in that language.
-const ogImageURL = new URL(localizedOgImage(ogImage, locale), siteOrigin(Astro.locals));
+const ogImageURL = ogImageAvailable
+  ? new URL(localizedOgImage(effectiveOgImage, locale), siteOrigin(Astro.locals))
+  : null;
 
 // hreflang must be absolute, and reciprocal: if English names Spanish, Spanish
 // has to name English with the identical pair, or Google discards the whole
@@ -102,10 +146,12 @@ const alternateLinks = (Object.entries(alternates) as [Locale, string][]).map(
   ([code, path]) => ({ code, href: new URL(path, siteOrigin(Astro.locals)).toString() }),
 );
 
-// x-default points at the unprefixed English URL: it is the already-indexed
-// canonical, and pointing it at /es/ would have Google serve Spanish to en-AU
-// and en-CA readers — exactly what the language rule says must not happen.
-const xDefault = alternates.en ? new URL(alternates.en, siteOrigin(Astro.locals)).toString() : null;
+// x-default belongs to the tenant's default locale — the one that owns its
+// unprefixed root. For tenant #1 that remains the existing English URL.
+const defaultAlternate = alternates[defaultLocaleOf(tenant)];
+const xDefault = defaultAlternate
+  ? new URL(defaultAlternate, siteOrigin(Astro.locals)).toString()
+  : null;
 
 // The feed follows the section it describes. A tenant that does not publish a
 // blog has no feed — `/rss.xml` answers 404 for it by design — so advertising
@@ -172,9 +218,9 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
       crossorigin
     />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/logo-oauth-120x120.png" />
-    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/svg+xml" href={icon} />
+    {appleTouchIconAvailable && <link rel="apple-touch-icon" href={appleTouchIcon} />}
+    {canonicalURL && <link rel="canonical" href={canonicalURL} />}
     {/* Not advertised by a tenant whose sitemap answers 404: every page of a
         non-indexable site used to announce a sitemap that does not exist. */}
     {tenant.indexable && <link rel="sitemap" href="/sitemap-index.xml" />}
@@ -190,7 +236,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     ))}
     {xDefault && <link rel="alternate" hreflang="x-default" href={xDefault} />}
 
-    <script is:inline>
+    {detectPreferredLocale && <script is:inline>
       /*
         First-visit language selection.
 
@@ -268,14 +314,14 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
 
         location.replace(target.pathname + location.search + location.hash);
       })();
-    </script>
+    </script>}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImageURL} />
-    <meta property="og:url" content={canonicalURL} />
+    {ogImageURL && <meta property="og:image" content={ogImageURL} />}
+    {canonicalURL && <meta property="og:url" content={canonicalURL} />}
     <meta property="og:site_name" content={tenant.brand_name} />
     <meta property="og:locale" content={OG_LOCALES[locale]} />
     {(Object.keys(alternates) as Locale[])
@@ -288,7 +334,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageURL} />
+    {ogImageURL && <meta name="twitter:image" content={ogImageURL} />}
 
     {rssPath && (
       <link
@@ -320,29 +366,22 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
       // baseline, which is what makes 'no regression' a measurement instead of a
       // judgement call.
       url: `https://${tenant.domain}`,
-      // The favicon is still a file in public/, so it is still the platform's
-      // drawing — but the URL must at least be the TENANT's origin, or this
-      // block tells a search engine the client's logo is hosted by us. Serving
-      // a per-tenant icon is D-17 work (public/ files become routes).
-      logo: `https://${tenant.domain}/favicon.svg`,
+      // Without a declared icon, a logo is emitted only after the derived
+      // social raster succeeds. Absence is more honest than a broken image or
+      // a platform fallback under a customer domain.
+      ...(logo ? { logo: `https://${tenant.domain}${logo}` } : {}),
     })} />
 
     {/*
-      Este bloque se escribe AL FINAL del <head> — pero eso NO es lo que le
-      gana la cascada a `global.css`, aunque el comentario original de este
-      archivo lo daba por sentado. Astro inyecta el `<link rel="stylesheet">`
-      de `global.css` (y de cada componente) en un punto que decide SU PROPIO
-      runtime de bundling, no la posición del `import` ni la del template —
-      medido: en el HTML servido ese `<link>` aparece DESPUÉS de este
-      `<style>`, así que por orden de fuente `global.css` ganaba siempre y el
-      acento del inquilino nunca llegaba a un elemento (issues #93/#94). Por
-      eso `themeDeclarations` devuelve `:root:root`, no `:root`: una
-      especificidad que gana pase lo que pase con el orden, sin depender de
-      dónde Astro decida colocar la hoja de estilos.
+      Astro places compiled stylesheet links after this dynamic block in the
+      served HTML, even though the component appears at the end of `<head>`.
+      The emitter therefore uses `html:root`: a more specific selector than
+      the `:root` in `global.css`, without depending on Astro's output order.
 
-      `set:html` apaga el escapado de Astro. Es seguro porque el contenido no es
-      texto libre: `themeDeclarations` sólo emite colores que casan `#` + 6
-      dígitos hex y fuentes de un enum cerrado, y descarta todo lo demás.
+      `set:html` disables Astro's escaping. This is safe because the content is
+      not free-form text: `themeDeclarations` emits only colors matching `#`
+      plus six hex digits and font families from a closed enum, discarding all
+      other input.
     */}
     {themeCss && <style set:html={themeCss} />}
   </head>

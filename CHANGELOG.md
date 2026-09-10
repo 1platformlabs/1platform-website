@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **A tenant's home-screen icon is now its own** (issue #107). `apple-touch-icon`
+  was a literal in `BaseLayout` — `/logo-oauth-120x120.png`, 1Platform's compiled
+  drawing — so every tenant advertised the platform's mark as the icon a device
+  SAVES to its home screen and keeps after the tab is closed. It is now resolved
+  from the manifest like the other two brand assets: `brand_assets.apple_touch_icon`
+  is an optional third field (an API that does not project it means "derive", not
+  "tenant offline", exactly as for `icon` and `social_image`), and a tenant without
+  one gets `/brand/apple-touch-icon.png`, a same-origin 180x180 PNG derived from its
+  own mark and accent. It is deliberately not `icon` reused: `icon` may be an SVG —
+  tenant #1's is — and Safari does not accept SVG for a touch icon. Nor is it
+  `iconSvg` upscaled: the derived square is full-bleed, because iOS applies its own
+  mask and rounded corners underneath it render as transparent, and its type ramp is
+  keyed to the mark's GRAPHEME count so a three-glyph or emoji mark stays inside the
+  square. The raster shares the bounded, retry-after-failure LRU the social card
+  already used (`BrandRasterCache`), and an unrasterisable icon omits the element
+  rather than advertising a broken link — with no `apple-touch-icon` a device looks
+  for `/apple-touch-icon.png` at the root, which this server does not publish, so the
+  fallback ends in nothing instead of in the platform's drawing. Tenant #1 keeps its
+  compiled PNG by DECLARING it, not by a branch on slug, so its bytes are unchanged:
+  the byte-for-byte gate still reports 51 identical / 2 differing / 47 known
+  redirects, and the control negative — dropping that declaration — moves it to 1 / 52.
+  Verified inside the production Linux image: `fc-match` resolves DejaVu Sans and both
+  tenants' icons rasterise as real 180x180 PNGs with the symbol actually drawn (8.00%
+  and 6.70% ink), so a missing font would show as a blank square instead of passing.
 - **A tenant's own brand and colour now reach its site.** Three E2E findings
   from the `website-multitenant` epic: a two-word brand starting with a letter
   (e.g. a clinic's) had its first letter boxed and cut off from the rest of the

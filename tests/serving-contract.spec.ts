@@ -213,6 +213,7 @@ test('the container carries a runtime for the application it now proxies to', ()
   // sharp is a devDependency and `/_image` needs it at REQUEST time; without
   // this line the site starts perfectly and every image answers 500.
   expect(dockerfile, 'sharp must survive --omit=dev').toMatch(/sharp/)
+  expect(dockerfile, 'derived social cards need a deterministic runtime font').toMatch(/font-dejavu/)
 })
 
 test('the container has a channel for its configuration', () => {

@@ -22,7 +22,7 @@ FAILED=0
 # markup into src/page-content; leaving those out would have kept the script
 # green while it watched two directories that no longer held the content it
 # exists to police.
-SRC="src/pages src/components src/layouts src/i18n src/page-content"
+SRC="src/pages src/components src/layouts src/i18n src/page-content src/lib"
 
 # The content collections — 30 Markdown files, ~17,500 words of client-facing
 # prose in both languages — are scanned SEPARATELY, and only by the rules whose
@@ -135,7 +135,11 @@ report "no numbered replace-count claim" \
 # 5. Brand colour as a hex literal instead of a token. Neutral #fff/#000
 #    shorthand inside authored SVG is tolerated; brand colours are not.
 # (src/layouts stays out: BaseLayout legitimately carries the theme-color meta.)
-m=$(grep -rnE '#[0-9a-fA-F]{6}' src/pages src/components src/page-content src/i18n \
+# `tenant-theme.ts` carries the one compiled default solely to compare incoming
+# manifest data with the stylesheet it preserves; its dedicated test reads the
+# stylesheet and pins that relationship. It is not authored presentational CSS.
+m=$(grep -rnE '#[0-9a-fA-F]{6}' src/pages src/components src/page-content src/i18n src/lib \
+  | grep -vE '^src/lib/tenant-theme\.ts:[0-9]+:.*accent:' \
   | grep -viE '#(ffffff|000000)\b' | strip_comments)
 report "no hardcoded brand colours" \
        "colour decisions live in the token layer (global.css), not in pages" "$m"
