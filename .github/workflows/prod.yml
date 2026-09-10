@@ -1124,6 +1124,20 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "24"
+          cache: "npm"
+
+      # ⚠️ ESTE PASO ES NUEVO Y SIN ÉL EL JOB NO ARRANCA. Con el sitio estático
+      # bastaba el artefacto: `serve dist/` no importa nada. El servidor de
+      # Astro sí — `dist/server/chunks/*.mjs` importa `@astrojs/internal-helpers`
+      # y el adapter en tiempo de EJECUCIÓN, y este job sólo descarga `dist/`.
+      # Medido en la corrida 34434870409: `ERR_MODULE_NOT_FOUND: Cannot find
+      # package '@astrojs/internal-helpers'`, «the Astro server exited during
+      # startup», Lighthouse en rojo con el deploy sano.
+      - name: Instalar dependencias de ejecución
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
 
       # Node en vez de `serve`, y hay que decir por qué: el artefacto ya no es un
       # sitio estático. `serve dist/ -s` serviría el PADRE de `client/` y
