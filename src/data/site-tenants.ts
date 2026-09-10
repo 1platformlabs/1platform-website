@@ -85,6 +85,11 @@ const ONEPLATFORM: SiteTenant = {
   brand_assets: {
     icon: '/favicon.svg',
     social_image: '/og/default.png',
+    // The compiled touch icon this page has always carried. Declaring it is
+    // what keeps tenant #1's bytes identical now that the element is resolved
+    // from the manifest instead of hard-coded (issue #107) — the same
+    // mechanism as the two fields above, and still not a branch on slug.
+    apple_touch_icon: '/logo-oauth-120x120.png',
   },
   // The canonical routes this tenant publishes — the SAME list the API is
   // seeded with, which is why it is not hand-written: it is the

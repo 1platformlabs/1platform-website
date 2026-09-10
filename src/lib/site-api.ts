@@ -33,6 +33,16 @@ export type HomeTemplate = (typeof HOME_TEMPLATES)[number]
 export interface SiteBrandAssets {
   icon?: string | null
   social_image?: string | null
+  /**
+   * The home-screen icon. Optional exactly like its two siblings: an API from
+   * before this field means "derive", not "take the tenant offline".
+   *
+   * It is a THIRD field rather than a reuse of `icon` because the two are not
+   * interchangeable. `icon` is free to be an SVG — tenant #1's is — and Safari
+   * does not accept SVG for a touch icon, so a tenant declaring one would be
+   * advertising an asset the device cannot draw.
+   */
+  apple_touch_icon?: string | null
 }
 
 /** The manifest, exactly as `GET /api/v1/sites/by-host` projects it. */
@@ -184,6 +194,7 @@ function isTenant(value: unknown): value is SiteTenant {
     const a = assets as Record<string, unknown>
     if ('icon' in a && !strOrNull(a.icon)) return false
     if ('social_image' in a && !strOrNull(a.social_image)) return false
+    if ('apple_touch_icon' in a && !strOrNull(a.apple_touch_icon)) return false
   }
   if (!Array.isArray(t.locales) || t.locales.length === 0 || !t.locales.every(str)) return false
   if (!str(t.default_locale)) return false

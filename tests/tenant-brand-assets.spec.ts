@@ -7,12 +7,16 @@ import sharp from 'sharp'
 import { repoTenants } from '../src/data/site-tenants'
 import { fetchTenantByHost } from '../src/lib/site-api'
 import {
+  appleTouchIconIsAvailable,
+  appleTouchIconPng,
+  appleTouchIconSvg,
   brandSymbol,
+  BrandRasterCache,
   iconSvg,
+  resolveAppleTouchIcon,
   resolveIcon,
   resolveLogo,
   resolveSocial,
-  SocialRasterCache,
   socialPng,
   socialSvg,
   socialTitleLayout,
@@ -30,8 +34,10 @@ test('declared platform assets preserve their compiled paths while a tenant with
 
   expect(resolveIcon(platform)).toBe('/favicon.svg')
   expect(resolveSocial(platform)).toBe('/og/default.png')
+  expect(resolveAppleTouchIcon(platform)).toBe('/logo-oauth-120x120.png')
   expect(resolveIcon(clinic)).toBe('/brand/icon.svg')
   expect(resolveSocial(clinic)).toBe('/brand/social.png')
+  expect(resolveAppleTouchIcon(clinic)).toBe('/brand/apple-touch-icon.png')
   expect(await resolveLogo(platform)).toBe('/favicon.svg')
   expect(await resolveLogo(clinic)).toBe('/brand/social.png')
 })
@@ -134,7 +140,7 @@ test('the social title keeps long and Unicode names inside at most three lines',
 test('the raster cache retries a transient failure and retains only the current tenant version', async () => {
   const clinic = tenant('clinicas')
   let attempts = 0
-  const cache = new SocialRasterCache(async (svg) => {
+  const cache = new BrandRasterCache(async (svg) => {
     attempts += 1
     if (attempts === 1) throw new Error('transient raster failure')
     return Buffer.from(svg)
@@ -151,7 +157,7 @@ test('the raster cache retries a transient failure and retains only the current 
 test('the raster cache evicts the least recently used tenant at its bound', async () => {
   const clinic = tenant('clinicas')
   let attempts = 0
-  const cache = new SocialRasterCache(async (svg) => {
+  const cache = new BrandRasterCache(async (svg) => {
     attempts += 1
     return Buffer.from(svg)
   }, 2)
@@ -179,4 +185,68 @@ test('the symbol derivation has one owner in src', () => {
   expect(owners, 'a second symbol derivation would drift from the two asset routes').toEqual([
     'src/lib/tenant-brand-assets.ts',
   ])
+})
+
+/**
+ * Issue #107. The home screen is the only surface where the wrong brand does
+ * not merely get served — it gets SAVED, and stays after the tab is closed.
+ */
+test('no tenant can be handed the platform touch icon it did not declare', () => {
+  const clinic = tenant('clinicas')
+
+  for (const assets of [null, undefined, {}, { icon: '/assets/clinic-icon.svg' }, { apple_touch_icon: '' }]) {
+    const candidate = { ...clinic, brand_assets: assets } as typeof clinic
+    expect(resolveAppleTouchIcon(candidate), JSON.stringify(assets)).toBe('/brand/apple-touch-icon.png')
+  }
+
+  // And the shape check is the same one the other two assets get: a value that
+  // is not a publishable same-origin path derives rather than being emitted.
+  for (const hostile of ['https://evil.example/icon.png', '//evil.example/icon.png', 'javascript:alert(1)']) {
+    const candidate = { ...clinic, brand_assets: { apple_touch_icon: hostile } } as typeof clinic
+    expect(resolveAppleTouchIcon(candidate), hostile).toBe('/brand/apple-touch-icon.png')
+  }
+})
+
+test('the derived touch icon is a full-bleed 180px square carrying the tenant symbol', async () => {
+  const clinic = tenant('clinicas')
+  const svg = appleTouchIconSvg({ ...clinic, brand_mark: 'CD' })
+
+  expect(svg).toContain('>CD</text>')
+  expect(svg).toContain('fill="#0f766e"')
+  // No `rx`: iOS masks the icon itself, and rounded corners underneath that
+  // mask render as transparent — black on a dark home screen.
+  expect(svg, 'a touch icon must not round its own corners').not.toContain('rx=')
+
+  const png = await appleTouchIconPng({ ...clinic, slug: 'touch-square' })
+  expect(png).not.toBeNull()
+  expect(png?.subarray(1, 4).toString('ascii')).toBe('PNG')
+  expect(await sharp(png!).metadata()).toMatchObject({ width: 180, height: 180 })
+})
+
+test('the touch-icon type ramp keeps a three-glyph and an emoji mark inside the square', async () => {
+  const clinic = tenant('clinicas')
+  const sizeOf = (svg: string) => Number(/font-size="(\d+)"/.exec(svg)?.[1])
+
+  expect(sizeOf(appleTouchIconSvg({ ...clinic, brand_mark: 'C' }))).toBe(104)
+  expect(sizeOf(appleTouchIconSvg({ ...clinic, brand_mark: 'CD' }))).toBe(78)
+  expect(sizeOf(appleTouchIconSvg({ ...clinic, brand_mark: 'CDE' }))).toBe(58)
+  // One visible glyph, two UTF-16 units: `.length` would have picked 78.
+  expect(sizeOf(appleTouchIconSvg({ ...clinic, brand_mark: '\u{1F691}' }))).toBe(104)
+
+  // The mark is escaped here exactly as it is in the other derived asset.
+  expect(appleTouchIconSvg({ ...clinic, brand_mark: '<&' })).toContain('>&lt;&amp;</text>')
+})
+
+test('an unrasterisable touch icon is omitted rather than advertised, and a declared one needs no raster', async () => {
+  const clinic = tenant('clinicas')
+
+  // A declared path is answered without touching the rasteriser at all, which
+  // is what lets tenant #1 keep its compiled PNG.
+  expect(await appleTouchIconIsAvailable(tenant('oneplatform'))).toBe(true)
+  expect(await appleTouchIconIsAvailable(clinic)).toBe(true)
+
+  const failing = new BrandRasterCache(async () => {
+    throw new Error('raster unavailable')
+  }, 2, appleTouchIconSvg)
+  expect(await failing.get(clinic), 'a failure must be null, not a platform fallback').toBeNull()
 })

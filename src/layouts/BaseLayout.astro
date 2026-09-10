@@ -16,7 +16,14 @@ import {
   isMultilingual,
 } from '@lib/site-locale';
 import { themeDeclarations } from '@lib/tenant-theme';
-import { resolveIcon, resolveLogo, resolveSocial, socialImageIsAvailable } from '@lib/tenant-brand-assets';
+import {
+  appleTouchIconIsAvailable,
+  resolveAppleTouchIcon,
+  resolveIcon,
+  resolveLogo,
+  resolveSocial,
+  socialImageIsAvailable,
+} from '@lib/tenant-brand-assets';
 
 interface Props {
   title: string;
@@ -56,6 +63,12 @@ const tenant = Astro.locals.tenant;
 // bytes it historically carried without a branch on slug.
 const icon = resolveIcon(tenant);
 const brandSocial = resolveSocial(tenant);
+// The home-screen icon is the one asset a device KEEPS. It used to be the
+// platform's compiled PNG for every tenant (issue #107); it is now the
+// tenant's, and it is omitted rather than advertised broken when a derived
+// raster cannot be made.
+const appleTouchIcon = resolveAppleTouchIcon(tenant);
+const appleTouchIconAvailable = await appleTouchIconIsAvailable(tenant);
 const logo = await resolveLogo(tenant);
 // A page's own card (notably an article) remains authoritative. The tenant
 // card supplies only the old layout default; if its derived raster is not
@@ -206,7 +219,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     />
 
     <link rel="icon" type="image/svg+xml" href={icon} />
-    <link rel="apple-touch-icon" href="/logo-oauth-120x120.png" />
+    {appleTouchIconAvailable && <link rel="apple-touch-icon" href={appleTouchIcon} />}
     {canonicalURL && <link rel="canonical" href={canonicalURL} />}
     {/* Not advertised by a tenant whose sitemap answers 404: every page of a
         non-indexable site used to announce a sitemap that does not exist. */}

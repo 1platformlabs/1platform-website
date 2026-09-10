@@ -142,24 +142,60 @@ export function socialSvg(tenant: SiteTenant): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="${accent}"/><rect x="72" y="72" width="120" height="120" rx="28" fill="${ink}" fill-opacity="0.16"/><text x="132" y="151" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="56" font-weight="700" text-anchor="middle">${symbol}</text><rect x="72" y="340" width="88" height="8" rx="4" fill="${ink}"/><text fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="${title.fontSize}" font-weight="700">${titleLines}</text></svg>`
 }
 
+/**
+ * The touch icon: a full-bleed square, deliberately NOT `iconSvg` scaled up.
+ *
+ * Two differences from the favicon are load-bearing rather than cosmetic.
+ * It has no rounded corners, because iOS applies its own mask and a rounded
+ * rect underneath leaves the four corners transparent — which a device renders
+ * as black against a dark home screen. And it is drawn at 180x180, the size
+ * current iOS asks for, so the device never has to upscale a 128px drawing.
+ *
+ * The type ramp is keyed to the symbol's length so a three-character mark
+ * cannot overflow the square the way a fixed size would.
+ */
+export function appleTouchIconSvg(tenant: SiteTenant): string {
+  const accent = colour(tenant.theme.accent, SAFE_INK)
+  const ink = colour(tenant.theme.accent_contrast, SAFE_PAPER)
+  const symbol = brandSymbol(tenant)
+  // Graphemes, not `.length`: an emoji mark is two UTF-16 units and would pick
+  // the two-character size for a single visible glyph.
+  const units = graphemes(symbol).length
+  const fontSize = units <= 1 ? 104 : units === 2 ? 78 : 58
+  const baseline = Math.round(90 + fontSize * 0.35)
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="${xmlText(tenant.brand_name)}"><rect width="180" height="180" fill="${accent}"/><text x="90" y="${baseline}" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="${fontSize}" font-weight="700" text-anchor="middle">${xmlText(symbol)}</text></svg>`
+}
+
 function rasterKey(tenant: SiteTenant): string {
   return `${tenant.slug}\u0000${tenant.brand_name}\u0000${tenant.brand_mark ?? ''}\u0000${tenant.theme.accent}\u0000${tenant.theme.accent_contrast}`
 }
 
 type Rasterize = (svg: string) => Promise<Buffer>
+type RenderSvg = (tenant: SiteTenant) => string
 
-interface SocialRasterEntry {
+interface BrandRasterEntry {
   fingerprint: string
   pending: Promise<Buffer | null>
 }
 
-/** Bounded, per-tenant cache that retries failures instead of poisoning a worker. */
-export class SocialRasterCache {
-  private readonly entries = new Map<string, SocialRasterEntry>()
+/**
+ * Bounded, per-tenant cache that retries failures instead of poisoning a worker.
+ *
+ * It takes the SVG renderer as a parameter because there is now more than one
+ * derived raster (the social card and the touch icon, issue #107). A second
+ * copy of this class per asset would have been two bounds to keep in step, two
+ * eviction policies to get right and two places for the retry-after-failure
+ * rule to rot — and `rasterKey` already fingerprints every brand field both
+ * assets are drawn from, so one implementation covers both exactly.
+ */
+export class BrandRasterCache {
+  private readonly entries = new Map<string, BrandRasterEntry>()
 
   constructor(
     private readonly rasterize: Rasterize,
     private readonly capacity = 64,
+    private readonly render: RenderSvg = socialSvg,
   ) {}
 
   get entryCount(): number {
@@ -177,7 +213,7 @@ export class SocialRasterCache {
 
     let pending: Promise<Buffer | null>
     pending = Promise.resolve()
-      .then(() => this.rasterize(socialSvg(tenant)))
+      .then(() => this.rasterize(this.render(tenant)))
       .catch(() => {
         if (this.entries.get(tenant.slug)?.pending === pending) {
           this.entries.delete(tenant.slug)
@@ -196,8 +232,14 @@ export class SocialRasterCache {
   }
 }
 
-const socialRaster = new SocialRasterCache(
+const socialRaster = new BrandRasterCache(
   (svg) => sharp(Buffer.from(svg)).png().toBuffer(),
+)
+
+const appleTouchRaster = new BrandRasterCache(
+  (svg) => sharp(Buffer.from(svg)).png().toBuffer(),
+  64,
+  appleTouchIconSvg,
 )
 
 /**
@@ -207,6 +249,38 @@ const socialRaster = new SocialRasterCache(
  */
 export function socialPng(tenant: SiteTenant): Promise<Buffer | null> {
   return socialRaster.get(tenant)
+}
+
+/** The touch icon's raster, on the same terms as the social card's. */
+export function appleTouchIconPng(tenant: SiteTenant): Promise<Buffer | null> {
+  return appleTouchRaster.get(tenant)
+}
+
+/**
+ * Always returns a path: absence of a declaration means a same-origin derived
+ * PNG, never `/logo-oauth-120x120.png`.
+ *
+ * That literal was hard-coded into `BaseLayout` for every tenant (issue #107),
+ * so a clinic's home screen icon was 1Platform's compiled drawing — the one
+ * surface where the wrong brand is not merely served but SAVED to a device and
+ * kept there after the tab is closed.
+ */
+export function resolveAppleTouchIcon(tenant: SiteTenant): string {
+  return publishedPath(tenant.brand_assets?.apple_touch_icon) ?? '/brand/apple-touch-icon.png'
+}
+
+/**
+ * A derived touch icon may be advertised only once its raster can be made.
+ *
+ * Omitting the element is the safe failure here, and specifically safer than it
+ * would be for the other two assets: with no `apple-touch-icon` a device looks
+ * for `/apple-touch-icon.png` at the origin root, which this server does not
+ * publish, so the fallback path ends in nothing rather than in the platform's
+ * drawing. Advertising a link that 404s would be strictly worse.
+ */
+export async function appleTouchIconIsAvailable(tenant: SiteTenant): Promise<boolean> {
+  if (publishedPath(tenant.brand_assets?.apple_touch_icon)) return true
+  return (await appleTouchIconPng(tenant)) !== null
 }
 
 /**
