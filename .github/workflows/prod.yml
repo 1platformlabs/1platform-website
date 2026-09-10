@@ -781,7 +781,7 @@ jobs:
               true
             } > .env.prod
             chmod 600 .env.prod
-            echo "config del contenedor: $(wc -l < .env.prod) variable(s) — $(cut -d= -f1 .env.prod | paste -sd, -)
+            echo "config del contenedor: $(wc -l < .env.prod) variable(s) — $(cut -d= -f1 .env.prod | paste -sd, -)"
 
             ./deploy.sh prod build
             ./deploy.sh prod stop || true
