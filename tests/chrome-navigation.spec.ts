@@ -65,6 +65,7 @@ test('the opening scene names the complete commerce flow without radio controls'
   await page.goto('/');
 
   await expect(page.locator('input[type="radio"], [role="radio"], [role="radiogroup"]')).toHaveCount(0);
+  await expect(page.locator('.commerce-hero__badge > [aria-hidden="true"]')).toHaveCount(0);
   await expect(page.locator('.orbit-card__title')).toHaveText([
     'Online Store',
     'Online payment',
@@ -80,6 +81,30 @@ test('the opening scene names the complete commerce flow without radio controls'
     'Factura electrónica',
     'Envío',
   ]);
+});
+
+test('the connected-sale cards keep one size and remain readable on mobile', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+
+  for (const viewport of [
+    { width: 1440, height: 900, columns: 4 },
+    { width: 390, height: 844, columns: 1 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/es/');
+
+    const geometry = await page.locator('.commerce-step').evaluateAll((cards) =>
+      cards.map((card) => {
+        const box = card.getBoundingClientRect();
+        return { top: box.top, width: box.width, height: box.height };
+      }),
+    );
+
+    expect(geometry).toHaveLength(4);
+    expect(Math.max(...geometry.map(({ width }) => width)) - Math.min(...geometry.map(({ width }) => width))).toBeLessThanOrEqual(1);
+    expect(Math.max(...geometry.map(({ height }) => height)) - Math.min(...geometry.map(({ height }) => height))).toBeLessThanOrEqual(1);
+    expect(new Set(geometry.map(({ top }) => Math.round(top))).size).toBe(viewport.columns === 1 ? 4 : 1);
+  }
 });
 
 test('the commerce orbit hands emphasis through the four stages without hiding any', async ({ page }) => {
