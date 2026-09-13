@@ -184,6 +184,8 @@ const chip = brandChip(Astro.locals.tenant);
   }
 
   .orbit-card {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     min-height: 188px;
     padding: 18px;
     overflow: hidden;
@@ -441,6 +443,7 @@ const chip = brandChip(Astro.locals.tenant);
       inset: auto;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: 1fr;
       gap: 14px;
       width: min(760px, calc(100% - 32px));
       margin: 56px auto 0;
@@ -469,7 +472,7 @@ const chip = brandChip(Astro.locals.tenant);
     .orbit-card__signal { display: none; }
     .orbit-card__icon { width: 30px; height: 30px; }
     .orbit-card__kicker { display: none; }
-    .orbit-card__title { font-size: 0.78rem; }
+    .orbit-card__title { font-size: 0.82rem; }
     .store-preview, .payment-card, .invoice-preview { margin-top: 12px; }
     .store-preview { grid-template-columns: 36px 1fr 20px; gap: 6px; padding: 7px; }
     .store-preview__image { height: 32px; }
@@ -482,7 +485,7 @@ const chip = brandChip(Astro.locals.tenant);
     .delivery-route { height: 44px; margin-top: 11px; }
     .delivery-route__line { top: 24px; }
     .delivery-route__stop { top: 19px; }
-    .orbit-card__event { grid-template-columns: auto 1fr; margin-top: 9px; font-size: 0.58rem; }
+    .orbit-card__event { grid-template-columns: auto 1fr; margin-top: 9px; font-size: 0.62rem; }
     .orbit-card__event strong { display: none; }
   }
 </style>

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **The connected-commerce landing now finishes cleanly at every viewport.**
+  The hero's remaining decorative badge marker is gone, the four sale-step
+  cards share one width and height instead of exposing uneven background rails,
+  and the mobile flow stacks into a readable single column while the opening
+  commerce scene keeps all four capabilities visible.
 - **A tenant's home-screen icon is now its own** (issue #107). `apple-touch-icon`
   was a literal in `BaseLayout` — `/logo-oauth-120x120.png`, 1Platform's compiled
   drawing — so every tenant advertised the platform's mark as the icon a device
