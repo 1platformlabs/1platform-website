@@ -202,3 +202,100 @@ jobs:
         run: |
           set -euo pipefail
           npm run check:baseline -- --explain
+
+  # ---------------------------------------------------------------------------
+  # SonarCloud — SOLO en pull requests (epica `sonar-solo-en-pr`).
+  #
+  # El `if:` va en el JOB y no en el `on:` a proposito. Lo que cuesta cuota es
+  # el analisis de `main`: el `nclocCount` que factura la organizacion es la
+  # suma del `ncloc` de las ramas `main`, y un proyecto con PRs analizados y
+  # `main` sin analizar aporta 0. Por eso este job no corre fuera de un PR, y
+  # agregarle un disparador de `push` reintroduce exactamente el costo que la
+  # epica retiro.
+  #
+  # INFORMATIVO: Sonar no es contexto requerido de `main` en este repo y este
+  # job no lo vuelve requerido (`continue-on-error` en el escaneo). El veredicto
+  # se publica igual, como check-run propio de SonarCloud.
+  #
+  # El sufijo del `name:` es deliberado: la app de SonarCloud publica su propio
+  # check-run llamado exactamente `SonarCloud Code Analysis`, y sin el sufijo
+  # hay dos checks homonimos de apps distintas en el mismo commit.
+  # ---------------------------------------------------------------------------
+  sonarcloud:
+    name: SonarCloud Code Analysis (Actions — informativo)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # OBLIGATORIO. Sin `permissions:` propio el job hereda el `permissions: {}`
+    # del workflow (cuando lo hay): un GITHUB_TOKEN sin alcance, y el checkout
+    # falla con 403 antes de que el escaner corra.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
+        with:
+          # El analisis de codigo NUEVO se apoya en `git blame`: con un checkout
+          # superficial SonarCloud no sabe que lineas trae este PR.
+          fetch-depth: 0
+
+      - name: Check for SONAR_TOKEN
+        id: sonar_token
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
+          # Dependabot no ve los secretos de Actions: los suyos viven en otro
+          # espacio de nombres, y darle el token reabre la exfiltracion desde el
+          # build de una dependencia.
+          ES_DEPENDABOT: ${{ github.actor == 'dependabot[bot]' }}
+        run: |
+          set -euo pipefail
+          if [ -n "${SONAR_TOKEN:-}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          elif [ "${ES_DEPENDABOT:-false}" = "true" ] || [ "${IS_FORK:-false}" = "true" ]; then
+            # Los dos casos en que el token NO llega por diseno de GitHub: el
+            # autor no puede hacer nada para que aparezca.
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            if [ "${ES_DEPENDABOT:-false}" = "true" ]; then
+              MOTIVO="el PR lo abrio Dependabot, que por diseno no recibe los secretos de Actions"
+            else
+              MOTIVO="el PR viene de un fork, que por diseno no recibe los secretos"
+            fi
+            echo "::warning::SonarCloud NO analizo este PR: ${MOTIVO}."
+            {
+              echo "## SonarCloud NO analizo este PR"
+              echo
+              echo "Este check esta en verde y **no midio nada**."
+              echo
+              echo "**Motivo:** ${MOTIVO}."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            # Cualquier otro PR sin token es un defecto de configuracion: el
+            # secreto vive en la organizacion. Falla en vez de pasar en falso.
+            echo "::error::SONAR_TOKEN no esta disponible en este job y el PR no viene de un fork ni de Dependabot. El analisis NO corrio."
+            exit 1
+          fi
+
+      - name: SonarCloud Scan
+        if: steps.sonar_token.outputs.present == 'true'
+        # Pinneada al SHA, no al tag: `githubactions:S7637` — un tag movil deja
+        # que el duenio de la accion cambie lo que corre en un job que recibe
+        # `SONAR_TOKEN` y `GITHUB_TOKEN`.
+        uses: SonarSource/sonarcloud-github-action@ffc3010689be73b8e5ae0c57ce35968afd7909e8 # v5
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # El host, EXPLICITO. Sin esto el escaner CLI 7.x pide
+          # `/api/v2/analysis/jres`, `sonarcloud.io` responde 404 y el fallo se
+          # lee como un problema de credenciales. Es INTERMITENTE: si el runner
+          # tiene el escaner en cache no baja el JRE y no falla.
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          # Espera el veredicto: sin esto el paso termina en verde apenas sube el
+          # analisis, antes de que exista el resultado del gate.
+          args: >
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.timeout=600
