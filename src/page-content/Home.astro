@@ -96,7 +96,7 @@ const jsonLd = [
   <section class="commerce-hero" id="hero">
     <div class="container commerce-hero__inner">
       <div class="commerce-hero__copy">
-        <p class="commerce-hero__badge"><span aria-hidden="true"></span>{t('home.hero.badge')}</p>
+        <p class="commerce-hero__badge">{t('home.hero.badge')}</p>
         <h1>{t('home.hero.headline')}</h1>
         <p class="commerce-hero__lead">{t('home.hero.lead')}</p>
         <div class="product-hero__actions commerce-hero__actions">
@@ -210,23 +210,12 @@ const jsonLd = [
   .commerce-hero__copy { max-width: 47rem; }
 
   .commerce-hero__badge {
-    display: inline-flex;
-    min-height: 32px;
-    align-items: center;
-    gap: 10px;
+    display: inline-block;
     color: var(--color-text-secondary);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-  }
-
-  .commerce-hero__badge span {
-    width: 11px;
-    height: 11px;
-    border-radius: 3px;
-    background: var(--color-accent);
-    box-shadow: inset 0 0 0 3px var(--color-accent-soft);
   }
 
   .commerce-hero h1 {
@@ -307,9 +296,17 @@ const jsonLd = [
     box-shadow: 0 20px 60px rgba(20, 22, 27, 0.07);
   }
 
+  .commerce-flow__steps > li {
+    display: flex;
+    min-width: 0;
+  }
+
   .commerce-step {
     position: relative;
     display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    width: 100%;
+    height: 100%;
     min-height: 330px;
     padding: var(--space-8);
     color: var(--color-text);
@@ -500,9 +497,17 @@ const jsonLd = [
     .commerce-hero__actions { margin-top: var(--space-6); }
     .commerce-hero__actions .btn { width: min(280px, 100%); }
     .commerce-hero__note { max-width: 19rem; margin-inline: auto; font-size: var(--text-xs); }
-    .commerce-step { min-height: 270px; padding: var(--space-5); }
+    .commerce-flow__steps {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: repeat(4, minmax(210px, 1fr));
+    }
+    .commerce-flow__steps li:first-child .commerce-step { border-radius: 17px 17px 0 0; }
+    .commerce-flow__steps li:nth-child(2) .commerce-step,
+    .commerce-flow__steps li:nth-child(3) .commerce-step { border-radius: 0; }
+    .commerce-flow__steps li:last-child .commerce-step { border-radius: 0 0 17px 17px; }
+    .commerce-step { min-height: 210px; padding: var(--space-5); }
     .commerce-step h3 { margin-top: var(--space-8); font-size: var(--text-lg); }
-    .commerce-step p { font-size: var(--text-xs); }
+    .commerce-step p { max-width: 31rem; font-size: var(--text-sm); }
     .commerce-step__icon { width: 40px; height: 40px; }
     .product-tools__grid { gap: var(--space-10); }
     .product-tools__image { border-radius: 14px; transform: none; }
