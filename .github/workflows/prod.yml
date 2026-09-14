@@ -589,7 +589,7 @@ jobs:
 # ─────────────────────────────────────────────────────────────────────────────
 
   deploy_hetzner:
-    name: Deploy al dedicado (PROD)
+    name: Deploy to dedicated host (PROD)
     # SIN `release`, y con `!cancelled()`. Desplegar el código mergeado es el
     # propósito de este workflow; el tag es contabilidad alrededor. Encadenar
     # producción detrás de la contabilidad detiene los despliegues en silencio,
