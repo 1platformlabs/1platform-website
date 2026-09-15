@@ -125,7 +125,7 @@ jobs:
           npm test
 
   visual:
-    name: Regresión visual SSR multitenant
+    name: Multitenant SSR visual regression
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -149,7 +149,7 @@ jobs:
           npm run test:visual
 
   baseline:
-    name: No-regresión byte a byte
+    name: Byte-for-byte non-regression
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -222,7 +222,7 @@ jobs:
   # hay dos checks homonimos de apps distintas en el mismo commit.
   # ---------------------------------------------------------------------------
   sonarcloud:
-    name: SonarCloud Code Analysis (Actions — informativo)
+    name: SonarCloud Code Analysis (Actions — informational)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
