@@ -3,6 +3,7 @@ import type { MiddlewareHandler } from 'astro'
 import { manifestSource } from './data/site-tenants'
 import { dictionaryFor } from './i18n'
 import { resolveTenant } from './lib/resolve-tenant'
+import { REDIRECT_MAX_AGE_SECONDS, decideRedirect } from './lib/site-redirect'
 import { resolveContent } from './lib/site-content'
 import { isPublishedRequest, physicalRouteOf } from './lib/site-routes'
 import {
@@ -127,6 +128,45 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   }
 
   const tenant = resolution.tenant
+
+  // ── The site moved to its own domain ───────────────────────────────────
+  //
+  // Placed HERE, before the tenant is published to `locals` and before a line
+  // of language or copy work: everything below this point is render cost for a
+  // body this response will not have, and one of those steps can answer 503 on
+  // its own — a site whose copy is briefly unfetchable should still redirect,
+  // not report itself broken at an address it no longer serves.
+  //
+  // The destination is validated in `decideRedirect`, not here — see that
+  // module for the rule and why it is a fixed point rather than a blocklist.
+  const decision = decideRedirect(tenant.redirect_to, host)
+  if (decision.outcome === 'redirect') {
+    return new Response(null, {
+      status: 301,
+      headers: {
+        location: `https://${decision.target}${url.pathname}${url.search}`,
+        // Bounded on purpose. A 301 is cacheable indefinitely by default and
+        // browsers take that literally, so an unbounded one would outlive the
+        // decision that produced it: disconnecting the custom domain later
+        // would leave visitors pinned to a host that no longer answers, with no
+        // way left to reach them.
+        'cache-control': `public, max-age=${REDIRECT_MAX_AGE_SECONDS}`,
+      },
+    })
+  }
+  if (decision.outcome === 'refused') {
+    // A manifest asked for something this site will not do. Logged rather than
+    // swallowed: the request is served normally either way, so without a line
+    // here the only symptom of a broken destination is a redirect that silently
+    // never happens.
+    console.warn(
+      '[tenant] ignored redirect_to host=%s why=%s value=%s',
+      host,
+      decision.why,
+      tenant.redirect_to,
+    )
+  }
+
   context.locals.tenant = tenant
 
   /** Age of the cached COPY, when it is being served stale. Reported separately

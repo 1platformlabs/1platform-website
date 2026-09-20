@@ -31,7 +31,25 @@ import { MissBudget, TenantCache } from './tenant-cache'
  */
 const cache = new TenantCache<SiteTenant>()
 
-/** Misses per minute allowed to reach the API when nothing is configured. */
+/**
+ * Misses per minute allowed to reach the API when nothing is configured.
+ *
+ * ⚠️ THIS NUMBER IS HALF OF A CROSS-REPO INVARIANT. Raising it means raising
+ * `SITE_RESOLVER_PUBLIC_LIMIT` in `1platform-api` (`app/core/rate_limit.py`)
+ * too, and the API's must stay at least 5x this value.
+ *
+ * The reason the two are coupled: the API rate-limits that endpoint BY CLIENT
+ * IP, and every tenant's misses arrive from the ONE address of this Node
+ * process. So the API's ceiling is, for us, a single global bucket shared by
+ * every site — while this budget is the number of misses we will actually send
+ * at it. A budget larger than the ceiling does not degrade gracefully: it turns
+ * a burst of unknown hosts into 429s for every OTHER tenant's cold cache.
+ *
+ * That ordering used to be inverted (60 on the API against 120 here) and it was
+ * latent only because no wildcard existed, so nobody could ask for arbitrary
+ * subdomains. `*.1platform.pro` is exactly the traffic that makes it reachable,
+ * which is why the API side ships and deploys BEFORE the wildcard is turned on.
+ */
 export const DEFAULT_MISS_BUDGET_PER_MINUTE = 120
 
 /**
