@@ -77,6 +77,22 @@ export interface SiteTenant {
    */
   google_site_verification: string | null
   indexable: boolean
+  /**
+   * The host this request should be redirected to, or absent/null when it
+   * should be served here.
+   *
+   * Only ever set when the request arrived on the site's PLATFORM address
+   * (`<slug>.1platform.pro`) while its confirmed primary domain is something
+   * else — the site moved onto its own domain and this address is now the old
+   * one. The API computes it from the stored manifest and never echoes the
+   * requested host back, so this is not a place a caller can inject a
+   * destination.
+   *
+   * Optional, in both directions and on purpose: an API from before this field
+   * omits it, and a site that is not redirecting sends null. Neither is
+   * "take the tenant offline", which is why `isTenant()` does not require it.
+   */
+  redirect_to?: string | null
 }
 
 /**
@@ -179,7 +195,7 @@ function unwrap(body: unknown): unknown {
  * is how a page ends up with the literal string "undefined" in its title. Every
  * field the layout actually reads is verified present and of the right type.
  */
-function isTenant(value: unknown): value is SiteTenant {
+export function isTenant(value: unknown): value is SiteTenant {
   if (!value || typeof value !== 'object') return false
   const t = value as Record<string, unknown>
   const str = (v: unknown) => typeof v === 'string' && v.length > 0
