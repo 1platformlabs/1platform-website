@@ -68,7 +68,14 @@ function startStubApi(redirecting: boolean): Promise<{ server: Server; base: str
             slug: TENANT.slug,
             locale: 'es',
             pages: [{ route: '@common', locale: 'es', blocks: {} }],
-            messages: {},
+            // NOT `{}` any more, and the reason is the point of issue #117: an
+            // empty dictionary is how the API says "this site has no copy", so
+            // the middleware now answers 503 for it — correctly — and the two
+            // SERVE cases below would measure that instead of the redirect
+            // rule they exist for. The double was standing in for a site with
+            // copy, so it has to carry some; the `next()` double renders canned
+            // HTML and never reads a key, so one is enough.
+            messages: { 'home.title': 'Medipago' },
           },
         }),
       )
