@@ -162,7 +162,21 @@ async function sitemapRoutes() {
   return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname)
 }
 
-const routes = [...new Set([...previousRoutes(), ...(await sitemapRoutes())])].sort()
+/**
+ * Byte order, stated explicitly rather than left to `Array#sort`'s default.
+ *
+ * Two reasons, and only one of them is the linter's. The default coerces each
+ * element with `String()` — harmless while every route IS a string, which is
+ * not something this file can prove, since half of them come back out of
+ * `JSON.parse`. And this order is COMMITTED: it decides the line order of
+ * `baseline.json`, so it has to be a property of the data and not of the
+ * machine. `localeCompare` would have been the other obvious choice and is
+ * exactly wrong for that — it sorts by locale, so a re-freeze on a differently
+ * configured box would rewrite the file without changing a single value.
+ */
+const byRoute = (a, b) => (a < b ? -1 : a > b ? 1 : 0)
+
+const routes = [...new Set([...previousRoutes(), ...(await sitemapRoutes())])].sort(byRoute)
 if (routes.length === 0) {
   console.error('freeze-baseline: no routes to freeze — refusing to write an empty baseline')
   process.exit(2)
@@ -210,7 +224,7 @@ writeFileSync(
       generator: 'scripts/freeze-baseline.mjs',
       subject: 'the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo',
       host: HOST,
-      bodies: HTML_DIR.split(/[\\/]/).join('/'),
+      bodies: HTML_DIR.replaceAll(/[\\/]/g, '/'),
       total_routes: entries.length,
       ok_routes: counts.ok,
       redirect_routes: counts.redirect,

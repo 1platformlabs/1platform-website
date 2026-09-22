@@ -1,8 +1,10 @@
-import type { MiddlewareHandler } from 'astro'
+import type { MiddlewareHandler, MiddlewareNext } from 'astro'
 
 import { manifestSource } from './data/site-tenants'
 import { dictionaryFor } from './i18n'
+import type { Locale } from './i18n/ui'
 import { resolveTenant } from './lib/resolve-tenant'
+import type { SiteTenant } from './lib/site-api'
 import { REDIRECT_MAX_AGE_SECONDS, decideRedirect } from './lib/site-redirect'
 import { resolveContent } from './lib/site-content'
 import { isPublishedRequest, physicalRouteOf } from './lib/site-routes'
@@ -148,58 +150,47 @@ async function settle(rendered: Response): Promise<Response | null> {
   })
 }
 
-export const onRequest: MiddlewareHandler = async (context, next) => {
-  const { url } = context
+/**
+ * Either a value, or the response the edge answers instead of carrying on.
+ *
+ * The alternative was to let each step return `Response | null` and read `null`
+ * as success, which is how a step that legitimately produces nothing becomes
+ * indistinguishable from one that failed. Spelling the two apart costs a type
+ * and removes a whole class of "it returned null, which null was it".
+ */
+type Step<T> = { ok: true; value: T } | { ok: false; response: Response }
 
-  if (url.pathname === '/_image' || url.pathname === '/_image/') {
-    const verdict = imageRequestIsAcceptable(url)
-    if (!verdict.ok) {
-      // 400, not 404: the resource is fine, the requested transform is not, and
-      // saying so plainly beats pretending the image does not exist.
-      return new Response(`Unacceptable image transform: ${verdict.why}\n`, {
-        status: 400,
-        headers: { 'content-type': 'text/plain; charset=utf-8', 'x-content-type-options': 'nosniff' },
-      })
-    }
-  }
+const carryOn = <T>(value: T): Step<T> => ({ ok: true, value })
+const stop = <T>(response: Response): Step<T> => ({ ok: false, response })
 
-  // The tenant for THIS request. `context.locals` is per request by
-  // construction, which is the entire reason the answer is put there.
-  const host = context.request.headers.get('host') ?? url.host
-  const resolution = await resolveTenant(host)
+/** The image guard's verdict as a response, or nothing when the request is fine. */
+function refuseUnacceptableImage(url: URL): Response | null {
+  if (url.pathname !== '/_image' && url.pathname !== '/_image/') return null
+  const verdict = imageRequestIsAcceptable(url)
+  if (verdict.ok) return null
+  // 400, not 404: the resource is fine, the requested transform is not, and
+  // saying so plainly beats pretending the image does not exist.
+  return new Response(`Unacceptable image transform: ${verdict.why}\n`, {
+    status: 400,
+    headers: { 'content-type': 'text/plain; charset=utf-8', 'x-content-type-options': 'nosniff' },
+  })
+}
 
-  if (resolution.outcome === 'unknown-host') {
-    // A real 404, and deliberately not another tenant's page. The front door
-    // today answers 200 with an unrelated product's panel for an unrouted
-    // domain; serving someone else's site here would be that same defect.
-    return new Response('Not Found\n', {
-      status: 404,
-      headers: { 'content-type': 'text/plain; charset=utf-8', 'x-content-type-options': 'nosniff' },
-    })
-  }
-
-  if (resolution.outcome === 'unavailable') {
-    // No copy and the API could not be asked. 503 is the honest answer: the
-    // site exists, we cannot render it right now, come back. A 404 here would
-    // tell crawlers the page is gone, and a half-rendered page would be worse
-    // than either.
-    console.warn('[tenant] unavailable host=%s reason=%s', host, resolution.reason)
-    return edgeFailure(503, 'Service Unavailable')
-  }
-
-  const tenant = resolution.tenant
-
-  // ── The site moved to its own domain ───────────────────────────────────
-  //
-  // Placed HERE, before the tenant is published to `locals` and before a line
-  // of language or copy work: everything below this point is render cost for a
-  // body this response will not have, and one of those steps can answer 503 on
-  // its own — a site whose copy is briefly unfetchable should still redirect,
-  // not report itself broken at an address it no longer serves.
-  //
-  // The destination is validated in `decideRedirect`, not here — see that
-  // module for the rule and why it is a fixed point rather than a blocklist.
+/**
+ * ── The site moved to its own domain ───────────────────────────────────
+ *
+ * Called BEFORE the tenant is published to `locals` and before a line of
+ * language or copy work: everything after this point is render cost for a body
+ * this response will not have, and one of those steps can answer 503 on its
+ * own — a site whose copy is briefly unfetchable should still redirect, not
+ * report itself broken at an address it no longer serves.
+ *
+ * The destination is validated in `decideRedirect`, not here — see that module
+ * for the rule and why it is a fixed point rather than a blocklist.
+ */
+function redirectIfMoved(tenant: SiteTenant, url: URL, host: string): Response | null {
   const decision = decideRedirect(tenant.redirect_to, host)
+
   if (decision.outcome === 'redirect') {
     return new Response(null, {
       status: 301,
@@ -214,6 +205,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
       },
     })
   }
+
   if (decision.outcome === 'refused') {
     // A manifest asked for something this site will not do. Logged rather than
     // swallowed: the request is served normally either way, so without a line
@@ -227,98 +219,116 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     )
   }
 
-  context.locals.tenant = tenant
+  return null
+}
 
-  /** Age of the cached COPY, when it is being served stale. Reported separately
-   *  from the manifest's age: the two are fetched independently and either can
-   *  be stale on its own, so one header for both would hide which. */
-  let contentAgeMs: number | null = null
-
-  // ── The tenant's language, and then the tenant's words ─────────────────
-  //
-  // Both go in `locals` and nowhere else, for the reason D-27 gives about the
-  // tenant itself: this process serves concurrent requests for different hosts,
-  // and the damage from a module-level "current" value is not a wrong render —
-  // it is a cache write under the wrong key, poisoning later responses for a
-  // tenant nobody was looking at.
-  let locale
+/**
+ * ── The tenant's language ──────────────────────────────────────────────
+ *
+ * The answer goes in `locals` and nowhere else, for the reason D-27 gives
+ * about the tenant itself: this process serves concurrent requests for
+ * different hosts, and the damage from a module-level "current" value is not a
+ * wrong render — it is a cache write under the wrong key, poisoning later
+ * responses for a tenant nobody was looking at.
+ */
+function localeFor(url: URL, tenant: SiteTenant, host: string): Step<Locale> {
   try {
-    locale = localeForRequest(url.pathname, tenant)
-    context.locals.localizePath = makeLocalizePath(tenant)
+    return carryOn(localeForRequest(url.pathname, tenant))
   } catch (err) {
     // A manifest this build cannot render. 503 and not a fallback to English:
     // serving the wrong language under a customer's domain, and reporting
     // success, is the failure this epic exists to stop shipping.
     const reason = err instanceof UnsupportedTenantLocale ? err.message : String(err)
     console.error('[tenant] unserveable manifest host=%s reason=%s', host, reason)
-    return edgeFailure(503, 'Service Unavailable')
+    return stop(edgeFailure(503, 'Service Unavailable'))
   }
-  context.locals.locale = locale
+}
 
+/**
+ * ── And then the tenant's words ────────────────────────────────────────
+ *
+ * `ageMs` is the age of the cached COPY, and only when it is being served
+ * stale. Reported separately from the manifest's age: the two are fetched
+ * independently and either can be stale on its own, so one header for both
+ * would hide which.
+ */
+async function copyFor(
+  tenant: SiteTenant,
+  locale: Locale,
+  host: string,
+): Promise<Step<{ messages: Record<string, string>; ageMs: number | null }>> {
   if (manifestSource() === 'repo') {
     // The repo catalogues, for a laptop and the browser suite. Explicitly
     // chosen, never a fallback — see `src/data/site-tenants.ts`.
-    context.locals.messages = dictionaryFor(locale)
-  } else {
-    const content = await resolveContent(tenant.slug, locale)
-    if (content.outcome === 'unavailable') {
-      // No copy and no way to fetch it. A page rendered without its dictionary
-      // does not degrade gracefully — `t()` throws by design — so the choice is
-      // between an honest 503 and a stack trace in a visitor's browser.
-      console.warn(
-        '[content] unavailable host=%s slug=%s locale=%s reason=%s',
-        host,
-        tenant.slug,
-        locale,
-        content.reason,
-      )
-      return edgeFailure(503, 'Service Unavailable')
-    }
-    context.locals.messages = content.content.messages
-    if (content.stale && content.ageMs !== null) {
-      contentAgeMs = content.ageMs
-    }
+    return carryOn({ messages: dictionaryFor(locale), ageMs: null })
   }
 
-  // ── The page set is a datum, and this is where it bites ────────────────
-  //
-  // `SiteTenant.pages` only ever reached the sitemap before this. So a tenant
-  // that published six pages still SERVED all of 1Platform's — `/pricing/`
-  // with the platform's prices, `/for-developers/`, the whole blog — to anyone
-  // who asked for the URL. The sitemap omitting them changed nothing: a file
-  // router does not consult a manifest.
-  //
-  // A route this tenant does not publish is a 404, and deliberately the SAME
-  // 404 an unknown host gets: distinguishing "this page exists for somebody
-  // else" from "this page does not exist" would tell a stranger which pages
-  // other tenants have.
-  //
-  // ⚠️ ESTA COMPROBACIÓN VA DESPUÉS DEL DICCIONARIO, y el orden es el arreglo.
-  // Cuando devolvía aquí mismo, `locals.messages` todavía no estaba puesto: el
-  // render del /404 caía al `?? DICTIONARIES[locale]` de `useI18n` y contestaba
-  // con las palabras del REPO —las de la plataforma— bajo el dominio del
-  // inquilino. Medido: misma petición, mismo Host, `/` decía «© 2026 Clínica
-  // Delta» y `/pricing/` decía «© 2026 1Platform Labs».
-  //
-  // No es un borde: un inquilino que publica una sola ruta sirve esta página en
-  // TODAS las demás direcciones de su dominio.
+  const content = await resolveContent(tenant.slug, locale)
+  if (content.outcome === 'unavailable') {
+    // No copy, or no way to fetch it. A page rendered without its dictionary
+    // does not degrade gracefully — `t()` throws by design — so the choice is
+    // between an honest 503 and a stack trace in a visitor's browser.
+    console.warn(
+      '[content] unavailable host=%s slug=%s locale=%s reason=%s',
+      host,
+      tenant.slug,
+      locale,
+      content.reason,
+    )
+    return stop(edgeFailure(503, 'Service Unavailable'))
+  }
+
+  return carryOn({
+    messages: content.content.messages,
+    ageMs: content.stale ? content.ageMs : null,
+  })
+}
+
+/**
+ * ── The page set is a datum, and this is where it bites ────────────────
+ *
+ * `SiteTenant.pages` only ever reached the sitemap before this. So a tenant
+ * that published six pages still SERVED all of 1Platform's — `/pricing/` with
+ * the platform's prices, `/for-developers/`, the whole blog — to anyone who
+ * asked for the URL. The sitemap omitting them changed nothing: a file router
+ * does not consult a manifest.
+ *
+ * A route this tenant does not publish is a 404, and deliberately the SAME 404
+ * an unknown host gets: distinguishing "this page exists for somebody else"
+ * from "this page does not exist" would tell a stranger which pages other
+ * tenants have.
+ *
+ * ⚠️ ESTO CORRE DESPUÉS DEL DICCIONARIO, y el orden es el arreglo. Cuando la
+ * comprobación devolvía antes, `locals.messages` todavía no estaba puesto: el
+ * render del /404 caía al `?? DICTIONARIES[locale]` de `useI18n` y contestaba
+ * con las palabras del REPO —las de la plataforma— bajo el dominio del
+ * inquilino. Medido: misma petición, mismo Host, `/` decía «© 2026 Clínica
+ * Delta» y `/pricing/` decía «© 2026 1Platform Labs».
+ *
+ * No es un borde: un inquilino que publica una sola ruta sirve esta página en
+ * TODAS las demás direcciones de su dominio.
+ */
+async function renderFor(
+  next: MiddlewareNext,
+  tenant: SiteTenant,
+  url: URL,
+  host: string,
+): Promise<Response> {
   const published = isPublishedRequest(url.pathname, tenant)
 
   let rendered: Response
   try {
-    if (!published) {
+    if (published) {
+      const physicalPath = physicalRouteOf(url.pathname, tenant)
+      rendered =
+        physicalPath === url.pathname ? await next() : await next(`${physicalPath}${url.search}`)
+    } else {
       // The site's own 404 PAGE, not a bare body — rewritten rather than
       // hand-written. The first version of this returned plain text and it was
       // a real regression the browser suite caught: every address a tenant does
       // not publish, `/404.html` included, lost the rendered page with its
       // chrome and its language control.
       rendered = await next('/404')
-    } else {
-      const physicalPath = physicalRouteOf(url.pathname, tenant)
-      rendered =
-        physicalPath === url.pathname
-          ? await next()
-          : await next(`${physicalPath}${url.search}`)
     }
   } catch (err) {
     // A render that throws BEFORE the first byte. Astro turns this into its own
@@ -350,21 +360,77 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     return edgeFailure(503, 'Service Unavailable')
   }
 
+  if (published) return complete
+
   // The status has to be restored explicitly on the 404 rewrite: it renders the
   // target route, and that route answers 200 on its own. A soft 404 would be
   // worse than plain text — it poisons the index instead of merely looking bad.
-  const response = published
-    ? complete
-    : new Response(complete.body, { status: 404, headers: complete.headers })
+  return new Response(complete.body, { status: 404, headers: complete.headers })
+}
 
-  // How old the manifest behind this page is. A header rather than a comment so
-  // that "we are serving a stale copy" is observable from outside the process,
-  // which is the only way anyone finds out the API has been down for an hour.
-  if (resolution.stale && resolution.ageMs !== null) {
-    response.headers.set('x-site-manifest-age', String(Math.round(resolution.ageMs / 1000)))
+/**
+ * How old the data behind this page is.
+ *
+ * Headers rather than a comment, so that "we are serving a stale copy" is
+ * observable from outside the process — which is the only way anyone finds out
+ * the API has been down for an hour.
+ */
+function stampAges(response: Response, manifestAgeMs: number | null, contentAgeMs: number | null) {
+  if (manifestAgeMs !== null) {
+    response.headers.set('x-site-manifest-age', String(Math.round(manifestAgeMs / 1000)))
   }
   if (contentAgeMs !== null) {
     response.headers.set('x-site-content-age', String(Math.round(contentAgeMs / 1000)))
   }
+}
+
+export const onRequest: MiddlewareHandler = async (context, next) => {
+  const { url } = context
+
+  const unacceptableImage = refuseUnacceptableImage(url)
+  if (unacceptableImage) return unacceptableImage
+
+  // The tenant for THIS request. `context.locals` is per request by
+  // construction, which is the entire reason the answer is put there.
+  const host = context.request.headers.get('host') ?? url.host
+  const resolution = await resolveTenant(host)
+
+  if (resolution.outcome === 'unknown-host') {
+    // A real 404, and deliberately not another tenant's page. The front door
+    // today answers 200 with an unrelated product's panel for an unrouted
+    // domain; serving someone else's site here would be that same defect.
+    return new Response('Not Found\n', {
+      status: 404,
+      headers: { 'content-type': 'text/plain; charset=utf-8', 'x-content-type-options': 'nosniff' },
+    })
+  }
+
+  if (resolution.outcome === 'unavailable') {
+    // No manifest and the API could not be asked. 503 is the honest answer: the
+    // site exists, we cannot render it right now, come back. A 404 here would
+    // tell crawlers the page is gone, and a half-rendered page would be worse
+    // than either.
+    console.warn('[tenant] unavailable host=%s reason=%s', host, resolution.reason)
+    return edgeFailure(503, 'Service Unavailable')
+  }
+
+  const tenant = resolution.tenant
+
+  const moved = redirectIfMoved(tenant, url, host)
+  if (moved) return moved
+
+  context.locals.tenant = tenant
+
+  const language = localeFor(url, tenant, host)
+  if (!language.ok) return language.response
+  context.locals.locale = language.value
+  context.locals.localizePath = makeLocalizePath(tenant)
+
+  const copy = await copyFor(tenant, language.value, host)
+  if (!copy.ok) return copy.response
+  context.locals.messages = copy.value.messages
+
+  const response = await renderFor(next, tenant, url, host)
+  stampAges(response, resolution.stale ? resolution.ageMs : null, copy.value.ageMs)
   return response
 }

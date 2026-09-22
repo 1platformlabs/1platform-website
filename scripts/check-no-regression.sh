@@ -74,11 +74,11 @@ trap cleanup EXIT INT TERM
 
 BASELINE_FILE="tests/baseline/baseline.json"
 BASELINE_BODIES="tests/baseline/html"
-if [ ! -f "$BASELINE_FILE" ]; then
+if [[ ! -f "$BASELINE_FILE" ]]; then
   printf '%sFAIL%s  %s does not exist — run scripts/freeze-baseline.mjs first\n' "$RED" "$RESET" "$BASELINE_FILE"
   exit 2
 fi
-if [ ! -d "$BASELINE_BODIES" ]; then
+if [[ ! -d "$BASELINE_BODIES" ]]; then
   printf '%sFAIL%s  %s does not exist — the frozen bodies are committed; re-freeze\n' "$RED" "$RESET" "$BASELINE_BODIES"
   exit 2
 fi
