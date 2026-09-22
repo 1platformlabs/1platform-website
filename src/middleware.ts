@@ -80,6 +80,74 @@ export function imageRequestIsAcceptable(url: URL): { ok: true } | { ok: false; 
   return { ok: true }
 }
 
+/**
+ * The edge's own answer, for the cases where no page can be produced.
+ *
+ * Plain text and BRAND-FREE, deliberately. The obvious improvement — a nice
+ * error page — is the one thing that cannot be done here: rendering this
+ * site's chrome needs the tenant's dictionary, which in every caller below is
+ * exactly what is missing, and the only other chrome available is the
+ * PLATFORM's. Serving 1Platform's logo, colours and words under a customer's
+ * domain is the leak this whole epic exists to close, and an error page is not
+ * an exception to it. Ten bytes that belong to nobody beat a beautiful page
+ * that belongs to the wrong tenant.
+ */
+function edgeFailure(status: 500 | 503, message: string): Response {
+  return new Response(`${message}\n`, {
+    status,
+    headers: {
+      'content-type': 'text/plain; charset=utf-8',
+      'x-content-type-options': 'nosniff',
+      ...(status === 503 ? { 'retry-after': '30' } : {}),
+      'cache-control': 'no-store',
+    },
+  })
+}
+
+/** Statuses that may not carry a body at all; `new Response(body, …)` throws on them. */
+const BODYLESS = new Set([101, 103, 204, 205, 304])
+
+/**
+ * Hold the rendered response until it is COMPLETE, and say so if it never is.
+ *
+ * ⚠️ THIS IS WHY THE SITE STOPPED STREAMING, and the trade is deliberate
+ * (issue #117).
+ *
+ * The Node adapter writes the status line and the headers BEFORE it reads the
+ * first chunk of the body (`astro/dist/core/app/node.js`, `writeResponse`).
+ * If the render then throws — and `t()` throws by design on a key the tenant's
+ * copy does not carry — the adapter's only remaining move is to write the
+ * literal string `Internal server error` into a response it has already
+ * declared a 200 and destroy the socket. Measured: `HTTP 200`, 21 bytes, that
+ * string. Every layer downstream reads that as a healthy page: the browser
+ * renders nothing, a crawler indexes success, and no uptime check goes red.
+ *
+ * A stream cannot be un-sent, so the only way the status can tell the truth is
+ * for it to be decided after the last byte exists. Buffering here costs this
+ * site nothing real: every page is a few tens of KB rendered from an in-memory
+ * dictionary the middleware already fetched, so there is no slow source for
+ * streaming to hide — the whole document is produced in one synchronous burst
+ * either way. What it buys is that a failed render is a 5xx instead of a lie.
+ *
+ * Returns `null` when the body died on the way out.
+ */
+async function settle(rendered: Response): Promise<Response | null> {
+  if (!rendered.body || BODYLESS.has(rendered.status)) return rendered
+
+  let body: ArrayBuffer
+  try {
+    body = await rendered.arrayBuffer()
+  } catch {
+    return null
+  }
+
+  return new Response(body, {
+    status: rendered.status,
+    statusText: rendered.statusText,
+    headers: rendered.headers,
+  })
+}
+
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const { url } = context
 
@@ -116,15 +184,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     // tell crawlers the page is gone, and a half-rendered page would be worse
     // than either.
     console.warn('[tenant] unavailable host=%s reason=%s', host, resolution.reason)
-    return new Response('Service Unavailable\n', {
-      status: 503,
-      headers: {
-        'content-type': 'text/plain; charset=utf-8',
-        'x-content-type-options': 'nosniff',
-        'retry-after': '30',
-        'cache-control': 'no-store',
-      },
-    })
+    return edgeFailure(503, 'Service Unavailable')
   }
 
   const tenant = resolution.tenant
@@ -191,15 +251,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     // success, is the failure this epic exists to stop shipping.
     const reason = err instanceof UnsupportedTenantLocale ? err.message : String(err)
     console.error('[tenant] unserveable manifest host=%s reason=%s', host, reason)
-    return new Response('Service Unavailable\n', {
-      status: 503,
-      headers: {
-        'content-type': 'text/plain; charset=utf-8',
-        'x-content-type-options': 'nosniff',
-        'retry-after': '30',
-        'cache-control': 'no-store',
-      },
-    })
+    return edgeFailure(503, 'Service Unavailable')
   }
   context.locals.locale = locale
 
@@ -220,15 +272,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
         locale,
         content.reason,
       )
-      return new Response('Service Unavailable\n', {
-        status: 503,
-        headers: {
-          'content-type': 'text/plain; charset=utf-8',
-          'x-content-type-options': 'nosniff',
-          'retry-after': '30',
-          'cache-control': 'no-store',
-        },
-      })
+      return edgeFailure(503, 'Service Unavailable')
     }
     context.locals.messages = content.content.messages
     if (content.stale && content.ageMs !== null) {
@@ -258,29 +302,60 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   //
   // No es un borde: un inquilino que publica una sola ruta sirve esta página en
   // TODAS las demás direcciones de su dominio.
-  let response: Response
-  if (!isPublishedRequest(url.pathname, tenant)) {
-    // The site's own 404 PAGE, not a bare body — rewritten rather than
-    // hand-written. The first version of this returned plain text and it was a
-    // real regression the browser suite caught: every address a tenant does not
-    // publish, `/404.html` included, lost the rendered page with its chrome and
-    // its language control.
-    //
-    // The status has to be restored explicitly: a rewrite renders the target
-    // route, and that route answers 200 on its own. A soft 404 would be worse
-    // than the plain text — it poisons the index instead of merely looking bad.
-    const rendered = await next('/404')
-    response = new Response(rendered.body, {
-      status: 404,
-      headers: rendered.headers,
-    })
-  } else {
-    const physicalPath = physicalRouteOf(url.pathname, tenant)
-    response =
-      physicalPath === url.pathname
-        ? await next()
-        : await next(`${physicalPath}${url.search}`)
+  const published = isPublishedRequest(url.pathname, tenant)
+
+  let rendered: Response
+  try {
+    if (!published) {
+      // The site's own 404 PAGE, not a bare body — rewritten rather than
+      // hand-written. The first version of this returned plain text and it was
+      // a real regression the browser suite caught: every address a tenant does
+      // not publish, `/404.html` included, lost the rendered page with its
+      // chrome and its language control.
+      rendered = await next('/404')
+    } else {
+      const physicalPath = physicalRouteOf(url.pathname, tenant)
+      rendered =
+        physicalPath === url.pathname
+          ? await next()
+          : await next(`${physicalPath}${url.search}`)
+    }
+  } catch (err) {
+    // A render that throws BEFORE the first byte. Astro turns this into its own
+    // 500, which is already honest; catching it here only makes the body the
+    // same brand-free one as every other edge failure, instead of whichever
+    // string the framework happens to emit.
+    console.error('[render] threw host=%s path=%s reason=%s', host, url.pathname, String(err))
+    return edgeFailure(500, 'Internal Server Error')
   }
+
+  // ⚠️ THE STATUS IS DECIDED AFTER THE LAST BYTE EXISTS — see `settle` (#117).
+  const complete = await settle(rendered)
+  if (complete === null) {
+    // The render died with the response already half out. Before this, that was
+    // answered as `200` with the adapter's `Internal server error` in the body.
+    //
+    // 503 rather than 500, and the choice is deliberate: from the edge there is
+    // no way to tell a code defect from a site whose copy has not been written
+    // yet, and the two want opposite answers. The cheap mistake is 503 — the
+    // documented signal for "temporarily unavailable, come back", which costs a
+    // crawler one revisit. The expensive one would be any 2xx, which is how a
+    // site with no copy gets indexed as healthy.
+    console.error(
+      '[render] died mid-stream host=%s slug=%s path=%s — answering 503 instead of a truncated 200',
+      host,
+      tenant.slug,
+      url.pathname,
+    )
+    return edgeFailure(503, 'Service Unavailable')
+  }
+
+  // The status has to be restored explicitly on the 404 rewrite: it renders the
+  // target route, and that route answers 200 on its own. A soft 404 would be
+  // worse than plain text — it poisons the index instead of merely looking bad.
+  const response = published
+    ? complete
+    : new Response(complete.body, { status: 404, headers: complete.headers })
 
   // How old the manifest behind this page is. A header rather than a comment so
   // that "we are serving a stale copy" is observable from outside the process,
