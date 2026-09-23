@@ -59,7 +59,8 @@ export function contentKey(slug: string, locale: string): string {
  * collapsing any two of them is how a site starts serving the wrong thing:
  *
  *   content      the tenant publishes this locale
- *   null         the API answered, and said no (404)
+ *   null         the API answered, and said no — a 404, OR a 200 whose
+ *                dictionary is EMPTY, which is the same answer said badly
  *   throws       the API did not answer, or answered something unusable
  */
 export async function fetchContent(
@@ -98,6 +99,30 @@ export async function fetchContent(
   if (!isContent(payload)) {
     throw new SiteApiUnavailable(`site API returned unrecognised content for ${slug}/${locale}`)
   }
+
+  // ── AN EMPTY DICTIONARY IS "NO COPY", NOT COPY (issue #117) ─────────────
+  //
+  // A site that is published but has no content documents yet answers `200
+  // {"pages": [], "messages": {}}`. The shape is valid, so `isContent` passes
+  // it — and that verdict used to travel all the way to the renderer, where
+  // the FIRST `t()` throws by design (`src/i18n/index.ts`) after the 200 and
+  // its headers are already on the wire. Measured on `origin/main` against a
+  // stub API: `HTTP 200`, 21 bytes, body `Internal server error`, socket
+  // destroyed. A success code wrapping an error string is the worst of both —
+  // a crawler indexes the page as healthy and no availability check goes red.
+  //
+  // It is mapped to `null` rather than to a throw because that is what it
+  // MEANS: the API answered, and what it said is "this site has no words".
+  // That is the 404 branch's answer arriving with the wrong status line, and
+  // `resolveContent` already turns it into the honest 503.
+  //
+  // The bound is exact on purpose — zero keys, not "too few". A dictionary
+  // that is short by one key is a different failure, it cannot be detected
+  // here (the key set a page needs is a property of the page), and the
+  // middleware now catches it where it actually surfaces: a render that dies
+  // mid-stream no longer escapes as a 200.
+  if (Object.keys(payload.messages).length === 0) return null
+
   return payload
 }
 
@@ -144,6 +169,11 @@ export type ContentResolution =
  * inconsistency between two documents rather than an absent visitor. Rendering
  * a page with no words would be the wrong answer to that; `unavailable` (and
  * therefore a 503) is the right one.
+ *
+ * A published site that simply has no copy YET arrives here the same way — see
+ * the empty-dictionary note in `fetchContent`. It is the ordinary state of a
+ * site between "created" and "written", not a rare edge, which is exactly why
+ * it must not be the one shape that slips through as a 200.
  *
  * @param now injected so expiry is testable without waiting, and so a test
  *            cannot pass by accident of timing

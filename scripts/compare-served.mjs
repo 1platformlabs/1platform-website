@@ -1,13 +1,28 @@
 #!/usr/bin/env node
 /**
- * Compares what the SERVER renders against the frozen static baseline (F0).
+ * Compares what the SERVER answers against the frozen baseline.
  *
  * WHY THIS EXISTS
  * ---------------
- * F0 froze the bytes of a static build. F1 turns the site into a long-lived
- * server. The central acceptance criterion of the epic is that `1platform.pro`
- * does not regress, so something has to hold the server's output against those
- * frozen bytes — and it has to be able to say NO, or it is decoration.
+ * The central acceptance criterion of `website-multitenant` is that
+ * `1platform.pro` does not regress, so something has to hold the server's
+ * answers against a frozen set — and it has to be able to say NO, or it is
+ * decoration.
+ *
+ * WHAT "THE BASELINE" IS NOW (issue #112)
+ * ---------------------------------------
+ * It was the bytes of a STATIC build: one file per route, every route a 200.
+ * The conversion to a server broke both halves of that — `dist/` holds no HTML
+ * at all, and 46 of the 100 frozen routes legitimately answer 301 because
+ * `astro.config.mjs` retires them. Against a baseline that could only express
+ * "200 with these bytes", those 46 read as failures, on every pull request,
+ * including ones that touched nothing but a workflow file. A gate that is red
+ * for reasons unrelated to the change is a gate nobody reads.
+ *
+ * So the baseline is now the RESPONSE: status for every route, destination for
+ * the redirects, and bytes for the routes that have a body — frozen from the
+ * server itself by `scripts/freeze-baseline.mjs` and committed under
+ * `tests/baseline/html/`.
  *
  * ON NORMALISATION
  * ----------------
@@ -192,8 +207,25 @@ function getWithHost(url, host) {
         const chunks = []
         res.on('data', (c) => chunks.push(c))
         res.on('end', () =>
-          resolve({ status: res.statusCode ?? 0, body: Buffer.concat(chunks).toString('utf8') }),
+          resolve({
+            status: res.statusCode ?? 0,
+            location: res.headers.location ?? null,
+            body: Buffer.concat(chunks).toString('utf8'),
+            truncated: false,
+          }),
         )
+        // A body that stops mid-flight is the shape of issue #117: the head
+        // said 200 and the render died after it. Resolving instead of hanging
+        // is what lets that be REPORTED rather than time out.
+        const cutShort = () =>
+          resolve({
+            status: res.statusCode ?? 0,
+            location: res.headers.location ?? null,
+            body: Buffer.concat(chunks).toString('utf8'),
+            truncated: true,
+          })
+        res.on('aborted', cutShort)
+        res.on('error', cutShort)
       },
     )
     req.on('error', reject)
@@ -340,38 +372,44 @@ const baseIdx = argv.indexOf('--base')
 const BASE = baseIdx >= 0 ? argv[baseIdx + 1] : 'http://127.0.0.1:4331'
 const EXPLAIN = argv.includes('--explain')
 const hostIdx = argv.indexOf('--host')
-const HOST_OVERRIDE = hostIdx >= 0 ? argv[hostIdx + 1] : null
 
 if (!existsSync(BASELINE)) {
-  console.error(`compare-served: ${BASELINE} missing — run scripts/freeze-baseline.mjs on a static build first`)
+  console.error(`compare-served: ${BASELINE} missing — run scripts/freeze-baseline.mjs against a running server first`)
   process.exit(2)
 }
 const baseline = JSON.parse(readFileSync(BASELINE, 'utf8'))
 const routes = baseline.entries.filter((e) => e.route)
 
-// The baseline stores hashes of file BYTES, which is the contract. To compare
-// at all we also need the bytes, and an SSR build no longer emits them — so
-// `--bodies <dir>` points at a static dist/ built from the commit
-// tests/baseline/baseline.json was frozen from (scripts/check-no-regression.sh
-// does this with a detached worktree, without disturbing anything).
+// The baseline records WHICH HOST it was frozen under, so the comparison
+// defaults to measuring the same tenant instead of whatever `--base` resolves
+// to. Passing `--host` still overrides it, which is how another tenant gets
+// measured against a baseline of its own.
+const HOST_OVERRIDE = hostIdx >= 0 ? argv[hostIdx + 1] : (baseline.host ?? null)
+
+// The baseline stores hashes of the frozen BYTES, which is the contract. To
+// compare at all we also need those bytes on hand, and a normaliser is only
+// meaningful applied to BOTH sides — so the frozen bodies live next to the
+// baseline, in `tests/baseline/html/`, and are committed (issue #112).
 //
-// `--bodies` is REQUIRED (issue #99), not merely accepted. It used to default
-// to tests/baseline/html/, a directory this repository never commits, so the
-// default run always fell through to comparing a NORMALISED served page
-// against the baseline's RAW hash — which cannot match unless a normaliser is
-// a no-op, so every route a normaliser was supposed to forgive is misreported
-// as a regression. Measured on a clean tree: 1 identical / 52 differing,
-// which reads as a catastrophe and is not one. Refusing to run without bodies
-// is what makes that reading impossible instead of merely unlikely.
+// Bodies are NOT optional (issue #99). Without them the run falls through to
+// comparing a NORMALISED served page against the baseline's RAW hash, which
+// cannot match unless every normaliser is a no-op, so every route a normaliser
+// was supposed to forgive is misreported as a regression: measured on a clean
+// tree, 1 identical / 52 differing — a catastrophe that is not one.
+//
+// They used to be obtained by checking out the commit the baseline was frozen
+// from and building it, which stopped being possible the moment that commit
+// built a SERVER (no `.html` in `dist/` at all) and was a gate with an expiry
+// date besides — it needed an old lockfile to keep installing, forever.
 const bodiesIdx = argv.indexOf('--bodies')
-const HTML_DIR = bodiesIdx >= 0 ? argv[bodiesIdx + 1] : null
+const HTML_DIR = bodiesIdx >= 0 ? argv[bodiesIdx + 1] : (baseline.bodies ?? join('tests', 'baseline', 'html'))
 if (!HTML_DIR || !existsSync(HTML_DIR)) {
   console.error(
-    'compare-served: --bodies <dir> is required and must point at a static dist/ built from the ' +
-      'commit tests/baseline/baseline.json was frozen from. Without it, a legitimate normalisation ' +
-      '(see NORMALISERS above) cannot be told from a real regression, and a clean tree reports most ' +
-      'routes as differing (issue #99). Run `npm run check:baseline` instead of invoking this script ' +
-      'bare — it builds that tree and passes --bodies for you.',
+    `compare-served: the frozen bodies are missing (${HTML_DIR}). They are committed alongside ` +
+      'tests/baseline/baseline.json; if the directory is gone, re-freeze with ' +
+      'scripts/freeze-baseline.mjs against a running server rather than running this bare — ' +
+      'without both sides a legitimate normalisation cannot be told from a real regression ' +
+      '(issue #99).',
   )
   process.exit(2)
 }
@@ -387,18 +425,39 @@ const differs = []
 const failed = []
 
 for (const entry of routes) {
+  // The status is part of the frozen answer, not a precondition for reading it
+  // (issue #112). A route that answers 301 today does so because
+  // `astro.config.mjs` retires it ON PURPOSE, and a gate that can only say
+  // "expected 200" reports 47 deliberate redirects as 47 failures — which is
+  // how it came to be red on every pull request for two days running and
+  // stopped being read at all.
+  const expectedStatus = entry.status ?? 200
+
   // Per-route try/catch on purpose: a route whose render dies mid-stream closes
   // the socket, and without this one bad route aborts the whole run and hides
   // the other 99 verdicts. An unfetchable route is a RESULT, not a crash.
   let served
   try {
     const url = BASE + entry.route
-    // The Host `--base`'s own address would produce, unless `--host` names a
-    // specific tenant — see the "ON `Host`" note above.
+    // The Host `--base`'s own address would produce, unless `--host` (or the
+    // baseline itself) names a specific tenant — see the "ON `Host`" note.
     const host = HOST_OVERRIDE ?? new URL(url).host
     const res = await getWithHost(url, host)
-    if (res.status !== 200) {
-      failed.push({ route: entry.route, why: `status ${res.status}` })
+
+    if (res.status !== expectedStatus) {
+      failed.push({ route: entry.route, why: `status ${res.status}, baseline says ${expectedStatus}` })
+      continue
+    }
+    if (res.truncated) {
+      // The defect #117 closed: a head that promised a body the render never
+      // finished. Reported loudly rather than hashed, because hashing half a
+      // document would freeze the truncation in as the expected answer.
+      failed.push({ route: entry.route, why: `answered ${res.status} and hung up mid-body` })
+      continue
+    }
+    if (expectedStatus >= 300 && expectedStatus < 400) {
+      if (res.location === entry.location) same.push(entry.route)
+      else failed.push({ route: entry.route, why: `redirects to ${res.location}, baseline says ${entry.location}` })
       continue
     }
     served = res.body
@@ -438,10 +497,10 @@ for (const entry of routes) {
 console.log(`compare-served: ${routes.length} baseline routes against ${BASE}`)
 console.log(`  identical : ${same.length}`)
 console.log(`  differing : ${differs.length}`)
-console.log(`  unfetched : ${failed.length}`)
+console.log(`  wrong     : ${failed.length}   (status, destination, or unreachable)`)
 console.log(`  normalisers applied: ${NORMALISERS.map((n) => n.name).join(', ') || '(none — raw bytes)'}`)
 
-for (const f of failed) console.log(`  UNFETCHED  ${f.route} — ${f.why}`)
+for (const f of failed) console.log(`  WRONG      ${f.route} — ${f.why}`)
 if (EXPLAIN) {
   for (const d of differs) {
     console.log(`  DIFFERS    ${d.route}  (baseline ${d.baselineBytes}B vs served ${d.servedBytes}B)`)
