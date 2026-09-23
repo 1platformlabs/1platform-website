@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **La portada conectada ya es reutilizable por un tenant de una sola página.**
+  Conserva la composición de `1platform.pro`, pero usa el soporte del tenant
+  como CTA cuando no hay app, mantiene visibles los pasos y audiencias como
+  contenido no interactivo cuando sus rutas no están publicadas, y no anuncia
+  en JSON-LD una página de precios inexistente. El tenant principal conserva
+  sus enlaces, CTA y schema actuales.
 - **The connected-commerce landing now finishes cleanly at every viewport.**
   The hero's remaining decorative badge marker is gone, the four sale-step
   cards share one width and height instead of exposing uneven background rails,

@@ -47,6 +47,7 @@ const DIRECTORY_HOST = 'directory.example'
 const NON_HOME_HOST = 'single-non-home.example'
 const NON_HOME_DIRECTORY_HOST = 'directory-no-home.example'
 const PROBE_HOST = 'consultorio-aurora.example'
+const COMMERCE_PROBE_HOST = 'medipago-reference.example'
 const BILINGUAL_HOST = 'centro-bilingue.example'
 
 type CompositionSource = { path: string; source: string }
@@ -110,6 +111,18 @@ const ROUTE_MESSAGE_KEYS = [
   ),
 ]
 
+const COMMERCE_MESSAGE_KEYS = [
+  ...new Set(
+    [
+      'src/page-content/Home.astro',
+      'src/components/home/CommerceOrbit.astro',
+    ].flatMap((source) =>
+      [...readFileSync(join(ROOT, source), 'utf8').matchAll(/\bt\(\s*(['"])([^'"]+)\1/g)]
+        .map((match) => match[2]),
+    ),
+  ),
+]
+
 function routeMessages(locale: string): Record<string, string> {
   return Object.fromEntries(ROUTE_MESSAGE_KEYS.map((key) => [key, `${locale}:${key}`]))
 }
@@ -152,6 +165,19 @@ function tenantFor(host: string): SiteTenantFixture | null {
       domain: PROBE_HOST,
     }
   }
+  if (host === COMMERCE_PROBE_HOST) {
+    return {
+      ...fixture.tenant,
+      slug: 'medipago-reference',
+      brand_name: 'Medipago',
+      brand_mark: 'M',
+      brand_wordmark: 'Medipago',
+      domain: COMMERCE_PROBE_HOST,
+      home_template: 'platform-commerce',
+      theme: { ...fixture.tenant.theme, display_font: 'space-grotesk' },
+      pages: ['/'],
+    }
+  }
   if (host === BILINGUAL_HOST) {
     return {
       ...fixture.tenant,
@@ -181,6 +207,25 @@ function responseFor(tenant: SiteTenantFixture, locale: string): SiteFixture['pa
         value.replaceAll('Clínica Delta', 'Consultorio Aurora'),
       ]),
     )
+  }
+  if (tenant.slug === 'medipago-reference') {
+    response.data.messages = {
+      ...Object.fromEntries(
+        Object.entries(response.data.messages).map(([key, value]) => [
+          key,
+          value.replaceAll('Clínica Delta', 'Medipago'),
+        ]),
+      ),
+      ...Object.fromEntries(COMMERCE_MESSAGE_KEYS.map((key) => [key, `Medipago · ${key}`])),
+      'home.title': 'Medipago — Cobros desde tu teléfono',
+      'home.description': 'Cobros, comprobantes y facturas en un solo recorrido.',
+      'home.hero.headline': 'Cobrá con tarjeta en tu teléfono.',
+      'home.hero.lead': 'La composición original, con la marca y el contenido de Medipago.',
+      'home.jsonld.name': 'Medipago',
+      'home.jsonld.brandName': 'Medipago',
+      'cta.scheduleDemo': 'Agendar una demostración',
+      'cta.scheduleDemoAria': 'Agendar una demostración con Medipago',
+    }
   }
   if (tenant.slug === 'directory-no-home') {
     response.data.messages = {
@@ -246,6 +291,7 @@ function startStubApi(): Promise<{ server: Server; baseUrl: string }> {
         tenantFor(NON_HOME_HOST),
         tenantFor(NON_HOME_DIRECTORY_HOST),
         tenantFor(PROBE_HOST),
+        tenantFor(COMMERCE_PROBE_HOST),
         tenantFor(BILINGUAL_HOST),
       ]
         .find((candidate) => candidate?.slug === slug)
@@ -401,6 +447,56 @@ test('a third tenant slug reuses service-lead without a layout or selector of it
   expect(response.body).toContain('data-home-template="service-lead"')
   expect(response.body).toContain('Consultorio Aurora')
   expect(response.body).not.toContain('Clínica Delta')
+})
+
+test('a one-page tenant reuses the reference commerce home without dead links', async ({ browser }) => {
+  const isolatedBrowser = await browser.browserType().launch({
+    args: [`--host-resolver-rules=MAP ${COMMERCE_PROBE_HOST} 127.0.0.1`],
+  })
+  const context = await isolatedBrowser.newContext({ viewport: { width: 1440, height: 900 } })
+  const page = await context.newPage()
+
+  try {
+    const port = new URL(appBaseUrl).port
+    const response = await page.goto(`http://${COMMERCE_PROBE_HOST}:${port}/`)
+    expect(response?.status()).toBe(200)
+    await expect(page.locator('.commerce-hero')).toBeVisible()
+    await expect(page.locator('.commerce-orbit')).toBeVisible()
+    await expect(page.locator('[data-home-template="service-lead"]')).toHaveCount(0)
+
+    const heroCta = page.locator('[data-support-cta="hero"]')
+    await expect(heroCta).toHaveAttribute('href', fixture.tenant.destinations.support!)
+    await expect(heroCta).toHaveAccessibleName('Agendar una demostración con Medipago')
+
+    await expect(page.locator('.commerce-step--static')).toHaveCount(4)
+    await expect(page.locator('.product-tool-link--static')).toHaveCount(2)
+    await expect(page.locator('.product-audience--static')).toHaveCount(3)
+    await expect(page.locator('main a[href="/pricing/"]')).toHaveCount(0)
+
+    const jsonLd = await page.locator('script[type="application/ld+json"]').allTextContents()
+    expect(jsonLd.join('\n')).not.toContain('"@type":"Product"')
+    await expect(page.locator('.commerce-hero h1')).toHaveCSS('font-family', /Space Grotesk/)
+
+    await page.setViewportSize({ width: 390, height: 844 })
+    await expect(heroCta).toBeVisible()
+    const mobileWidth = await page.evaluate(() => ({
+      documentWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+      overflowing: [...document.body.querySelectorAll<HTMLElement>('*')]
+        .map((element) => {
+          const rect = element.getBoundingClientRect()
+          return { element: `${element.tagName.toLowerCase()}.${element.className}`, left: rect.left, right: rect.right }
+        })
+        .filter(({ left, right }) => left < -1 || right > window.innerWidth + 1),
+    }))
+    expect(
+      mobileWidth.documentWidth,
+      `overflowing elements: ${JSON.stringify(mobileWidth.overflowing)}`,
+    ).toBeLessThanOrEqual(mobileWidth.viewportWidth)
+  } finally {
+    await context.close()
+    await isolatedBrowser.close()
+  }
 })
 
 test('a long valid tenant wordmark yields to the complete mobile support CTA', async ({ browser }) => {

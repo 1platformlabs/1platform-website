@@ -16,23 +16,31 @@ const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
  *
  * The tables below are the composition's STRUCTURE and are shared by every
  * tenant (D-20 forbids a composition per brand). Their destinations are not
- * structure: a tenant that publishes one page had this home offering nine
- * links, every one of them a 404 from the middleware. Filtering here keeps one
- * composition and still lets the page set be a datum.
+ * structure: a tenant that publishes one page used to lose the nine pieces of
+ * content below the hero because their destinations were absent. Rendering
+ * those entries as static cards keeps one composition, without creating links
+ * that the middleware would answer with 404.
  */
 const published = (route: string): string | null =>
   Astro.locals.tenant.pages.includes(route) ? l(route) : null;
 
-const withHref = <T extends { href: string | null }>(rows: T[]) =>
-  rows.filter((r): r is T & { href: string } => r.href !== null);
 const title = t('home.title');
 const description = t('home.description');
+const tenantAppUrl = appUrl(Astro.locals);
+const supportUrl = Astro.locals.tenant.destinations.support;
+const heroCtaHref = supportUrl ?? tenantAppUrl;
+const heroCtaLabel = supportUrl
+  ? t('cta.scheduleDemo')
+  : tenantAppUrl
+    ? t('home.hero.cta')
+    : null;
+const heroCtaAria = supportUrl ? t('cta.scheduleDemoAria') : undefined;
 
 type JourneyStep = {
   icon: IconName;
   title: string;
   body: string;
-  href: string;
+  href: string | null;
 };
 
 /**
@@ -40,7 +48,7 @@ type JourneyStep = {
  * share a product destination but remain separate moments in the story: that
  * distinction is what makes automatic invoicing visible at first glance.
  */
-const journey: JourneyStep[] = withHref([
+const journey: JourneyStep[] = [
   {
     icon: 'store',
     title: t('home.flow.store.title'),
@@ -65,30 +73,31 @@ const journey: JourneyStep[] = withHref([
     body: t('home.flow.delivery.description'),
     href: published('/solutions/deliveries/'),
   },
-]);
+];
 
 /** Ordered by distance from the sale, nearest first. */
-const tools = withHref([
+const tools = [
   { label: t('home.tools.ads'), href: published('/solutions/ads/') },
   { label: t('home.tools.content'), href: published('/solutions/content/') },
-]);
+];
 
-const audiences = withHref([
+const audiences = [
   { title: t('home.useCase.merchants.title'), body: t('home.useCase.merchants.description'), href: published('/solutions/online-store/') },
   { title: t('home.useCase.agencies.title'), body: t('home.useCase.agencies.description'), href: published('/for-agencies/') },
   { title: t('home.useCase.developers.title'), body: t('home.useCase.developers.description'), href: published('/for-developers/') },
-]);
+];
 
+const pricingHref = published('/pricing/');
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: t('home.jsonld.name'), url: new URL(l('/'), siteOrigin(Astro.locals)).toString(), description },
-  {
+  ...(pricingHref ? [{
     '@context': 'https://schema.org', '@type': 'Product', name: t('home.jsonld.name'), description,
     brand: { '@type': 'Brand', name: t('home.jsonld.brandName') },
     offers: {
-      '@type': 'Offer', url: new URL(l('/pricing/'), siteOrigin(Astro.locals)).toString(), priceCurrency: 'USD',
+      '@type': 'Offer', url: new URL(pricingHref, siteOrigin(Astro.locals)).toString(), priceCurrency: 'USD',
       priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'PayPerUse' }, availability: 'https://schema.org/InStock',
     },
-  },
+  }] : []),
 ];
 ---
 
@@ -100,8 +109,13 @@ const jsonLd = [
         <h1>{t('home.hero.headline')}</h1>
         <p class="commerce-hero__lead">{t('home.hero.lead')}</p>
         <div class="product-hero__actions commerce-hero__actions">
-          {appUrl(Astro.locals) && (
-            <a href={appUrl(Astro.locals)} class="btn btn--primary">{t('home.hero.cta')}</a>
+          {heroCtaHref && heroCtaLabel && (
+            <a
+              href={heroCtaHref}
+              class="btn btn--primary"
+              aria-label={heroCtaAria}
+              data-support-cta={supportUrl ? 'hero' : undefined}
+            >{heroCtaLabel}</a>
           )}
         </div>
         <p class="commerce-hero__note">{t('home.hero.ctaNote')}</p>
@@ -121,15 +135,26 @@ const jsonLd = [
       <ol class="commerce-flow__steps">
         {journey.map((item, index) => (
           <li>
-            <a href={item.href} class="commerce-step">
-              <span class="commerce-step__top">
-                <span class="commerce-step__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                <span class="commerce-step__icon" aria-hidden="true"><Icon name={item.icon} size={22} /></span>
-              </span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-              <span class="commerce-step__cue" aria-hidden="true"><Icon name="arrow-right" size={18} /></span>
-            </a>
+            {item.href ? (
+              <a href={item.href} class="commerce-step">
+                <span class="commerce-step__top">
+                  <span class="commerce-step__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                  <span class="commerce-step__icon" aria-hidden="true"><Icon name={item.icon} size={22} /></span>
+                </span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+                <span class="commerce-step__cue" aria-hidden="true"><Icon name="arrow-right" size={18} /></span>
+              </a>
+            ) : (
+              <article class="commerce-step commerce-step--static">
+                <span class="commerce-step__top">
+                  <span class="commerce-step__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                  <span class="commerce-step__icon" aria-hidden="true"><Icon name={item.icon} size={22} /></span>
+                </span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
+            )}
           </li>
         ))}
       </ol>
@@ -147,9 +172,15 @@ const jsonLd = [
         <p class="product-tools__lead">{t('home.tools.lead')}</p>
         <div class="product-tools__list">
           {tools.map((tool) => (
-            <a href={tool.href} class="product-tool-link">
-              <span>{tool.label}</span><span aria-hidden="true"><Icon name="arrow-right" size={18} /></span>
-            </a>
+            tool.href ? (
+              <a href={tool.href} class="product-tool-link">
+                <span>{tool.label}</span><span aria-hidden="true"><Icon name="arrow-right" size={18} /></span>
+              </a>
+            ) : (
+              <div class="product-tool-link product-tool-link--static">
+                <span>{tool.label}</span>
+              </div>
+            )
           ))}
         </div>
         {published('/solutions/') && (
@@ -167,11 +198,18 @@ const jsonLd = [
       </div>
       <div class="product-audiences__grid">
         {audiences.map((audience) => (
-          <a href={audience.href} class="product-audience">
-            <span class="product-audience__cue" aria-hidden="true"><Icon name="arrow-right" size={19} /></span>
-            <h3>{audience.title}</h3>
-            <p>{audience.body}</p>
-          </a>
+          audience.href ? (
+            <a href={audience.href} class="product-audience">
+              <span class="product-audience__cue" aria-hidden="true"><Icon name="arrow-right" size={19} /></span>
+              <h3>{audience.title}</h3>
+              <p>{audience.body}</p>
+            </a>
+          ) : (
+            <article class="product-audience product-audience--static">
+              <h3>{audience.title}</h3>
+              <p>{audience.body}</p>
+            </article>
+          )
         ))}
       </div>
     </div>
@@ -400,10 +438,11 @@ const jsonLd = [
   .product-audiences__header { display: grid; gap: var(--space-6); align-items: end; margin-bottom: var(--space-12); }
   .product-audiences__header h2 { max-width: 10ch; margin-top: var(--space-4); }
   .product-audiences__header > p { max-width: 32rem; font-size: var(--text-lg); }
-  .product-audiences__grid { display: grid; gap: var(--space-4); }
+  .product-audiences__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
 
   .product-audience {
     display: grid;
+    min-width: 0;
     min-height: 280px;
     padding: var(--space-8);
     border: 1px solid var(--color-border-strong);
@@ -413,8 +452,8 @@ const jsonLd = [
   }
 
   .product-audience__cue { justify-self: end; color: var(--color-accent); }
-  .product-audience h3 { align-self: end; margin-top: var(--space-12); font-size: var(--text-2xl); font-weight: 600; }
-  .product-audience p { margin-top: var(--space-3); }
+  .product-audience h3 { align-self: end; min-width: 0; margin-top: var(--space-12); overflow-wrap: anywhere; font-size: var(--text-2xl); font-weight: 600; }
+  .product-audience p { min-width: 0; margin-top: var(--space-3); overflow-wrap: anywhere; }
 
   .product-faq { padding-block: clamp(5rem, 9vw, 9rem); background: var(--surface); }
   .product-faq__grid { display: grid; gap: var(--space-10); }
@@ -456,20 +495,20 @@ const jsonLd = [
                   transform var(--duration-normal) var(--ease-out-expo);
     }
 
-    .commerce-step:hover .commerce-step__cue,
-    .product-tool-link:hover > span:last-child,
+    .commerce-step[href]:hover .commerce-step__cue,
+    .product-tool-link[href]:hover > span:last-child,
     .product-text-link:hover :global(svg),
-    .product-audience:hover .product-audience__cue { transform: translateX(3px); }
+    .product-audience[href]:hover .product-audience__cue { transform: translateX(3px); }
   }
 
-  .commerce-step:hover,
-  .product-audience:hover { border-color: var(--color-accent); box-shadow: var(--shadow-card-hover); }
-  .product-tool-link:hover,
+  .commerce-step[href]:hover,
+  .product-audience[href]:hover { border-color: var(--color-accent); box-shadow: var(--shadow-card-hover); }
+  .product-tool-link[href]:hover,
   .product-text-link:hover { color: var(--color-accent); }
 
   @media (min-width: 760px) {
     .product-audiences__header { grid-template-columns: 1fr minmax(260px, 0.65fr); }
-    .product-audiences__grid { grid-template-columns: repeat(3, 1fr); }
+    .product-audiences__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 
   @media (min-width: 900px) {
