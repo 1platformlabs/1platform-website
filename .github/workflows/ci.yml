@@ -153,28 +153,26 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # ⚠️ NO BLOQUEANTE A PROPÓSITO (issue #99 la cablea; no le pide bloquear).
+    # BLOQUEANTE (issue #99). Hasta el 2026-09-23 llevaba `continue-on-error:
+    # true`, justificado por una línea base desactualizada que la ponía roja en
+    # todos los PRs (#112). #112 la re-congeló contra lo que el servidor sirve
+    # hoy (`identical: 100 · differing: 0 · wrong: 0`) y las corridas
+    # posteriores salen así en verde, así que un rojo acá vuelve a significar
+    # «este cambio movió el sitio» — y ya no hay razón para que no ponga el PR
+    # en rojo.
     #
-    # Lo que decía este comentario —«hoy da 51 idénticas / 2 con diferencia /
-    # 47 redirecciones-o-404, y por eso no puede bloquear»— YA NO ES CIERTO:
-    # issue #112 re-congeló la línea base contra lo que el servidor sirve hoy,
-    # y con eso el comparador da 100/100 idénticas. La compuerta volvió a
-    # informar: un rojo acá vuelve a significar «este cambio movió el sitio».
+    # Un cambio deliberado del sitio se declara re-congelando la línea base
+    # (cabecera de scripts/check-no-regression.sh) y commiteando el diff de
+    # tests/baseline/: ese diff ES la revisión de qué se empieza a servir.
     #
-    # `continue-on-error` se MANTIENE, y ahora por otra razón: cambiar la
-    # semántica de merge no es alcance de #112, y este job tampoco es contexto
-    # requerido de `main` (lo son `Suite de navegador` y `Tipos, guard de
-    # diseño y build`). Volverlo bloqueante es una decisión de una persona.
-    # Mientras tanto un fallo no pasa desapercibido: el paso emite una
-    # anotación `::error::`, que sale en la pestaña de checks del PR aunque el
-    # job termine en verde.
+    # Medido al quitar la bandera: sabotear `BaseLayout.astro` (plantilla
+    # compartida) lleva el comparador de exit 0 a exit 1 — ver el PR que la
+    # quitó. Al re-congelar (#112) también se midió que quitar un redirect o
+    # cambiarle el destino sale `WRONG`. La compuerta discrimina.
     #
-    # Medido al re-congelar: sabotear `BaseLayout.astro` (una plantilla
-    # compartida) mueve «differing» de 0 a 53 y «exit» de 0 a 1; quitar un
-    # redirect de `astro.config.mjs` y cambiarle el destino a otro los reporta
-    # como `WRONG … status 404, baseline says 301` y `redirects to /pricing/,
-    # baseline says /for-developers/`. La compuerta SÍ discrimina.
-    continue-on-error: true
+    # ⚠️ Rojo acá NO bloquea el merge por sí solo mientras este contexto no
+    # figure entre los requeridos de `main` (hoy: `Suite de navegador` y `Tipos,
+    # guard de diseño y build`). Eso es protección de rama, no este archivo.
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
