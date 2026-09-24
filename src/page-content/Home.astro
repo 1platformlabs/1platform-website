@@ -2,12 +2,14 @@
 import { Image } from 'astro:assets';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import CommerceOrbit from '@components/home/CommerceOrbit.astro';
+import ToolsScene from '@components/home/ToolsScene.astro';
 import Icon from '@components/Icon.astro';
 import type { IconName } from '@components/icons';
 import platformModules from '@assets/editorial/platform-modules.png';
 import { useI18n } from '@i18n';
 import { siteOrigin } from '@lib/site-origin';
 import { appUrl } from '@lib/site-destinations';
+import { paintsCompiledAccent } from '@lib/tenant-theme';
 
 const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
@@ -88,6 +90,10 @@ const audiences = [
 ];
 
 const pricingHref = published('/pricing/');
+
+// The editorial render is painted in the compiled palette; a tenant with its
+// own accent gets the same section drawn from its tokens. See `ToolsScene`.
+const showsPlatformArt = paintsCompiledAccent(Astro.locals.tenant);
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: t('home.jsonld.name'), url: new URL(l('/'), siteOrigin(Astro.locals)).toString(), description },
   ...(pricingHref ? [{
@@ -163,9 +169,13 @@ const jsonLd = [
 
   <section class="product-tools section" id="tools">
     <div class="container product-tools__grid">
-      <figure class="product-tools__image">
-        <Image src={platformModules} alt="" aria-hidden="true" widths={[480, 720, 960]} sizes="(min-width: 900px) 42vw, 100vw" />
-      </figure>
+      {showsPlatformArt ? (
+        <figure class="product-tools__image">
+          <Image src={platformModules} alt="" aria-hidden="true" widths={[480, 720, 960]} sizes="(min-width: 900px) 42vw, 100vw" />
+        </figure>
+      ) : (
+        <ToolsScene tools={tools} />
+      )}
       <div class="product-tools__copy">
         <p class="eyebrow">{t('home.tools.eyebrow')}</p>
         <h2>{t('home.tools.title')}</h2>

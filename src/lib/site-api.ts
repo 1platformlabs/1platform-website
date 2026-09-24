@@ -78,6 +78,12 @@ export interface SiteTenant {
   google_site_verification: string | null
   indexable: boolean
   /**
+   * ISO 3166-1 alpha-2 country the site addresses (`GT`), or absent/null when
+   * the manifest does not say. Only used to qualify `og:locale` (`es_GT`); an
+   * API from before this field omits it, which means exactly today's output.
+   */
+  region?: string | null
+  /**
    * The host this request should be redirected to, or absent/null when it
    * should be served here.
    *

@@ -49,6 +49,80 @@ export const COMPILED_DEFAULTS = {
   display_font: 'space-grotesk',
 } as const satisfies SiteTenant['theme']
 
+/**
+ * The status colour for "done / approved / paid", as `global.css` compiles it.
+ * Duplicated for the same reason as `COMPILED_DEFAULTS`, and guarded the same
+ * way by `tests/tenant-theme.spec.ts`.
+ */
+export const COMPILED_SUCCESS = '#0f7b4f'
+
+/**
+ * How close, in hue, an accent may sit to the success green before the two
+ * stop reading as two colours and start reading as one colour applied
+ * inconsistently.
+ *
+ * Reported on medipago.1platform.pro: brand `#0f766e` (hue 175°) beside
+ * status `#0f7b4f` (hue 156°), 19° apart, on the same hero cards. Keeping
+ * brand and status apart is a sound rule — a red or blue brand still needs a
+ * green "Pagado" — but it only pays off when the two are visibly different.
+ * Below this distance the status simply follows the brand.
+ */
+export const SUCCESS_MERGE_HUE_DEGREES = 30
+
+/** Hue in degrees and HSL saturation, or null for a grey (no hue to compare). */
+function hueOf(hex: string): { hue: number; saturation: number } | null {
+  const n = Number.parseInt(hex.slice(1), 16)
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => c / 255) as [number, number, number]
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const delta = max - min
+  if (delta === 0) return null
+  const lightness = (max + min) / 2
+  const saturation = delta / (1 - Math.abs(2 * lightness - 1))
+  let hue = max === r ? ((g - b) / delta) % 6 : max === g ? (b - r) / delta + 2 : (r - g) / delta + 4
+  hue *= 60
+  if (hue < 0) hue += 360
+  return { hue, saturation }
+}
+
+/** True when `accent` is a green close enough to the status green to replace it. */
+export function successFollowsAccent(accent: string): boolean {
+  if (!HEX.test(accent)) return false
+  const brand = hueOf(accent.toLowerCase())
+  const status = hueOf(COMPILED_SUCCESS)
+  if (!brand || !status || brand.saturation < 0.25) return false
+  const distance = Math.abs(brand.hue - status.hue)
+  return Math.min(distance, 360 - distance) < SUCCESS_MERGE_HUE_DEGREES
+}
+
+/**
+ * The browser-chrome colour (`<meta name="theme-color">`).
+ *
+ * It was `#FFFFFF` for every tenant, so on Android a teal clinic got a white
+ * address bar. The accent is used only when it differs from the compiled one,
+ * by the same rule as `themeDeclarations`: tenant #1 keeps its historical
+ * white and its byte-identical baseline.
+ */
+export function themeColorOf(tenant: SiteTenant): string {
+  return paintsCompiledAccent(tenant) ? '#FFFFFF' : tenant.theme.accent.toLowerCase()
+}
+
+/**
+ * Whether this tenant is drawn in the compiled palette — the one the
+ * repository's editorial artwork (`src/assets/editorial/`) was painted in.
+ *
+ * That artwork is 1Platform's: cobalt and cream blocks with generic chart
+ * icons. Shown on a teal clinic's home it read as a borrowed stock render, the
+ * one image on the page unrelated to health, payments or the brand. A tenant
+ * that repaints the accent therefore gets a scene drawn from its own tokens,
+ * and a tenant that does not keeps the artwork byte for byte.
+ */
+export function paintsCompiledAccent(tenant: SiteTenant): boolean {
+  const accent = tenant.theme?.accent
+  if (typeof accent !== 'string' || !HEX.test(accent)) return true
+  return accent.toLowerCase() === COMPILED_DEFAULTS.accent
+}
+
 /** Safe CSS stacks for every value accepted by the public API. */
 export const DISPLAY_FONT_STACKS = {
   'space-grotesk': "'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif",
@@ -177,6 +251,11 @@ export function themeDeclarations(tenant: SiteTenant): string {
     // on a light one. This override is request-scoped, so tenant #1 keeps its
     // frozen stylesheet and HTML bytes.
     out.push('--shadow-glow-ring:0 0 0 2px var(--surface),0 0 0 5px var(--color-text)')
+
+    if (successFollowsAccent(ramp.accent)) {
+      out.push(`--color-success:${ramp.accent}`)
+      out.push(`--color-success-bg:${ramp.soft}`)
+    }
   }
   if (accentDiffers || inkDiffers) out.push(`--color-accent-ink:${ink}`)
   if (fontDiffers) out.push(`--font-display:${DISPLAY_FONT_STACKS[displayFont]}`)
