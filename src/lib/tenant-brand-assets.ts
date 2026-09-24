@@ -1,5 +1,6 @@
 import sharp from 'sharp'
 
+import { centredMark, outlineText } from './brand-glyphs'
 import type { SiteTenant } from './site-api'
 
 /** A manifest value that can safely be emitted as a same-origin URL. */
@@ -63,9 +64,11 @@ export function resolveSocial(tenant: SiteTenant): string {
 export function iconSvg(tenant: SiteTenant): string {
   const accent = colour(tenant.theme.accent, SAFE_INK)
   const ink = colour(tenant.theme.accent_contrast, SAFE_PAPER)
-  const symbol = xmlText(brandSymbol(tenant))
+  const symbol = brandSymbol(tenant)
+  const mark = centredMark(symbol, tenant.theme.display_font, 52, 64, 64, ink)
+    ?? `<text x="64" y="76" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="52" font-weight="700" text-anchor="middle">${xmlText(symbol)}</text>`
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="${xmlText(tenant.brand_name)}"><rect width="128" height="128" rx="28" fill="${accent}"/><text x="64" y="76" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="52" font-weight="700" text-anchor="middle">${symbol}</text></svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="${xmlText(tenant.brand_name)}"><rect width="128" height="128" rx="28" fill="${accent}"/>${mark}</svg>`
 }
 
 export interface SocialTitleLayout {
@@ -127,19 +130,50 @@ export function socialTitleLayout(value: string): SocialTitleLayout {
   return { lines, fontSize }
 }
 
+/**
+ * The brand name on the social card: outlined in the display face when it can
+ * draw every character, otherwise the historical text run.
+ *
+ * `socialTitleLayout` sizes lines from ESTIMATED glyph widths; once the real
+ * advances are known the size may only shrink, so a face wider than the
+ * estimate still stays inside the 1056px box.
+ */
+function socialTitle(name: string, display: SiteTenant['theme']['display_font'], ink: string): string {
+  const title = socialTitleLayout(name)
+  const measured = title.lines.map((line) => outlineText(line, display, title.fontSize))
+  const outlined = measured.every((outline): outline is NonNullable<typeof outline> => outline !== null)
+  const widest = outlined ? Math.max(...measured.map((outline) => outline.width), 1) : 0
+  const fontSize = outlined && widest > 1056
+    ? Math.max(18, Math.floor((title.fontSize * 1056) / widest))
+    : title.fontSize
+  const lineGap = Math.round(fontSize * 1.22)
+  const firstBaseline = 505 - Math.round(((title.lines.length - 1) * lineGap) / 2)
+
+  if (outlined) {
+    const lines = fontSize === title.fontSize
+      ? measured
+      : title.lines.map((line) => outlineText(line, display, fontSize))
+    return lines.map((outline, index) => (
+      outline ? `<path transform="translate(72 ${firstBaseline + index * lineGap})" fill="${ink}" d="${outline.d}"/>` : ''
+    )).join('')
+  }
+
+  const titleLines = title.lines.map((line, index) => (
+    `<tspan x="72" y="${firstBaseline + index * lineGap}">${xmlText(line)}</tspan>`
+  )).join('')
+  return `<text fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="${fontSize}" font-weight="700">${titleLines}</text>`
+}
+
 /** The source for the social card; rasterised only by the request route. */
 export function socialSvg(tenant: SiteTenant): string {
   const accent = colour(tenant.theme.accent, SAFE_INK)
   const ink = colour(tenant.theme.accent_contrast, SAFE_PAPER)
-  const symbol = xmlText(brandSymbol(tenant))
-  const title = socialTitleLayout(tenant.brand_name)
-  const lineGap = Math.round(title.fontSize * 1.22)
-  const firstBaseline = 505 - Math.round(((title.lines.length - 1) * lineGap) / 2)
-  const titleLines = title.lines.map((line, index) => (
-    `<tspan x="72" y="${firstBaseline + index * lineGap}">${xmlText(line)}</tspan>`
-  )).join('')
+  const display = tenant.theme.display_font
+  const symbol = brandSymbol(tenant)
+  const mark = centredMark(symbol, display, 56, 132, 132, ink)
+    ?? `<text x="132" y="151" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="56" font-weight="700" text-anchor="middle">${xmlText(symbol)}</text>`
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="${accent}"/><rect x="72" y="72" width="120" height="120" rx="28" fill="${ink}" fill-opacity="0.16"/><text x="132" y="151" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="56" font-weight="700" text-anchor="middle">${symbol}</text><rect x="72" y="340" width="88" height="8" rx="4" fill="${ink}"/><text fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="${title.fontSize}" font-weight="700">${titleLines}</text></svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="${accent}"/><rect x="72" y="72" width="120" height="120" rx="28" fill="${ink}" fill-opacity="0.16"/>${mark}<rect x="72" y="340" width="88" height="8" rx="4" fill="${ink}"/>${socialTitle(tenant.brand_name, display, ink)}</svg>`
 }
 
 /**
@@ -163,12 +197,16 @@ export function appleTouchIconSvg(tenant: SiteTenant): string {
   const units = graphemes(symbol).length
   const fontSize = units <= 1 ? 104 : units === 2 ? 78 : 58
   const baseline = Math.round(90 + fontSize * 0.35)
+  const mark = centredMark(symbol, tenant.theme.display_font, fontSize, 90, 90, ink)
+    ?? `<text x="90" y="${baseline}" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="${fontSize}" font-weight="700" text-anchor="middle">${xmlText(symbol)}</text>`
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="${xmlText(tenant.brand_name)}"><rect width="180" height="180" fill="${accent}"/><text x="90" y="${baseline}" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="${fontSize}" font-weight="700" text-anchor="middle">${xmlText(symbol)}</text></svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="${xmlText(tenant.brand_name)}"><rect width="180" height="180" fill="${accent}"/>${mark}</svg>`
 }
 
 function rasterKey(tenant: SiteTenant): string {
-  return `${tenant.slug}\u0000${tenant.brand_name}\u0000${tenant.brand_mark ?? ''}\u0000${tenant.theme.accent}\u0000${tenant.theme.accent_contrast}`
+  // The display face is part of the drawing now: without it here, a tenant
+  // that changes typography keeps its old raster until the worker restarts.
+  return `${tenant.slug}\u0000${tenant.brand_name}\u0000${tenant.brand_mark ?? ''}\u0000${tenant.theme.accent}\u0000${tenant.theme.accent_contrast}\u0000${tenant.theme.display_font}`
 }
 
 type Rasterize = (svg: string) => Promise<Buffer>

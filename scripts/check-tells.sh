@@ -138,8 +138,11 @@ report "no numbered replace-count claim" \
 # `tenant-theme.ts` carries the one compiled default solely to compare incoming
 # manifest data with the stylesheet it preserves; its dedicated test reads the
 # stylesheet and pins that relationship. It is not authored presentational CSS.
+# `COMPILED_SUCCESS` is the same kind of restatement (the status green the
+# success-merge rule measures hue against), pinned by tenant-brand-coherence.
 m=$(grep -rnE '#[0-9a-fA-F]{6}' src/pages src/components src/page-content src/i18n src/lib \
   | grep -vE '^src/lib/tenant-theme\.ts:[0-9]+:.*accent:' \
+  | grep -vE "^src/lib/tenant-theme\.ts:[0-9]+:export const COMPILED_SUCCESS = '#[0-9a-f]{6}'$" \
   | grep -viE '#(ffffff|000000)\b' | strip_comments)
 report "no hardcoded brand colours" \
        "colour decisions live in the token layer (global.css), not in pages" "$m"

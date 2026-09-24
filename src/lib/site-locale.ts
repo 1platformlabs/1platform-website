@@ -40,6 +40,7 @@
 
 import {
   LOCALES,
+  OG_LOCALES,
   alternatesForPath,
   localizePath,
   stripLocale,
@@ -277,4 +278,21 @@ export function makeLocalizePath(
 
     return canonical
   }
+}
+
+const REGION = /^[A-Z]{2}$/
+
+/**
+ * The `og:locale` value for `locale` on this tenant's site.
+ *
+ * `OG_LOCALES` is 1Platform's own answer (`es_ES`) and it was every tenant's:
+ * a Guatemalan clinic whose hero says "ciudad de Guatemala" and whose WhatsApp
+ * is `+502` announced itself as Spanish from Spain. A manifest that declares
+ * its `region` gets `<language>_<REGION>` instead. Without one — tenant #1
+ * included — nothing changes. A malformed region is ignored rather than
+ * printed: this value is cosmetic, and not worth taking a site offline for.
+ */
+export function ogLocaleOf(locale: Locale, tenant: SiteTenant): string {
+  const region = tenant.region
+  return typeof region === 'string' && REGION.test(region) ? `${locale}_${region}` : OG_LOCALES[locale]
 }

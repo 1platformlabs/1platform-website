@@ -4,7 +4,7 @@ import AnnouncementBar from '@components/AnnouncementBar.astro';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { pickAnnouncement } from '@components/announcement';
-import { OG_LOCALES, useI18n, type Locale } from '@i18n';
+import { useI18n, type Locale } from '@i18n';
 import { getLocalized } from '@i18n/collections';
 import { localizedOgImage } from '@i18n/og';
 import '@styles/global.css';
@@ -14,8 +14,9 @@ import {
   alternatesForTenantPath,
   defaultLocaleOf,
   isMultilingual,
+  ogLocaleOf,
 } from '@lib/site-locale';
-import { themeDeclarations } from '@lib/tenant-theme';
+import { themeColorOf, themeDeclarations } from '@lib/tenant-theme';
 import {
   appleTouchIconIsAvailable,
   resolveAppleTouchIcon,
@@ -192,7 +193,7 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="theme-color" content={themeColorOf(tenant)} />
 
     <!-- Self-hosted display + text faces; the rest load on demand with swap. -->
     <link
@@ -323,11 +324,11 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     {ogImageURL && <meta property="og:image" content={ogImageURL} />}
     {canonicalURL && <meta property="og:url" content={canonicalURL} />}
     <meta property="og:site_name" content={tenant.brand_name} />
-    <meta property="og:locale" content={OG_LOCALES[locale]} />
+    <meta property="og:locale" content={ogLocaleOf(locale, tenant)} />
     {(Object.keys(alternates) as Locale[])
       .filter((code) => code !== locale)
       .map((code) => (
-        <meta property="og:locale:alternate" content={OG_LOCALES[code]} />
+        <meta property="og:locale:alternate" content={ogLocaleOf(code, tenant)} />
       ))}
 
     <!-- Twitter -->

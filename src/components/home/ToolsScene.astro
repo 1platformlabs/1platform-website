@@ -1,0 +1,171 @@
+---
+import Icon from '@components/Icon.astro';
+import type { IconName } from '@components/icons';
+
+/**
+ * The "also" section's picture, drawn from the tenant's tokens.
+ *
+ * It replaces `platform-modules.png` for any tenant that repaints the accent
+ * (see `paintsCompiledAccent`): that render is 1Platform's own artwork, and on
+ * a clinic's home it was the one image unrelated to the product. This scene
+ * speaks the hero's language instead — the same floating cards, one per tool,
+ * each carrying the tool's own name — so it follows the tenant's accent, face
+ * and copy without a per-brand drawing (D-20).
+ *
+ * Decorative: the names are already the section's list, right beside it.
+ */
+interface Props {
+  tools: { label: string }[];
+}
+
+const { tools } = Astro.props;
+const icons: IconName[] = ['bell', 'invoice'];
+---
+
+<div class="tools-scene" aria-hidden="true">
+  <span class="tools-scene__path"></span>
+  {tools.slice(0, 2).map((tool, index) => (
+    <article class:list={['tools-card', `tools-card--${index === 0 ? 'one' : 'two'}`]}>
+      <header class="tools-card__header">
+        <span class="tools-card__icon"><Icon name={icons[index] ?? 'layers'} size={18} /></span>
+        <p class="tools-card__title">{tool.label}</p>
+      </header>
+      {index === 0 ? (
+        <div class="tools-card__thread">
+          <span class="tools-card__bubble"><span></span><span></span></span>
+          <span class="tools-card__bubble tools-card__bubble--reply"><span></span></span>
+        </div>
+      ) : (
+        <div class="tools-card__receipt">
+          <span></span><span></span><span></span>
+          <span class="tools-card__total"></span>
+        </div>
+      )}
+      <span class="tools-card__signal"></span>
+    </article>
+  ))}
+</div>
+
+<style>
+  .tools-scene {
+    position: relative;
+    display: grid;
+    gap: var(--space-5);
+    padding: clamp(1.5rem, 4vw, 3rem);
+    overflow: hidden;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 20px;
+    background: var(--color-bg-muted);
+    box-shadow: 0 22px 64px rgba(20, 22, 27, 0.1);
+  }
+
+  .tools-scene__path {
+    position: absolute;
+    inset: 12% auto 12% 50%;
+    width: 0;
+    border-left: 2px dashed var(--color-accent-ring);
+  }
+
+  .tools-card {
+    position: relative;
+    display: grid;
+    gap: var(--space-4);
+    width: min(100%, 22rem);
+    padding: 18px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: 0 24px 70px rgba(20, 22, 27, 0.12), 0 3px 10px rgba(20, 22, 27, 0.05);
+  }
+
+  .tools-card--one { justify-self: start; transform: rotate(-1.5deg); }
+  .tools-card--two { justify-self: end; transform: rotate(1.25deg); }
+
+  .tools-card__header { display: flex; align-items: center; gap: var(--space-3); }
+
+  .tools-card__icon {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .tools-card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-text);
+  }
+
+  .tools-card__thread { display: grid; gap: var(--space-2); }
+
+  .tools-card__bubble {
+    display: grid;
+    gap: 6px;
+    justify-self: start;
+    width: 78%;
+    padding: 10px 12px;
+    border-radius: 12px 12px 12px 4px;
+    background: var(--color-bg-muted);
+  }
+
+  .tools-card__bubble span,
+  .tools-card__receipt span {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-border-strong);
+  }
+
+  .tools-card__bubble span + span { width: 62%; }
+
+  .tools-card__bubble--reply {
+    justify-self: end;
+    width: 46%;
+    border-radius: 12px 12px 4px 12px;
+    background: var(--color-accent-soft);
+  }
+
+  .tools-card__bubble--reply span { background: var(--color-accent-bright, var(--cobalt-bright)); }
+
+  .tools-card__receipt {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px dashed var(--color-border-strong);
+    border-radius: 10px;
+  }
+
+  .tools-card__receipt span:nth-child(2) { width: 72%; }
+  .tools-card__receipt span:nth-child(3) { width: 54%; }
+
+  .tools-card__receipt .tools-card__total {
+    justify-self: end;
+    width: 34%;
+    height: 8px;
+    background: var(--color-accent);
+  }
+
+  .tools-card__signal {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 0 4px var(--color-success-bg);
+  }
+
+  @media (max-width: 560px) {
+    .tools-card { width: 100%; }
+    .tools-card--one,
+    .tools-card--two { transform: none; }
+  }
+</style>

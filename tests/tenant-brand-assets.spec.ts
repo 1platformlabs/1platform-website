@@ -79,7 +79,8 @@ test('a rolling deploy accepts an old or partially projected brand-assets field'
 
 test('the derived icon contains the tenant symbol and its contrast-checked accent', () => {
   const clinic = tenant('clinicas')
-  const svg = iconSvg({ ...clinic, brand_mark: 'CD' })
+  // A system stack has no font file to outline, so the mark stays a text run.
+  const svg = iconSvg({ ...clinic, brand_mark: 'CD', theme: { ...clinic.theme, display_font: 'system-sans' } })
 
   expect(svg).toContain('>CD</text>')
   expect(svg).toContain('fill="#0f766e"')
@@ -88,7 +89,7 @@ test('the derived icon contains the tenant symbol and its contrast-checked accen
 
 test('the derived SVG escapes the mark instead of allowing it to become markup', () => {
   const clinic = tenant('clinicas')
-  const svg = iconSvg({ ...clinic, brand_mark: '<&' })
+  const svg = iconSvg({ ...clinic, brand_mark: '<&', theme: { ...clinic.theme, display_font: 'system-sans' } })
 
   expect(brandSymbol({ ...clinic, brand_mark: '<&' })).toBe('<&')
   expect(svg).toContain('>&lt;&amp;</text>')
@@ -117,7 +118,9 @@ test('the social title keeps long and Unicode names inside at most three lines',
 
     expect(layout.lines, caseName).toHaveLength(3)
     expect(layout.lines.join('').replace(/\s/gu, ''), caseName).toBe(longName)
-    expect(svg.match(/<tspan /gu), caseName).toHaveLength(3)
+    // One line is one `<tspan>` in the text run, or one outlined `<path>` at the
+    // title's left edge when the display face can draw every character.
+    expect((svg.match(/<tspan |<path transform="translate\(72 /gu) ?? []), caseName).toHaveLength(3)
     expect(png, caseName).not.toBeNull()
     expect(await sharp(png!).metadata(), caseName).toMatchObject({ width: 1200, height: 630 })
 
@@ -209,7 +212,7 @@ test('no tenant can be handed the platform touch icon it did not declare', () =>
 
 test('the derived touch icon is a full-bleed 180px square carrying the tenant symbol', async () => {
   const clinic = tenant('clinicas')
-  const svg = appleTouchIconSvg({ ...clinic, brand_mark: 'CD' })
+  const svg = appleTouchIconSvg({ ...clinic, brand_mark: 'CD', theme: { ...clinic.theme, display_font: 'system-sans' } })
 
   expect(svg).toContain('>CD</text>')
   expect(svg).toContain('fill="#0f766e"')
@@ -224,7 +227,10 @@ test('the derived touch icon is a full-bleed 180px square carrying the tenant sy
 })
 
 test('the touch-icon type ramp keeps a three-glyph and an emoji mark inside the square', async () => {
-  const clinic = tenant('clinicas')
+  // The ramp is read off the text run's `font-size`; an outlined mark uses the
+  // same size, it just has no attribute to read it from.
+  const repo = tenant('clinicas')
+  const clinic = { ...repo, theme: { ...repo.theme, display_font: 'system-sans' as const } }
   const sizeOf = (svg: string) => Number(/font-size="(\d+)"/.exec(svg)?.[1])
 
   expect(sizeOf(appleTouchIconSvg({ ...clinic, brand_mark: 'C' }))).toBe(104)
