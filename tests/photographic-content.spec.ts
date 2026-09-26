@@ -20,7 +20,7 @@ test('the public contract selects a composition with tenant-owned money, brand a
 
 test('missing copy, unsafe theme, absent destinations and invalid numeric configuration fail closed', () => {
   const cases: Array<(d: ReturnType<typeof data>) => void> = [
-    (d) => { delete d.messages['photographic.hero.motionPause'] },
+    (d) => { delete d.messages['photographic.calculator.changed'] },
     (d) => { d.tenant.theme.accent = 'red;display:none' },
     (d) => { d.tenant.destinations.support = 'javascript:alert(1)' },
     (d) => { d.tenant.destinations.support = null },

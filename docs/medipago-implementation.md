@@ -7,6 +7,47 @@ comisiones del motor, retiros o emisión de facturas.
 
 ## Fuentes y decisiones
 
+### Ajustes posteriores solicitados el 2026-09-25
+
+La revisión del usuario retira del hero «Para médicos especialistas» y el botón
+«Pausar fondo». Sustituye esas dos decisiones del prototipo, que sigue intacto.
+Se eliminan también sus estilos y configuración de cliente sin uso. La foto
+conserva zoom/paneo, movimiento reducido y pausa automática fuera de pantalla
+o con la pestaña oculta. No cambia el contrato de API ni requiere otro seed.
+
+Estos ajustes continúan el commit de implementación `a1d8333` en el worktree
+`/Users/staimer/Documents/1platform/artifacts/landing-review-worktree`, rama
+`feat/medipago-hero-review`. El worktree original está fuera de los directorios
+editables de esta sesión y se preserva. No se pudo actualizar `origin/main`
+por la restricción de red; esta revisión parte del trabajo ya implementado.
+
+Verificación de esta revisión: build y typecheck correctos (0 errores, 0 warnings,
+27 hints), guard de diseño y sus self-tests, 9 pruebas focalizadas de contenido y
+calculadora, y `git diff --check`. Las pruebas de navegador se adaptaron al nuevo
+contrato, pero no se ejecutaron de nuevo: el entorno impide abrir puertos y acceder
+a Docker. Las capturas y resultados completos de las secciones siguientes son
+de la implementación anterior a estos dos ajustes, no de esta revisión.
+
+El lanzador local
+`/Users/staimer/Documents/1platform/artifacts/medipago-e2e-2026-09-25/preview-medipago.mjs`
+apunta ahora al build de este worktree. Para verlo, detener con Ctrl+C el preview
+anterior y volver a ejecutar el lanzador con Node 24. Sigue siendo un preview con
+fixture HTTP, no el banco E2E. La sesión no puede reiniciar el proceso por sí misma.
+
+La ampliación a `1platform.pro` queda pendiente de identificar el diseño solicitado.
+Su home actual ya tiene composición `platform-commerce` y `CommerceOrbit.astro`;
+no se ha sustituido por la composición fotográfica de Medipago.
+
+El gate `/verify-epic-e2e website-multitenant`, autorizado posteriormente con
+«continue», se intentó y quedó bloqueado en preflight: puertos locales y Docker
+denegados, GitHub inaccesible. No se levantó la DB/API ni se abrió el issue del
+bloqueo. Los detalles y el borrador de issue permanecen en
+`/Users/staimer/Documents/1platform/artifacts/medipago-e2e-2026-09-25/`.
+Al retomar el banco deben usarse este worktree website y el worktree API indicado
+abajo, con los prerrequisitos documentados y el comando canónico del monorepo.
+
+### Implementación original
+
 Se leyeron directamente los archivos no rastreados del prototipo en
 `/Users/staimer/Documents/1platform-worktrees/medipago-landing-prototype/epics/website-multitenant/prototipo/`.
 `evidence/REVISION-AJUSTES.md` prevalece sobre las revisiones anteriores. Los

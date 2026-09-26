@@ -213,7 +213,8 @@ test('without JavaScript copy, all demonstration views, FAQ and default calculat
     await expect(page.locator('#calc-net')).toHaveText(/Q\s?95\.10/);
     await expect(page.locator('#calc-fee')).toHaveText(/Q\s?4\.90/);
     await expect(page.locator('#calc-status')).not.toBeEmpty();
-    await expect(page.locator('.hero-motion')).toBeHidden();
+    await expect(page.locator('.hero-motion')).toHaveCount(0);
+    await expect(page.locator('.hero-eyebrow')).toHaveCount(0);
     await expect(page.locator('#mobile-menu')).toBeVisible();
     await page.locator('#faq-list summary').first().click();
     await expect(page.locator('#faq-list details').first()).toHaveAttribute('open', '');
@@ -332,41 +333,38 @@ test('one editable amount uses the configured rate, clears stale results and rec
   await expect(page.locator('#calc-net')).toHaveText(/Q\s?95\.10/);
 });
 
-test('photograph motion pauses and resumes, finite sequences replay, and reduced motion remains static', async ({ landingPage: page }) => {
+test('photograph motion pauses offscreen without a manual control, finite sequences replay, and reduced motion remains static', async ({ landingPage: page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await gotoLanding(page);
   const hero = page.locator('.hero');
   const photo = page.locator('.hero-photo');
-  const control = page.locator('.hero-motion');
+  await expect(page.locator('.hero-motion')).toHaveCount(0);
+  await expect(page.locator('.hero-eyebrow')).toHaveCount(0);
   await expect(hero).toHaveAttribute('data-motion', 'playing');
   const first = await photo.evaluate((element) => getComputedStyle(element).transform);
   await expect.poll(() => photo.evaluate((element) => getComputedStyle(element).transform)).not.toBe(first);
-  await control.click();
+  const flow = page.locator('.flow-panel');
+  await flow.scrollIntoViewIfNeeded();
+  await expect(flow).toHaveAttribute('data-animated', '');
   await expect(hero).toHaveAttribute('data-motion', 'paused');
-  await expect(control).toHaveAccessibleName(fixture.pagesResponse.data.messages['photographic.hero.motionPlayLabel']);
   await photo.evaluate(async (element) => {
     // CSS pause is committed on the next animation frame. Measure only once
     // the browser confirms that transition, then require an unchanged matrix.
     await Promise.all(element.getAnimations().map((animation) => animation.ready));
   });
   const paused = await photo.evaluate((element) => getComputedStyle(element).transform);
-  await page.waitForTimeout(250); // Compare two animation frames while explicitly paused.
+  await page.waitForTimeout(250); // Compare animation frames while the photograph is offscreen.
   expect(await photo.evaluate((element) => getComputedStyle(element).transform)).toBe(paused);
-  await control.click();
-  await expect(hero).toHaveAttribute('data-motion', 'playing');
-  await expect.poll(() => photo.evaluate((element) => getComputedStyle(element).transform)).not.toBe(paused);
-  const flow = page.locator('.flow-panel');
-  await flow.scrollIntoViewIfNeeded();
-  await expect(flow).toHaveAttribute('data-animated', '');
-  await expect(hero).toHaveAttribute('data-motion', 'paused');
   await expect.poll(() => flow.evaluate((element) => Math.max(0, ...element.getAnimations({ subtree: true }).map((animation) => Number(animation.currentTime))))).toBeGreaterThan(300);
   await page.locator('[data-replay="flow"]').click();
   const replayed = await flow.evaluate((element) => element.getAnimations({ subtree: true }).map((animation) => Number(animation.currentTime)));
   expect(replayed.length).toBeGreaterThan(0);
   expect(Math.max(...replayed)).toBeLessThan(300);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await expect(hero).toHaveAttribute('data-motion', 'playing');
+  await expect.poll(() => photo.evaluate((element) => getComputedStyle(element).transform)).not.toBe(paused);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(hero).toHaveAttribute('data-motion', 'reduced');
-  await expect(control).toBeHidden();
   await expect(page.locator('[data-replay]:visible')).toHaveCount(0);
   await expect(photo).toHaveCSS('animation-name', 'none');
   await expect(flow).not.toHaveAttribute('data-animated');

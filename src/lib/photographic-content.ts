@@ -79,7 +79,6 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
     copy, contactHref, navigation, steps, audiences, faqs, calculator, panel,
     brandStyle: `--accent:${tenant.theme.accent};--accent-ink:${tenant.theme.accent_contrast};--tenant-font-family:${font}`,
     clientConfig: {
-      hero: { motionPause: copy('hero.motionPause'), motionPlay: copy('hero.motionPlay'), motionPauseLabel: copy('hero.motionPauseLabel'), motionPlayLabel: copy('hero.motionPlayLabel') },
       calculator,
       panel: { summary: panel.summary, billing: panel.billing, withdrawals: panel.withdrawals, filterStatusOne: panel.filterStatusOne, filterStatusMany: panel.filterStatusMany },
       navigationLabels: { open: copy('ui.menu_toggle_aria_label'), close: copy('ui.menu_close') },

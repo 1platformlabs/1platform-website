@@ -353,7 +353,6 @@ h3 {
 .hero[data-motion="reduced"] .hero-photo {
   animation: none;
 }
-.hero[data-enter] .hero-eyebrow,
 .hero[data-enter] h1,
 .hero[data-enter] .hero-description,
 .hero[data-enter] .hero-actions {
@@ -395,32 +394,6 @@ h3 {
   align-items: center;
   gap: 20px;
 }
-.hero-motion {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 44px;
-  padding: 8px 12px;
-  border: 1px solid rgb(255 255 255 / 32%);
-  border-radius: 999px;
-  background: rgb(8 47 44 / 76%);
-  color: #fff;
-  font-size: 10px;
-}
-.hero-motion:hover {
-  background: var(--accent);
-}
-.hero-motion .icon {
-  width: 15px;
-  height: 15px;
-}
-.hero-motion .motion-play,
-.hero-motion[aria-pressed="true"] .motion-pause {
-  display: none;
-}
-.hero-motion[aria-pressed="true"] .motion-play {
-  display: block;
-}
 .hero-photo,
 .hero-shade {
   position: absolute;
@@ -444,20 +417,6 @@ h3 {
 .hero-content {
   text-align: center;
   padding-block: 172px 170px;
-}
-.hero-eyebrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: #f1f7f3;
-  letter-spacing: 0.15em;
-  margin-bottom: 26px;
-}
-.eyebrow-line {
-  width: 28px;
-  height: 1px;
-  background: #e1f4ea;
 }
 h1 {
   font-size: clamp(64px, 6.4vw, 94px);
@@ -1549,15 +1508,6 @@ h1 span {
   }
   .hero-content {
     padding-block: 145px 190px;
-  }
-  .hero-eyebrow {
-    font-size: 9px;
-    letter-spacing: 0.13em;
-    gap: 8px;
-    margin-bottom: 25px;
-  }
-  .eyebrow-line {
-    width: 21px;
   }
   h1 {
     font-size: clamp(38px, 10.9vw, 61px);

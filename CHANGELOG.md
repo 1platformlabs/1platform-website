@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   las composiciones existentes conservan su comportamiento.
 
 ### Fixed
+- El hero de la landing fotográfica omite la frase «Para médicos especialistas»
+  y el control de pausa, según la revisión solicitada. Conserva movimiento
+  reducido y pausa automática al quedar fuera de pantalla.
 - **La portada conectada ya es reutilizable por un tenant de una sola página.**
   Conserva la composición de `1platform.pro`, pero usa el soporte del tenant
   como CTA cuando no hay app, mantiene visibles los pasos y audiencias como

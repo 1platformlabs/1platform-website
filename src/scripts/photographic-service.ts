@@ -48,29 +48,16 @@ function initPhotographicService() {
   updateHeader();
 
   const hero = root.querySelector<HTMLElement>('.hero');
-  const motionButton = root.querySelector<HTMLButtonElement>('.hero-motion');
-  const motionLabel = motionButton?.querySelector('span');
-  const heroCopy = section(config, 'hero');
-  const pause = stringValue(heroCopy, 'motionPause');
-  const play = stringValue(heroCopy, 'motionPlay');
-  const pauseLabel = stringValue(heroCopy, 'motionPauseLabel');
-  const playLabel = stringValue(heroCopy, 'motionPlayLabel');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const sequenceStates = [...root.querySelectorAll<HTMLElement>('[data-sequence]')]
     .map((element) => ({ element, visible: false }));
   const replayButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-replay]')];
-  let motionPaused = false;
   let heroVisible = true;
-  const canAnimateHero = Boolean(hero && motionButton && motionLabel && pause && play && pauseLabel && playLabel);
 
   function updateMotion() {
     const reduced = reducedMotion.matches;
-    if (hero && motionButton && motionLabel && canAnimateHero) {
-      hero.dataset.motion = reduced ? 'reduced' : motionPaused || !heroVisible || document.hidden ? 'paused' : 'playing';
-      motionButton.hidden = reduced;
-      motionButton.setAttribute('aria-pressed', String(motionPaused));
-      motionLabel.textContent = (motionPaused ? play : pause) ?? '';
-      motionButton.setAttribute('aria-label', (motionPaused ? playLabel : pauseLabel) ?? '');
+    if (hero) {
+      hero.dataset.motion = reduced ? 'reduced' : !heroVisible || document.hidden ? 'paused' : 'playing';
       if (reduced) hero.removeAttribute('data-enter');
     }
     sequenceStates.forEach(({ element, visible }) => {
@@ -81,12 +68,8 @@ function initPhotographicService() {
     replayButtons.forEach((button) => { button.hidden = reduced; });
   }
 
-  if (canAnimateHero && hero && motionButton) {
+  if (hero) {
     if (!reducedMotion.matches) hero.setAttribute('data-enter', '');
-    motionButton.addEventListener('click', () => {
-      motionPaused = !motionPaused;
-      updateMotion();
-    }, { signal });
     const observer = new IntersectionObserver(([entry]) => {
       if (entry) heroVisible = entry.isIntersecting;
       updateMotion();
