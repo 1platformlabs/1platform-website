@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Medipago presenta el correo con dominio personal como beneficio adicional,
+  con `consulta@minombre.com` sólo como ejemplo y consulta al contacto configurado.
 - Las homes de 1Platform EN/ES y Medipago comparten el rediseño fotográfico
   aprobado. 1Platform conserva su marca, foto comercial existente, destinos,
   precios USD por cuenta y páginas secundarias; Medipago conserva GTQ y 4.9%.

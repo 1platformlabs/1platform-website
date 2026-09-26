@@ -15,6 +15,24 @@ comisiones del motor, retiros o emisión de facturas.
 
 ## Fuentes y decisiones
 
+### Correo con dominio personal — 2026-09-26
+
+El usuario autorizó añadir el beneficio y corrigió el ejemplo a
+`consulta@minombre.com`. Se reutiliza el bloque de acompañamiento existente:
+«Su nombre. Su dominio. Su correo profesional.», con consulta por el WhatsApp
+configurado. La dirección es sólo un ejemplo de la identidad del profesional,
+no un buzón de contacto ni un enlace de envío. No se anuncia precio, dominio
+incluido, número de buzones ni aprovisionamiento automático.
+
+Las cinco claves son contenido del tenant en la fixture API
+`scripts/fixtures/site_pages_medipago.json`; el espejo website
+`tests/fixtures/photographic-site.json` alimenta las pruebas y el preview.
+El renderer, los estilos, 1Platform y las referencias congeladas no cambian.
+Para persistir esta revisión se debe aplicar el seed de páginas de Medipago
+con URI/DB explícitas según el runbook; no requiere un PATCH de manifest ni
+cambio de esquema. No se ejecutaron seeds remotos ni se aprovisionó correo.
+El E2E anterior acredita la migración previa, no la publicación de estos textos.
+
 ### Ajustes posteriores solicitados el 2026-09-25
 
 La revisión del usuario retira del hero «Para médicos especialistas» y el botón

@@ -199,6 +199,10 @@ test('actual tenant Host renders the approved SSR page, metadata and configured 
   expect(text).toMatch(/facturación automática/i);
   expect(text).toMatch(/datos.*ficticios/i);
   expect(text).not.toMatch(/factura asistida|Android|prototipo|contacto simulado|tarifas pendientes|\bUSD\b/i);
+  // The approved personal address is illustrative copy, never a contact link.
+  await expect(page.locator('.onboarding-copy')).toContainText('como consulta@minombre.com');
+  await expect(page.locator('[data-support-cta="onboarding"]')).toHaveText('Consultar por mi correo');
+  await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
   const destinations = await page.locator('[data-support-cta]').evaluateAll((links) => links.map((link) => ({
     placement: link.getAttribute('data-support-cta'), href: link.getAttribute('href'),
   })));
@@ -459,7 +463,7 @@ for (const [locale, path] of [['en', '/'], ['es', '/es/']] as const) {
     await expect(page.locator('#price-calculator')).toHaveCount(0);
     await expect(page.locator('.pricing-card')).toContainText('USD');
     const text = await page.locator('body').innerText();
-    expect(text).not.toMatch(/Medipago|médicos?|consultorio|4\.9%|WhatsApp|\bGTQ\b/i);
+    expect(text).not.toMatch(/Medipago|médicos?|consultorio|4\.9%|WhatsApp|\bGTQ\b|consulta@minombre\.com/i);
     expect(text).toMatch(locale === 'en' ? /fictional/i : /fictici/i);
     for (const href of await page.locator('[data-support-cta]').evaluateAll((links) => links.map((link) => link.getAttribute('href')))) {
       expect(href).toBe(platformTenant.destinations.app);
