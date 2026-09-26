@@ -39,7 +39,9 @@ export async function openTenantPage(
   const browser = await chromium.launch({
     args: [`--host-resolver-rules=MAP ${host} 127.0.0.1`],
   })
-  const page = await browser.newPage()
+  // An explicit context, not `browser.newPage()`: axe's Playwright builder
+  // refuses a page whose context was created implicitly.
+  const page = await (await browser.newContext()).newPage()
   const res = await page.goto(`http://${host}:${port}${path}`, { waitUntil: 'load' })
   if (!res || res.status() !== 200) {
     await browser.close()

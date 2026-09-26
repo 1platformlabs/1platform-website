@@ -103,15 +103,20 @@ for (const viewport of [
   });
 }
 
-test('clinic tenant / with the compact menu open: still zero violations', async () => {
+// A one-page tenant publishes no other route, so its header carries no menu
+// (#119) — the open state left to cover at the compact width is the FAQ.
+test('clinic tenant / at 390px with a FAQ row open: still zero violations', async () => {
   const { browser, page } = await openTenantPage(clinic.domain, '/');
   try {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.locator('#menu-toggle').click();
-    await expect(page.locator('#mobile-menu')).toBeVisible();
+    await expect(page.locator('#menu-toggle')).toHaveCount(0);
+    const row = page.locator('.product-faq__item').first();
+    await expect(row).toHaveCount(1);
+    await row.evaluate((item) => item.setAttribute('open', ''));
     const results = await scan(page);
-    const sawPanel = results.passes.some((p) => p.nodes.some((n) => n.html.includes('mobile-menu')));
-    expect(sawPanel || results.violations.length > 0).toBe(true);
+    // Floor: the opened row was in the tree axe walked.
+    const sawFaq = results.passes.some((p) => p.nodes.some((n) => `${n.target.join(' ')} ${n.html}`.includes('product-faq')));
+    expect(sawFaq || results.violations.length > 0).toBe(true);
     expectNoViolations(results);
   } finally {
     await browser.close();
