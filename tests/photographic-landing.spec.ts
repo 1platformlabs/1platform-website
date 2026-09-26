@@ -438,7 +438,9 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await gotoLanding(page);
-    const evidence = join(ROOT, 'evidence/medipago');
+    // Captures belong to this run's output, not to the tracked evidence/ folder:
+    // writing there dirtied the worktree on every suite run.
+    const evidence = testInfo.outputPath('evidence');
     mkdirSync(evidence, { recursive: true });
     // Visit the lazy image before checking all page assets and making a full-page capture.
     await page.locator('.onboarding-photo').scrollIntoViewIfNeeded();
