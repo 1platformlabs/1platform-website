@@ -10,6 +10,7 @@ import { repoTenantForHost } from '../src/data/site-tenants.ts';
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const APP_PORT = 4460;
 const API_PORT = 4461;
+const byText = (a, b) => a.localeCompare(b);
 
 export function loadPreviewSites() {
   const exported = join(ROOT, 'dist/preview-oneplatform.json');
@@ -22,7 +23,7 @@ export function loadPreviewSites() {
   const content = JSON.parse(readFileSync(exported, 'utf8'));
   const platform = structuredClone(repoTenantForHost('1platform.pro'));
   if (!platform || content.tenant_slug !== platform.slug) throw new Error('El contenido no pertenece a 1Platform');
-  if (JSON.stringify([...content.published_routes].sort()) !== JSON.stringify([...platform.pages].sort())) {
+  if (JSON.stringify([...content.published_routes].sort(byText)) !== JSON.stringify([...platform.pages].sort(byText))) {
     throw new Error('Las rutas del manifest y del contenido de 1Platform no coinciden');
   }
   const platformContent = new Map(platform.locales.map((locale) => {

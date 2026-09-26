@@ -7,13 +7,13 @@ import { translateToEs } from '../src/i18n/routes.ts';
 import { loadPreviewSites, previewResponse } from './preview-landings.mjs';
 process.env.ASTRO_NODE_AUTOSTART = 'disabled';
 process.env.SITE_MANIFEST_SOURCE = 'api';
-process.env.SITE_API_BASE_URL = 'http://contract.invalid';
+process.env.SITE_API_BASE_URL = 'https://contract.invalid';
 const sites = loadPreviewSites();
 const originalFetch = globalThis.fetch;
 after(() => { globalThis.fetch = originalFetch; });
 globalThis.fetch = async (input) => {
   const url = new URL(typeof input === 'string' ? input : input.url ?? input.toString());
-  assert.equal(url.origin, 'http://contract.invalid', 'Unexpected external request');
+  assert.equal(url.origin, 'https://contract.invalid', 'Unexpected external request');
   const result = previewResponse(url, sites);
   return Response.json(result.body, { status: result.status });
 };
@@ -30,7 +30,12 @@ async function render(host, path = '/') {
     getHeader(key) { return headers.get(key.toLowerCase()); },
     removeHeader(key) { headers.delete(key.toLowerCase()); },
     getHeaders() { return Object.fromEntries(headers); },
-    writeHead(status, values) { this.statusCode = status; for (const [key, value] of Object.entries(values ?? {})) this.setHeader(key, value); this.headersSent = true; return this; },
+    writeHead(status, values) {
+      this.statusCode = status;
+      for (const [key, value] of Object.entries(values ?? {})) { this.setHeader(key, value); }
+      this.headersSent = true;
+      return this;
+    },
   });
   const done = new Promise((resolve, reject) => { res.on('finish', resolve); res.on('error', reject); });
   handler(req, res);

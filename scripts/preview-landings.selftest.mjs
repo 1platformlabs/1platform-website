@@ -22,7 +22,8 @@ test('1Platform has separate complete English and Spanish dictionaries', () => {
   assert.equal(en.locale, 'en');
   assert.equal(es.locale, 'es');
   assert.notEqual(en.messages['home.hero.headline'], es.messages['home.hero.headline']);
-  assert.deepEqual(Object.keys(en.messages).sort(), Object.keys(es.messages).sort());
+  const byText = (a, b) => a.localeCompare(b);
+  assert.deepEqual(Object.keys(en.messages).sort(byText), Object.keys(es.messages).sort(byText));
   assert.equal(en.pages.some((page) => page.locale !== 'en'), false);
   assert.equal(es.pages.some((page) => page.locale !== 'es'), false);
   assert.equal(es.messages['photographic.hero.image'], 'commerce');
