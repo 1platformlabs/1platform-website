@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   las composiciones existentes conservan su comportamiento.
 
 ### Fixed
+- El correo de ejemplo de las landings (`consulta@minombre.com`) queda como texto:
+  el borde lo convertía en un enlace ofuscado «[email protected]» visible sin
+  JavaScript y para buscadores. Se marca con `email_off`; las referencias de las
+  homes EN/ES sólo suman ese marcador.
 - Las referencias HTML y visuales de las homes EN/ES reflejan el rediseño
   fotográfico aprobado (issue #124). Se conservan las otras 98 rutas, las cuatro
   referencias de clínica, el umbral visual del 1 % y todos los guards.
