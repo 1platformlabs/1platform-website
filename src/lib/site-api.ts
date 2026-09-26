@@ -17,11 +17,12 @@ export const DISPLAY_FONTS = [
   'system-serif',
   'system-sans',
   'system-mono',
+  'manrope',
 ] as const
 
 export type DisplayFont = (typeof DISPLAY_FONTS)[number]
 
-export const HOME_TEMPLATES = ['platform-commerce', 'service-lead'] as const
+export const HOME_TEMPLATES = ['platform-commerce', 'service-lead', 'photographic-service'] as const
 
 export type HomeTemplate = (typeof HOME_TEMPLATES)[number]
 

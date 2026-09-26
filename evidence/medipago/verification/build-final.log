@@ -1,0 +1,22 @@
+
+> 1platform-website@3.5.17 build
+> astro build
+
+19:09:06 [@astrojs/node] Enabling sessions with filesystem storage
+19:09:06 [content] Syncing content
+19:09:06 [content] Synced content
+19:09:06 [types] Generated 364ms
+19:09:06 [build] output: "server"
+19:09:06 [build] mode: "server"
+19:09:06 [build] directory: /Users/staimer/Documents/1platform-worktrees/website-medipago-approved-landing/dist/
+19:09:06 [build] adapter: @astrojs/node
+19:09:06 [build] Collecting build info...
+19:09:06 [build] ✓ Completed in 415ms.
+19:09:06 [build] Building server entrypoints...
+19:09:07 [vite] ✓ built in 222ms
+19:09:07 [vite] ✓ built in 286ms
+19:09:07 [vite] ✓ built in 60ms
+19:09:07 [build] Rearranging server assets...
+19:09:07 [build] ✓ Completed in 615ms.
+19:09:07 [build] Server built in 1.04s
+19:09:07 [build] Complete!

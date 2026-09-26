@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Composición multitenant `photographic-service` y fuente Manrope para migrar la
+  landing aprobada de Medipago: fotografía animada, panel ilustrativo y calculadora
+  en centavos enteros. Marca, contenido, comisión y contacto proceden del tenant;
+  las composiciones existentes conservan su comportamiento.
+
 ### Fixed
 - **La portada conectada ya es reutilizable por un tenant de una sola página.**
   Conserva la composición de `1platform.pro`, pero usa el soporte del tenant
