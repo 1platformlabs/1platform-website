@@ -47,6 +47,7 @@ test('support URLs and request-local configuration cannot inherit another tenant
   second.tenant.destinations.support = 'https://contact.example/request?source=home'
   second.tenant.theme.accent = '#234567'
   second.messages['photographic.calculator.commissionBasisPoints'] = '200'
+  second.messages['photographic.onboarding.description'] = 'Correo propio para su negocio.'
   const a = photographicContent(first.messages, first.tenant)
   const b = photographicContent(second.messages, second.tenant)
   expect(b.contactHref('hero')).toBe(second.tenant.destinations.support)
@@ -54,6 +55,9 @@ test('support URLs and request-local configuration cannot inherit another tenant
   expect(b.calculator?.commissionBasisPoints).toBe(200)
   expect(a.brandStyle).not.toContain('#234567')
   expect(b.brandStyle).toContain('#234567')
+  expect(b.copy('onboarding.description')).toBe('Correo propio para su negocio.')
+  expect(a.copy('onboarding.description')).toContain('consulta@minombre.com')
+  expect(b.contactHref('onboarding')).toBe(second.tenant.destinations.support)
 })
 
 test('tenant strings cannot terminate a JSON script element', () => {
@@ -73,6 +77,8 @@ for (const locale of ['en', 'es'] as const) {
     expect(site.palette).toBe('brand')
     expect(site.copy('hero.image')).toBe('commerce')
     expect(site.contactHref('hero')).toBe(tenant.destinations.app)
+    expect(site.contactHref('onboarding')).toBe(tenant.destinations.app)
+    expect(site.copy('onboarding.description')).toContain('consulta@minombre.com')
     expect(site.calculator).toBeNull()
     expect(site.panel.currency).toBe('USD')
     expect(site.panel.sample).toEqual({ creditCents: 48000, withdrawCents: 0 })

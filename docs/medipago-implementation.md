@@ -15,6 +15,45 @@ comisiones del motor, retiros o emisión de facturas.
 
 ## Fuentes y decisiones
 
+### Animaciones automáticas y correo en ambos tenants — 2026-09-26
+
+La revisión posterior del usuario retira «Ver animaciones»: tarjetas y flujo
+se reproducen al entrar en pantalla y se reinician al volver después de salir
+completamente. Se observa la ilustración de cada tarjeta, no su encabezado,
+para que la secuencia no termine fuera de pantalla en móvil. Las secuencias
+siguen siendo finitas; se pausan con la pestaña oculta y respetan movimiento
+reducido. Se eliminaron los controles de repetición y sus estilos/listeners.
+La mejora vive una sola vez en la composición compartida, sin casos por host.
+
+El beneficio de correo también aplica a 1Platform EN/ES por instrucción
+explícita: título, descripción, eyebrow y CTA son contenido de tenant en
+`src/i18n/messages/pages/photographic-home.ts`, exportado sin modificar las
+otras páginas a la fixture API `site_pages_oneplatform.json`. Se conserva
+`consulta@minombre.com` como ejemplo. 1Platform usa su app configurada y
+Medipago su soporte configurado; el renderer no conoce dominios ni buzones.
+No se aprovisiona correo ni se anuncia precio o dominio incluido.
+
+Esta ampliación sustituye la limitación a Medipago de la primera revisión de
+correo descrita debajo. Para persistir contenido hay que sembrar las páginas
+de ambos tenants y renovar cachés según sus runbooks; no requiere cambios de
+manifest si ya usan `photographic-service`. No se hicieron escrituras remotas.
+
+Validación de esta revisión: build, check (43 self-tests), typecheck (0 errores,
+0 warnings), 324 pruebas generales y 8/8 comparaciones visuales Linux aprobadas.
+Las 12 pruebas del banco privado siguen separadas y no se repitieron aquí.
+Se añadieron seis casos de reproducción automática: ambos anchos y los tres
+pares tenant/locale. También se comprobó que otro contenido sobre la misma
+configuración de tenant cambia el beneficio sin depender del dominio.
+
+Las referencias de `/` y `/es/` se sincronizaron con esta revisión solicitada:
+sólo dos cuerpos HTML, sus hashes/tamaños y cuatro PNG de las homes, tras
+inspeccionar las capturas y confirmar que el DOM sólo cambia en el contenido
+de correo, los controles retirados y los fingerprints de sus assets. Las otras
+98 rutas, cuatro capturas de clínica, comparadores y umbrales están intactos.
+El gate posterior confirma 100/100 rutas. Evidencia antes/después y capturas
+en `artifacts/medipago-e2e-2026-09-25/autoplay-email-tenants-20260926/` del
+monorepo. El prototipo y las capturas históricas de Medipago se preservan.
+
 ### Correo con dominio personal — 2026-09-26
 
 El usuario autorizó añadir el beneficio y corrigió el ejemplo a

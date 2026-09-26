@@ -59,8 +59,14 @@ function initPhotographicService() {
   const hero = root.querySelector<HTMLElement>('.hero');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const sequenceStates = [...root.querySelectorAll<HTMLElement>('[data-sequence]')]
-    .map((element) => ({ element, visible: false }));
-  const replayButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-replay]')];
+    .map((element) => ({
+      element,
+      // Observe the illustration, so a tall card's heading cannot consume its
+      // animation before the illustration reaches the viewport on mobile.
+      target: element.querySelector<HTMLElement>('.service-stage') ?? element,
+      inViewport: false,
+      visible: false,
+    }));
   let heroVisible = true;
 
   function updateMotion() {
@@ -69,12 +75,13 @@ function initPhotographicService() {
       hero.dataset.motion = reduced ? 'reduced' : !heroVisible || document.hidden ? 'paused' : 'playing';
       if (reduced) hero.removeAttribute('data-enter');
     }
-    sequenceStates.forEach(({ element, visible }) => {
+    sequenceStates.forEach(({ element, inViewport, visible }) => {
       element.dataset.playing = String(visible && !reduced && !document.hidden);
-      if (reduced) delete element.dataset.animated;
+      // Reset only after leaving the viewport, ready for automatic re-entry.
+      // Hiding the tab pauses the current sequence without restarting it.
+      if (reduced || !inViewport) delete element.dataset.animated;
       else if (visible) element.dataset.animated = '';
     });
-    replayButtons.forEach((button) => { button.hidden = reduced; });
   }
 
   if (hero) {
@@ -90,23 +97,16 @@ function initPhotographicService() {
   document.addEventListener('visibilitychange', updateMotion, { signal });
   const sequenceObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      const state = sequenceStates.find((item) => item.element === entry.target);
-      if (state) state.visible = entry.isIntersecting && entry.intersectionRatio >= 0.18;
+      const state = sequenceStates.find((item) => item.target === entry.target);
+      if (state) {
+        state.inViewport = entry.isIntersecting;
+        state.visible = entry.isIntersecting && entry.intersectionRatio >= 0.35;
+      }
     });
     updateMotion();
-  }, { threshold: [0, 0.18] });
-  sequenceStates.forEach(({ element }) => sequenceObserver.observe(element));
+  }, { threshold: [0, 0.35] });
+  sequenceStates.forEach(({ target }) => sequenceObserver.observe(target));
   observers.push(sequenceObserver);
-  replayButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      if (reducedMotion.matches) return;
-      const selector = button.dataset.replay === 'flow' ? '.flow-panel' : '.service-card';
-      root.querySelectorAll<HTMLElement>(selector).forEach((element) => {
-        // Rewind the approved finite sequences; no animation timers or layout reads.
-        element.getAnimations({ subtree: true }).forEach((animation) => { animation.currentTime = 0; });
-      });
-    }, { signal });
-  });
   updateMotion();
 
   const menuToggle = root.querySelector<HTMLButtonElement>('.menu-toggle');

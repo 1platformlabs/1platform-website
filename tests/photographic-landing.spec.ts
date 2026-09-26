@@ -353,12 +353,13 @@ test('one editable amount uses the configured rate, clears stale results and rec
   await expect(page.locator('#calc-net')).toHaveText(/Q\s?95\.10/);
 });
 
-test('photograph motion pauses offscreen without a manual control, finite sequences replay, and reduced motion remains static', async ({ landingPage: page }) => {
+test('photograph and flow play automatically, restart on re-entry and respect reduced motion', async ({ landingPage: page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await gotoLanding(page);
   const hero = page.locator('.hero');
   const photo = page.locator('.hero-photo');
   await expect(page.locator('.hero-motion')).toHaveCount(0);
+  await expect(page.locator('[data-replay]')).toHaveCount(0);
   await expect(page.locator('.hero-eyebrow')).toHaveCount(0);
   await expect(hero).toHaveAttribute('data-motion', 'playing');
   const first = await photo.evaluate((element) => getComputedStyle(element).transform);
@@ -376,13 +377,14 @@ test('photograph motion pauses offscreen without a manual control, finite sequen
   await page.waitForTimeout(250); // Compare animation frames while the photograph is offscreen.
   expect(await photo.evaluate((element) => getComputedStyle(element).transform)).toBe(paused);
   await expect.poll(() => flow.evaluate((element) => Math.max(0, ...element.getAnimations({ subtree: true }).map((animation) => Number(animation.currentTime))))).toBeGreaterThan(300);
-  await page.locator('[data-replay="flow"]').click();
-  const replayed = await flow.evaluate((element) => element.getAnimations({ subtree: true }).map((animation) => Number(animation.currentTime)));
-  expect(replayed.length).toBeGreaterThan(0);
-  expect(Math.max(...replayed)).toBeLessThan(300);
+  const firstStart = await flow.evaluate((element) => element.getAnimations({ subtree: true })[0].startTime);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await expect(flow).not.toHaveAttribute('data-animated');
   await expect(hero).toHaveAttribute('data-motion', 'playing');
   await expect.poll(() => photo.evaluate((element) => getComputedStyle(element).transform)).not.toBe(paused);
+  await flow.scrollIntoViewIfNeeded();
+  await expect(flow).toHaveAttribute('data-playing', 'true');
+  await expect.poll(() => flow.evaluate((element) => element.getAnimations({ subtree: true })[0]?.startTime)).toBeGreaterThan(Number(firstStart));
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(hero).toHaveAttribute('data-motion', 'reduced');
   await expect(page.locator('[data-replay]:visible')).toHaveCount(0);
@@ -390,6 +392,45 @@ test('photograph motion pauses offscreen without a manual control, finite sequen
   await expect(flow).not.toHaveAttribute('data-animated');
   await expect(page.locator('#calc-amount')).toBeEnabled();
 });
+
+for (const [host, path] of [[HOST, '/'], [PLATFORM_HOST, '/'], [PLATFORM_HOST, '/es/']] as const) {
+  for (const width of [1440, 390]) {
+    test(`illustrations autoplay when visible and on return: ${host}${path} ${width}px`, async ({ landingPage: page }) => {
+      await page.setViewportSize({ width, height: width === 1440 ? 900 : 844 });
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      await page.goto(`http://${host}:${appPort}${path}`);
+      await expect(page.locator('body')).toHaveAttribute('data-enhanced', 'true');
+      await expect(page.locator('[data-replay]')).toHaveCount(0);
+      const cards = page.locator('.service-card');
+      if (width === 390) {
+        // Reading the title alone must not consume an offscreen illustration.
+        await cards.first().evaluate((card) => window.scrollTo({
+          top: window.scrollY + card.getBoundingClientRect().top - window.innerHeight + 120,
+          behavior: 'instant',
+        }));
+        await expect(cards.first()).not.toHaveAttribute('data-animated');
+      }
+      for (const card of await cards.all()) {
+        await card.locator('.service-stage').scrollIntoViewIfNeeded();
+        await expect(card).toHaveAttribute('data-playing', 'true');
+        await expect.poll(() => card.evaluate((element) => element.getAnimations({ subtree: true })
+          .filter((animation) => animation.playState === 'running').length)).toBeGreaterThan(0);
+        const firstStart = await card.evaluate((element) => element.getAnimations({ subtree: true })[0].startTime);
+        await expect.poll(() => card.evaluate((element) => Math.max(0, ...element.getAnimations({ subtree: true })
+          .map((animation) => Number(animation.currentTime))))).toBeGreaterThan(300);
+        await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+        await expect(card).not.toHaveAttribute('data-animated');
+        await card.locator('.service-stage').scrollIntoViewIfNeeded();
+        await expect.poll(() => card.evaluate((element) => element.getAnimations({ subtree: true })[0]?.startTime)).toBeGreaterThan(Number(firstStart));
+      }
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      for (const card of await cards.all()) {
+        await expect(card).not.toHaveAttribute('data-animated');
+        expect(await card.evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(0);
+      }
+    });
+  }
+}
 
 for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 360, height: 800 }]) {
   test(`all page sections and panel views reflow and pass Axe at ${viewport.width}px`, async ({ landingPage: page }, testInfo) => {
@@ -463,7 +504,12 @@ for (const [locale, path] of [['en', '/'], ['es', '/es/']] as const) {
     await expect(page.locator('#price-calculator')).toHaveCount(0);
     await expect(page.locator('.pricing-card')).toContainText('USD');
     const text = await page.locator('body').innerText();
-    expect(text).not.toMatch(/Medipago|médicos?|consultorio|4\.9%|WhatsApp|\bGTQ\b|consulta@minombre\.com/i);
+    expect(text).not.toMatch(/Medipago|médicos?|consultorio|4\.9%|WhatsApp|\bGTQ\b/i);
+    const configured = platformContent.get(locale)!.data.messages;
+    await expect(page.locator('.onboarding-copy h2')).toHaveText(configured['photographic.onboarding.title']);
+    await expect(page.locator('.onboarding-copy p').last()).toHaveText(configured['photographic.onboarding.description']);
+    await expect(page.locator('.onboarding-copy')).toContainText('consulta@minombre.com');
+    await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
     expect(text).toMatch(locale === 'en' ? /fictional/i : /fictici/i);
     for (const href of await page.locator('[data-support-cta]').evaluateAll((links) => links.map((link) => link.getAttribute('href')))) {
       expect(href).toBe(platformTenant.destinations.app);

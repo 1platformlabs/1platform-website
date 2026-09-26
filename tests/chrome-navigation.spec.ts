@@ -141,7 +141,7 @@ test('the service cards align on desktop and stack without clipping on mobile', 
   }
 });
 
-test('the photograph moves and finite service and invoice demonstrations can replay', async ({ page }) => {
+test('the photograph moves and finite demonstrations restart automatically on re-entry', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
@@ -156,20 +156,19 @@ test('the photograph moves and finite service and invoice demonstrations can rep
   await expect(card.locator('.product-panel')).toHaveCSS('animation-name', 'panel-arrive');
   await expect(card.locator('.product-panel')).toHaveCSS('animation-iteration-count', '1');
   await expect(page.locator('.hero')).toHaveAttribute('data-motion', 'paused');
-  await page.locator('[data-replay="cards"]').click();
+  await expect(page.locator('[data-replay]')).toHaveCount(0);
   await expect(card.locator('h3')).toBeVisible();
-  const replayedCard = await card.evaluate((node) => node.getAnimations({ subtree: true }).map((animation) => Number(animation.currentTime)));
-  expect(replayedCard.length).toBeGreaterThan(0);
-  expect(Math.max(...replayedCard)).toBeLessThan(300);
+  await expect.poll(() => card.evaluate((node) => Math.max(0, ...node.getAnimations({ subtree: true }).map((animation) => Number(animation.currentTime))))).toBeGreaterThan(300);
 
   const flow = page.locator('.flow-panel');
   await flow.scrollIntoViewIfNeeded();
   await expect(flow).toHaveAttribute('data-playing', 'true');
   await expect.poll(() => flow.evaluate((node) => Math.max(0, ...node.getAnimations({ subtree: true }).map((animation) => Number(animation.currentTime))))).toBeGreaterThan(300);
-  await page.locator('[data-replay="flow"]').click();
-  const replayed = await flow.evaluate((node) => node.getAnimations({ subtree: true }).map((animation) => Number(animation.currentTime)));
-  expect(replayed.length).toBeGreaterThan(0);
-  expect(Math.max(...replayed)).toBeLessThan(300);
+  const firstStart = await flow.evaluate((node) => node.getAnimations({ subtree: true })[0].startTime);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await expect(flow).not.toHaveAttribute('data-animated');
+  await flow.scrollIntoViewIfNeeded();
+  await expect.poll(() => flow.evaluate((node) => node.getAnimations({ subtree: true })[0]?.startTime)).toBeGreaterThan(Number(firstStart));
 });
 
 test('the home retains reciprocal SEO alternatives and focused CTAs', async ({ page }) => {

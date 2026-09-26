@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Las dos landings reproducen automáticamente tarjetas y recorrido al entrar
+  en pantalla, sin controles de repetición. El correo con dominio propio
+  también se presenta en 1Platform EN/ES desde su contenido de tenant.
 - Medipago presenta el correo con dominio personal como beneficio adicional,
   con `consulta@minombre.com` sólo como ejemplo y consulta al contacto configurado.
 - Las homes de 1Platform EN/ES y Medipago comparten el rediseño fotográfico

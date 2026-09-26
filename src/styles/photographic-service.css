@@ -784,34 +784,8 @@ h1 span {
   width: 16px;
   height: 16px;
 }
-.section-motion-controls {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-.motion-replay {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 2px;
-  min-height: 44px;
-  background: transparent;
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.motion-replay .icon {
-  width: 15px;
-  height: 15px;
-}
 .flow-panel {
   min-width: 0;
-}
-.flow-panel .motion-replay {
-  color: #c2e4d6;
-  margin-top: 20px;
 }
 .how-section {
   background: var(--deep);
@@ -1998,9 +1972,6 @@ h1 span {
   .service-footnote {
     align-self: end;
     margin-top: 25px;
-  }
-  .section-motion-controls {
-    justify-content: flex-start;
   }
 }
 @media (max-width: 560px) {
