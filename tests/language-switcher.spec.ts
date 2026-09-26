@@ -7,15 +7,15 @@ import { expect, test, type Page } from '@playwright/test';
  * properties that matter are: it keeps you on the page you were reading, it
  * remembers, and it never offers a language that does not exist.
  *
- * The language control lives in the compact menu. Every interaction below opens
- * that menu first, so keyboard access follows the same public path as a
- * narrow viewport visitor.
+ * Standard pages expose the control in the compact menu. The photographic
+ * landing keeps its language control in the floating header. Both surfaces
+ * must preserve the page and preference through a language change.
  */
 
 /** Open the header menu so the language control is on screen and clickable. */
 async function openMenu(page: Page) {
   await page.setViewportSize({ width: 390, height: 844 });
-  const toggle = page.locator('#menu-toggle');
+  const toggle = page.locator('header [aria-controls="mobile-menu"]');
   if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
     await toggle.click();
     await expect(page.locator('#mobile-menu')).toBeVisible();
@@ -50,20 +50,19 @@ test('a blog post switches to its own translation, not the index', async ({ page
   await expect(page).toHaveURL(/\/es\/blog\/primeros-pasos-en-5-minutos\/$/);
 });
 
-test('the cookie is written before the client router swaps the document', async ({
+test('the cookie is written before language navigation replaces the document', async ({
   context,
   page,
 }) => {
-  // The site mounts Astro's client router, so this click exchanges the document
-  // rather than reloading. If the cookie were written after the swap it would
-  // be lost, and the automatic redirect would undo the user's choice on their
-  // next visit — which would make the control useless.
+  // The landing navigates to the translated document. The preference must
+  // already exist when that document runs its first-visit detection, or the
+  // browser language would undo the explicit choice.
   await page.goto('/es/');
   await openMenu(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
   // Assert the destination, not the development port: isolated worktrees run
   // their static server on different ports but still exercise the same route.
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
 
   const cookie = (await context.cookies()).find((c) => c.name === '1p_lang');
   expect(cookie?.value).toBe('en');
@@ -81,7 +80,7 @@ test('the choice survives a new page load', async ({ browser }) => {
   await page.goto('/es/');
   await openMenu(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
 
   // Fresh navigation, same context: the Spanish browser locale would otherwise
   // send this straight back to /es/.
@@ -102,6 +101,31 @@ test('the current language is marked, not linked', async ({ page }) => {
   // The current language must not be a link to itself.
   await expect(page.locator('.lang a[data-lang-choice="es"]')).toHaveCount(0);
 });
+
+for (const width of [1440, 390]) {
+  test(`the landing language control is keyboard-operable at ${width}px`, async ({ page, context }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/es/');
+    const group = page.locator('.landing-languages');
+    await expect(group).toBeVisible();
+    await expect(group).toHaveAttribute('aria-label', 'Idioma');
+    await expect(group.locator('[aria-current="true"]')).toHaveText('ES');
+    await expect(group.locator('[aria-current="true"]')).toHaveAttribute('lang', 'es');
+    await expect(group.locator('a[data-lang-choice="es"]')).toHaveCount(0);
+
+    const english = group.locator('a[data-lang-choice="en"]');
+    await expect(english).toHaveAttribute('href', '/');
+    await expect(english).toHaveAttribute('hreflang', 'en');
+    await english.focus();
+    await expect(english).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
+    expect((await context.cookies()).find((cookie) => cookie.name === '1p_lang')?.value).toBe('en');
+
+    await expect(page.locator('.landing-languages [aria-current="true"]')).toHaveText('EN');
+    await expect(page.locator('.landing-languages a[data-lang-choice="es"]')).toHaveAttribute('href', '/es/');
+  });
+}
 
 test('a language with no translation is offered as unavailable, never as a link', async ({
   page,

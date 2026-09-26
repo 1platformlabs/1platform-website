@@ -79,11 +79,15 @@ test('only the compiled palette gets the platform artwork', () => {
   expect(paintsCompiledAccent(clinic)).toBe(false)
 })
 
-test('the SERVED heads and homes carry each fix, and tenant #1 keeps its own', async () => {
+test('the SERVED heads preserve standard chrome and apply the photographic tenant theme', async () => {
+  const platformStandard = await getWithHost(`${BASE}/pricing/`, platform.domain)
+  expect(platformStandard.status).toBe(200)
+  expect(platformStandard.body).toContain('<meta name="theme-color" content="#FFFFFF">')
   const platformHome = await getWithHost(`${BASE}/`, platform.domain)
   expect(platformHome.status).toBe(200)
-  expect(platformHome.body).toContain('<meta name="theme-color" content="#FFFFFF">')
-  expect(platformHome.body).toContain('platform-modules')
+  expect(platformHome.body).toContain(`<meta name="theme-color" content="${platform.theme.accent}">`)
+  expect(platformHome.body).toContain('data-home-template="photographic-service"')
+  expect(platformHome.body).toContain('showcase-store-bg')
   expect(platformHome.body).not.toContain('tools-scene')
 
   const clinicHome = await getWithHost(`${BASE}/`, clinic.domain)

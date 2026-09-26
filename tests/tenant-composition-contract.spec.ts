@@ -387,6 +387,7 @@ test('the route edge selects a closed template catalogue and contains no tenant 
   expect(templates, 'the route edge must expose exactly the approved strategies').toEqual([
     'platform-commerce',
     'service-lead',
+    'photographic-service',
   ])
   expect(routingSource).toContain('HOME_RENDER_ROUTES[tenant.home_template]')
 

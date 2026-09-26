@@ -100,7 +100,7 @@ system across every public route.
   **Space Grotesk** display (500/700) for headings and the logo · **Inter** text
   (400/500/600) · **JetBrains Mono** (400) for labels, data and code ·
   **Instrument Serif** (400) — the home system's display serif (56 px openers,
-  the footer card's heading), added by the home redesign. `@font-face` with
+  the footer card's heading) for legacy commerce compositions. `@font-face` with
   `font-display: swap` in `global.css`; display 700, text 400 and the serif are
   preloaded in `BaseLayout.astro`. Four families, weights deliberately limited
   — the serif ships exactly one.
@@ -118,16 +118,23 @@ system across every public route.
 
 ### The home system
 
-The home (`/`, `/es/`) opens on a white orbital commerce scene built from
-semantic HTML and CSS: Online Store, online payment, electronic invoicing and
-delivery remain visible together while emphasis follows one order through the
-four states. It contains no radio inputs, fake selectors or carousel controls.
-The four-step index below the fold repeats the same narrative as real links,
-then hands off to the editorial Astro Image assets under `src/assets/editorial/`
-and the dark closing footer. Keep interactions to native controls and small
-progressive enhancements; every motion path must have a reduced-motion state.
-`tests/chrome-navigation.spec.ts`, `tests/contrast.spec.ts` and the visual
-baselines are the contracts for this system.
+The homes of 1Platform (`/`, `/es/`) and Medipago use the shared
+`photographic-service` composition: fixed floating navigation, animated photograph,
+three service cards, payment-to-invoice flow, fictitious interactive panel and a
+dark footer. This follows the approved Medipago prototype and the user's explicit
+request to apply that design to both tenants. Brand, content, destinations and
+pricing remain tenant data. 1Platform keeps USD/account pricing and its app CTA;
+Medipago keeps its GTQ 4.9% calculator. Never copy a tenant's commercial terms.
+
+The landing uses self-hosted Manrope while the demo keeps PanelInter. The
+1Platform global theme remains Space Grotesk for standard pages. The user removed
+the hero specialty label and pause button; reduced motion and automatic pause
+outside the viewport remain. `CommerceOrbit.astro` remains supported by
+`platform-commerce` tenants such as the clinic regression fixture. Standard
+page chrome remains in `BaseLayout.astro`. See `docs/medipago-implementation.md`
+for scope and historical test status. The private-DB verification passed on
+2026-09-26; `docs/issue-124-home-references.md` records the subsequent approved
+home-reference reconciliation and its local premerge gates.
 
 **Anti-patterns — do not reintroduce** (`scripts/check-tells.sh` enforces these):
 aurora blobs, decorative gradient text, gradient icon tiles,
@@ -143,8 +150,8 @@ Restrained by design — over-animation was one of the tells this site was rebui
 - **One reveal:** IntersectionObserver adds `.is-visible` to `.reveal` (a short fade-up).
   `animations.ts` deliberately supports **no** per-element or per-index delay.
 - **Decorative motion** is limited to opacity, colour and transform changes in
-  the editorial system. The home orbit is the only ambient sequence and its
-  four cards never disappear, so the story remains legible at every phase;
+  the editorial system. Photographic homes animate the hero with reduced-motion fallback and pause
+  automatically offscreen; legacy commerce cards remain visible through their sequence;
   public pages never mount a canvas or WebGL runtime.
 - **Hover:** cards firm their border and take a faint shadow — no lift. Link cues nudge
   their arrow 3px.

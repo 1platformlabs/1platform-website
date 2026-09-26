@@ -1,55 +1,144 @@
-import { readFileSync } from 'node:fs'
+import { execFileSync, spawn, type ChildProcessWithoutNullStreams } from 'node:child_process'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { createServer, type Server } from 'node:http'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
-import { expect, test } from '@playwright/test'
+import { chromium, expect, test as base, type Browser, type Page } from '@playwright/test'
 
 import { openTenantPage, computedProperty } from './helpers/tenant-browser'
+import { getWithHost } from './helpers/http-host'
+import { repoTenants } from '../src/data/site-tenants'
 
 /**
- * Issues #93 and #94 — the chrome reads the platform's palette, not the
- * tenant's accent, and the tenant's declared display font never reaches an
- * element either.
- *
- * WHY THIS FILE VERIFIES COMPUTED STYLE, NOT SOURCE OR SERVED TEXT
- * ------------------------------------------------------------------
- * `tests/tenant-theme.spec.ts` already proves `themeDeclarations()` emits the
- * right CSS text and that the text reaches the served HTML. Neither proves it
- * reaches an ELEMENT: a custom property is only resolved once a browser lays
- * out the page, and — measured while building this fix — the tenant's
- * `<style>` block was losing the cascade to `global.css`'s own `<link>`
- * regardless of DOM order (see BaseLayout.astro's comment by `{themeCss && ...}`
- * and `tenant-theme.ts`'s `:root:root`). A test that stops at "the string is in
- * the body" would have stayed green through that bug. This one reads
- * `getComputedStyle` in a real Chromium instance instead.
- *
- * WHY SOME OF THE TEN ARE CROSS-TENANT AND SOME ARE PLATFORM-ONLY
- * ------------------------------------------------------------------
- * The clinic (the only non-platform fixture) does not render every one of the
- * ten sites issue #93 lists. Its explicit mark now exercises `.logo__mark` in
- * both header and footer, but its manifest has no `destinations.app`, so D-7
- * correctly renders no `.btn--footer`. That site is verified as a
- * NO-REGRESSION on the platform instead. `ProcessSpine.astro` and
- * `Changelog.astro` get the same treatment: the
- * clinic's repo-manifest fixture publishes only `/` (`site-tenants.ts` —
- * deliberately, until a later phase writes its vertical's pages), and neither
- * component is mounted on that route.
- *
- * `InterconnectDiagram.astro`'s `.motif__spine rect` is the one site with NO
- * live verification at all, on either tenant: `Hero`'s `motif` prop defaults
- * to `false` and no page in `src/page-content/` passes `true` — measured, the
- * component's CSS does not appear in ANY built `dist/client/_astro/*.css`
- * chunk, so Astro's own bundler has already determined it renders nowhere.
- * The token rename there is applied per issue #93's explicit list and
- * verified by the shared-mechanism argument above (same `--color-accent`,
- * same `:root` cascade, proven live everywhere else it is reachable) plus a
- * source check below — not a claim that this fix made it reachable. Whether
- * to wire `motif={true}` somewhere or remove the component is a separate,
- * pre-existing question outside these three issues.
+ * Issues #93 and #94: tokens must reach rendered elements, not just CSS text.
+ * The photographic landing supersedes the platform home. CommerceOrbit remains
+ * a supported composition, so its original cross-tenant regressions run against
+ * two explicit platform-commerce manifests through the normal API resolver.
+ * Standard page chrome and the new landing are also checked on their real repo
+ * tenant routes. This fixture is a component integration check, not local E2E.
  */
 
 const CLINIC_HOST = 'clinicas.1platform.dev'
 const PLATFORM_HOST = '1platform.pro'
 
-test.describe('cross-tenant: elements reachable on both tenants\' home page', () => {
+type LegacyCommerce = {
+  open: (host: string) => Promise<{ browser: Browser; page: Page }>
+}
+
+type ExportedPage = { route: string; locale: string; published: boolean; blocks: Record<string, string> }
+
+async function listen(server: Server): Promise<number> {
+  return new Promise((resolve, reject) => {
+    server.once('error', reject)
+    server.listen(0, '127.0.0.1', () => {
+      server.off('error', reject)
+      const address = server.address()
+      if (!address || typeof address === 'string') return reject(new Error('No local TCP port assigned'))
+      resolve(address.port)
+    })
+  })
+}
+
+async function close(server: Server): Promise<void> {
+  if (!server.listening) return
+  await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()))
+}
+
+async function stop(app: ChildProcessWithoutNullStreams | undefined): Promise<void> {
+  if (!app || app.exitCode !== null) return
+  await new Promise<void>((resolve) => {
+    const timer = setTimeout(() => { app.kill('SIGKILL'); resolve() }, 3000)
+    app.once('exit', () => { clearTimeout(timer); resolve() })
+    app.kill('SIGTERM')
+  })
+}
+
+const test = base.extend<{}, { legacyCommerce: LegacyCommerce }>({
+  legacyCommerce: [async ({}, use) => {
+    const directory = mkdtempSync(join(tmpdir(), 'website-commerce-colors-'))
+    const exportPath = join(directory, 'site-content.json')
+    let app: ChildProcessWithoutNullStreams | undefined
+    const manifests = repoTenants()
+      .filter((tenant) => [PLATFORM_HOST, CLINIC_HOST].includes(tenant.domain))
+      .map((tenant) => ({ ...tenant, home_template: 'platform-commerce' as const }))
+    let documents: ExportedPage[] = []
+    const api = createServer((request, response) => {
+      const url = new URL(request.url ?? '/', 'http://fixture')
+      response.setHeader('content-type', 'application/json')
+      if (url.pathname === '/api/v1/sites/by-host') {
+        const tenant = manifests.find((item) => item.domain === url.searchParams.get('host'))
+        if (tenant) return void response.end(JSON.stringify({ success: true, data: tenant, msg: 'ok' }))
+      }
+      const match = /^\/api\/v1\/sites\/([^/]+)\/pages$/.exec(url.pathname)
+      const tenant = match && manifests.find((item) => item.slug === match[1])
+      const locale = url.searchParams.get('locale') ?? tenant?.default_locale
+      if (tenant && locale && tenant.locales.includes(locale)) {
+        const pages = documents.filter((item) => item.locale === locale)
+        const messages = Object.assign({}, ...pages.map((item) => item.blocks)) as Record<string, string>
+        return void response.end(JSON.stringify({ success: true, data: { slug: tenant.slug, locale, pages, messages }, msg: 'ok' }))
+      }
+      response.statusCode = 404
+      response.end(JSON.stringify({ success: false, data: null, msg: 'not found' }))
+    })
+    try {
+      expect(manifests).toHaveLength(2)
+      execFileSync(process.execPath, ['scripts/export-site-content.mjs', '--out', exportPath], { stdio: 'pipe' })
+      documents = (JSON.parse(readFileSync(exportPath, 'utf8')) as { documents: ExportedPage[] }).documents
+      const apiPort = await listen(api)
+      const reservation = createServer()
+      const port = await listen(reservation)
+      await close(reservation)
+      app = spawn(process.execPath, ['dist/server/entry.mjs'], {
+        env: { ...process.env, HOST: '127.0.0.1', PORT: String(port), SITE_MANIFEST_SOURCE: 'api', SITE_API_BASE_URL: `http://127.0.0.1:${apiPort}` },
+        stdio: 'pipe',
+      })
+      let logs = ''
+      app.stdout.on('data', (chunk) => { logs = (logs + String(chunk)).slice(-8192) })
+      app.stderr.on('data', (chunk) => { logs = (logs + String(chunk)).slice(-8192) })
+      const deadline = Date.now() + 30_000
+      let ready = false
+      while (Date.now() < deadline) {
+        if (app.exitCode !== null) throw new Error(`Commerce fixture exited early: ${logs}`)
+        try { ready = (await getWithHost(`http://127.0.0.1:${port}/`, PLATFORM_HOST)).status === 200 } catch { /* Adapter startup. */ }
+        if (ready) break
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+      if (!ready) throw new Error(`Commerce fixture did not become ready: ${logs}`)
+      await use({ open: async (host) => {
+        const browser = await chromium.launch({ args: [`--host-resolver-rules=MAP ${host} 127.0.0.1`] })
+        try {
+          const page = await browser.newPage()
+          const response = await page.goto(`http://${host}:${port}/`)
+          expect(response?.status()).toBe(200)
+          await expect(page.locator('.orbit-card')).toHaveCount(4)
+          return { browser, page }
+        } catch (error) {
+          await browser.close()
+          throw error
+        }
+      } })
+    } finally {
+      await stop(app)
+      await close(api)
+      rmSync(directory, { recursive: true, force: true })
+    }
+  }, { scope: 'worker' }],
+})
+
+test.describe('cross-tenant: the same supported commerce composition under both palettes', () => {
+  test('legacy commerce keeps its platform artwork and tenant invoice chips', async ({ legacyCommerce }) => {
+    for (const [host, chip] of [[PLATFORM_HOST, '1P'], [CLINIC_HOST, 'CD']]) {
+      const { browser, page } = await legacyCommerce.open(host)
+      try {
+        await expect(page.locator('.invoice-preview__number')).toHaveText(chip)
+        if (host === PLATFORM_HOST) {
+          await expect(page.locator('img[src*="platform-modules"]')).toHaveCount(1)
+          await expect(page.locator('.tools-scene')).toHaveCount(0)
+        }
+      } finally { await browser.close() }
+    }
+  })
   const cases: Array<{ name: string; selector: string; property: string }> = [
     { name: 'store preview image (accent-soft wash)', selector: '.store-preview__image', property: 'background-color' },
     { name: 'store preview card edge (accent)', selector: '.store-preview__image span', property: 'border-color' },
@@ -58,9 +147,9 @@ test.describe('cross-tenant: elements reachable on both tenants\' home page', ()
   ]
 
   for (const { name, selector, property } of cases) {
-    test(`${name}: the clinic's own accent reaches it, and differs from the platform's`, async () => {
-      const platform = await openTenantPage(PLATFORM_HOST, '/')
-      const clinic = await openTenantPage(CLINIC_HOST, '/')
+    test(`${name}: the clinic's own accent reaches it, and differs from the platform's`, async ({ legacyCommerce }) => {
+      const platform = await legacyCommerce.open(PLATFORM_HOST)
+      const clinic = await legacyCommerce.open(CLINIC_HOST)
       try {
         const platformValue = await computedProperty(platform.page, selector, property)
         const clinicValue = await computedProperty(clinic.page, selector, property)
@@ -93,8 +182,8 @@ test.describe('cross-tenant: elements reachable on both tenants\' home page', ()
     }
   })
 
-  test('the platform is untouched: every accent-carrying property is still the compiled cobalt', async () => {
-    const { browser, page } = await openTenantPage(PLATFORM_HOST, '/')
+  test('the commerce composition retains the platform palette when its manifest selects it', async ({ legacyCommerce }) => {
+    const { browser, page } = await legacyCommerce.open(PLATFORM_HOST)
     try {
       expect(await computedProperty(page, '.logo__mark', 'background-color')).toBe('rgb(23, 72, 167)') // #1748a7
       expect(await computedProperty(page, '.store-preview__image span', 'border-color')).toBe('rgb(23, 72, 167)')
@@ -127,8 +216,8 @@ test.describe('explicit tenant mark and platform-only regression sites', () => {
     }
   })
 
-  test('the footer logo mark and CTA still carry the compiled --cobalt-bright on the platform', async () => {
-    const { browser, page } = await openTenantPage(PLATFORM_HOST, '/')
+  test('the standard footer logo mark and CTA still carry the compiled --cobalt-bright on the platform', async () => {
+    const { browser, page } = await openTenantPage(PLATFORM_HOST, '/about/')
     try {
       expect(await computedProperty(page, '.site-footer .logo__mark', 'background-color')).toBe('rgb(120, 166, 255)')
       expect(await computedProperty(page, '.btn--footer', 'background-color')).toBe('rgb(120, 166, 255)')
@@ -179,13 +268,13 @@ test('the unreachable interconnect motif stays on the bridged primitive — meas
 
 /**
  * Issue #94 — `.logo`'s `font-family` is the one accent-carrying rule that IS
- * reachable on both tenants' home page (Logo mounts in Header AND Footer of
- * every page), so display_font gets the same live, cross-tenant proof the
+ * reachable in both tenants' standard chrome (the platform's /about/ and
+ * the clinic's legacy home), so display_font gets the same cross-tenant proof the
  * color tokens got above.
  */
 test.describe('display_font reaches the element (issue #94)', () => {
   test('the clinic\'s declared serif reaches .logo, and the platform keeps Space Grotesk', async () => {
-    const platform = await openTenantPage(PLATFORM_HOST, '/')
+    const platform = await openTenantPage(PLATFORM_HOST, '/about/')
     const clinic = await openTenantPage(CLINIC_HOST, '/')
     try {
       const platformFont = await computedProperty(platform.page, '.logo', 'font-family')
@@ -202,4 +291,21 @@ test.describe('display_font reaches the element (issue #94)', () => {
       await clinic.browser.close()
     }
   })
+})
+
+
+test('the photographic platform home uses its cobalt palette and Manrope without repainting standard pages', async () => {
+  const { browser, page } = await openTenantPage(PLATFORM_HOST, '/')
+  try {
+    await expect(page.locator('body')).toHaveAttribute('data-home-template', 'photographic-service')
+    await expect(page.locator('body')).toHaveAttribute('data-palette', 'brand')
+    expect(await computedProperty(page, '.hero h1', 'font-family')).toContain('Manrope')
+    expect(await computedProperty(page, '.brand-mark', 'color')).toBe('rgb(23, 72, 167)')
+    expect(await computedProperty(page, '.button-teal', 'background-color')).toBe('rgb(23, 72, 167)')
+    await page.goto(`http://${PLATFORM_HOST}:${process.env.PLAYWRIGHT_PORT ?? 4321}/about/`)
+    expect(await computedProperty(page, '.logo', 'font-family')).toContain('Space Grotesk')
+    expect(await computedProperty(page, '.logo__mark', 'background-color')).toBe('rgb(23, 72, 167)')
+  } finally {
+    await browser.close()
+  }
 })

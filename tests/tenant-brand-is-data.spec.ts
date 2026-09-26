@@ -57,7 +57,9 @@ test('the clinic tenant renders, and the platform host still renders', async () 
 
 test('the wordmark is the tenant\'s, not the platform\'s', async () => {
   const { html: clinic } = await serve(CLINIC_HOST)
-  const { html: platform } = await serve(PLATFORM_HOST)
+  // The shared Logo component remains on standard pages; the photographic
+  // home has its own approved lockup, checked separately below.
+  const { html: platform } = await serve(PLATFORM_HOST, '/pricing/')
 
   const mark = (html: string) => html.match(/logo__mark"[^>]*>([^<]*)</)?.[1] ?? null
   const text = (html: string) => html.match(/logo__text"[^>]*>([^<]*)</)?.[1] ?? null
@@ -78,6 +80,10 @@ test('the wordmark is the tenant\'s, not the platform\'s', async () => {
   expect(label(clinic), 'the accessible name must use the complete semantic brand name').toBe(
     'Clínica Delta',
   )
+  const { html: home } = await serve(PLATFORM_HOST)
+  expect(home).toMatch(/class="brand-mark">1<\/span>/)
+  expect(home).toMatch(/class="wordmark">Platform<\/span>/)
+  expect(home).toContain('aria-label="1Platform, home"')
 })
 
 test('the leak that is LEFT is content, and its size is pinned', async () => {

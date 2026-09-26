@@ -7,7 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Las dos landings reproducen automáticamente tarjetas y recorrido al entrar
+  en pantalla, sin controles de repetición. El correo con dominio propio
+  también se presenta en 1Platform EN/ES desde su contenido de tenant.
+- Medipago presenta el correo con dominio personal como beneficio adicional,
+  con `consulta@minombre.com` sólo como ejemplo y consulta al contacto configurado.
+- Las homes de 1Platform EN/ES y Medipago comparten el rediseño fotográfico
+  aprobado. 1Platform conserva su marca, foto comercial existente, destinos,
+  precios USD por cuenta y páginas secundarias; Medipago conserva GTQ y 4.9%.
+  Contenido y elección de plantilla permanecen en configuración del tenant.
+
+### Added
+- Lanzador local `preview:landings` para revisar Medipago y 1Platform por hosts
+  separados en el mismo build, con contenido de fixture por tenant e idioma.
+  No sustituye la verificación con API y DB reales.
+- Composición multitenant `photographic-service` y fuente Manrope para migrar la
+  landing aprobada de Medipago: fotografía animada, panel ilustrativo y calculadora
+  en centavos enteros. Marca, contenido, comisión y contacto proceden del tenant;
+  las composiciones existentes conservan su comportamiento.
+
 ### Fixed
+- Las referencias HTML y visuales de las homes EN/ES reflejan el rediseño
+  fotográfico aprobado (issue #124). Se conservan las otras 98 rutas, las cuatro
+  referencias de clínica, el umbral visual del 1 % y todos los guards.
+- El hero de la landing fotográfica omite la frase «Para médicos especialistas»
+  y el control de pausa, según la revisión solicitada. Conserva movimiento
+  reducido y pausa automática al quedar fuera de pantalla.
 - **axe también mira un inquilino de la vertical de clínicas** (issue #122).
   `tests/a11y-home.spec.ts` sólo escaneaba el inquilino de referencia; ahora
   corre el mismo conjunto WCAG A/AA contra `clinicas.1platform.dev` (plantilla

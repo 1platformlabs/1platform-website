@@ -1,0 +1,18 @@
+
+Running 8 tests using 1 worker
+
+  ✓  1 [chromium] › tests/visual/home.spec.ts:27:3 › home-en-1440 (1.5s)
+  ✓  2 [chromium] › tests/visual/home.spec.ts:27:3 › home-es-1440 (1.2s)
+  ✓  3 [chromium] › tests/visual/home.spec.ts:27:3 › home-en-390 (1.1s)
+  ✓  4 [chromium] › tests/visual/home.spec.ts:27:3 › home-es-390 (1.2s)
+  ✓  5 [clinic-chromium] › tests/visual/clinic.spec.ts:11:3 › clinic-home-1440 (1.1s)
+  ✓  6 [clinic-chromium] › tests/visual/clinic.spec.ts:11:3 › clinic-home-390 (776ms)
+  ✓  7 [clinic-chromium] › tests/visual/clinic.spec.ts:11:3 › clinic-404-1440 (724ms)
+  ✓  8 [clinic-chromium] › tests/visual/clinic.spec.ts:11:3 › clinic-404-390 (640ms)
+
+  8 passed (18.7s)
+npm notice
+npm notice New major version of npm available! 11.13.0 -> 12.1.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.1.0
+npm notice To update run: npm install -g npm@12.1.0
+npm notice

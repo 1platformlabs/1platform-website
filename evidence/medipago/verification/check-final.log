@@ -1,0 +1,88 @@
+
+> 1platform-website@3.5.17 check
+> ./scripts/check-tells.sh && ./scripts/check-tells-self-test.sh
+
+ok    no emoji or entity glyphs as icons
+ok    no retired card/kit components
+ok    no fabricated prices or vanity metrics
+ok    no numbered replace-count claim
+ok    no hardcoded brand colours
+ok    no var(--token, #fallback) colour fallbacks
+ok    no retired template kit
+ok    no decorative gradients
+ok    fonts are self-hosted and preloaded
+ok    no external provider names outside the privacy policy
+ok    no client:* directives
+ok    no hardcoded locale tags
+ok    no untranslated literal attributes
+ok    public JS inside the 64 KB gzip budget
+ok    no external visual source is named
+
+All design-system checks passed.
+
+Control — the tree as committed
+ok    clean tree passes
+
+Emoji and entity glyphs
+ok    literal 4-byte emoji
+ok    six-digit decimal entity
+ok    five-hex entity
+ok    dingbat arrow
+
+Retired components and template kit
+ok    retired card component
+ok    retired template kit
+ok    dot grid
+ok    decorative gradient
+
+Fabricated numbers
+ok    competitor price
+ok    English count claim
+ok    English count, new noun
+ok    Spanish count claim
+ok    Spanish count, noun first
+
+Colour and token discipline
+ok    hardcoded brand hex
+ok    hardcoded brand hex in lib
+ok    token hex fallback
+
+i18n rules added by this epic
+ok    pinned locale tag
+ok    untranslated aria-label
+ok    client directive
+
+Provider names — the exemption must be exact
+ok    provider in ordinary page
+ok    provider in privacy partial (es)
+ok    provider in privacy partial (en)
+ok    provider in privacy catalogue
+ok    ad network in an ordinary page
+ok    ad network, hyphenated
+ok    ad network, second brand
+ok    meta element is not a brand
+ok    Spanish noun meta is not a brand
+
+The content collections
+ok    provider name in an English post
+ok    provider name in a Spanish post
+ok    provider name in the changelog
+ok    fabricated price in a post
+ok    arrow used as punctuation in prose
+ok    editorial observation about the market
+
+Documentation must stay writable
+ok    comment naming a tell
+
+Rules of the home epic (14 · 15)
+ok    a build over the JS budget goes red
+ok    a missing build fails the budget loudly
+ok    banned name caught as "zzsyntheticbrand"
+ok    banned name caught as "uikit-zzsyntheticbrand-theme"
+ok    banned name caught as "ZzSyntheticBrandProvider"
+ok    banned name caught as "tryzzsyntheticbrand"
+
+Preflight
+ok    missing scan directory fails loudly
+
+All 43 self-tests passed.

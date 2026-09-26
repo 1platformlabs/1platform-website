@@ -42,8 +42,8 @@ import { translateToEs } from '../src/i18n/routes';
  */
 
 const LOCALES = [
-  { label: 'en' as const, home: '/' },
-  { label: 'es' as const, home: '/es/' },
+  { label: 'en' as const, home: '/', standardPage: '/about/' },
+  { label: 'es' as const, home: '/es/', standardPage: '/es/nosotros/' },
 ];
 
 /**
@@ -74,7 +74,7 @@ function bodyLinks(html: string): Set<string> {
   return new Set([...body.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]));
 }
 
-for (const { label, home } of LOCALES) {
+for (const { label, home, standardPage } of LOCALES) {
   test(`the ${label} home page names every solution the menu offers`, async () => {
     // The home used to be a path on disk, and opening a file that had been
     // deleted was its own alarm. Fetching one is not: the enumeration has to
@@ -93,7 +93,9 @@ for (const { label, home } of LOCALES) {
     // Throws on any non-200, so a home that 404s or redirects fails here rather
     // than quietly handing an error page to the parsers below.
     const html = await servedHtml(home);
-    const destinations = menuDestinations(html, label);
+    // The landing has section anchors. Derive the global solution inventory
+    // from an unchanged standard page, then require it in the landing body.
+    const destinations = menuDestinations(await servedHtml(standardPage), label);
 
     // Floor, not an inventory. A prefix typo or a renamed nav class would yield
     // an empty list, and "0 missing" over 0 destinations reads exactly like a

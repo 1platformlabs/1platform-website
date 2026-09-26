@@ -1,0 +1,2250 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> app/models/site_tenant.py:29:1
+   |
+27 |   """
+28 |
+29 | / import re
+30 | | from enum import Enum
+31 | | from typing import Annotated, Any, Optional
+32 | | from urllib.parse import urlsplit
+33 | |
+34 | | from beanie import Document
+35 | | from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator, model_validator
+36 | | from pymongo import IndexModel
+37 | |
+38 | | from app.utils.date_helpers import utc_now
+   | |__________________________________________^
+39 |
+40 |   # ─────────────────────────────────────────────────────────────────────────────
+   |
+help: Organize imports
+   |
+34 | from beanie import Document
+   - from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator, model_validator
+35 + from pydantic import (
+36 +     BaseModel,
+37 +     BeforeValidator,
+38 +     ConfigDict,
+39 +     Field,
+40 +     field_validator,
+41 +     model_validator,
+42 + )
+43 | from pymongo import IndexModel
+   |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:114:28
+    |
+114 | def validate_region(value: Optional[str]) -> Optional[str]:
+    |                            ^^^^^^^^^^^^^
+115 |     """The one rule for ``region``, shared by the document and every write body.
+    |
+help: Convert to `X | None`
+    |
+113 |
+    - def validate_region(value: Optional[str]) -> Optional[str]:
+114 + def validate_region(value: str | None) -> Optional[str]:
+115 |     """The one rule for ``region``, shared by the document and every write body.
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:114:46
+    |
+114 | def validate_region(value: Optional[str]) -> Optional[str]:
+    |                                              ^^^^^^^^^^^^^
+115 |     """The one rule for ``region``, shared by the document and every write body.
+    |
+help: Convert to `X | None`
+    |
+113 |
+    - def validate_region(value: Optional[str]) -> Optional[str]:
+114 + def validate_region(value: Optional[str]) -> str | None:
+115 |     """The one rule for ``region``, shared by the document and every write body.
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:133:20
+    |
+131 | #: ``region`` as every model that accepts it declares it: one validator, bound
+132 | #: to the type, so the document and both console write bodies cannot drift.
+133 | Region = Annotated[Optional[str], BeforeValidator(validate_region)]
+    |                    ^^^^^^^^^^^^^
+134 |
+135 | #: The characters a single path SEGMENT may contain — one segment, no slashes.
+    |
+help: Convert to `X | None`
+    |
+132 | #: to the type, so the document and both console write bodies cannot drift.
+    - Region = Annotated[Optional[str], BeforeValidator(validate_region)]
+133 + Region = Annotated[str | None, BeforeValidator(validate_region)]
+134 |
+    |
+
+TRY004 Prefer `TypeError` exception for invalid type
+   --> app/models/site_tenant.py:201:9
+    |
+199 |     """
+200 |     if not isinstance(value, str):
+201 |         raise ValueError("must be a string")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+202 |     candidate = value.strip()
+203 |     if not candidate or len(candidate) > _MAX_URL_LENGTH:
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:298:13
+    |
+297 |     status: SiteProvisioningStatus = Field(default=SiteProvisioningStatus.PENDING)
+298 |     detail: Optional[str] = Field(
+    |             ^^^^^^^^^^^^^
+299 |         default=None, max_length=500, description="Human-readable outcome."
+300 |     )
+    |
+help: Convert to `X | None`
+    |
+297 |     status: SiteProvisioningStatus = Field(default=SiteProvisioningStatus.PENDING)
+    -     detail: Optional[str] = Field(
+298 +     detail: str | None = Field(
+299 |         default=None, max_length=500, description="Human-readable outcome."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:301:18
+    |
+299 |         default=None, max_length=500, description="Human-readable outcome."
+300 |     )
+301 |     detail_code: Optional[str] = Field(
+    |                  ^^^^^^^^^^^^^
+302 |         default=None, max_length=64, description="Stable key for the outcome."
+303 |     )
+    |
+help: Convert to `X | None`
+    |
+300 |     )
+    -     detail_code: Optional[str] = Field(
+301 +     detail_code: str | None = Field(
+302 |         default=None, max_length=64, description="Stable key for the outcome."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:304:22
+    |
+302 |         default=None, max_length=64, description="Stable key for the outcome."
+303 |     )
+304 |     action_required: Optional[str] = Field(
+    |                      ^^^^^^^^^^^^^
+305 |         default=None, max_length=500, description="What a person has to do next."
+306 |     )
+    |
+help: Convert to `X | None`
+    |
+303 |     )
+    -     action_required: Optional[str] = Field(
+304 +     action_required: str | None = Field(
+305 |         default=None, max_length=500, description="What a person has to do next."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:307:18
+    |
+305 |         default=None, max_length=500, description="What a person has to do next."
+306 |     )
+307 |     action_code: Optional[str] = Field(
+    |                  ^^^^^^^^^^^^^
+308 |         default=None, max_length=64, description="Stable key for that action."
+309 |     )
+    |
+help: Convert to `X | None`
+    |
+306 |     )
+    -     action_code: Optional[str] = Field(
+307 +     action_code: str | None = Field(
+308 |         default=None, max_length=64, description="Stable key for that action."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:310:17
+    |
+308 |         default=None, max_length=64, description="Stable key for that action."
+309 |     )
+310 |     started_at: Optional[Any] = Field(default=None)
+    |                 ^^^^^^^^^^^^^
+311 |     completed_at: Optional[Any] = Field(default=None)
+    |
+help: Convert to `X | None`
+    |
+309 |     )
+    -     started_at: Optional[Any] = Field(default=None)
+310 +     started_at: Any | None = Field(default=None)
+311 |     completed_at: Optional[Any] = Field(default=None)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:311:19
+    |
+309 |     )
+310 |     started_at: Optional[Any] = Field(default=None)
+311 |     completed_at: Optional[Any] = Field(default=None)
+    |                   ^^^^^^^^^^^^^
+help: Convert to `X | None`
+    |
+310 |     started_at: Optional[Any] = Field(default=None)
+    -     completed_at: Optional[Any] = Field(default=None)
+311 +     completed_at: Any | None = Field(default=None)
+312 |
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:351:13
+    |
+349 |     #: standing between two concurrent runs, because there is no job row to
+350 |     #: claim — see ``SiteProvisioningService._claim``.
+351 |     run_id: Optional[str] = Field(default=None, max_length=64)
+    |             ^^^^^^^^^^^^^
+352 |     started_at: Optional[Any] = Field(default=None)
+353 |     updated_at: Optional[Any] = Field(default=None)
+    |
+help: Convert to `X | None`
+    |
+350 |     #: claim — see ``SiteProvisioningService._claim``.
+    -     run_id: Optional[str] = Field(default=None, max_length=64)
+351 +     run_id: str | None = Field(default=None, max_length=64)
+352 |     started_at: Optional[Any] = Field(default=None)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:352:17
+    |
+350 |     #: claim — see ``SiteProvisioningService._claim``.
+351 |     run_id: Optional[str] = Field(default=None, max_length=64)
+352 |     started_at: Optional[Any] = Field(default=None)
+    |                 ^^^^^^^^^^^^^
+353 |     updated_at: Optional[Any] = Field(default=None)
+354 |     #: WHICH HOST the three layers above were computed for.
+    |
+help: Convert to `X | None`
+    |
+351 |     run_id: Optional[str] = Field(default=None, max_length=64)
+    -     started_at: Optional[Any] = Field(default=None)
+352 +     started_at: Any | None = Field(default=None)
+353 |     updated_at: Optional[Any] = Field(default=None)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:353:17
+    |
+351 |     run_id: Optional[str] = Field(default=None, max_length=64)
+352 |     started_at: Optional[Any] = Field(default=None)
+353 |     updated_at: Optional[Any] = Field(default=None)
+    |                 ^^^^^^^^^^^^^
+354 |     #: WHICH HOST the three layers above were computed for.
+355 |     #:
+    |
+help: Convert to `X | None`
+    |
+352 |     started_at: Optional[Any] = Field(default=None)
+    -     updated_at: Optional[Any] = Field(default=None)
+353 +     updated_at: Any | None = Field(default=None)
+354 |     #: WHICH HOST the three layers above were computed for.
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:362:18
+    |
+360 |     #: computed against. Storing the host makes that detectable: a run whose
+361 |     #: target differs from this resets the layers before doing anything.
+362 |     target_host: Optional[str] = Field(default=None, max_length=253)
+    |                  ^^^^^^^^^^^^^
+363 |     #: The nameservers the domain's owner has to delegate to, as the provider
+364 |     #: reported them for THIS zone. Stored rather than derived because the pair
+    |
+help: Convert to `X | None`
+    |
+361 |     #: target differs from this resets the layers before doing anything.
+    -     target_host: Optional[str] = Field(default=None, max_length=253)
+362 +     target_host: str | None = Field(default=None, max_length=253)
+363 |     #: The nameservers the domain's owner has to delegate to, as the provider
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:415:11
+    |
+413 |     model_config = ConfigDict(extra="forbid")
+414 |
+415 |     docs: Optional[str] = Field(default=None, description="Developer documentation.")
+    |           ^^^^^^^^^^^^^
+416 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens.")
+417 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes.")
+    |
+help: Convert to `X | None`
+    |
+414 |
+    -     docs: Optional[str] = Field(default=None, description="Developer documentation.")
+415 +     docs: str | None = Field(default=None, description="Developer documentation.")
+416 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:416:10
+    |
+415 |     docs: Optional[str] = Field(default=None, description="Developer documentation.")
+416 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens.")
+    |          ^^^^^^^^^^^^^
+417 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes.")
+418 |     status: Optional[str] = Field(default=None, description="Status page.")
+    |
+help: Convert to `X | None`
+    |
+415 |     docs: Optional[str] = Field(default=None, description="Developer documentation.")
+    -     app: Optional[str] = Field(default=None, description="The product the header CTA opens.")
+416 +     app: str | None = Field(default=None, description="The product the header CTA opens.")
+417 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:417:14
+    |
+415 |     docs: Optional[str] = Field(default=None, description="Developer documentation.")
+416 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens.")
+417 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes.")
+    |              ^^^^^^^^^^^^^
+418 |     status: Optional[str] = Field(default=None, description="Status page.")
+    |
+help: Convert to `X | None`
+    |
+416 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens.")
+    -     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes.")
+417 +     support: str | None = Field(default=None, description="Where 'talk to us' goes.")
+418 |     status: Optional[str] = Field(default=None, description="Status page.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:418:13
+    |
+416 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens.")
+417 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes.")
+418 |     status: Optional[str] = Field(default=None, description="Status page.")
+    |             ^^^^^^^^^^^^^
+419 |
+420 |     @field_validator("docs", "app", "support", "status")
+    |
+help: Convert to `X | None`
+    |
+417 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes.")
+    -     status: Optional[str] = Field(default=None, description="Status page.")
+418 +     status: str | None = Field(default=None, description="Status page.")
+419 |
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:422:29
+    |
+420 |     @field_validator("docs", "app", "support", "status")
+421 |     @classmethod
+422 |     def _https_only(cls, v: Optional[str]) -> Optional[str]:
+    |                             ^^^^^^^^^^^^^
+423 |         if v is None or v == "":
+424 |             return None
+    |
+help: Convert to `X | None`
+    |
+421 |     @classmethod
+    -     def _https_only(cls, v: Optional[str]) -> Optional[str]:
+422 +     def _https_only(cls, v: str | None) -> Optional[str]:
+423 |         if v is None or v == "":
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:422:47
+    |
+420 |     @field_validator("docs", "app", "support", "status")
+421 |     @classmethod
+422 |     def _https_only(cls, v: Optional[str]) -> Optional[str]:
+    |                                               ^^^^^^^^^^^^^
+423 |         if v is None or v == "":
+424 |             return None
+    |
+help: Convert to `X | None`
+    |
+421 |     @classmethod
+    -     def _https_only(cls, v: Optional[str]) -> Optional[str]:
+422 +     def _https_only(cls, v: Optional[str]) -> str | None:
+423 |         if v is None or v == "":
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:440:11
+    |
+438 |     model_config = ConfigDict(extra="forbid")
+439 |
+440 |     icon: Optional[str] = Field(
+    |           ^^^^^^^^^^^^^
+441 |         default=None,
+442 |         max_length=_MAX_PATH_LENGTH,
+    |
+help: Convert to `X | None`
+    |
+439 |
+    -     icon: Optional[str] = Field(
+440 +     icon: str | None = Field(
+441 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:445:19
+    |
+443 |         description="Root-relative path to the tenant's published tab icon.",
+444 |     )
+445 |     social_image: Optional[str] = Field(
+    |                   ^^^^^^^^^^^^^
+446 |         default=None,
+447 |         max_length=_MAX_PATH_LENGTH,
+    |
+help: Convert to `X | None`
+    |
+444 |     )
+    -     social_image: Optional[str] = Field(
+445 +     social_image: str | None = Field(
+446 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:453:37
+    |
+451 |     @field_validator("icon", "social_image")
+452 |     @classmethod
+453 |     def _published_path(cls, value: Optional[str]) -> Optional[str]:
+    |                                     ^^^^^^^^^^^^^
+454 |         if value is None:
+455 |             return None
+    |
+help: Convert to `X | None`
+    |
+452 |     @classmethod
+    -     def _published_path(cls, value: Optional[str]) -> Optional[str]:
+453 +     def _published_path(cls, value: str | None) -> Optional[str]:
+454 |         if value is None:
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:453:55
+    |
+451 |     @field_validator("icon", "social_image")
+452 |     @classmethod
+453 |     def _published_path(cls, value: Optional[str]) -> Optional[str]:
+    |                                                       ^^^^^^^^^^^^^
+454 |         if value is None:
+455 |             return None
+    |
+help: Convert to `X | None`
+    |
+452 |     @classmethod
+    -     def _published_path(cls, value: Optional[str]) -> Optional[str]:
+453 +     def _published_path(cls, value: Optional[str]) -> str | None:
+454 |         if value is None:
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:479:17
+    |
+477 |         description="Complete accessible and semantic name of the site.",
+478 |     )
+479 |     brand_mark: Optional[str] = Field(
+    |                 ^^^^^^^^^^^^^
+480 |         default=None,
+481 |         min_length=1,
+    |
+help: Convert to `X | None`
+    |
+478 |     )
+    -     brand_mark: Optional[str] = Field(
+479 +     brand_mark: str | None = Field(
+480 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:488:21
+    |
+486 |         ),
+487 |     )
+488 |     brand_wordmark: Optional[str] = Field(
+    |                     ^^^^^^^^^^^^^
+489 |         default=None,
+490 |         min_length=1,
+    |
+help: Convert to `X | None`
+    |
+487 |     )
+    -     brand_wordmark: Optional[str] = Field(
+488 +     brand_wordmark: str | None = Field(
+489 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:518:21
+    |
+516 |     #: and without the claim another site could take the same domain in the
+517 |     #: meantime and win the race at promotion time.
+518 |     pending_domain: Optional[str] = Field(
+    |                     ^^^^^^^^^^^^^
+519 |         default=None,
+520 |         description="Own domain being connected; becomes `domain` once it serves this site.",
+    |
+help: Convert to `X | None`
+    |
+517 |     #: meantime and win the race at promotion time.
+    -     pending_domain: Optional[str] = Field(
+518 +     pending_domain: str | None = Field(
+519 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:533:34
+    |
+531 |     #: visible and forces every reader through `ensure_aware`, which is where
+532 |     #: the problem is actually solved.
+533 |     pending_domain_connected_at: Optional[Any] = Field(default=None)
+    |                                  ^^^^^^^^^^^^^
+534 |     #: When the sweep should look at this site again. Stamped on every write
+535 |     #: that touches the pending domain — including the connection itself — so a
+    |
+help: Convert to `X | None`
+    |
+532 |     #: the problem is actually solved.
+    -     pending_domain_connected_at: Optional[Any] = Field(default=None)
+533 +     pending_domain_connected_at: Any | None = Field(default=None)
+534 |     #: When the sweep should look at this site again. Stamped on every write
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:537:35
+    |
+535 |     #: that touches the pending domain — including the connection itself — so a
+536 |     #: site can never sit in the queue without a due date.
+537 |     pending_domain_next_check_at: Optional[Any] = Field(default=None)
+    |                                   ^^^^^^^^^^^^^
+538 |
+539 |     locales: list[str] = Field(
+    |
+help: Convert to `X | None`
+    |
+536 |     #: site can never sit in the queue without a due date.
+    -     pending_domain_next_check_at: Optional[Any] = Field(default=None)
+537 +     pending_domain_next_check_at: Any | None = Field(default=None)
+538 |
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:563:19
+    |
+561 |     )
+562 |     destinations: SiteDestinations = Field(default_factory=SiteDestinations)
+563 |     brand_assets: Optional[SiteBrandAssets] = Field(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+564 |         default=None,
+565 |         description=(
+    |
+help: Convert to `X | None`
+    |
+562 |     destinations: SiteDestinations = Field(default_factory=SiteDestinations)
+    -     brand_assets: Optional[SiteBrandAssets] = Field(
+563 +     brand_assets: SiteBrandAssets | None = Field(
+564 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:580:31
+    |
+578 |     )
+579 |
+580 |     google_site_verification: Optional[str] = Field(
+    |                               ^^^^^^^^^^^^^
+581 |         default=None,
+582 |         max_length=120,
+    |
+help: Convert to `X | None`
+    |
+579 |
+    -     google_site_verification: Optional[str] = Field(
+580 +     google_site_verification: str | None = Field(
+581 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:605:19
+    |
+603 |     status: SiteTenantStatus = Field(default=SiteTenantStatus.DRAFT)
+604 |
+605 |     provisioning: Optional[SiteProvisioningState] = Field(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+606 |         default=None,
+607 |         description=(
+    |
+help: Convert to `X | None`
+    |
+604 |
+    -     provisioning: Optional[SiteProvisioningState] = Field(
+605 +     provisioning: SiteProvisioningState | None = Field(
+606 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:645:42
+    |
+643 |     @field_validator("brand_name", "brand_mark", "brand_wordmark", mode="before")
+644 |     @classmethod
+645 |     def _brand_text_is_plain(cls, value: Optional[str], info) -> Optional[str]:
+    |                                          ^^^^^^^^^^^^^
+646 |         """Trim brand text and reject markup/control characters at the border."""
+647 |         if value is None:
+    |
+help: Convert to `X | None`
+    |
+644 |     @classmethod
+    -     def _brand_text_is_plain(cls, value: Optional[str], info) -> Optional[str]:
+645 +     def _brand_text_is_plain(cls, value: str | None, info) -> Optional[str]:
+646 |         """Trim brand text and reject markup/control characters at the border."""
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:645:66
+    |
+643 |     @field_validator("brand_name", "brand_mark", "brand_wordmark", mode="before")
+644 |     @classmethod
+645 |     def _brand_text_is_plain(cls, value: Optional[str], info) -> Optional[str]:
+    |                                                                  ^^^^^^^^^^^^^
+646 |         """Trim brand text and reject markup/control characters at the border."""
+647 |         if value is None:
+    |
+help: Convert to `X | None`
+    |
+644 |     @classmethod
+    -     def _brand_text_is_plain(cls, value: Optional[str], info) -> Optional[str]:
+645 +     def _brand_text_is_plain(cls, value: Optional[str], info) -> str | None:
+646 |         """Trim brand text and reject markup/control characters at the border."""
+    |
+
+TRY004 Prefer `TypeError` exception for invalid type
+   --> app/models/site_tenant.py:650:13
+    |
+648 |             return None
+649 |         if not isinstance(value, str):
+650 |             raise ValueError("must be text")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+651 |         candidate = value.strip()
+652 |         if not candidate:
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:677:44
+    |
+675 |     @field_validator("pending_domain")
+676 |     @classmethod
+677 |     def _pending_domain_normalised(cls, v: Optional[str]) -> Optional[str]:
+    |                                            ^^^^^^^^^^^^^
+678 |         """The same canonicalisation `domain` gets, because it becomes `domain`.
+    |
+help: Convert to `X | None`
+    |
+676 |     @classmethod
+    -     def _pending_domain_normalised(cls, v: Optional[str]) -> Optional[str]:
+677 +     def _pending_domain_normalised(cls, v: str | None) -> Optional[str]:
+678 |         """The same canonicalisation `domain` gets, because it becomes `domain`.
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:677:62
+    |
+675 |     @field_validator("pending_domain")
+676 |     @classmethod
+677 |     def _pending_domain_normalised(cls, v: Optional[str]) -> Optional[str]:
+    |                                                              ^^^^^^^^^^^^^
+678 |         """The same canonicalisation `domain` gets, because it becomes `domain`.
+    |
+help: Convert to `X | None`
+    |
+676 |     @classmethod
+    -     def _pending_domain_normalised(cls, v: Optional[str]) -> Optional[str]:
+677 +     def _pending_domain_normalised(cls, v: Optional[str]) -> str | None:
+678 |         """The same canonicalisation `domain` gets, because it becomes `domain`.
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:715:43
+    |
+713 |     @field_validator("google_site_verification")
+714 |     @classmethod
+715 |     def _verification_token_shape(cls, v: Optional[str]) -> Optional[str]:
+    |                                           ^^^^^^^^^^^^^
+716 |         """Alphanumerics and hyphens, nothing else, and never a path.
+    |
+help: Convert to `X | None`
+    |
+714 |     @classmethod
+    -     def _verification_token_shape(cls, v: Optional[str]) -> Optional[str]:
+715 +     def _verification_token_shape(cls, v: str | None) -> Optional[str]:
+716 |         """Alphanumerics and hyphens, nothing else, and never a path.
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:715:61
+    |
+713 |     @field_validator("google_site_verification")
+714 |     @classmethod
+715 |     def _verification_token_shape(cls, v: Optional[str]) -> Optional[str]:
+    |                                                             ^^^^^^^^^^^^^
+716 |         """Alphanumerics and hyphens, nothing else, and never a path.
+    |
+help: Convert to `X | None`
+    |
+714 |     @classmethod
+    -     def _verification_token_shape(cls, v: Optional[str]) -> Optional[str]:
+715 +     def _verification_token_shape(cls, v: Optional[str]) -> str | None:
+716 |         """Alphanumerics and hyphens, nothing else, and never a path.
+    |
+
+RUF012 Mutable default value for class attribute
+   --> app/models/site_tenant.py:749:19
+    |
+747 |           # Lookup indexes only. The UNIQUE index on `domain` is created by
+748 |           # scripts/create_site_tenant_indexes.py — see the module docstring.
+749 |           indexes = [
+    |  ___________________^
+750 | |             IndexModel([("host_aliases", 1)]),
+751 | |             IndexModel([("status", 1)]),
+752 | |         ]
+    | |_________^
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:779:11
+    |
+777 |     model_config = ConfigDict(extra="forbid")
+778 |
+779 |     docs: Optional[str] = Field(
+    |           ^^^^^^^^^^^^^
+780 |         default=None, description="Developer-documentation destination, or `null` when absent."
+781 |     )
+    |
+help: Convert to `X | None`
+    |
+778 |
+    -     docs: Optional[str] = Field(
+779 +     docs: str | None = Field(
+780 |         default=None, description="Developer-documentation destination, or `null` when absent."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:782:10
+    |
+780 |         default=None, description="Developer-documentation destination, or `null` when absent."
+781 |     )
+782 |     app: Optional[str] = Field(
+    |          ^^^^^^^^^^^^^
+783 |         default=None, description="Product destination, or `null` when absent."
+784 |     )
+    |
+help: Convert to `X | None`
+    |
+781 |     )
+    -     app: Optional[str] = Field(
+782 +     app: str | None = Field(
+783 |         default=None, description="Product destination, or `null` when absent."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:785:14
+    |
+783 |         default=None, description="Product destination, or `null` when absent."
+784 |     )
+785 |     support: Optional[str] = Field(
+    |              ^^^^^^^^^^^^^
+786 |         default=None, description="Tenant-controlled HTTPS support action, or `null` when absent."
+787 |     )
+    |
+help: Convert to `X | None`
+    |
+784 |     )
+    -     support: Optional[str] = Field(
+785 +     support: str | None = Field(
+786 |         default=None, description="Tenant-controlled HTTPS support action, or `null` when absent."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:788:13
+    |
+786 |         default=None, description="Tenant-controlled HTTPS support action, or `null` when absent."
+787 |     )
+788 |     status: Optional[str] = Field(
+    |             ^^^^^^^^^^^^^
+789 |         default=None, description="Service-status destination, or `null` when absent."
+790 |     )
+    |
+help: Convert to `X | None`
+    |
+787 |     )
+    -     status: Optional[str] = Field(
+788 +     status: str | None = Field(
+789 |         default=None, description="Service-status destination, or `null` when absent."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:798:11
+    |
+796 |     model_config = ConfigDict(extra="forbid")
+797 |
+798 |     icon: Optional[str] = Field(
+    |           ^^^^^^^^^^^^^
+799 |         default=None, description="Declared root-relative tab-icon path, or `null` when absent."
+800 |     )
+    |
+help: Convert to `X | None`
+    |
+797 |
+    -     icon: Optional[str] = Field(
+798 +     icon: str | None = Field(
+799 |         default=None, description="Declared root-relative tab-icon path, or `null` when absent."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:801:19
+    |
+799 |         default=None, description="Declared root-relative tab-icon path, or `null` when absent."
+800 |     )
+801 |     social_image: Optional[str] = Field(
+    |                   ^^^^^^^^^^^^^
+802 |         default=None,
+803 |         description="Declared root-relative social-image path, or `null` when absent.",
+    |
+help: Convert to `X | None`
+    |
+800 |     )
+    -     social_image: Optional[str] = Field(
+801 +     social_image: str | None = Field(
+802 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:807:30
+    |
+806 |     @classmethod
+807 |     def project(cls, assets: Optional[SiteBrandAssets]) -> Optional["SiteBrandAssetsPublic"]:
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^
+808 |         """Collapse an empty stored object to the public derive-state null."""
+809 |         if assets is None or (assets.icon is None and assets.social_image is None):
+    |
+help: Convert to `X | None`
+    |
+806 |     @classmethod
+    -     def project(cls, assets: Optional[SiteBrandAssets]) -> Optional["SiteBrandAssetsPublic"]:
+807 +     def project(cls, assets: SiteBrandAssets | None) -> Optional["SiteBrandAssetsPublic"]:
+808 |         """Collapse an empty stored object to the public derive-state null."""
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:834:17
+    |
+832 |     slug: str = Field(description="Stable public site identifier; never the Mongo document id.")
+833 |     brand_name: str = Field(description="Complete accessible and semantic tenant name.")
+834 |     brand_mark: Optional[str] = Field(
+    |                 ^^^^^^^^^^^^^
+835 |         description="Compact logo symbol, or `null` when the lockup has no separate mark."
+836 |     )
+    |
+help: Convert to `X | None`
+    |
+833 |     brand_name: str = Field(description="Complete accessible and semantic tenant name.")
+    -     brand_mark: Optional[str] = Field(
+834 +     brand_mark: str | None = Field(
+835 |         description="Compact logo symbol, or `null` when the lockup has no separate mark."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:837:21
+    |
+835 |         description="Compact logo symbol, or `null` when the lockup has no separate mark."
+836 |     )
+837 |     brand_wordmark: Optional[str] = Field(
+    |                     ^^^^^^^^^^^^^
+838 |         description="Visible wordmark beside the mark, or `null` when brand_name is used."
+839 |     )
+    |
+help: Convert to `X | None`
+    |
+836 |     )
+    -     brand_wordmark: Optional[str] = Field(
+837 +     brand_wordmark: str | None = Field(
+838 |         description="Visible wordmark beside the mark, or `null` when brand_name is used."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:843:13
+    |
+841 |     locales: list[str] = Field(description="BCP-47 locales for which this tenant publishes content.")
+842 |     default_locale: str = Field(description="Locale served at the root without a locale prefix.")
+843 |     region: Optional[str] = Field(
+    |             ^^^^^^^^^^^^^
+844 |         default=None,
+845 |         description=(
+    |
+help: Convert to `X | None`
+    |
+842 |     default_locale: str = Field(description="Locale served at the root without a locale prefix.")
+    -     region: Optional[str] = Field(
+843 +     region: str | None = Field(
+844 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:857:19
+    |
+855 |         description="Optional HTTPS destinations rendered by the public site."
+856 |     )
+857 |     brand_assets: Optional[SiteBrandAssetsPublic] = Field(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+858 |         default=None,
+859 |         description=(
+    |
+help: Convert to `X | None`
+    |
+856 |     )
+    -     brand_assets: Optional[SiteBrandAssetsPublic] = Field(
+857 +     brand_assets: SiteBrandAssetsPublic | None = Field(
+858 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:865:31
+    |
+863 |     )
+864 |     pages: list[str] = Field(description="Published root-relative routes for this tenant.")
+865 |     google_site_verification: Optional[str] = Field(
+    |                               ^^^^^^^^^^^^^
+866 |         default=None,
+867 |         description="Search verification token, or `null` when the tenant has none.",
+    |
+help: Convert to `X | None`
+    |
+864 |     pages: list[str] = Field(description="Published root-relative routes for this tenant.")
+    -     google_site_verification: Optional[str] = Field(
+865 +     google_site_verification: str | None = Field(
+866 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:876:18
+    |
+874 |         ),
+875 |     )
+876 |     redirect_to: Optional[str] = Field(
+    |                  ^^^^^^^^^^^^^
+877 |         default=None,
+878 |         description=(
+    |
+help: Convert to `X | None`
+    |
+875 |     )
+    -     redirect_to: Optional[str] = Field(
+876 +     redirect_to: str | None = Field(
+877 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:887:52
+    |
+885 |     @classmethod
+886 |     def project(
+887 |         cls, tenant: "SiteTenant", *, redirect_to: Optional[str] = None
+    |                                                    ^^^^^^^^^^^^^
+888 |     ) -> "SiteTenantPublic":
+889 |         """The ONLY way a tenant becomes a public payload.
+    |
+help: Convert to `X | None`
+    |
+886 |     def project(
+    -         cls, tenant: "SiteTenant", *, redirect_to: Optional[str] = None
+887 +         cls, tenant: "SiteTenant", *, redirect_to: str | None = None
+888 |     ) -> "SiteTenantPublic":
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:940:17
+    |
+938 |     slug: str = Field(description="Stable public site identifier; never the Mongo document id.")
+939 |     brand_name: str = Field(description="Complete accessible and semantic tenant name.")
+940 |     brand_mark: Optional[str] = Field(description="Compact logo symbol, or `null` when absent.")
+    |                 ^^^^^^^^^^^^^
+941 |     brand_wordmark: Optional[str] = Field(
+942 |         description="Visible wordmark beside the compact mark, or `null` when absent."
+    |
+help: Convert to `X | None`
+    |
+939 |     brand_name: str = Field(description="Complete accessible and semantic tenant name.")
+    -     brand_mark: Optional[str] = Field(description="Compact logo symbol, or `null` when absent.")
+940 +     brand_mark: str | None = Field(description="Compact logo symbol, or `null` when absent.")
+941 |     brand_wordmark: Optional[str] = Field(
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:941:21
+    |
+939 |     brand_name: str = Field(description="Complete accessible and semantic tenant name.")
+940 |     brand_mark: Optional[str] = Field(description="Compact logo symbol, or `null` when absent.")
+941 |     brand_wordmark: Optional[str] = Field(
+    |                     ^^^^^^^^^^^^^
+942 |         description="Visible wordmark beside the compact mark, or `null` when absent."
+943 |     )
+    |
+help: Convert to `X | None`
+    |
+940 |     brand_mark: Optional[str] = Field(description="Compact logo symbol, or `null` when absent.")
+    -     brand_wordmark: Optional[str] = Field(
+941 +     brand_wordmark: str | None = Field(
+942 |         description="Visible wordmark beside the compact mark, or `null` when absent."
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:948:13
+    |
+946 |     locales: list[str] = Field(description="BCP-47 locales the tenant declares.")
+947 |     default_locale: str = Field(description="Locale served at the root without a locale prefix.")
+948 |     region: Optional[str] = Field(
+    |             ^^^^^^^^^^^^^
+949 |         default=None,
+950 |         description="ISO 3166-1 alpha-2 country the site addresses, or `null` when unknown.",
+    |
+help: Convert to `X | None`
+    |
+947 |     default_locale: str = Field(description="Locale served at the root without a locale prefix.")
+    -     region: Optional[str] = Field(
+948 +     region: str | None = Field(
+949 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:959:19
+    |
+957 |         description="Optional HTTPS destinations available to the tenant site."
+958 |     )
+959 |     brand_assets: Optional[SiteBrandAssetsPublic] = Field(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+960 |         default=None,
+961 |         description="Declared brand assets, or `null` when the site derives them.",
+    |
+help: Convert to `X | None`
+    |
+958 |     )
+    -     brand_assets: Optional[SiteBrandAssetsPublic] = Field(
+959 +     brand_assets: SiteBrandAssetsPublic | None = Field(
+960 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:967:20
+    |
+965 |         description="Whether the canonical domain is final and may become indexable."
+966 |     )
+967 |     platform_host: Optional[str] = Field(
+    |                    ^^^^^^^^^^^^^
+968 |         default=None,
+969 |         description=(
+    |
+help: Convert to `X | None`
+    |
+966 |     )
+    -     platform_host: Optional[str] = Field(
+967 +     platform_host: str | None = Field(
+968 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:976:21
+    |
+974 |         ),
+975 |     )
+976 |     pending_domain: Optional[str] = Field(
+    |                     ^^^^^^^^^^^^^
+977 |         default=None,
+978 |         description=(
+    |
+help: Convert to `X | None`
+    |
+975 |     )
+    -     pending_domain: Optional[str] = Field(
+976 +     pending_domain: str | None = Field(
+977 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:983:34
+    |
+981 |         ),
+982 |     )
+983 |     pending_domain_connected_at: Optional[str] = Field(
+    |                                  ^^^^^^^^^^^^^
+984 |         default=None,
+985 |         description="When the connection was requested, ISO-8601, or `null`.",
+    |
+help: Convert to `X | None`
+    |
+982 |     )
+    -     pending_domain_connected_at: Optional[str] = Field(
+983 +     pending_domain_connected_at: str | None = Field(
+984 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:988:17
+    |
+986 |     )
+987 |     status: SiteTenantStatus = Field(description="Current tenant publication lifecycle.")
+988 |     created_at: Optional[str] = Field(description="Creation timestamp serialised as ISO-8601.")
+    |                 ^^^^^^^^^^^^^
+989 |     updated_at: Optional[str] = Field(description="Last-update timestamp serialised as ISO-8601.")
+    |
+help: Convert to `X | None`
+    |
+987 |     status: SiteTenantStatus = Field(description="Current tenant publication lifecycle.")
+    -     created_at: Optional[str] = Field(description="Creation timestamp serialised as ISO-8601.")
+988 +     created_at: str | None = Field(description="Creation timestamp serialised as ISO-8601.")
+989 |     updated_at: Optional[str] = Field(description="Last-update timestamp serialised as ISO-8601.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/models/site_tenant.py:989:17
+    |
+987 |     status: SiteTenantStatus = Field(description="Current tenant publication lifecycle.")
+988 |     created_at: Optional[str] = Field(description="Creation timestamp serialised as ISO-8601.")
+989 |     updated_at: Optional[str] = Field(description="Last-update timestamp serialised as ISO-8601.")
+    |                 ^^^^^^^^^^^^^
+help: Convert to `X | None`
+    |
+988 |     created_at: Optional[str] = Field(description="Creation timestamp serialised as ISO-8601.")
+    -     updated_at: Optional[str] = Field(description="Last-update timestamp serialised as ISO-8601.")
+989 +     updated_at: str | None = Field(description="Last-update timestamp serialised as ISO-8601.")
+990 |
+    |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1017:13
+     |
+1016 |     status: SiteProvisioningStatus = Field(description="Outcome of this layer.")
+1017 |     detail: Optional[str] = Field(
+     |             ^^^^^^^^^^^^^
+1018 |         default=None, description="Human-readable outcome, or `null`."
+1019 |     )
+     |
+help: Convert to `X | None`
+     |
+1016 |     status: SiteProvisioningStatus = Field(description="Outcome of this layer.")
+     -     detail: Optional[str] = Field(
+1017 +     detail: str | None = Field(
+1018 |         default=None, description="Human-readable outcome, or `null`."
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1020:18
+     |
+1018 |         default=None, description="Human-readable outcome, or `null`."
+1019 |     )
+1020 |     detail_code: Optional[str] = Field(
+     |                  ^^^^^^^^^^^^^
+1021 |         default=None, description="Stable key for the outcome, or `null`."
+1022 |     )
+     |
+help: Convert to `X | None`
+     |
+1019 |     )
+     -     detail_code: Optional[str] = Field(
+1020 +     detail_code: str | None = Field(
+1021 |         default=None, description="Stable key for the outcome, or `null`."
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1023:22
+     |
+1021 |         default=None, description="Stable key for the outcome, or `null`."
+1022 |     )
+1023 |     action_required: Optional[str] = Field(
+     |                      ^^^^^^^^^^^^^
+1024 |         default=None,
+1025 |         description="What a person must do for this layer to finish, or `null`.",
+     |
+help: Convert to `X | None`
+     |
+1022 |     )
+     -     action_required: Optional[str] = Field(
+1023 +     action_required: str | None = Field(
+1024 |         default=None,
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1027:18
+     |
+1025 |         description="What a person must do for this layer to finish, or `null`.",
+1026 |     )
+1027 |     action_code: Optional[str] = Field(
+     |                  ^^^^^^^^^^^^^
+1028 |         default=None, description="Stable key for that action, or `null`."
+1029 |     )
+     |
+help: Convert to `X | None`
+     |
+1026 |     )
+     -     action_code: Optional[str] = Field(
+1027 +     action_code: str | None = Field(
+1028 |         default=None, description="Stable key for that action, or `null`."
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1030:17
+     |
+1028 |         default=None, description="Stable key for that action, or `null`."
+1029 |     )
+1030 |     started_at: Optional[str] = Field(
+     |                 ^^^^^^^^^^^^^
+1031 |         default=None, description="Start timestamp as ISO-8601, or `null`."
+1032 |     )
+     |
+help: Convert to `X | None`
+     |
+1029 |     )
+     -     started_at: Optional[str] = Field(
+1030 +     started_at: str | None = Field(
+1031 |         default=None, description="Start timestamp as ISO-8601, or `null`."
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1033:19
+     |
+1031 |         default=None, description="Start timestamp as ISO-8601, or `null`."
+1032 |     )
+1033 |     completed_at: Optional[str] = Field(
+     |                   ^^^^^^^^^^^^^
+1034 |         default=None, description="Finish timestamp as ISO-8601, or `null`."
+1035 |     )
+     |
+help: Convert to `X | None`
+     |
+1032 |     )
+     -     completed_at: Optional[str] = Field(
+1033 +     completed_at: str | None = Field(
+1034 |         default=None, description="Finish timestamp as ISO-8601, or `null`."
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1067:18
+     |
+1065 |         description="Whether a provisioning run currently holds this site."
+1066 |     )
+1067 |     target_host: Optional[str] = Field(
+     |                  ^^^^^^^^^^^^^
+1068 |         default=None,
+1069 |         description=(
+     |
+help: Convert to `X | None`
+     |
+1066 |     )
+     -     target_host: Optional[str] = Field(
+1067 +     target_host: str | None = Field(
+1068 |         default=None,
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1084:17
+     |
+1082 |         ),
+1083 |     )
+1084 |     updated_at: Optional[str] = Field(
+     |                 ^^^^^^^^^^^^^
+1085 |         default=None,
+1086 |         description="Last time any layer changed, as ISO-8601, or `null`.",
+     |
+help: Convert to `X | None`
+     |
+1083 |     )
+     -     updated_at: Optional[str] = Field(
+1084 +     updated_at: str | None = Field(
+1085 |         default=None,
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/models/site_tenant.py:1093:16
+     |
+1091 |         cls,
+1092 |         tenant: "SiteTenant",
+1093 |         state: Optional[SiteProvisioningState],
+     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1094 |         *,
+1095 |         isoformat,
+     |
+help: Convert to `X | None`
+     |
+1092 |         tenant: "SiteTenant",
+     -         state: Optional[SiteProvisioningState],
+1093 +         state: SiteProvisioningState | None,
+1094 |         *,
+     |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> app/services/site_tenant_service.py:43:1
+   |
+41 |   """
+42 |
+43 | / import logging
+44 | | import math
+45 | | import re
+46 | | from dataclasses import dataclass
+47 | | from typing import TYPE_CHECKING, Annotated, Any, Optional
+48 | |
+49 | | from pydantic import (
+50 | |     BaseModel,
+51 | |     ConfigDict,
+52 | |     Field,
+53 | |     WithJsonSchema,
+54 | |     field_validator,
+55 | |     model_validator,
+56 | | )
+57 | |
+58 | | from app.core.exceptions import (
+59 | |     SiteBrandLockupInvalidError,
+60 | |     SiteContentParityError,
+61 | |     SiteContentProviderLeakError,
+62 | |     SiteHomeTemplateInvalidError,
+63 | |     SiteHostAlreadyClaimedError,
+64 | |     SiteSlugReservedError,
+65 | |     SiteCustomDomainAlreadySetError,
+66 | |     SiteCustomDomainInvalidError,
+67 | |     SiteCustomDomainPendingError,
+68 | |     SiteHostReservedError,
+69 | |     SiteNotFoundError,
+70 | |     SitePlatformLabelInvalidError,
+71 | |     SiteProvisioningInProgressError,
+72 | |     SitePublishActionRequiredError,
+73 | |     SiteSlugAlreadyExistsError,
+74 | |     SiteThemeContrastBelowAAError,
+75 | | )
+76 | | from app.models.site_tenant import (
+77 | |     CLAIM_STALE_AFTER_SECONDS,
+78 | |     DisplayFont,
+79 | |     HomeTemplate,
+80 | |     Region,
+81 | |     SiteBrandAssets,
+82 | |     SiteDestinations,
+83 | |     SiteTenant,
+84 | |     SiteTenantPublic,
+85 | |     SiteTenantStatus,
+86 | |     SiteTheme,
+87 | |     normalize_host,
+88 | | )
+89 | | from app.utils.config_provider import ConfigProvider
+90 | | from app.utils.date_helpers import utc_now
+91 | | from app.utils.domain_names import derive_apex
+92 | | from app.utils.platform_host import (
+93 | |     PANEL_ROUTE_SLUG_PREFIX,
+94 | |     is_under_platform_apex,
+95 | |     platform_host_for,
+96 | |     platform_label_of,
+97 | | )
+   | |_^
+98 |
+99 |   if TYPE_CHECKING:
+   |
+help: Organize imports
+   |
+61 |     SiteContentProviderLeakError,
+   -     SiteHomeTemplateInvalidError,
+   -     SiteHostAlreadyClaimedError,
+   -     SiteSlugReservedError,
+62 |     SiteCustomDomainAlreadySetError,
+63 |     SiteCustomDomainInvalidError,
+64 |     SiteCustomDomainPendingError,
+65 +     SiteHomeTemplateInvalidError,
+66 +     SiteHostAlreadyClaimedError,
+67 |     SiteHostReservedError,
+--------------------------------------------------------------------------------
+72 |     SiteSlugAlreadyExistsError,
+73 +     SiteSlugReservedError,
+74 |     SiteThemeContrastBelowAAError,
+   |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:254:26
+    |
+253 |     @property
+254 |     def failure(self) -> Optional[tuple[str, float, float]]:
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+255 |         """The first failing ``(pair, measured ratio, required threshold)``.
+    |
+help: Convert to `X | None`
+    |
+253 |     @property
+    -     def failure(self) -> Optional[tuple[str, float, float]]:
+254 +     def failure(self) -> tuple[str, float, float] | None:
+255 |         """The first failing ``(pair, measured ratio, required threshold)``.
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:448:53
+    |
+448 | def assert_theme_legible(theme: SiteTheme, *, slug: Optional[str] = None) -> SiteThemeContrast:
+    |                                                     ^^^^^^^^^^^^^
+449 |     """Refuse a theme that would leave the site unreadable.
+    |
+help: Convert to `X | None`
+    |
+447 |
+    - def assert_theme_legible(theme: SiteTheme, *, slug: Optional[str] = None) -> SiteThemeContrast:
+448 + def assert_theme_legible(theme: SiteTheme, *, slug: str | None = None) -> SiteThemeContrast:
+449 |     """Refuse a theme that would leave the site unreadable.
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:583:17
+    |
+581 |     )
+582 |     brand_name: str = Field(..., max_length=120, description="What the site calls itself.")
+583 |     brand_mark: Optional[str] = Field(
+    |                 ^^^^^^^^^^^^^
+584 |         default=None,
+585 |         min_length=1,
+    |
+help: Convert to `X | None`
+    |
+582 |     brand_name: str = Field(..., max_length=120, description="What the site calls itself.")
+    -     brand_mark: Optional[str] = Field(
+583 +     brand_mark: str | None = Field(
+584 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:589:21
+    |
+587 |         description="Compact 1-3 character logo symbol. Requires brand_wordmark when published.",
+588 |     )
+589 |     brand_wordmark: Optional[str] = Field(
+    |                     ^^^^^^^^^^^^^
+590 |         default=None,
+591 |         min_length=1,
+    |
+help: Convert to `X | None`
+    |
+588 |     )
+    -     brand_wordmark: Optional[str] = Field(
+589 +     brand_wordmark: str | None = Field(
+590 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:596:13
+    |
+594 |     )
+595 |
+596 |     domain: Optional[str] = Field(
+    |             ^^^^^^^^^^^^^
+597 |         default=None,
+598 |         description=(
+    |
+help: Convert to `X | None`
+    |
+595 |
+    -     domain: Optional[str] = Field(
+596 +     domain: str | None = Field(
+597 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:606:20
+    |
+604 |         ),
+605 |     )
+606 |     custom_domain: Optional[str] = Field(
+    |                    ^^^^^^^^^^^^^
+607 |         default=None,
+608 |         max_length=253,
+    |
+help: Convert to `X | None`
+    |
+605 |     )
+    -     custom_domain: Optional[str] = Field(
+606 +     custom_domain: str | None = Field(
+607 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:646:19
+    |
+644 |         description="Outbound links the chrome may offer. Every one of them is optional.",
+645 |     )
+646 |     brand_assets: Optional[SiteBrandAssets] = Field(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+647 |         default=None,
+648 |         description=(
+    |
+help: Convert to `X | None`
+    |
+645 |     )
+    -     brand_assets: Optional[SiteBrandAssets] = Field(
+646 +     brand_assets: SiteBrandAssets | None = Field(
+647 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:670:39
+    |
+668 |     @field_validator("brand_name", "brand_mark", "brand_wordmark", mode="before")
+669 |     @classmethod
+670 |     def _model_brand_text(cls, value: Optional[str], info) -> Optional[str]:
+    |                                       ^^^^^^^^^^^^^
+671 |         return SiteTenant._brand_text_is_plain(value, info)
+    |
+help: Convert to `X | None`
+    |
+669 |     @classmethod
+    -     def _model_brand_text(cls, value: Optional[str], info) -> Optional[str]:
+670 +     def _model_brand_text(cls, value: str | None, info) -> Optional[str]:
+671 |         return SiteTenant._brand_text_is_plain(value, info)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:670:63
+    |
+668 |     @field_validator("brand_name", "brand_mark", "brand_wordmark", mode="before")
+669 |     @classmethod
+670 |     def _model_brand_text(cls, value: Optional[str], info) -> Optional[str]:
+    |                                                               ^^^^^^^^^^^^^
+671 |         return SiteTenant._brand_text_is_plain(value, info)
+    |
+help: Convert to `X | None`
+    |
+669 |     @classmethod
+    -     def _model_brand_text(cls, value: Optional[str], info) -> Optional[str]:
+670 +     def _model_brand_text(cls, value: Optional[str], info) -> str | None:
+671 |         return SiteTenant._brand_text_is_plain(value, info)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:675:42
+    |
+673 |     @field_validator("domain", "custom_domain")
+674 |     @classmethod
+675 |     def _model_domain_format(cls, value: Optional[str]) -> Optional[str]:
+    |                                          ^^^^^^^^^^^^^
+676 |         # The embedded `theme` and `destinations` above are the MODEL's own
+677 |         # types, so their formats are already checked as the body is parsed.
+    |
+help: Convert to `X | None`
+    |
+674 |     @classmethod
+    -     def _model_domain_format(cls, value: Optional[str]) -> Optional[str]:
+675 +     def _model_domain_format(cls, value: str | None) -> Optional[str]:
+676 |         # The embedded `theme` and `destinations` above are the MODEL's own
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:675:60
+    |
+673 |     @field_validator("domain", "custom_domain")
+674 |     @classmethod
+675 |     def _model_domain_format(cls, value: Optional[str]) -> Optional[str]:
+    |                                                            ^^^^^^^^^^^^^
+676 |         # The embedded `theme` and `destinations` above are the MODEL's own
+677 |         # types, so their formats are already checked as the body is parsed.
+    |
+help: Convert to `X | None`
+    |
+674 |     @classmethod
+    -     def _model_domain_format(cls, value: Optional[str]) -> Optional[str]:
+675 +     def _model_domain_format(cls, value: Optional[str]) -> str | None:
+676 |         # The embedded `theme` and `destinations` above are the MODEL's own
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:776:13
+    |
+774 |     model_config = ConfigDict(extra="forbid")
+775 |
+776 |     accent: Optional[str] = Field(default=None, description="Brand accent, `#rrggbb`.")
+    |             ^^^^^^^^^^^^^
+777 |     accent_contrast: Optional[str] = Field(default=None, description="Ink drawn ON the accent, `#rrggbb`.")
+778 |     display_font: Optional[DisplayFont] = Field(default=None, description="Display typeface, from the closed set.")
+    |
+help: Convert to `X | None`
+    |
+775 |
+    -     accent: Optional[str] = Field(default=None, description="Brand accent, `#rrggbb`.")
+776 +     accent: str | None = Field(default=None, description="Brand accent, `#rrggbb`.")
+777 |     accent_contrast: Optional[str] = Field(default=None, description="Ink drawn ON the accent, `#rrggbb`.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:777:22
+    |
+776 |     accent: Optional[str] = Field(default=None, description="Brand accent, `#rrggbb`.")
+777 |     accent_contrast: Optional[str] = Field(default=None, description="Ink drawn ON the accent, `#rrggbb`.")
+    |                      ^^^^^^^^^^^^^
+778 |     display_font: Optional[DisplayFont] = Field(default=None, description="Display typeface, from the closed set.")
+    |
+help: Convert to `X | None`
+    |
+776 |     accent: Optional[str] = Field(default=None, description="Brand accent, `#rrggbb`.")
+    -     accent_contrast: Optional[str] = Field(default=None, description="Ink drawn ON the accent, `#rrggbb`.")
+777 +     accent_contrast: str | None = Field(default=None, description="Ink drawn ON the accent, `#rrggbb`.")
+778 |     display_font: Optional[DisplayFont] = Field(default=None, description="Display typeface, from the closed set.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:778:19
+    |
+776 |     accent: Optional[str] = Field(default=None, description="Brand accent, `#rrggbb`.")
+777 |     accent_contrast: Optional[str] = Field(default=None, description="Ink drawn ON the accent, `#rrggbb`.")
+778 |     display_font: Optional[DisplayFont] = Field(default=None, description="Display typeface, from the closed set.")
+    |                   ^^^^^^^^^^^^^^^^^^^^^
+779 |
+780 |     @field_validator("*", mode="before")
+    |
+help: Convert to `X | None`
+    |
+777 |     accent_contrast: Optional[str] = Field(default=None, description="Ink drawn ON the accent, `#rrggbb`.")
+    -     display_font: Optional[DisplayFont] = Field(default=None, description="Display typeface, from the closed set.")
+778 +     display_font: DisplayFont | None = Field(default=None, description="Display typeface, from the closed set.")
+779 |
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:813:11
+    |
+811 |     model_config = ConfigDict(extra="forbid")
+812 |
+813 |     docs: Optional[str] = Field(default=None, description="Developer documentation. Explicit null removes the link.")
+    |           ^^^^^^^^^^^^^
+814 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens. Explicit null removes it.")
+815 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes. Explicit null removes it.")
+    |
+help: Convert to `X | None`
+    |
+812 |
+    -     docs: Optional[str] = Field(default=None, description="Developer documentation. Explicit null removes the link.")
+813 +     docs: str | None = Field(default=None, description="Developer documentation. Explicit null removes the link.")
+814 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens. Explicit null removes it.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:814:10
+    |
+813 |     docs: Optional[str] = Field(default=None, description="Developer documentation. Explicit null removes the link.")
+814 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens. Explicit null removes it.")
+    |          ^^^^^^^^^^^^^
+815 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes. Explicit null removes it.")
+816 |     status: Optional[str] = Field(default=None, description="Status page. Explicit null removes it.")
+    |
+help: Convert to `X | None`
+    |
+813 |     docs: Optional[str] = Field(default=None, description="Developer documentation. Explicit null removes the link.")
+    -     app: Optional[str] = Field(default=None, description="The product the header CTA opens. Explicit null removes it.")
+814 +     app: str | None = Field(default=None, description="The product the header CTA opens. Explicit null removes it.")
+815 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes. Explicit null removes it.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:815:14
+    |
+813 |     docs: Optional[str] = Field(default=None, description="Developer documentation. Explicit null removes the link.")
+814 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens. Explicit null removes it.")
+815 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes. Explicit null removes it.")
+    |              ^^^^^^^^^^^^^
+816 |     status: Optional[str] = Field(default=None, description="Status page. Explicit null removes it.")
+    |
+help: Convert to `X | None`
+    |
+814 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens. Explicit null removes it.")
+    -     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes. Explicit null removes it.")
+815 +     support: str | None = Field(default=None, description="Where 'talk to us' goes. Explicit null removes it.")
+816 |     status: Optional[str] = Field(default=None, description="Status page. Explicit null removes it.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:816:13
+    |
+814 |     app: Optional[str] = Field(default=None, description="The product the header CTA opens. Explicit null removes it.")
+815 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes. Explicit null removes it.")
+816 |     status: Optional[str] = Field(default=None, description="Status page. Explicit null removes it.")
+    |             ^^^^^^^^^^^^^
+817 |
+818 |     @field_validator("docs", "app", "support", "status")
+    |
+help: Convert to `X | None`
+    |
+815 |     support: Optional[str] = Field(default=None, description="Where 'talk to us' goes. Explicit null removes it.")
+    -     status: Optional[str] = Field(default=None, description="Status page. Explicit null removes it.")
+816 +     status: str | None = Field(default=None, description="Status page. Explicit null removes it.")
+817 |
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:820:41
+    |
+818 |     @field_validator("docs", "app", "support", "status")
+819 |     @classmethod
+820 |     def _model_https_format(cls, value: Optional[str]) -> Optional[str]:
+    |                                         ^^^^^^^^^^^^^
+821 |         # `SiteDestinations._https_only` — the same delegation, and the same
+822 |         # reason: this value ends up in an `href`, and Astro does not look at a
+    |
+help: Convert to `X | None`
+    |
+819 |     @classmethod
+    -     def _model_https_format(cls, value: Optional[str]) -> Optional[str]:
+820 +     def _model_https_format(cls, value: str | None) -> Optional[str]:
+821 |         # `SiteDestinations._https_only` — the same delegation, and the same
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:820:59
+    |
+818 |     @field_validator("docs", "app", "support", "status")
+819 |     @classmethod
+820 |     def _model_https_format(cls, value: Optional[str]) -> Optional[str]:
+    |                                                           ^^^^^^^^^^^^^
+821 |         # `SiteDestinations._https_only` — the same delegation, and the same
+822 |         # reason: this value ends up in an `href`, and Astro does not look at a
+    |
+help: Convert to `X | None`
+    |
+819 |     @classmethod
+    -     def _model_https_format(cls, value: Optional[str]) -> Optional[str]:
+820 +     def _model_https_format(cls, value: Optional[str]) -> str | None:
+821 |         # `SiteDestinations._https_only` — the same delegation, and the same
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:839:11
+    |
+837 |     model_config = ConfigDict(extra="forbid")
+838 |
+839 |     icon: Optional[str] = Field(
+    |           ^^^^^^^^^^^^^
+840 |         default=None,
+841 |         max_length=2048,
+    |
+help: Convert to `X | None`
+    |
+838 |
+    -     icon: Optional[str] = Field(
+839 +     icon: str | None = Field(
+840 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:844:19
+    |
+842 |         description="Root-relative tab icon. Explicit null removes this declared asset.",
+843 |     )
+844 |     social_image: Optional[str] = Field(
+    |                   ^^^^^^^^^^^^^
+845 |         default=None,
+846 |         max_length=2048,
+    |
+help: Convert to `X | None`
+    |
+843 |     )
+    -     social_image: Optional[str] = Field(
+844 +     social_image: str | None = Field(
+845 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:852:43
+    |
+850 |     @field_validator("icon", "social_image")
+851 |     @classmethod
+852 |     def _model_published_path(cls, value: Optional[str]) -> Optional[str]:
+    |                                           ^^^^^^^^^^^^^
+853 |         return SiteBrandAssets._published_path(value)
+    |
+help: Convert to `X | None`
+    |
+851 |     @classmethod
+    -     def _model_published_path(cls, value: Optional[str]) -> Optional[str]:
+852 +     def _model_published_path(cls, value: str | None) -> Optional[str]:
+853 |         return SiteBrandAssets._published_path(value)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:852:61
+    |
+850 |     @field_validator("icon", "social_image")
+851 |     @classmethod
+852 |     def _model_published_path(cls, value: Optional[str]) -> Optional[str]:
+    |                                                             ^^^^^^^^^^^^^
+853 |         return SiteBrandAssets._published_path(value)
+    |
+help: Convert to `X | None`
+    |
+851 |     @classmethod
+    -     def _model_published_path(cls, value: Optional[str]) -> Optional[str]:
+852 +     def _model_published_path(cls, value: Optional[str]) -> str | None:
+853 |         return SiteBrandAssets._published_path(value)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:873:17
+    |
+871 |     model_config = ConfigDict(extra="forbid")
+872 |
+873 |     brand_name: Optional[str] = Field(default=None, max_length=120, description="What the site calls itself.")
+    |                 ^^^^^^^^^^^^^
+874 |     brand_mark: Optional[str] = Field(
+875 |         default=None,
+    |
+help: Convert to `X | None`
+    |
+872 |
+    -     brand_name: Optional[str] = Field(default=None, max_length=120, description="What the site calls itself.")
+873 +     brand_name: str | None = Field(default=None, max_length=120, description="What the site calls itself.")
+874 |     brand_mark: Optional[str] = Field(
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:874:17
+    |
+873 |     brand_name: Optional[str] = Field(default=None, max_length=120, description="What the site calls itself.")
+874 |     brand_mark: Optional[str] = Field(
+    |                 ^^^^^^^^^^^^^
+875 |         default=None,
+876 |         min_length=1,
+    |
+help: Convert to `X | None`
+    |
+873 |     brand_name: Optional[str] = Field(default=None, max_length=120, description="What the site calls itself.")
+    -     brand_mark: Optional[str] = Field(
+874 +     brand_mark: str | None = Field(
+875 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:880:21
+    |
+878 |         description="Compact logo symbol. Explicit null removes the symbol.",
+879 |     )
+880 |     brand_wordmark: Optional[str] = Field(
+    |                     ^^^^^^^^^^^^^
+881 |         default=None,
+882 |         min_length=1,
+    |
+help: Convert to `X | None`
+    |
+879 |     )
+    -     brand_wordmark: Optional[str] = Field(
+880 +     brand_wordmark: str | None = Field(
+881 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:887:13
+    |
+885 |     )
+886 |
+887 |     domain: Optional[str] = Field(default=None, description="Primary domain. Normalised before it is stored.")
+    |             ^^^^^^^^^^^^^
+888 |     host_aliases: Optional[list[str]] = Field(
+889 |         default=None,
+    |
+help: Convert to `X | None`
+    |
+886 |
+    -     domain: Optional[str] = Field(default=None, description="Primary domain. Normalised before it is stored.")
+887 +     domain: str | None = Field(default=None, description="Primary domain. Normalised before it is stored.")
+888 |     host_aliases: Optional[list[str]] = Field(
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:888:19
+    |
+887 |     domain: Optional[str] = Field(default=None, description="Primary domain. Normalised before it is stored.")
+888 |     host_aliases: Optional[list[str]] = Field(
+    |                   ^^^^^^^^^^^^^^^^^^^
+889 |         default=None,
+890 |         description="Replaces the whole alias list. Send [] to drop every alias.",
+    |
+help: Convert to `X | None`
+    |
+887 |     domain: Optional[str] = Field(default=None, description="Primary domain. Normalised before it is stored.")
+    -     host_aliases: Optional[list[str]] = Field(
+888 +     host_aliases: list[str] | None = Field(
+889 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:893:14
+    |
+891 |     )
+892 |
+893 |     locales: Optional[list[str]] = Field(default=None, description="Replaces the whole locale list.")
+    |              ^^^^^^^^^^^^^^^^^^^
+894 |     default_locale: Optional[str] = Field(default=None, description="Must be one of the resulting `locales`.")
+895 |     region: Region = Field(
+    |
+help: Convert to `X | None`
+    |
+892 |
+    -     locales: Optional[list[str]] = Field(default=None, description="Replaces the whole locale list.")
+893 +     locales: list[str] | None = Field(default=None, description="Replaces the whole locale list.")
+894 |     default_locale: Optional[str] = Field(default=None, description="Must be one of the resulting `locales`.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:894:21
+    |
+893 |     locales: Optional[list[str]] = Field(default=None, description="Replaces the whole locale list.")
+894 |     default_locale: Optional[str] = Field(default=None, description="Must be one of the resulting `locales`.")
+    |                     ^^^^^^^^^^^^^
+895 |     region: Region = Field(
+896 |         default=None,
+    |
+help: Convert to `X | None`
+    |
+893 |     locales: Optional[list[str]] = Field(default=None, description="Replaces the whole locale list.")
+    -     default_locale: Optional[str] = Field(default=None, description="Must be one of the resulting `locales`.")
+894 +     default_locale: str | None = Field(default=None, description="Must be one of the resulting `locales`.")
+895 |     region: Region = Field(
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:900:12
+    |
+898 |     )
+899 |
+900 |     theme: Optional[SiteThemePatch] = Field(default=None, description="Partial theme; omitted parts keep their value.")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+901 |     home_template: Optional[_HomeTemplateInput] = Field(
+902 |         default=None,
+    |
+help: Convert to `X | None`
+    |
+899 |
+    -     theme: Optional[SiteThemePatch] = Field(default=None, description="Partial theme; omitted parts keep their value.")
+900 +     theme: SiteThemePatch | None = Field(default=None, description="Partial theme; omitted parts keep their value.")
+901 |     home_template: Optional[_HomeTemplateInput] = Field(
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:901:20
+    |
+900 |     theme: Optional[SiteThemePatch] = Field(default=None, description="Partial theme; omitted parts keep their value.")
+901 |     home_template: Optional[_HomeTemplateInput] = Field(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+902 |         default=None,
+903 |         description="Home composition from the closed catalogue.",
+    |
+help: Convert to `X | None`
+    |
+900 |     theme: Optional[SiteThemePatch] = Field(default=None, description="Partial theme; omitted parts keep their value.")
+    -     home_template: Optional[_HomeTemplateInput] = Field(
+901 +     home_template: _HomeTemplateInput | None = Field(
+902 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:905:19
+    |
+903 |         description="Home composition from the closed catalogue.",
+904 |     )
+905 |     destinations: Optional[SiteDestinationsPatch] = Field(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+906 |         default=None,
+907 |         description="Partial destinations; an explicit null on a leaf removes that link.",
+    |
+help: Convert to `X | None`
+    |
+904 |     )
+    -     destinations: Optional[SiteDestinationsPatch] = Field(
+905 +     destinations: SiteDestinationsPatch | None = Field(
+906 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:909:19
+    |
+907 |         description="Partial destinations; an explicit null on a leaf removes that link.",
+908 |     )
+909 |     brand_assets: Optional[SiteBrandAssetsPatch] = Field(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+910 |         default=None,
+911 |         description=(
+    |
+help: Convert to `X | None`
+    |
+908 |     )
+    -     brand_assets: Optional[SiteBrandAssetsPatch] = Field(
+909 +     brand_assets: SiteBrandAssetsPatch | None = Field(
+910 |         default=None,
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:917:12
+    |
+915 |     )
+916 |
+917 |     pages: Optional[list[str]] = Field(default=None, description="Replaces the whole route list.")
+    |            ^^^^^^^^^^^^^^^^^^^
+918 |
+919 |     domain_is_final: Optional[bool] = Field(default=None, description="Flips indexability.")
+    |
+help: Convert to `X | None`
+    |
+916 |
+    -     pages: Optional[list[str]] = Field(default=None, description="Replaces the whole route list.")
+917 +     pages: list[str] | None = Field(default=None, description="Replaces the whole route list.")
+918 |
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:919:22
+    |
+917 |     pages: Optional[list[str]] = Field(default=None, description="Replaces the whole route list.")
+918 |
+919 |     domain_is_final: Optional[bool] = Field(default=None, description="Flips indexability.")
+    |                      ^^^^^^^^^^^^^^
+920 |     status: Optional[SiteTenantStatus] = Field(default=None, description="Lifecycle transition.")
+    |
+help: Convert to `X | None`
+    |
+918 |
+    -     domain_is_final: Optional[bool] = Field(default=None, description="Flips indexability.")
+919 +     domain_is_final: bool | None = Field(default=None, description="Flips indexability.")
+920 |     status: Optional[SiteTenantStatus] = Field(default=None, description="Lifecycle transition.")
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:920:13
+    |
+919 |     domain_is_final: Optional[bool] = Field(default=None, description="Flips indexability.")
+920 |     status: Optional[SiteTenantStatus] = Field(default=None, description="Lifecycle transition.")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+921 |
+922 |     @field_validator(
+    |
+help: Convert to `X | None`
+    |
+919 |     domain_is_final: Optional[bool] = Field(default=None, description="Flips indexability.")
+    -     status: Optional[SiteTenantStatus] = Field(default=None, description="Lifecycle transition.")
+920 +     status: SiteTenantStatus | None = Field(default=None, description="Lifecycle transition.")
+921 |
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:950:39
+    |
+948 |     @field_validator("brand_name", "brand_mark", "brand_wordmark", mode="before")
+949 |     @classmethod
+950 |     def _model_brand_text(cls, value: Optional[str], info) -> Optional[str]:
+    |                                       ^^^^^^^^^^^^^
+951 |         return SiteTenant._brand_text_is_plain(value, info)
+    |
+help: Convert to `X | None`
+    |
+949 |     @classmethod
+    -     def _model_brand_text(cls, value: Optional[str], info) -> Optional[str]:
+950 +     def _model_brand_text(cls, value: str | None, info) -> Optional[str]:
+951 |         return SiteTenant._brand_text_is_plain(value, info)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+   --> app/services/site_tenant_service.py:950:63
+    |
+948 |     @field_validator("brand_name", "brand_mark", "brand_wordmark", mode="before")
+949 |     @classmethod
+950 |     def _model_brand_text(cls, value: Optional[str], info) -> Optional[str]:
+    |                                                               ^^^^^^^^^^^^^
+951 |         return SiteTenant._brand_text_is_plain(value, info)
+    |
+help: Convert to `X | None`
+    |
+949 |     @classmethod
+    -     def _model_brand_text(cls, value: Optional[str], info) -> Optional[str]:
+950 +     def _model_brand_text(cls, value: Optional[str], info) -> str | None:
+951 |         return SiteTenant._brand_text_is_plain(value, info)
+    |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/services/site_tenant_service.py:1167:25
+     |
+1165 |           keeps the seed script and every existing caller working unchanged.
+1166 |         """
+1167 |         pending_domain: Optional[str] = None
+     |                         ^^^^^^^^^^^^^
+1168 |         if payload.domain is not None:
+1169 |             requested_domain = payload.domain
+     |
+help: Convert to `X | None`
+     |
+1166 |         """
+     -         pending_domain: Optional[str] = None
+1167 +         pending_domain: str | None = None
+1168 |         if payload.domain is not None:
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/services/site_tenant_service.py:1333:48
+     |
+1332 |     @staticmethod
+1333 |     def _canonical_hosts(domain: str, aliases: Optional[list[str]]) -> tuple[str, list[str]]:
+     |                                                ^^^^^^^^^^^^^^^^^^^
+1334 |         """Normalise the host set and collapse it to distinct values.
+     |
+help: Convert to `X | None`
+     |
+1332 |     @staticmethod
+     -     def _canonical_hosts(domain: str, aliases: Optional[list[str]]) -> tuple[str, list[str]]:
+1333 +     def _canonical_hosts(domain: str, aliases: list[str] | None) -> tuple[str, list[str]]:
+1334 |         """Normalise the host set and collapse it to distinct values.
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/services/site_tenant_service.py:1384:70
+     |
+1383 |     async def _assert_hosts_free(
+1384 |         self, domain: str, host_aliases: list[str], *, exclude_slug: Optional[str]
+     |                                                                      ^^^^^^^^^^^^^
+1385 |     ) -> None:
+1386 |         """Refuse a write that would make two tenants answer for one host.
+     |
+help: Convert to `X | None`
+     |
+1383 |     async def _assert_hosts_free(
+     -         self, domain: str, host_aliases: list[str], *, exclude_slug: Optional[str]
+1384 +         self, domain: str, host_aliases: list[str], *, exclude_slug: str | None
+1385 |     ) -> None:
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/services/site_tenant_service.py:1442:48
+     |
+1440 |         return platform_site_settings()
+1441 |
+1442 |     def _platform_host_for(self, slug: str) -> Optional[str]:
+     |                                                ^^^^^^^^^^^^^
+1443 |         """This site's platform address, or ``None`` when it cannot have one."""
+1444 |         platform = self._platform_settings()
+     |
+help: Convert to `X | None`
+     |
+1441 |
+     -     def _platform_host_for(self, slug: str) -> Optional[str]:
+1442 +     def _platform_host_for(self, slug: str) -> str | None:
+1443 |         """This site's platform address, or ``None`` when it cannot have one."""
+     |
+
+UP045 [*] Use `X | None` for type annotations
+    --> app/services/site_tenant_service.py:1537:48
+     |
+1535 |         return updated
+1536 |
+1537 |     def _explain_failed_connect(self, current: Optional[SiteTenant], slug: str) -> None:
+     |                                                ^^^^^^^^^^^^^^^^^^^^
+1538 |         """Say WHICH clause of the connect filter did not match. Always raises."""
+1539 |         if current is None:
+     |
+help: Convert to `X | None`
+     |
+1536 |
+     -     def _explain_failed_connect(self, current: Optional[SiteTenant], slug: str) -> None:
+1537 +     def _explain_failed_connect(self, current: SiteTenant | None, slug: str) -> None:
+1538 |         """Say WHICH clause of the connect filter did not match. Always raises."""
+     |
+
+ISC004 Unparenthesized implicit string concatenation in collection
+   --> tests/unit/scripts/test_medipago_fixture.py:168:17
+    |
+166 |               ),
+167 |               (
+168 | /                 "a foreign health-privacy regulation — it does not apply in Guatemala "
+169 | |                 "and naming it would be a false promise",
+    | |________________________________________________________^
+170 |                   r"\bHIPAA\b|\bGDPR\b|\bRGPD\b|\bHITECH\b",
+171 |               ),
+    |
+help: Did you forget a comma?
+help: Wrap implicitly concatenated strings in parentheses
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/unit/services/test_site_tenant_refinement.py:3:1
+   |
+ 1 |   """R1 contract: explicit lockups, home strategies and one colour-ramp truth."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import json
+ 6 | | from dataclasses import asdict
+ 7 | | from pathlib import Path
+ 8 | |
+ 9 | | import pytest
+10 | | from pydantic import ValidationError
+11 | |
+12 | | from app.core.exceptions import (
+13 | |     SiteBrandLockupInvalidError,
+14 | |     SiteContentParityError,
+15 | |     SiteContentProviderLeakError,
+16 | |     SiteNotFoundError,
+17 | |     SitePublishActionRequiredError,
+18 | | )
+19 | | from app.models.site_tenant import (
+20 | |     DisplayFont,
+21 | |     HomeTemplate,
+22 | |     SiteTenant,
+23 | |     SiteTenantPublic,
+24 | |     SiteTenantStatus,
+25 | |     SiteTheme,
+26 | |     _is_published_path,
+27 | |     _validate_https_url,
+28 | |     normalize_host,
+29 | | )
+30 | | from app.services.site_tenant_service import (
+31 | |     ACCENT_SURFACE_MIN_RATIO,
+32 | |     BRIGHT_ACCENT_WEIGHT,
+33 | |     BRIGHT_FOOTER_MIN_RATIO,
+34 | |     FOOTER_INK_ON_BRIGHT_MIN_RATIO,
+35 | |     HOVER_ACCENT_WEIGHT,
+36 | |     ON_ACCENT_MIN_RATIO,
+37 | |     SITE_FOOTER_INK,
+38 | |     SITE_FOOTER_SURFACE,
+39 | |     SITE_PAGE_SURFACES,
+40 | |     SOFT_ACCENT_WEIGHT,
+41 | |     SiteTenantCreateRequest,
+42 | |     SiteTenantPatchRequest,
+43 | |     SiteTenantService,
+44 | |     SiteThemeContrast,
+45 | |     SiteThemePatch,
+46 | |     _contrast_refusal_message,
+47 | |     assert_no_provider_leak,
+48 | |     assert_tenant_publishable,
+49 | |     derive_theme_ramp,
+50 | |     measure_theme_contrast,
+51 | |     mix_hex_color,
+52 | | )
+53 | | from tests.support.site_tenants import (
+54 | |     LEGIBLE_ACCENT,
+55 | |     LEGIBLE_INK,
+56 | |     InMemorySiteTenantRepository,
+57 | |     install_document_settings,
+58 | |     make_site_tenant,
+59 | | )
+60 | | from tests.support.site_tenants import PanelApps
+   | |________________________________________________^
+61 |
+62 |   pytestmark = pytest.mark.unit
+   |
+help: Organize imports
+   |
+56 |     InMemorySiteTenantRepository,
+57 +     PanelApps,
+58 |     install_document_settings,
+59 |     make_site_tenant,
+60 | )
+   - from tests.support.site_tenants import PanelApps
+61 |
+   |
+
+Found 121 errors.
+[*] 117 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).

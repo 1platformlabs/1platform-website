@@ -267,6 +267,7 @@ function publishedContentRouteOf(pathname: string, tenant: SiteTenant): string |
 export const HOME_RENDER_ROUTES = {
   'platform-commerce': null,
   'service-lead': '/render/service-lead/',
+  'photographic-service': '/render/photographic-service/',
 } as const satisfies Record<HomeTemplate, string | null>
 
 export function physicalRouteOf(pathname: string, tenant: SiteTenant): string {

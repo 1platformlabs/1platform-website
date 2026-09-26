@@ -1,0 +1,694 @@
+---
+import { Image } from 'astro:assets';
+import { useI18n, type Locale } from '@i18n';
+import consultorio from '@assets/photographic/consultorio-hero.webp';
+import commerce from '@assets/product/showcase-store-bg.webp';
+import { photographicContent, safeJson } from '@lib/photographic-content';
+import { calculateLandingAmount } from '@lib/landing-calculator';
+import { siteOrigin } from '@lib/site-origin';
+import { alternatesForTenantPath, defaultLocaleOf, makeLocalizePath, ogLocaleOf } from '@lib/site-locale';
+import { resolveIcon, resolveSocial, resolveAppleTouchIcon, socialImageIsAvailable, appleTouchIconIsAvailable } from '@lib/tenant-brand-assets';
+import '@styles/photographic-service.css';
+import '@styles/photographic-panel.css';
+
+const tenant = Astro.locals.tenant;
+const { copy, contactHref, navigation, steps, audiences, faqs, calculator, panel, brandStyle, clientConfig, fontKey, palette } = photographicContent(Astro.locals.messages, tenant);
+const photographs = { consultorio, commerce };
+const photoKey = copy('hero.image');
+if (!Object.hasOwn(photographs, photoKey)) throw new Error('Unrecognised photographic asset');
+const heroPhoto = photographs[photoKey as keyof typeof photographs];
+const photoWidth = Math.min(1672, heroPhoto.width);
+const photoHeight = Math.round(photoWidth * heroPhoto.height / heroPhoto.width);
+const title = copy('meta.title');
+const description = copy('meta.description');
+const canonical = new URL(Astro.originPathname, siteOrigin(Astro.locals));
+const alternates = alternatesForTenantPath(tenant, Astro.originPathname);
+const icon = resolveIcon(tenant);
+const socialImage = await socialImageIsAvailable(tenant) ? new URL(resolveSocial(tenant), siteOrigin(Astro.locals)) : null;
+const touchIcon = await appleTouchIconIsAvailable(tenant) ? resolveAppleTouchIcon(tenant) : null;
+const locale = Astro.locals.locale;
+const localize = makeLocalizePath(tenant);
+const pricingHref = tenant.pages.includes('/pricing/') ? localize('/pricing/', locale) : contactHref('calculator');
+const defaultAlternate = alternates[defaultLocaleOf(tenant)];
+const rssPath = tenant.pages.includes('/blog/') ? localize('/rss.xml', locale) : null;
+const languageChoices = Object.entries(alternates).filter(([language]) => language === 'en' || language === 'es');
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
+// Published routes and their existing tenant-authored labels remain reachable
+// when the home changes composition. Single-page tenants get no borrowed links.
+const publishedLinks = (links: { route: string; label: () => string }[]) => links
+  .filter(({ route }) => tenant.pages.includes(route))
+  .map(({ route, label }) => ({ href: localize(route, locale), label: label() }));
+const productLinks = publishedLinks([
+  { route: '/solutions/online-store/', label: () => t('nav.solutions.onlineStore') },
+  { route: '/payments-invoicing/', label: () => t('nav.solutions.payments') },
+  { route: '/solutions/deliveries/', label: () => t('nav.solutions.deliveries') },
+  { route: '/solutions/ads/', label: () => t('nav.solutions.ads') },
+  { route: '/solutions/content/', label: () => t('nav.solutions.content') },
+  { route: '/solutions/whitelabel/', label: () => t('nav.solutions.whitelabel') },
+  { route: '/solutions/', label: () => t('footer.link.allSolutions') },
+]);
+const companyLinks = publishedLinks([
+  { route: '/about/', label: () => t('footer.link.about') },
+  { route: '/pricing/', label: () => t('nav.pricing') },
+  { route: '/for-agencies/', label: () => t('footer.link.forAgencies') },
+  { route: '/for-developers/', label: () => t('footer.link.forDevelopers') },
+  { route: '/blog/', label: () => t('nav.blog') },
+  { route: '/changelog/', label: () => t('footer.link.changelog') },
+]);
+const legalLinks = publishedLinks([
+  { route: '/terms/', label: () => t('footer.link.terms') },
+  { route: '/privacy/', label: () => t('footer.link.privacy') },
+  { route: '/cookies/', label: () => t('footer.link.cookiePreferences') },
+]);
+const formatLocale = tenant.region ? `${locale}-${tenant.region}` : locale;
+const money = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: panel.currency, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
+const calculatorMoney = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: 'GTQ', currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
+const rateLabel = calculator ? new Intl.NumberFormat(formatLocale, { style: 'percent', maximumFractionDigits: 2 }).format(calculator.commissionBasisPoints / 10000) : null;
+const defaultCalculation = calculator ? calculateLandingAmount('100.00', calculator.commissionBasisPoints) : null;
+if (defaultCalculation && !defaultCalculation.ok) throw new Error('Invalid landing calculator configuration');
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: tenant.brand_name, url: canonical.toString(), description },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: tenant.brand_name, url: canonical.toString(), ...(socialImage ? { logo: socialImage.toString() } : {}) },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) },
+];
+---
+<!doctype html>
+<html lang={formatLocale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content={tenant.theme.accent} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {!tenant.indexable && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical} />
+    {tenant.indexable && <link rel="sitemap" href="/sitemap-index.xml" />}
+    {rssPath && <link rel="alternate" type="application/rss+xml" title={t('layout.rssTitle')} href={rssPath} />}
+    {defaultAlternate && <link rel="alternate" hreflang="x-default" href={new URL(defaultAlternate, siteOrigin(Astro.locals))} />}
+    {Object.entries(alternates).map(([language, path]) => <link rel="alternate" hreflang={language} href={new URL(path!, siteOrigin(Astro.locals))} />)}
+    <link rel="icon" href={icon} type="image/svg+xml" />
+    {touchIcon && <link rel="apple-touch-icon" href={touchIcon} />}
+    {fontKey === 'manrope' && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={tenant.brand_name} />
+    <meta property="og:locale" content={ogLocaleOf(locale, tenant)} />
+    {(Object.keys(alternates) as Locale[]).filter((language) => language !== locale).map((language) => <meta property="og:locale:alternate" content={ogLocaleOf(language, tenant)} />)}
+    {socialImage && <meta property="og:image" content={socialImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {socialImage && <meta name="twitter:image" content={socialImage} />}
+    <script is:inline type="application/ld+json" set:html={safeJson(jsonLd)} />
+    {languageChoices.length > 1 && <script is:inline>
+      // Keep the established locale preference and stay on the current host.
+      if (!window.__1pLangChecked) {
+        window.__1pLangChecked = true;
+        const path = location.pathname.toLowerCase();
+        if (path !== '/es' && !path.startsWith('/es/')) {
+          const cookie = /(?:^|;\s*)1p_lang=(en|es)(?:;|$)/.exec(document.cookie)?.[1];
+          const language = navigator.language?.toLowerCase().split('-')[0];
+          const wanted = cookie || (language ? language === 'en' ? 'en' : 'es' : 'en');
+          const alternate = document.querySelector('link[rel="alternate"][hreflang="es"]');
+          if (wanted === 'es' && alternate) {
+            const target = new URL(alternate.getAttribute('href'), location.origin);
+            if (target.pathname !== location.pathname) location.replace(target.pathname + location.search + location.hash);
+          }
+        }
+      }
+    </script>}
+  </head>
+<body class="photographic-service" data-home-template="photographic-service" data-palette={palette} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
+<a class="skip-link" href="#contenido">{copy('ui.skip_link')}</a>
+<svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-arrow" viewBox="0 0 24 24">
+<path d="M4 12h15m-6-6 6 6-6 6"></path>
+</symbol>
+<symbol id="i-up-right" viewBox="0 0 24 24">
+<path d="M6 18 18 6M6 6h12v12"></path>
+</symbol>
+<symbol id="i-phone" viewBox="0 0 24 24">
+<rect height="20" rx="3" width="12" x="6" y="2"></rect>
+<path d="M10 5h4m-3 14h2"></path>
+</symbol>
+<symbol id="i-link" viewBox="0 0 24 24">
+<path d="m10 13 4-4m-6 5-1 1a4 4 0 0 0 6 6l4-4a4 4 0 0 0 0-6m-1-1 1-1a4 4 0 0 0-6-6L7 7a4 4 0 0 0 0 6" transform="translate(0 -1)"></path>
+</symbol>
+<symbol id="i-check" viewBox="0 0 24 24">
+<path d="m5 12 4 4L19 6"></path>
+</symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24">
+<path d="M5 3v18l3-2 4 2 4-2 3 2V3l-3 2-4-2-4 2-3-2Zm4 6h6m-6 4h6"></path>
+</symbol>
+<symbol id="i-chat" viewBox="0 0 24 24">
+<path d="M21 11.5a9 9 0 0 1-9 9c-1.6 0-3-.4-4.4-1.1L3 21l1.5-4.6A9 9 0 1 1 21 11.5Z"></path>
+<path d="M8 12h.01M12 12h.01M16 12h.01"></path>
+</symbol>
+<symbol id="i-person" viewBox="0 0 24 24">
+<circle cx="12" cy="7" r="4"></circle>
+<path d="M4 21v-2a8 8 0 0 1 16 0v2"></path>
+</symbol>
+<symbol id="i-clock" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="9"></circle>
+<path d="M12 7v5l3 2"></path>
+</symbol>
+<symbol id="i-team" viewBox="0 0 24 24">
+<circle cx="9" cy="7" r="3"></circle>
+<path d="M2 21v-3a7 7 0 0 1 14 0v3M16 4a3 3 0 0 1 0 6m3 4a6 6 0 0 1 3 5v2"></path>
+</symbol>
+<symbol id="i-plus" viewBox="0 0 24 24">
+<path d="M5 12h14M12 5v14"></path>
+</symbol>
+<symbol id="i-home" viewBox="0 0 24 24">
+<path d="m3 10 9-7 9 7v10H3Zm6 10v-7h6v7"></path>
+</symbol>
+<symbol id="i-card" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="M2 9h20M6 15h4"></path>
+</symbol>
+<symbol id="i-download" viewBox="0 0 24 24">
+<path d="M12 3v12m-5-5 5 5 5-5M4 15v6h16v-6"></path>
+</symbol>
+</svg>
+<header class="site-header">
+<a aria-label={copy('ui.brand_home').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio">
+<span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span>
+</a>
+<nav aria-label={copy('ui.desktop_nav_aria_label')} class="desktop-nav">{navigation.map((item) => <a href={item.href}>{item.label}</a>)}</nav>
+{languageChoices.length > 1 && <nav class="landing-languages" aria-label={copy('ui.language_label')}>{languageChoices.map(([language, path]) => language === locale ? <span aria-current="true" lang={language}>{copy(`ui.language_${language}`)}</span> : <a href={path} hreflang={language} lang={language} data-lang-choice={language}>{copy(`ui.language_${language}`)}</a>)}</nav>}
+<a class="button button-header" data-support-cta="header" href={contactHref('header')}>
+<span>{copy('actions.header')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg>
+</a>
+<button aria-controls="mobile-menu" aria-expanded="false" aria-label={copy('ui.menu_toggle_aria_label')} class="menu-toggle" data-close-label={copy('ui.menu_close')} hidden="" type="button">
+<span></span><span></span>
+</button>
+<nav aria-label={copy('ui.mobile_menu_aria_label')} class="mobile-nav" id="mobile-menu">{navigation.map((item) => <a href={item.href}>{item.label}</a>)}</nav>
+</header>
+<main id="contenido">
+<section aria-labelledby="hero-title" class="hero" id="inicio">
+<Image alt="" class="hero-photo" fetchpriority="high" format="webp" height={photoHeight} loading="eager" quality={90} src={heroPhoto} width={photoWidth}/>
+<div class="hero-shade"></div>
+<div class="hero-content wrap">
+<h1 id="hero-title">
+<span>{copy('hero.title1')}</span><span>{copy('hero.title2')}</span>
+</h1>
+<p class="hero-description">{copy('hero.description')}</p>
+<div class="hero-actions">
+<a class="button button-white" data-support-cta="hero" href={contactHref('hero')}>
+<span>{copy('actions.primary')}</span><svg aria-hidden="true" class="icon">
+<use href="#i-up-right"></use>
+</svg>
+</a>
+<a class="button button-outline" href="#como-funciona"><span>{copy('actions.secondary')}</span><svg aria-hidden="true" class="icon"><use href="#i-arrow"></use></svg></a>
+</div>
+</div>
+<div class="hero-bottom wrap">
+<div class="hero-caption">
+<p>{copy('hero.location')}</p>
+</div>
+<div class="hero-capabilities">
+<span><svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg><span>{copy('hero.feature1')}</span></span>
+<span><svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg><span>{copy('hero.feature2')}</span></span>
+<span><svg aria-hidden="true" class="icon">
+<use href="#i-receipt"></use></svg><span>{copy('hero.feature3')}</span></span>
+</div>
+</div>
+</section>
+<section aria-labelledby="solutions-title" class="solutions section-pad wrap" id="como-cobras">
+<div class="section-heading">
+<div>
+<p class="eyebrow">{copy('solutions.eyebrow')}</p>
+<h2 id="solutions-title">{copy('solutions.title')}</h2>
+</div>
+</div>
+<div class="solutions-grid">
+<article class="service-card service-presencial" data-sequence="">
+<div class="service-copy">
+<h3>{copy('solutions.card1.title')}</h3>
+<p>{copy('solutions.card1.description')}</p>
+</div>
+<div aria-label={copy('ui.service_stage_aria_label')} class="service-stage" role="img">
+<div class="product-panel payment-panel">
+<div class="product-heading">
+<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
+<use href="#i-phone"></use>
+</svg>
+</div>
+<div class="payment-result">
+<svg aria-hidden="true" class="confirmation-ring" viewBox="0 0 64 64">
+<circle cx="32" cy="32" r="29"></circle>
+<path d="m21 32 8 8 15-17"></path>
+</svg>
+<strong>{copy('illustrations.received')}</strong>
+<span>{copy('illustrations.cardPayment')}</span>
+</div>
+<div class="product-footer">
+<svg aria-hidden="true" class="icon">
+<use href="#i-receipt"></use></svg><span>{copy('illustrations.receipt')}</span>
+</div>
+</div>
+</div>
+<div class="service-footnote">
+<svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg><span>{copy('illustrations.device')}</span>
+</div>
+</article>
+<article class="service-card service-link" data-sequence="">
+<div class="service-copy">
+<h3>{copy('solutions.card2.title')}</h3>
+<p>{copy('solutions.card2.description')}</p>
+</div>
+<div aria-label={copy('ui.service_stage_aria_label52')} class="service-stage" role="img">
+<div class="product-panel link-panel">
+<div class="product-heading">
+<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
+<use href="#i-link"></use>
+</svg>
+</div>
+<div class="link-preview">
+<span>{copy('illustrations.paymentLink')}</span><strong>{copy('illustrations.consultation')}</strong>
+<p>{copy('illustrations.remoteDescription')}</p>
+</div>
+<div class="share-action">
+<span>{copy('illustrations.remoteAction')}</span><svg aria-hidden="true" class="icon">
+<use href="#i-up-right"></use>
+</svg>
+</div>
+<div class="link-delivery">
+<svg aria-hidden="true" class="icon">
+<use href="#i-check"></use></svg><span>{copy('illustrations.share')}</span>
+</div>
+</div>
+</div>
+<div class="service-footnote">
+<svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg><span>{copy('hero.feature2')}</span>
+</div>
+</article>
+<article class="service-card service-invoice" data-sequence="">
+<div class="service-copy">
+<h3>{copy('solutions.card3.title')}</h3>
+<p>{copy('solutions.card3.description')}</p>
+</div>
+<div aria-label={copy('ui.service_stage_aria_label53')} class="service-stage" role="img">
+<div class="product-panel invoice-panel">
+<div class="product-heading">
+<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{copy('illustrations.invoice')}</span><svg aria-hidden="true" class="icon">
+<use href="#i-receipt"></use>
+</svg>
+</div>
+<div class="invoice-review">
+<span>{copy('illustrations.issuance')}</span>
+<div class="review-row">
+<span class="review-number">01</span><strong>{copy('illustrations.invoiceData')}</strong><svg aria-hidden="true" class="icon">
+<use href="#i-check"></use>
+</svg>
+</div>
+<div class="review-row">
+<span class="review-number">02</span><strong>{copy('illustrations.invoiceReview')}</strong><svg aria-hidden="true" class="icon">
+<use href="#i-check"></use>
+</svg>
+</div>
+</div>
+<div class="product-footer">
+<svg aria-hidden="true" class="icon">
+<use href="#i-chat"></use></svg><span>{copy('illustrations.issued')}</span>
+</div>
+</div>
+</div>
+<div class="service-footnote">
+<svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('illustrations.automatic')}</span>
+</div>
+</article>
+</div>
+</section>
+<section aria-labelledby="how-title" class="how-section" id="como-funciona">
+<div class="wrap how-grid">
+<div class="how-copy">
+<p class="eyebrow">{copy('how.eyebrow')}</p>
+<h2 id="how-title">{copy('how.title')}</h2>
+<ol class="steps" id="steps-list">{steps.map((step, index) => <li><span class="step-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol>
+</div>
+<div class="flow-panel" data-sequence="">
+<div aria-label={copy('ui.flow_visual_aria_label')} class="flow-visual" role="img">
+<div class="flow-topline">
+<span class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{copy('how.visualLabel')}</span><span class="flow-dot"></span>
+</div>
+<div class="flow-options">
+<div>
+<svg aria-hidden="true" class="icon">
+<use href="#i-phone"></use></svg><strong>{copy('how.option1')}</strong><span>{copy('how.option1Note')}</span>
+</div>
+<span class="flow-or">{copy('how.or')}</span>
+<div>
+<svg aria-hidden="true" class="icon">
+<use href="#i-link"></use></svg><strong>{copy('how.option2')}</strong><span>{copy('how.option2Note')}</span>
+</div>
+</div>
+<div class="flow-connector"></div>
+<div class="flow-receipt">
+<span class="flow-check"><svg aria-hidden="true" class="icon">
+<use href="#i-check"></use></svg></span>
+<div>
+<strong>{copy('how.payment')}</strong><span>{copy('how.paymentNote')}</span>
+</div>
+</div>
+<div class="flow-connector"></div>
+<div class="flow-assisted">
+<svg aria-hidden="true" class="icon">
+<use href="#i-receipt"></use>
+</svg>
+<div>
+<strong>{copy('how.invoice')}</strong><span>{copy('how.invoiceNote')}</span>
+</div>
+<span class="small-tag">{copy('how.automaticTag')}</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section aria-labelledby="panel-title" class="panel-section section-pad" id="su-panel">
+<div class="wrap">
+<div class="section-heading panel-intro">
+<div>
+<p class="eyebrow">{copy('panel.eyebrow')}</p>
+<h2 id="panel-title">{copy('panel.title')}</h2>
+</div>
+<p class="section-intro">{copy('panel.description')}</p>
+</div>
+<div class="panel-demo">
+<aside aria-label={copy('ui.panel_sidebar_aria_label')} class="panel-sidebar">
+<div class="panel-brand">
+<span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<div>
+<strong>{tenant.brand_wordmark ?? tenant.brand_name}</strong><span>{copy('panel.name')}</span>
+</div>
+</div>
+<div aria-label={copy('ui.panel_tabs_aria_label')} aria-orientation="vertical" class="panel-tabs" hidden>
+<button aria-controls="panel-summary" aria-selected="true" data-panel-tab="summary" hidden="" id="panel-tab-summary" type="button">
+<svg aria-hidden="true" class="icon">
+<use href="#i-home"></use></svg><span>{copy('panel.summary')}</span>
+</button>
+<button aria-controls="panel-billing" aria-selected="false" data-panel-tab="billing" hidden="" id="panel-tab-billing" tabindex="-1" type="button">
+<svg aria-hidden="true" class="icon">
+<use href="#i-card"></use></svg><span>{copy('panel.billing')}</span>
+</button>
+<button aria-controls="panel-withdrawals" aria-selected="false" data-panel-tab="withdrawals" hidden="" id="panel-tab-withdrawals" tabindex="-1" type="button">
+<svg aria-hidden="true" class="icon">
+<use href="#i-download"></use></svg><span>{copy('panel.withdrawals')}</span>
+</button>
+</div>
+<div class="panel-sidebar-note">
+<svg aria-hidden="true" class="icon">
+<use href="#i-check"></use></svg><span>{copy('ui.label')}<br/>{copy('ui.label2')}</span>
+</div>
+</aside>
+<div class="panel-workspace">
+<div class="panel-topbar">
+<span id="panel-location">{copy('panel.summary')}</span><span class="panel-example">{copy('ui.panel_example')}</span><span aria-hidden="true" class="panel-avatar">{copy('ui.panel_avatar')}</span>
+</div>
+<div class="panel-surface">
+<div aria-labelledby="panel-tab-summary" data-panel-screen="" id="panel-summary" tabindex="0">
+<h3 class="panel-page-title">{copy('panel.greeting')}</h3>
+<p class="panel-page-desc">{copy('panel.subtitle')}</p>
+<section aria-labelledby="attention-title" class="panel-card panel-attention">
+<span class="panel-eyebrow">{copy('ui.panel_eyebrow')}</span>
+<h4 id="attention-title">{copy('ui.attention_title')}</h4>
+<div class="panel-action-row">
+<span><svg aria-hidden="true" class="icon">
+<use href="#i-card"></use></svg>{copy('ui.label7')}</span><button class="panel-text-button" data-panel-go="billing" hidden="" type="button">{copy('ui.panel_text_button')}<span aria-hidden="true"><svg aria-hidden="true" class="icon"><use href="#i-arrow"></use></svg></span>
+</button>
+</div>
+<div class="panel-action-row">
+<span><svg aria-hidden="true" class="icon">
+<use href="#i-download"></use></svg>{copy('ui.label9')}</span><button class="panel-text-button" data-panel-go="withdrawals" hidden="" type="button">{copy('ui.panel_text_button10')}<span aria-hidden="true"><svg aria-hidden="true" class="icon"><use href="#i-arrow"></use></svg></span>
+</button>
+</div>
+</section>
+<div class="panel-summary-grid">
+<section aria-labelledby="chart-title" class="panel-card panel-chart">
+<div class="panel-card-heading">
+<span class="panel-eyebrow">{copy('ui.panel_eyebrow11')}</span>
+<h4 id="chart-title">{copy('ui.chart_title')}</h4>
+</div>
+<div class="panel-chart-body">
+<span class="panel-chart-label">{copy('ui.panel_chart_label')}</span><svg aria-label={copy('ui.svg_aria_label')} role="img" viewBox="0 0 540 140">
+<path class="chart-grid" d="M0 20h540M0 70h540M0 120h540"></path>
+<path class="chart-line" d="M0 110 49 110 98 104 147 105 196 92 245 95 294 80 343 82 392 60 441 65 490 42 530 38"></path>
+<circle cx="530" cy="38" r="5"></circle>
+</svg>
+<div class="panel-chart-axis">
+<span>{copy('ui.label14')}</span><span>{copy('ui.label15')}</span>
+</div>
+</div>
+</section>
+<section aria-labelledby="credit-title" class="panel-card panel-credit">
+<div class="panel-card-heading">
+<h4 class="panel-eyebrow" id="credit-title">{copy('ui.credit_title')}</h4>
+<span class="panel-chip">{panel.currency}</span>
+</div>
+<div class="panel-credit-body">
+<strong class="panel-money" data-panel-money="credit">{money(panel.sample.creditCents)}</strong>
+<p>{copy('ui.label17')}</p>
+<button class="panel-primary" data-panel-go="billing" hidden="" type="button">{copy('ui.panel_primary')}<svg aria-hidden="true" class="icon">
+<use href="#i-arrow"></use>
+</svg>
+</button>
+</div>
+</section>
+</div>
+</div>
+<div aria-labelledby="panel-tab-billing" data-panel-screen="" id="panel-billing" tabindex="0">
+<h3 class="panel-page-title">{copy('ui.panel_page_title')}</h3>
+<p class="panel-page-desc">{copy('ui.panel_page_desc')}</p>
+<section aria-label={copy('ui.panel_card_panel_balance_aria_label')} class="panel-card panel-balance">
+<div class="panel-between">
+<span class="panel-eyebrow">{copy('ui.credit_title')}</span><span class="panel-chip">{panel.currency}</span>
+</div>
+<strong class="panel-money" data-panel-money="credit">{money(panel.sample.creditCents)}</strong>
+<p class="panel-callout">{copy('ui.panel_callout')}</p>
+</section>
+<section aria-labelledby="transactions-title" class="panel-card panel-transactions">
+<div class="panel-transactions-head">
+<h4 id="transactions-title">{copy('ui.transactions_title')}</h4>
+<div aria-label={copy('ui.panel_filters_aria_label')} class="panel-filters" role="group">
+<button aria-pressed="true" data-panel-filter="all" hidden="" type="button">{copy('ui.label23')}</button><button aria-pressed="false" data-panel-filter="expense" hidden="" type="button">{copy('ui.label24')}</button><button aria-pressed="false" data-panel-filter="income" hidden="" type="button">{copy('ui.label25')}</button>
+</div>
+</div>
+<table>
+<caption class="sr-only">{copy('ui.sr_only')}</caption>
+<thead>
+<tr>
+<th scope="col">{copy('ui.label27')}</th>
+<th scope="col">{copy('ui.label28')}</th>
+<th scope="col">{copy('ui.label29')}</th>
+</tr>
+</thead>
+<tbody id="panel-transaction-rows">{panel.movements.map((item) => <tr data-panel-movement={item.type}><td>{item.text}</td><td>{item.date}</td><td class={item.type}>{money(item.cents)}</td></tr>)}</tbody>
+</table>
+<p class="panel-filter-status" id="panel-filter-status" role="status">{copy('ui.movements_fictional')}</p>
+</section>
+</div>
+<div aria-labelledby="panel-tab-withdrawals" data-panel-screen="" id="panel-withdrawals" tabindex="0">
+<div class="panel-withdraw-heading">
+<div>
+<h3 class="panel-page-title">{copy('ui.panel_page_title30')}</h3>
+<p class="panel-page-desc">{copy('ui.panel_page_desc31')}</p>
+</div>
+<button aria-describedby="withdraw-reason" class="panel-disabled" disabled="" type="button">{copy('ui.panel_disabled')}</button>
+</div>
+<p class="panel-callout" id="withdraw-reason">{copy('ui.withdraw_reason')}</p>
+<div class="panel-withdraw-balances">
+<section aria-labelledby="withdraw-gtq" class="panel-card">
+<h4 id="withdraw-gtq">{copy('ui.withdraw_gtq')}</h4>
+<strong class="panel-money" data-panel-money="withdraw">{money(panel.sample.withdrawCents)}</strong>
+<p>{copy('ui.label35')}</p>
+</section>
+</div>
+<section aria-labelledby="method-title" class="panel-card panel-empty">
+<svg aria-hidden="true" class="icon">
+<use href="#i-card"></use>
+</svg>
+<h4 id="method-title">{copy('ui.method_title')}</h4>
+<p>{copy('ui.label37')}</p>
+<details>
+<summary>{copy('ui.label38')}</summary>
+<ul>
+<li>{copy('ui.label39')}</li>
+<li>{copy('ui.label40')}</li>
+<li>{copy('ui.label41')}</li>
+</ul>
+</details>
+</section>
+</div>
+</div>
+</div>
+</div>
+<div class="panel-footnote">
+<p>{copy('panel.note')}</p>
+<a class="text-button" data-support-cta="panel" href={contactHref('panel')}>
+<span>{copy('panel.contact')}</span><svg aria-hidden="true" class="icon">
+<use href="#i-arrow"></use>
+</svg>
+</a>
+</div>
+<p class="panel-explanation">{copy('panel.explanation')}</p>
+</div>
+</section>
+<section aria-labelledby="audience-title" class="audience-section section-pad wrap" id="para-quien">
+<div class="section-heading">
+<div>
+<p class="eyebrow">{copy('audience.eyebrow')}</p>
+<h2 id="audience-title">{copy('audience.title')}</h2>
+</div>
+<p class="section-intro">{copy('audience.description')}</p>
+</div>
+<div class="audience-grid" id="audience-list">{audiences.map((item) => <article class="audience-card"><span class="audience-icon"><svg class="icon" aria-hidden="true"><use href={`#i-${item.icon}`} /></svg></span><h3>{item.title}</h3><p>{item.text}</p></article>)}</div>
+</section>
+<section aria-labelledby="onboarding-title" class="onboarding-section wrap">
+<div class="onboarding-card">
+<div class="onboarding-copy">
+<p class="eyebrow">{copy('onboarding.eyebrow')}</p>
+<h2 id="onboarding-title">{copy('onboarding.title')}</h2>
+<p>{copy('onboarding.description')}</p>
+{productLinks.length > 0 && <ul class="landing-product-links">{productLinks.map(({ href, label }) => <li><a href={href}>{label}</a></li>)}</ul>}
+<a class="button button-teal" data-support-cta="onboarding" href={contactHref('onboarding')}>
+<span>{copy('actions.onboarding')}</span><svg aria-hidden="true" class="icon">
+<use href="#i-up-right"></use>
+</svg>
+</a>
+</div>
+<div class="onboarding-photo">
+<Image alt={copy('ui.img_alt')} format="webp" height={photoHeight} loading="lazy" quality={90} sizes="(min-width: 981px) 50vw, 100vw" src={heroPhoto} width={photoWidth} widths={[640, 960, 1280, 1672]}/>
+</div>
+</div>
+</section>
+<section aria-labelledby="calculator-title" class="calculator-section section-pad wrap" id="calculadora">
+{defaultCalculation?.ok ? <>
+<form class="calculator-form" id="price-calculator" novalidate="">
+<h3>{copy('calculator.formTitle')}</h3>
+<div class="calc-field amount-field">
+<label for="calc-amount">{copy('calculator.amount')}</label>
+<div class="amount-input">
+<span aria-hidden="true">Q</span><input aria-describedby="calc-error" autocomplete="off" disabled="" id="calc-amount" inputmode="decimal" maxlength="10" name="amount" required="" type="text" value="100.00"/>
+</div>
+</div>
+<div class="calc-pricing">
+<div>
+<span>{copy('calculator.rate')}</span><strong data-commission="">{rateLabel}</strong>
+</div>
+<span class="calc-no-fixed">{copy('calculator.terms')}</span>
+</div>
+<button class="button button-teal calc-submit" hidden="" type="submit">
+<span>{copy('calculator.submit')}</span><svg aria-hidden="true" class="icon"><use href="#i-arrow"></use></svg>
+</button>
+<p class="calc-error" id="calc-error" role="alert"></p>
+<div aria-atomic="true" aria-live="polite" class="calc-result" role="status">
+<span>{copy('calculator.result')}</span><output id="calc-net">{calculatorMoney(defaultCalculation.net)}</output>
+<dl>
+<div>
+<dt>{copy('calculator.fee')}</dt>
+<dd id="calc-fee">{calculatorMoney(defaultCalculation.fee)}</dd>
+</div>
+</dl>
+<p id="calc-status">{copy('ui.calculator_nojs')}</p>
+</div>
+</form>
+<div class="calculator-copy">
+<p class="eyebrow">{copy('calculator.eyebrow')}</p>
+<h2 id="calculator-title">{copy('calculator.title')}</h2>
+<p class="calculator-intro">{copy('calculator.description')}</p>
+<a class="button button-teal" data-support-cta="calculator" href={contactHref('calculator')}>
+<span>{copy('calculator.contact')}</span><svg aria-hidden="true" class="icon">
+<use href="#i-up-right"></use>
+</svg>
+</a>
+<p class="calculator-note">{copy('calculator.note')}</p>
+</div>
+</> : <>
+<div class="calculator-form pricing-card">
+<h3>{copy('pricing.heading')}</h3>
+<dl>
+<div><dt>{copy('pricing.balanceLabel')}</dt><dd>{copy('pricing.balanceValue')}</dd></div>
+<div><dt>{copy('pricing.rateLabel')}</dt><dd>{copy('pricing.rateValue')}</dd></div>
+</dl>
+<p>{copy('pricing.note')}</p>
+</div>
+<div class="calculator-copy">
+<p class="eyebrow">{copy('calculator.eyebrow')}</p>
+<h2 id="calculator-title">{copy('pricing.title')}</h2>
+<p class="calculator-intro">{copy('pricing.description')}</p>
+<a class="button button-teal" href={pricingHref}><span>{copy('pricing.cta')}</span><svg aria-hidden="true" class="icon"><use href="#i-arrow" /></svg></a>
+</div>
+</>}
+</section>
+<section aria-labelledby="faq-title" class="faq-section section-pad wrap" id="preguntas">
+<div class="faq-heading">
+<p class="eyebrow">{copy('faq.eyebrow')}</p>
+<h2 id="faq-title">{copy('faq.title')}</h2>
+<a class="text-button" data-support-cta="question" href={contactHref('question')}>
+<span>{copy('actions.question')}</span><svg aria-hidden="true" class="icon"><use href="#i-arrow"></use></svg>
+</a>
+</div>
+<div class="faq-list" id="faq-list">{faqs.map((item) => <details><summary><span>{item.question}</span><svg class="icon" aria-hidden="true"><use href="#i-plus" /></svg></summary><p>{item.answer}</p></details>)}</div>
+</section>
+<section aria-labelledby="closing-title" class="closing-section">
+<div class="wrap closing-content">
+<span aria-hidden="true" class="closing-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<h2 id="closing-title">{copy('closing.title')}</h2>
+<a class="button button-white" data-support-cta="closing" href={contactHref('closing')}>
+<svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('actions.primary')}</span><svg aria-hidden="true" class="icon">
+<use href="#i-up-right"></use>
+</svg>
+</a>
+</div>
+</section>
+</main>
+<footer class="site-footer">
+<div class="wrap footer-grid">
+<div class="footer-brand">
+<a aria-label={copy('ui.brand_back').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio"><span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></a>
+<p>{copy('footer.description')}</p>
+</div>
+<nav aria-label={copy('ui.footer_column_aria_label')} class="footer-column">
+<h2>{copy('footer.solutions')}</h2>
+{productLinks.length > 0 ? productLinks.map(({ href, label }) => <a href={href}>{label}</a>) : <>
+<a href="#como-cobras">{copy('hero.feature1')}</a>
+<a href="#como-cobras">{copy('hero.feature2')}</a>
+<a href="#como-funciona">{copy('hero.feature3')}</a>
+</>}
+</nav>
+<nav aria-label={copy('ui.footer_column_aria_label63')} class="footer-column">
+<h2>{tenant.brand_name}</h2>
+{companyLinks.length > 0 ? companyLinks.map(({ href, label }) => <a href={href}>{label}</a>) : <>
+<a href="#como-funciona">{copy('ui.label42')}</a>
+<a href="#su-panel">{copy('ui.label43')}</a>
+<a href="#para-quien">{copy('ui.label44')}</a>
+<a href="#calculadora">{copy('ui.label45')}</a>
+<a href="#preguntas">{copy('ui.label46')}</a>
+</>}
+</nav>
+<div class="footer-column">
+<h2>{copy('footer.contact')}</h2>
+<p>{copy('footer.coverage')}</p>
+<a class="footer-contact" data-support-cta="footer" href={contactHref('footer')}>
+<svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('actions.header')}</span><svg aria-hidden="true" class="icon">
+<use href="#i-up-right"></use>
+</svg>
+</a>
+{legalLinks.map(({ href, label }) => <a href={href}>{label}</a>)}
+{tenant.destinations.docs && <a href={tenant.destinations.docs}>{copy('footer.docs')}</a>}
+</div>
+</div>
+<div class="wrap footer-bottom">
+<span>{copy('footer.copyright')}</span>
+<a class="back-to-top" href="#inicio"><span>{copy('footer.back')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg></a>
+</div>
+</footer>
+
+
+<script is:inline type="application/json" id="landing-config" set:html={safeJson(clientConfig)} />
+<script>import '@scripts/photographic-service';</script></body>
+</html>

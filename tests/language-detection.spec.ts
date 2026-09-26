@@ -190,9 +190,10 @@ test.describe('the document language survives a soft navigation', () => {
   test.use({ locale: 'es-MX' });
 
   test('lang stays es after the client router swaps the document', async ({ page }) => {
-    // The router copies the root element's attributes across a swap. We depend
-    // on that for <html lang>, so it is asserted rather than assumed.
-    await page.goto('/es/');
+    // Standard pages retain the Astro client router; the photographic landing
+    // uses native document navigation. Keep this regression on a standard page
+    // so it continues to prove that a client-router swap copies <html lang>.
+    await page.goto('/es/nosotros/');
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
 
     await page.getByRole('link', { name: 'Precios', exact: true }).first().click();
@@ -223,5 +224,51 @@ test.describe('without JavaScript', () => {
 
     await toSpanish.click();
     await expect(page).toHaveURL(/\/es\/precios\/$/);
+  });
+});
+
+
+test.describe('photographic home language detection', () => {
+  test.describe('Spanish browser', () => {
+    test.use({ locale: 'es-MX' });
+
+    test('the home redirects to its translation with query and fragment intact', async ({ page }) => {
+      await page.goto('/?utm_source=landing-test#preguntas');
+      await expect(page).toHaveURL('/es/?utm_source=landing-test#preguntas');
+      await expect(page.locator('body')).toHaveAttribute('data-home-template', 'photographic-service');
+      await expect(page.locator('html')).toHaveAttribute('lang', /^es(?:-|$)/);
+      await expect(page.locator('.hero h1')).toContainText('Venda en línea.');
+    });
+  });
+
+  test.describe('English browser', () => {
+    test.use({ locale: 'en-US' });
+
+    test('an English home stays English until the visitor chooses Spanish', async ({ context, page }) => {
+      await page.goto('/');
+      await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
+      await expect(page.locator('.hero h1')).toContainText('Sell online.');
+      await page.locator('.landing-languages a[data-lang-choice="es"]').click();
+      await expect(page).toHaveURL(/\/es\/$/);
+      expect((await context.cookies()).find((cookie) => cookie.name === '1p_lang')?.value).toBe('es');
+
+      // A new document must honour the choice over this context's en-US locale.
+      await page.goto('/');
+      await expect(page).toHaveURL(/\/es\/$/);
+      await expect(page.locator('.hero h1')).toContainText('Venda en línea.');
+    });
+  });
+
+  test.describe('without JavaScript', () => {
+    test.use({ locale: 'es-MX', javaScriptEnabled: false });
+
+    test('the home is complete at the requested English address', async ({ page }) => {
+      const response = await page.goto('/');
+      expect(response?.status()).toBe(200);
+      await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
+      await expect(page.locator('.hero h1')).toBeVisible();
+      await expect(page.locator('.service-card')).toHaveCount(3);
+      await expect(page.locator('.landing-languages a[data-lang-choice="es"]')).toHaveAttribute('href', '/es/');
+    });
   });
 });

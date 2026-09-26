@@ -12,6 +12,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "preview:landings": "node scripts/preview-landings.mjs",
+    "test:preview-landings": "node --test scripts/preview-landings.selftest.mjs",
     "astro": "astro",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
@@ -21,7 +23,8 @@
     "check:baseline": "./scripts/check-no-regression.sh",
     "typecheck": "astro check",
     "test:deploy": "bash deploy/cpanel/activate-graft.test.sh",
-    "test:deploy:activator": "bash deploy/cpanel/publish-activator.test.sh"
+    "test:deploy:activator": "bash deploy/cpanel/publish-activator.test.sh",
+    "test:landing-ssr": "node --test scripts/photographic-ssr.selftest.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.5",

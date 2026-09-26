@@ -63,6 +63,7 @@ const PAGES_DIR = 'src/pages'
 const ROUTE_OF = {
   // — Pages: the route is the canonical English-rooted path —
   'pages/home.ts': '/',
+  'pages/photographic-home.ts': '@photographic-home',
   'pages/about.ts': '/about/',
   'pages/contact.ts': '/contact/',
   'pages/cookies.ts': '/cookies/',

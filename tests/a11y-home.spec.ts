@@ -17,6 +17,15 @@ import { openTenantPage } from './helpers/tenant-browser';
  */
 
 async function scan(page: Page) {
+  // Audit the finished page, as this test promises. Sampling halfway through
+  // the photographic hero's opacity entrance invents a transient contrast
+  // failure; await the real finite animation, without disabling any axe rule.
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await Promise.all(document.getAnimations().filter((animation) =>
+      animation instanceof CSSAnimation && animation.animationName === 'hero-enter'
+    ).map((animation) => animation.finished.catch(() => undefined)));
+  });
   return new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
 }
 
@@ -46,9 +55,9 @@ for (const path of ['/', '/es/']) {
 test('/ with the compact menu and a FAQ row open: still zero violations', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await page.locator('#menu-toggle').click();
+  await page.locator('.menu-toggle').click();
   await expect(page.locator('#mobile-menu')).toBeVisible();
-  await page.locator('.product-faq__item').first().evaluate((item) => item.setAttribute('open', ''));
+  await page.locator('#faq-list > details').first().evaluate((item) => item.setAttribute('open', ''));
 
   const results = await scan(page);
   // Floor: the open panel was in the tree axe walked.
