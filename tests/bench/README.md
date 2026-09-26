@@ -33,6 +33,9 @@ reemplaza con mocks. Los 12 casos se ejecutan separadamente en el banco real.
    `node tests/bench/capture-landings-control.mjs`.
 6. Desde API: `python -m tests.bench.seed_website_landings --content`.
    Aplica los seeds de operador y verifica 50/2 documentos y 26/1 rutas.
+   La API cachea `PlatformSettings` en proceso y lo refresca cada 60 s: si ya
+   estaba arriba al sembrar, esperar ese refresco (o reiniciarla) antes de la
+   sonda; si no, el staff recibe 401 «Staff session invalid» (medido 2026-09-26).
    Después: `python -m tests.bench.probe_website_landings
    --auth <privado>/auth.json --out <evidencia>/http-db-results.json`.
    Intercambia app JWT por HTTP real, firma sólo al staff del banco y ejerce

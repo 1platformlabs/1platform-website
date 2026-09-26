@@ -125,6 +125,41 @@ test('photograph animates, pauses offscreen and respects reduced motion', async 
   await expect(page.locator('.hero')).toHaveAttribute('data-motion', 'reduced');
   await expect(photo).toHaveCSS('animation-name', 'none');
 });
+test('professional email is persisted tenant copy on both brands: an example, never a contact', async ({ live: page }) => {
+  for (const home of homes) {
+    await visit(page, home.host, home.path);
+    const section = page.locator('.onboarding-section');
+    await expect(section).toContainText('consulta@minombre.com');
+    await expect(section.locator('h2')).not.toBeEmpty();
+    // The example is text: no mailto anywhere, and the CTA keeps the tenant destination.
+    await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
+    expect((await section.locator('[data-support-cta]').getAttribute('href'))!.split('?')[0]).toBe(home.cta);
+    const text = await section.innerText();
+    if (home.id === 'medipago') expect(text).toMatch(/Medipago|usted|su /i);
+    else expect(text).not.toMatch(/Medipago|pacientes/i);
+    if (home.id === 'oneplatform-en') expect(text).toMatch(/your own/i);
+  }
+});
+test('service cards and flow autoplay on entry and again on return, with no replay or pause controls', async ({ live: page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  for (const home of homes) {
+    await visit(page, home.host, home.path);
+    await expect(page.getByRole('button', { name: /Ver animaciones|Replay|Repetir|Pausar fondo|Pause/i })).toHaveCount(0);
+    const sequences = page.locator('[data-sequence]');
+    expect(await sequences.count()).toBeGreaterThanOrEqual(3);
+    for (const item of await sequences.all()) {
+      await (item.locator('.service-stage').or(item).first()).scrollIntoViewIfNeeded();
+      await expect(item).toHaveAttribute('data-animated', '');
+      await page.evaluate(() => scrollTo(0, 0));
+      await expect(item).not.toHaveAttribute('data-animated');
+      await (item.locator('.service-stage').or(item).first()).scrollIntoViewIfNeeded();
+      await expect(item).toHaveAttribute('data-animated', '');
+    }
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    for (const item of await sequences.all()) await expect(item).not.toHaveAttribute('data-animated');
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+  }
+});
 test('progressive enhancement: usable native FAQ and content without JS', async () => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
