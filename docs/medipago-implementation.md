@@ -34,9 +34,33 @@ apunta ahora al build de este worktree. Para verlo, detener con Ctrl+C el previe
 anterior y volver a ejecutar el lanzador con Node 24. Sigue siendo un preview con
 fixture HTTP, no el banco E2E. La sesión no puede reiniciar el proceso por sí misma.
 
-La ampliación a `1platform.pro` queda pendiente de identificar el diseño solicitado.
-Su home actual ya tiene composición `platform-commerce` y `CommerceOrbit.astro`;
-no se ha sustituido por la composición fotográfica de Medipago.
+La home actual de `1platform.pro` ya tiene composición `platform-commerce` y
+`CommerceOrbit.astro`. Ahora `npm run preview:landings` sirve las dos composiciones
+en el mismo build, con fixtures por tenant y locale, a través del resolver real:
+
+- Medipago: `http://medipago.localhost:4460/` o `http://127.0.0.1:4460/`.
+- 1Platform español: `http://1platform.localhost:4460/es/`.
+- 1Platform inglés: `http://1platform.localhost:4460/` (la preferencia de idioma del
+  navegador puede redirigir al español; el selector EN permite cambiarla).
+
+`scripts/preview-landings.mjs` deriva el manifest del catálogo local existente y
+el contenido EN/ES del exportador del repositorio; no duplica textos ni modifica
+configuración persistida. Se comparó el export contra
+`api-medipago-approved-landing/scripts/fixtures/site_pages_oneplatform.json`:
+cero documentos distintos y las mismas rutas publicadas. No hace falta cambiar
+esa fixture; los datos persistidos siguen pendientes de verificar en el banco.
+La API fixture usa `127.0.0.1:4461`, rechaza hosts, slugs e idiomas desconocidos y
+sólo acepta GET. Ctrl+C termina sus procesos propios. El lanzador antiguo delega
+a éste para conservar el comando ya compartido. Requisitos: Node 24, dependencias
+instaladas y `npm run build` antes de arrancar.
+`npm run test:preview-landings` pasa sus 4 controles de aislamiento/configuración
+sin abrir puertos; no acredita renderizado ni interacción en navegador.
+
+No hay otra referencia aprobada de landing 1Platform identificada en esta sesión.
+Su diseño existente se conserva; cualquier migración visual distinta queda
+pendiente de esa referencia. El acceso del navegador al preview fue rechazado
+por la política de permisos, por lo que no se capturó ni verificó visualmente la
+versión nueva. No se intentó eludir esa restricción.
 
 El gate `/verify-epic-e2e website-multitenant`, autorizado posteriormente con
 «continue», se intentó y quedó bloqueado en preflight: puertos locales y Docker

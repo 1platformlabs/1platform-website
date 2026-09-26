@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Lanzador local `preview:landings` para revisar Medipago y 1Platform por hosts
+  separados en el mismo build, con contenido de fixture por tenant e idioma.
+  No sustituye la verificación con API y DB reales.
 - Composición multitenant `photographic-service` y fuente Manrope para migrar la
   landing aprobada de Medipago: fotografía animada, panel ilustrativo y calculadora
   en centavos enteros. Marca, contenido, comisión y contacto proceden del tenant;
