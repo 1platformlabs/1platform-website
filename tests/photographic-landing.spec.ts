@@ -183,6 +183,9 @@ test('actual tenant Host renders the approved SSR page, metadata and configured 
   expect(raw.status).toBe(200);
   expect(raw.body).toContain('data-home-template="photographic-service"');
   expect(raw.body).not.toMatch(/noindex|contact-dialog|PROTOTYPE_SITE|prototipo/i);
+  // The edge's email obfuscation would turn the example into a /cdn-cgi/l/email-protection
+  // link reading "[email protected]" without JavaScript. The marker keeps it plain text.
+  expect(raw.body).toMatch(/<!--email_off-->[^<]*consulta@minombre\.com[^<]*<!--\/email_off-->/);
   await gotoLanding(page);
   expect(new URL(page.url()).hostname).toBe(HOST);
   expect(resolvedHosts.has(HOST)).toBe(true);
