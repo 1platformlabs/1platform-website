@@ -1,13 +1,14 @@
 name: Served claims — PROD scan
 
 # Reglas 3 y 4 de `scripts/check-tells.sh` (precios inventados y «reemplaza N
-# herramientas») sobre lo que PRODUCCIÓN sirve, en TODOS los sitios publicados e
-# indexables que lista el API (`GET /api/v1/sites/published-hosts`). Issue #101.
+# herramientas») sobre lo que PRODUCCIÓN sirve, en cada sitio publicado e
+# indexable que lista el API (`GET /api/v1/sites/published-hosts`). Issue #101.
 #
 # NO es un check de PR, a propósito: mide datos vivos que el PR no cambia. Un
 # precio publicado por un inquilino no puede poner en rojo un PR ajeno. Corre:
-#   - una vez por día;
-#   - después de cada deploy de producción que terminó bien;
+#   - una vez por día (schedule);
+#   - después de cada deploy de producción: `prod.yml` lo llama como último
+#     paso (`workflow_call`) sólo si el deploy terminó bien;
 #   - a mano (workflow_dispatch).
 #
 # Una lista vacía o corta es ROJO, no verde: el spec exige al menos
@@ -16,21 +17,14 @@ name: Served claims — PROD scan
 on:
   schedule:
     - cron: "17 13 * * *"
-  workflow_run:
-    workflows: ["1Platform Website — PROD"]
-    types: [completed]
+  workflow_call:
   workflow_dispatch:
 
 permissions: {}
 
-concurrency:
-  group: served-claims-prod
-  cancel-in-progress: false
-
 jobs:
   scan:
     name: Rules 3-4 over production
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -39,9 +33,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v5
         with:
-          # En `workflow_run` el checkout por defecto es la rama por defecto,
-          # que es lo que se desplegó; se deja explícito.
-          ref: main
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -49,13 +41,14 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "npm"
 
+      # `--ignore-scripts`: el scan no construye nada ni abre un navegador, así
+      # que ningún script de instalación hace falta.
       - name: Instalar dependencias
         shell: bash
         run: |
           set -euo pipefail
-          npm ci --no-audit --no-fund
+          npm ci --no-audit --no-fund --ignore-scripts
 
-      # Sin navegador: el spec pide HTML con `fetch`, no dibuja nada.
       - name: Escanear producción
         shell: bash
         env:
@@ -64,4 +57,4 @@ jobs:
           SITE_API_BASE_URL: https://api.1platform.pro
         run: |
           set -euo pipefail
-          npx playwright test -c playwright.served-claims.config.ts
+          ./node_modules/.bin/playwright test -c playwright.served-claims.config.ts
