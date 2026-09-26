@@ -26,8 +26,8 @@ import { servedHead, servedHtml } from './helpers/served';
  * `dist/client` would be worse, because it would quietly go green while proving
  * nothing about the ~17 links it is here to protect.
  *
- * So both halves moved to the server: the header markup comes from the home
- * page as it is SERVED, and "resolves" is now the HTTP question it always
+ * So both halves moved to the server: the global header markup comes from the standard
+ * about page as it is SERVED, and "resolves" is now the HTTP question it always
  * really was.
  *
  * WHY A 301 STILL COUNTS AS RESOLVING
@@ -52,8 +52,8 @@ import { servedHead, servedHtml } from './helpers/served';
  */
 
 const LOCALES = [
-  { label: 'en', home: '/' },
-  { label: 'es', home: '/es/' },
+  { label: 'en', standardPage: '/about/' },
+  { label: 'es', standardPage: '/es/nosotros/' },
 ];
 
 const REGIONS: Record<string, RegExp> = {
@@ -110,12 +110,12 @@ async function resolveLink(href: string): Promise<{ ok: boolean; trail: string }
   return { ok: false, trail: `${hops.join(' -> ')} (redirect chain longer than ${MAX_HOPS} hops)` };
 }
 
-for (const { label, home } of LOCALES) {
+for (const { label, standardPage } of LOCALES) {
   for (const [region, pattern] of Object.entries(REGIONS)) {
     test(`every ${region} link on the ${label} header resolves to a served page`, async () => {
       // Fetched inside the test, not at module scope: module scope runs before
       // Playwright has started the server, so there would be nothing to ask.
-      const html = await servedHtml(home);
+      const html = await servedHtml(standardPage);
       const hrefs = internalHrefs(html, pattern, region);
 
       // Floor, not an inventory, and it counts the unit the loop below iterates:

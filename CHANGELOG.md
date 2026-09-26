@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Las homes de 1Platform EN/ES y Medipago comparten el rediseño fotográfico
+  aprobado. 1Platform conserva su marca, foto comercial existente, destinos,
+  precios USD por cuenta y páginas secundarias; Medipago conserva GTQ y 4.9%.
+  Contenido y elección de plantilla permanecen en configuración del tenant.
+
 ### Added
 - Lanzador local `preview:landings` para revisar Medipago y 1Platform por hosts
   separados en el mismo build, con contenido de fixture por tenant e idioma.

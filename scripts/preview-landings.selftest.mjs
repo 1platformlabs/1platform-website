@@ -9,7 +9,7 @@ test('one build resolves the two hosts to their own composition and destinations
   const medipago = get('/api/v1/sites/by-host?host=medipago.localhost').body.data;
   const platform = get('/api/v1/sites/by-host?host=1platform.localhost').body.data;
   assert.equal(medipago.home_template, 'photographic-service');
-  assert.equal(platform.home_template, 'platform-commerce');
+  assert.equal(platform.home_template, 'photographic-service');
   assert.equal(medipago.domain, 'medipago.gt');
   assert.equal(platform.domain, '1platform.pro');
   assert.notEqual(medipago.destinations.support, platform.destinations.support);
@@ -25,7 +25,10 @@ test('1Platform has separate complete English and Spanish dictionaries', () => {
   assert.deepEqual(Object.keys(en.messages).sort(), Object.keys(es.messages).sort());
   assert.equal(en.pages.some((page) => page.locale !== 'en'), false);
   assert.equal(es.pages.some((page) => page.locale !== 'es'), false);
-  assert.equal(Object.keys(es.messages).some((key) => key.startsWith('photographic.')), false);
+  assert.equal(es.messages['photographic.hero.image'], 'commerce');
+  assert.equal(es.messages['photographic.calculator.mode'], 'quote');
+  assert.equal(es.messages['photographic.panel.currency'], 'USD');
+  assert.equal(es.messages['photographic.calculator.commissionBasisPoints'], undefined);
 });
 
 test('Medipago retains the configured GTQ illustration without platform copy leaking in', () => {

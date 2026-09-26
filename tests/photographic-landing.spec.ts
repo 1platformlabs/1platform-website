@@ -1,4 +1,4 @@
-import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
+import { spawn, spawnSync, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import { join } from 'node:path';
@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
 import { chromium, expect, test as base, type Browser, type Page } from '@playwright/test';
 import type { SiteTenant } from '../src/lib/site-api';
+import { repoTenantForHost } from '../src/data/site-tenants';
 import { getWithHost } from './helpers/http-host';
 
 /**
@@ -29,6 +30,9 @@ type SiteFixture = {
 const ROOT = process.cwd();
 const fixture = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/photographic-site.json'), 'utf8')) as SiteFixture;
 const HOST = 'medipago.gt';
+const PLATFORM_HOST = '1platform.pro';
+const platformTenant = repoTenantForHost(PLATFORM_HOST)!;
+const platformContent = new Map<string, SiteFixture['pagesResponse']>();
 const ALTERNATE_HOST = 'aurora-photographic.example';
 const ALTERNATE_NAME = 'Salud Aurora';
 const alternate: SiteFixture = JSON.parse(JSON.stringify(fixture).replaceAll('Medipago', ALTERNATE_NAME));
@@ -62,7 +66,7 @@ const resolvedHosts = new Set<string>();
 const test = base.extend<{ landingPage: Page }>({
   landingPage: async ({}, use) => {
     if (!tenantBrowser) throw new Error('Tenant browser is not running');
-    const context = await tenantBrowser.newContext({ viewport: { width: 1440, height: 900 } });
+    const context = await tenantBrowser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'en-US' });
     const page = await context.newPage();
     await use(page);
     await context.close();
@@ -114,16 +118,28 @@ test.describe.configure({ mode: 'default' });
 
 test.beforeAll(async () => {
   expect(existsSync(join(ROOT, 'dist/server/entry.mjs')), 'Build the real Node adapter first').toBe(true);
+  const exportPath = join(ROOT, 'test-results/photographic-oneplatform.json');
+  mkdirSync(join(ROOT, 'test-results'), { recursive: true });
+  const exported = spawnSync(process.execPath, ['scripts/export-site-content.mjs', '--out', exportPath], { cwd: ROOT, encoding: 'utf8' });
+  expect(exported.status, exported.stderr).toBe(0);
+  const catalogue = JSON.parse(readFileSync(exportPath, 'utf8')) as { documents: { route: string; locale: string; published: boolean; blocks: Record<string, string> }[] };
+  for (const locale of platformTenant.locales) {
+    const pages = catalogue.documents.filter((document) => document.locale === locale && document.published);
+    platformContent.set(locale, { success: true, data: { slug: platformTenant.slug, locale, pages, messages: Object.assign({}, ...pages.map((document) => document.blocks)) }, msg: 'ok' });
+  }
   api = createServer((request, response) => {
     const url = new URL(request.url ?? '/', 'http://contract');
     response.setHeader('content-type', 'application/json; charset=utf-8');
     if (url.pathname.endsWith('/sites/by-host')) {
       const host = url.searchParams.get('host') ?? '';
       resolvedHosts.add(host);
+      if (host === PLATFORM_HOST) return response.end(JSON.stringify({ success: true, data: platformTenant, msg: 'Site resolved' }));
       const selected = host === HOST ? fixture : host === ALTERNATE_HOST ? alternate : null;
       if (selected) return response.end(JSON.stringify({ success: true, data: selected.tenant, msg: 'Site resolved' }));
     } else {
       const match = /\/sites\/([^/]+)\/pages$/.exec(url.pathname);
+      const content = match?.[1] === platformTenant.slug ? platformContent.get(url.searchParams.get('locale') ?? '') : null;
+      if (content) return response.end(JSON.stringify(content));
       const selected = [fixture, alternate].find((candidate) => candidate.tenant.slug === match?.[1]);
       if (selected && url.searchParams.get('locale') === selected.tenant.default_locale) {
         return response.end(JSON.stringify(selected.pagesResponse));
@@ -149,7 +165,7 @@ test.beforeAll(async () => {
     try { return (await getWithHost(`${appBaseUrl}/`, HOST)).status; } catch { return 0; }
   }, { timeout: 30_000, message: 'The built tenant route must start' }).toBe(200);
   tenantBrowser = await chromium.launch({
-    args: [`--host-resolver-rules=MAP ${HOST} 127.0.0.1, MAP ${ALTERNATE_HOST} 127.0.0.1`],
+    args: [`--host-resolver-rules=MAP ${HOST} 127.0.0.1, MAP ${ALTERNATE_HOST} 127.0.0.1, MAP ${PLATFORM_HOST} 127.0.0.1`],
   });
 });
 
@@ -275,7 +291,7 @@ test('the demonstration has keyboard tabs, local filters and separate credits an
   await expect(billing).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#panel-billing')).toBeVisible();
   await expect(page.locator('#panel-summary')).toBeHidden();
-  await expect(page.locator('#panel-billing [data-panel-money="creditGTQ"]')).toHaveText(/Q\s?480\.00/);
+  await expect(page.locator('#panel-billing [data-panel-money="credit"]')).toHaveText(/Q\s?480\.00/);
   await page.locator('[data-panel-filter="expense"]').click();
   await expect(page.locator('#panel-transaction-rows tr:visible')).toHaveCount(1);
   await expect(page.locator('#panel-transaction-rows tr:visible')).toContainText(/-Q\s*20\.00/);
@@ -287,7 +303,7 @@ test('the demonstration has keyboard tabs, local filters and separate credits an
   await billing.focus();
   await page.keyboard.press('End');
   await expect(withdrawals).toBeFocused();
-  await expect(page.locator('#panel-withdrawals [data-panel-money="withdrawGTQ"]')).toHaveText(/Q\s?0\.00/);
+  await expect(page.locator('#panel-withdrawals [data-panel-money="withdraw"]')).toHaveText(/Q\s?0\.00/);
   await expect(page.locator('#panel-withdrawals .panel-disabled')).toBeDisabled();
   await expect(page.locator('#withdraw-reason')).not.toBeEmpty();
   await page.setViewportSize({ width: 360, height: 800 });
@@ -423,3 +439,38 @@ test('another tenant reuses the composition with its own brand, destination, fon
   expect(unknown.status).toBe(404);
   expect(unknown.body).not.toContain('data-home-template="photographic-service"');
 });
+
+for (const [locale, path] of [['en', '/'], ['es', '/es/']] as const) {
+  test(`1Platform ${locale} resolves the shared design with its own pricing and CTA`, async ({ landingPage: page }) => {
+    const response = await page.goto(`http://${PLATFORM_HOST}:${appPort}${path}`);
+    expect(response?.status()).toBe(200);
+    await expect(page.locator('body')).toHaveAttribute('data-home-template', 'photographic-service');
+    await expect(page.locator('body')).toHaveAttribute('data-enhanced', 'true');
+    expect(resolvedHosts.has(PLATFORM_HOST)).toBe(true);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://${PLATFORM_HOST}${path}`);
+    await expect(page.locator('.site-header .wordmark')).toHaveText('Platform');
+    await expect(page.locator('link[hreflang="x-default"]')).toHaveAttribute('href', `https://${PLATFORM_HOST}/`);
+    await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveCount(1);
+    await expect(page.locator('link[rel="sitemap"]')).toHaveAttribute('href', '/sitemap-index.xml');
+    await expect(page.locator('link[type="application/rss+xml"]')).toHaveAttribute('href', locale === 'en' ? '/rss.xml' : '/es/rss.xml');
+    await expect(page.locator('h1')).toHaveCSS('font-family', /Manrope/);
+    await expect(page.locator('.panel-demo')).toHaveCSS('font-family', /PanelInter/);
+    await expect(page.locator('.pricing-card')).toBeVisible();
+    await expect(page.locator('#price-calculator')).toHaveCount(0);
+    await expect(page.locator('.pricing-card')).toContainText('USD');
+    const text = await page.locator('body').innerText();
+    expect(text).not.toMatch(/Medipago|médicos?|consultorio|4\.9%|WhatsApp|\bGTQ\b/i);
+    expect(text).toMatch(locale === 'en' ? /fictional/i : /fictici/i);
+    for (const href of await page.locator('[data-support-cta]').evaluateAll((links) => links.map((link) => link.getAttribute('href')))) {
+      expect(href).toBe(platformTenant.destinations.app);
+    }
+    await expect(page.locator('.landing-product-links a')).toHaveCount(7);
+    await expect(page.locator('.site-footer a[href^="/es/"]')).toHaveCount(locale === 'es' ? 16 : 0);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await checkOverflow(page);
+    await expect(page.locator('.site-header')).toHaveCSS('position', 'fixed');
+    await expect(page.locator('.menu-toggle')).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+    expect(results.violations).toEqual([]);
+  });
+}

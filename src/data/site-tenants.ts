@@ -49,7 +49,7 @@ const ONEPLATFORM: SiteTenant = {
   domain: '1platform.pro',
   locales: ['en', 'es'],
   default_locale: 'en',
-  home_template: 'platform-commerce',
+  home_template: 'photographic-service',
   theme: {
     // The values the site ships today, read from src/styles/global.css so the
     // conversion changes the SOURCE of the tokens and not the tokens.

@@ -1,20 +1,24 @@
 ---
 import { Image } from 'astro:assets';
+import { useI18n, type Locale } from '@i18n';
 import consultorio from '@assets/photographic/consultorio-hero.webp';
+import commerce from '@assets/product/showcase-store-bg.webp';
 import { photographicContent, safeJson } from '@lib/photographic-content';
 import { calculateLandingAmount } from '@lib/landing-calculator';
 import { siteOrigin } from '@lib/site-origin';
-import { alternatesForTenantPath, ogLocaleOf } from '@lib/site-locale';
+import { alternatesForTenantPath, defaultLocaleOf, makeLocalizePath, ogLocaleOf } from '@lib/site-locale';
 import { resolveIcon, resolveSocial, resolveAppleTouchIcon, socialImageIsAvailable, appleTouchIconIsAvailable } from '@lib/tenant-brand-assets';
 import '@styles/photographic-service.css';
 import '@styles/photographic-panel.css';
 
 const tenant = Astro.locals.tenant;
-const { copy, contactHref, navigation, steps, audiences, faqs, calculator, panel, brandStyle, clientConfig } = photographicContent(Astro.locals.messages, tenant);
-const photographs = { consultorio };
+const { copy, contactHref, navigation, steps, audiences, faqs, calculator, panel, brandStyle, clientConfig, fontKey, palette } = photographicContent(Astro.locals.messages, tenant);
+const photographs = { consultorio, commerce };
 const photoKey = copy('hero.image');
 if (!Object.hasOwn(photographs, photoKey)) throw new Error('Unrecognised photographic asset');
 const heroPhoto = photographs[photoKey as keyof typeof photographs];
+const photoWidth = Math.min(1672, heroPhoto.width);
+const photoHeight = Math.round(photoWidth * heroPhoto.height / heroPhoto.width);
 const title = copy('meta.title');
 const description = copy('meta.description');
 const canonical = new URL(Astro.originPathname, siteOrigin(Astro.locals));
@@ -23,11 +27,45 @@ const icon = resolveIcon(tenant);
 const socialImage = await socialImageIsAvailable(tenant) ? new URL(resolveSocial(tenant), siteOrigin(Astro.locals)) : null;
 const touchIcon = await appleTouchIconIsAvailable(tenant) ? resolveAppleTouchIcon(tenant) : null;
 const locale = Astro.locals.locale;
+const localize = makeLocalizePath(tenant);
+const pricingHref = tenant.pages.includes('/pricing/') ? localize('/pricing/', locale) : contactHref('calculator');
+const defaultAlternate = alternates[defaultLocaleOf(tenant)];
+const rssPath = tenant.pages.includes('/blog/') ? localize('/rss.xml', locale) : null;
+const languageChoices = Object.entries(alternates).filter(([language]) => language === 'en' || language === 'es');
+const { t } = useI18n(Astro.url.pathname, Astro.locals);
+// Published routes and their existing tenant-authored labels remain reachable
+// when the home changes composition. Single-page tenants get no borrowed links.
+const publishedLinks = (links: { route: string; label: () => string }[]) => links
+  .filter(({ route }) => tenant.pages.includes(route))
+  .map(({ route, label }) => ({ href: localize(route, locale), label: label() }));
+const productLinks = publishedLinks([
+  { route: '/solutions/online-store/', label: () => t('nav.solutions.onlineStore') },
+  { route: '/payments-invoicing/', label: () => t('nav.solutions.payments') },
+  { route: '/solutions/deliveries/', label: () => t('nav.solutions.deliveries') },
+  { route: '/solutions/ads/', label: () => t('nav.solutions.ads') },
+  { route: '/solutions/content/', label: () => t('nav.solutions.content') },
+  { route: '/solutions/whitelabel/', label: () => t('nav.solutions.whitelabel') },
+  { route: '/solutions/', label: () => t('footer.link.allSolutions') },
+]);
+const companyLinks = publishedLinks([
+  { route: '/about/', label: () => t('footer.link.about') },
+  { route: '/pricing/', label: () => t('nav.pricing') },
+  { route: '/for-agencies/', label: () => t('footer.link.forAgencies') },
+  { route: '/for-developers/', label: () => t('footer.link.forDevelopers') },
+  { route: '/blog/', label: () => t('nav.blog') },
+  { route: '/changelog/', label: () => t('footer.link.changelog') },
+]);
+const legalLinks = publishedLinks([
+  { route: '/terms/', label: () => t('footer.link.terms') },
+  { route: '/privacy/', label: () => t('footer.link.privacy') },
+  { route: '/cookies/', label: () => t('footer.link.cookiePreferences') },
+]);
 const formatLocale = tenant.region ? `${locale}-${tenant.region}` : locale;
-const money = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: calculator.currency, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
-const rateLabel = new Intl.NumberFormat(formatLocale, { style: 'percent', maximumFractionDigits: 2 }).format(calculator.commissionBasisPoints / 10000);
-const defaultCalculation = calculateLandingAmount('100.00', calculator.commissionBasisPoints);
-if (!defaultCalculation.ok) throw new Error('Invalid landing calculator configuration');
+const money = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: panel.currency, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
+const calculatorMoney = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: 'GTQ', currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
+const rateLabel = calculator ? new Intl.NumberFormat(formatLocale, { style: 'percent', maximumFractionDigits: 2 }).format(calculator.commissionBasisPoints / 10000) : null;
+const defaultCalculation = calculator ? calculateLandingAmount('100.00', calculator.commissionBasisPoints) : null;
+if (defaultCalculation && !defaultCalculation.ok) throw new Error('Invalid landing calculator configuration');
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: tenant.brand_name, url: canonical.toString(), description },
   { '@context': 'https://schema.org', '@type': 'Organization', name: tenant.brand_name, url: canonical.toString(), ...(socialImage ? { logo: socialImage.toString() } : {}) },
@@ -45,24 +83,45 @@ const jsonLd = [
     <meta name="description" content={description} />
     {!tenant.indexable && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
+    {tenant.indexable && <link rel="sitemap" href="/sitemap-index.xml" />}
+    {rssPath && <link rel="alternate" type="application/rss+xml" title={t('layout.rssTitle')} href={rssPath} />}
+    {defaultAlternate && <link rel="alternate" hreflang="x-default" href={new URL(defaultAlternate, siteOrigin(Astro.locals))} />}
     {Object.entries(alternates).map(([language, path]) => <link rel="alternate" hreflang={language} href={new URL(path!, siteOrigin(Astro.locals))} />)}
     <link rel="icon" href={icon} type="image/svg+xml" />
     {touchIcon && <link rel="apple-touch-icon" href={touchIcon} />}
-    {tenant.theme.display_font === 'manrope' && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
+    {fontKey === 'manrope' && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content={tenant.brand_name} />
     <meta property="og:locale" content={ogLocaleOf(locale, tenant)} />
+    {(Object.keys(alternates) as Locale[]).filter((language) => language !== locale).map((language) => <meta property="og:locale:alternate" content={ogLocaleOf(language, tenant)} />)}
     {socialImage && <meta property="og:image" content={socialImage} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     {socialImage && <meta name="twitter:image" content={socialImage} />}
     <script is:inline type="application/ld+json" set:html={safeJson(jsonLd)} />
+    {languageChoices.length > 1 && <script is:inline>
+      // Keep the established locale preference and stay on the current host.
+      if (!window.__1pLangChecked) {
+        window.__1pLangChecked = true;
+        const path = location.pathname.toLowerCase();
+        if (path !== '/es' && !path.startsWith('/es/')) {
+          const cookie = /(?:^|;\s*)1p_lang=(en|es)(?:;|$)/.exec(document.cookie)?.[1];
+          const language = navigator.language?.toLowerCase().split('-')[0];
+          const wanted = cookie || (language ? language === 'en' ? 'en' : 'es' : 'en');
+          const alternate = document.querySelector('link[rel="alternate"][hreflang="es"]');
+          if (wanted === 'es' && alternate) {
+            const target = new URL(alternate.getAttribute('href'), location.origin);
+            if (target.pathname !== location.pathname) location.replace(target.pathname + location.search + location.hash);
+          }
+        }
+      }
+    </script>}
   </head>
-<body class="photographic-service" data-home-template="photographic-service" style={brandStyle}>
+<body class="photographic-service" data-home-template="photographic-service" data-palette={palette} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
 <a class="skip-link" href="#contenido">{copy('ui.skip_link')}</a>
 <svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg">
 <symbol id="i-arrow" viewBox="0 0 24 24">
@@ -120,6 +179,7 @@ const jsonLd = [
 <span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span>
 </a>
 <nav aria-label={copy('ui.desktop_nav_aria_label')} class="desktop-nav">{navigation.map((item) => <a href={item.href}>{item.label}</a>)}</nav>
+{languageChoices.length > 1 && <nav class="landing-languages" aria-label={copy('ui.language_label')}>{languageChoices.map(([language, path]) => language === locale ? <span aria-current="true" lang={language}>{copy(`ui.language_${language}`)}</span> : <a href={path} hreflang={language} lang={language} data-lang-choice={language}>{copy(`ui.language_${language}`)}</a>)}</nav>}
 <a class="button button-header" data-support-cta="header" href={contactHref('header')}>
 <span>{copy('actions.header')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg>
 </a>
@@ -130,7 +190,7 @@ const jsonLd = [
 </header>
 <main id="contenido">
 <section aria-labelledby="hero-title" class="hero" id="inicio">
-<Image alt="" class="hero-photo" fetchpriority="high" format="webp" height="941" loading="eager" quality={90} src={heroPhoto} width="1672"/>
+<Image alt="" class="hero-photo" fetchpriority="high" format="webp" height={photoHeight} loading="eager" quality={90} src={heroPhoto} width={photoWidth}/>
 <div class="hero-shade"></div>
 <div class="hero-content wrap">
 <h1 id="hero-title">
@@ -397,10 +457,10 @@ const jsonLd = [
 <section aria-labelledby="credit-title" class="panel-card panel-credit">
 <div class="panel-card-heading">
 <h4 class="panel-eyebrow" id="credit-title">{copy('ui.credit_title')}</h4>
-<span class="panel-chip">GTQ</span>
+<span class="panel-chip">{panel.currency}</span>
 </div>
 <div class="panel-credit-body">
-<strong class="panel-money" data-panel-money="creditGTQ">{money(panel.sample.creditGTQ)}</strong>
+<strong class="panel-money" data-panel-money="credit">{money(panel.sample.creditCents)}</strong>
 <p>{copy('ui.label17')}</p>
 <button class="panel-primary" data-panel-go="billing" hidden="" type="button">{copy('ui.panel_primary')}<svg aria-hidden="true" class="icon">
 <use href="#i-arrow"></use>
@@ -415,9 +475,9 @@ const jsonLd = [
 <p class="panel-page-desc">{copy('ui.panel_page_desc')}</p>
 <section aria-label={copy('ui.panel_card_panel_balance_aria_label')} class="panel-card panel-balance">
 <div class="panel-between">
-<span class="panel-eyebrow">{copy('ui.credit_title')}</span><span class="panel-chip">GTQ</span>
+<span class="panel-eyebrow">{copy('ui.credit_title')}</span><span class="panel-chip">{panel.currency}</span>
 </div>
-<strong class="panel-money" data-panel-money="creditGTQ">{money(panel.sample.creditGTQ)}</strong>
+<strong class="panel-money" data-panel-money="credit">{money(panel.sample.creditCents)}</strong>
 <p class="panel-callout">{copy('ui.panel_callout')}</p>
 </section>
 <section aria-labelledby="transactions-title" class="panel-card panel-transactions">
@@ -453,7 +513,7 @@ const jsonLd = [
 <div class="panel-withdraw-balances">
 <section aria-labelledby="withdraw-gtq" class="panel-card">
 <h4 id="withdraw-gtq">{copy('ui.withdraw_gtq')}</h4>
-<strong class="panel-money" data-panel-money="withdrawGTQ">{money(panel.sample.withdrawGTQ)}</strong>
+<strong class="panel-money" data-panel-money="withdraw">{money(panel.sample.withdrawCents)}</strong>
 <p>{copy('ui.label35')}</p>
 </section>
 </div>
@@ -503,6 +563,7 @@ const jsonLd = [
 <p class="eyebrow">{copy('onboarding.eyebrow')}</p>
 <h2 id="onboarding-title">{copy('onboarding.title')}</h2>
 <p>{copy('onboarding.description')}</p>
+{productLinks.length > 0 && <ul class="landing-product-links">{productLinks.map(({ href, label }) => <li><a href={href}>{label}</a></li>)}</ul>}
 <a class="button button-teal" data-support-cta="onboarding" href={contactHref('onboarding')}>
 <span>{copy('actions.onboarding')}</span><svg aria-hidden="true" class="icon">
 <use href="#i-up-right"></use>
@@ -510,11 +571,12 @@ const jsonLd = [
 </a>
 </div>
 <div class="onboarding-photo">
-<Image alt={copy('ui.img_alt')} format="webp" height="941" loading="lazy" quality={90} sizes="(min-width: 981px) 50vw, 100vw" src={heroPhoto} width="1672" widths={[640, 960, 1280, 1672]}/>
+<Image alt={copy('ui.img_alt')} format="webp" height={photoHeight} loading="lazy" quality={90} sizes="(min-width: 981px) 50vw, 100vw" src={heroPhoto} width={photoWidth} widths={[640, 960, 1280, 1672]}/>
 </div>
 </div>
 </section>
 <section aria-labelledby="calculator-title" class="calculator-section section-pad wrap" id="calculadora">
+{defaultCalculation?.ok ? <>
 <form class="calculator-form" id="price-calculator" novalidate="">
 <h3>{copy('calculator.formTitle')}</h3>
 <div class="calc-field amount-field">
@@ -534,11 +596,11 @@ const jsonLd = [
 </button>
 <p class="calc-error" id="calc-error" role="alert"></p>
 <div aria-atomic="true" aria-live="polite" class="calc-result" role="status">
-<span>{copy('calculator.result')}</span><output id="calc-net">{money(defaultCalculation.net)}</output>
+<span>{copy('calculator.result')}</span><output id="calc-net">{calculatorMoney(defaultCalculation.net)}</output>
 <dl>
 <div>
 <dt>{copy('calculator.fee')}</dt>
-<dd id="calc-fee">{money(defaultCalculation.fee)}</dd>
+<dd id="calc-fee">{calculatorMoney(defaultCalculation.fee)}</dd>
 </div>
 </dl>
 <p id="calc-status">{copy('ui.calculator_nojs')}</p>
@@ -555,6 +617,22 @@ const jsonLd = [
 </a>
 <p class="calculator-note">{copy('calculator.note')}</p>
 </div>
+</> : <>
+<div class="calculator-form pricing-card">
+<h3>{copy('pricing.heading')}</h3>
+<dl>
+<div><dt>{copy('pricing.balanceLabel')}</dt><dd>{copy('pricing.balanceValue')}</dd></div>
+<div><dt>{copy('pricing.rateLabel')}</dt><dd>{copy('pricing.rateValue')}</dd></div>
+</dl>
+<p>{copy('pricing.note')}</p>
+</div>
+<div class="calculator-copy">
+<p class="eyebrow">{copy('calculator.eyebrow')}</p>
+<h2 id="calculator-title">{copy('pricing.title')}</h2>
+<p class="calculator-intro">{copy('pricing.description')}</p>
+<a class="button button-teal" href={pricingHref}><span>{copy('pricing.cta')}</span><svg aria-hidden="true" class="icon"><use href="#i-arrow" /></svg></a>
+</div>
+</>}
 </section>
 <section aria-labelledby="faq-title" class="faq-section section-pad wrap" id="preguntas">
 <div class="faq-heading">
@@ -586,17 +664,21 @@ const jsonLd = [
 </div>
 <nav aria-label={copy('ui.footer_column_aria_label')} class="footer-column">
 <h2>{copy('footer.solutions')}</h2>
+{productLinks.length > 0 ? productLinks.map(({ href, label }) => <a href={href}>{label}</a>) : <>
 <a href="#como-cobras">{copy('hero.feature1')}</a>
 <a href="#como-cobras">{copy('hero.feature2')}</a>
 <a href="#como-funciona">{copy('hero.feature3')}</a>
+</>}
 </nav>
 <nav aria-label={copy('ui.footer_column_aria_label63')} class="footer-column">
 <h2>{tenant.brand_name}</h2>
+{companyLinks.length > 0 ? companyLinks.map(({ href, label }) => <a href={href}>{label}</a>) : <>
 <a href="#como-funciona">{copy('ui.label42')}</a>
 <a href="#su-panel">{copy('ui.label43')}</a>
 <a href="#para-quien">{copy('ui.label44')}</a>
 <a href="#calculadora">{copy('ui.label45')}</a>
 <a href="#preguntas">{copy('ui.label46')}</a>
+</>}
 </nav>
 <div class="footer-column">
 <h2>{copy('footer.contact')}</h2>
@@ -606,6 +688,8 @@ const jsonLd = [
 <use href="#i-up-right"></use>
 </svg>
 </a>
+{legalLinks.map(({ href, label }) => <a href={href}>{label}</a>)}
+{tenant.destinations.docs && <a href={tenant.destinations.docs}>{copy('footer.docs')}</a>}
 </div>
 </div>
 <div class="wrap footer-bottom">

@@ -60,3 +60,18 @@ Los paneles de cobro, enlace y facturación automática, el flujo y los iconos s
 Se eliminó únicamente el CSS del contacto simulado, el aviso que bloqueaba el sitio sin JavaScript y el footer anterior que ya no tenía markup. Se conservan navbar fijo, jerarquía tipográfica, panel, footer oscuro y animaciones; la marca y la tipografía se reciben desde la configuración del tenant. La versión de producción presenta contenido SSR y mejora progresiva.
 
 No se copiaron el arnés de auditoría, Axe, capturas del prototipo, su `noindex` ni su PNG de 1,92 MB al bundle del sitio.
+
+## Reutilización para 1Platform
+
+La ampliación al segundo tenant usa `src/assets/product/showcase-store-bg.webp`,
+2880 × 1800, ya presente en el repositorio. La procedencia sigue en
+`src/assets/product/showcase-editorial-provenance.json` (revisión 2026-08-29-v2,
+generación `43d402ce-ead9-4e5c-a7c9-f8f41f39b2d5`). Es una escena original
+ilustrativa de un comerciante preparando un paquete, no un testimonio. No se
+crearon imágenes nuevas ni se incorporó material de terceros. La imagen fue
+inspeccionada en disco para confirmar escena y texto alternativo.
+
+El renderer permite únicamente claves de fotografía registradas (`consultorio`
+y `commerce`). Astro sirve WebP hasta 1672 px conservando proporción y respetando
+el límite del endpoint de imágenes; la imagen secundaria usa variantes y lazy
+loading. Los dos tenants comparten fuentes locales y licencias ya documentadas.

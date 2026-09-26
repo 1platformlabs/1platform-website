@@ -1,10 +1,12 @@
 import type { SiteTenant } from './site-api'
 import { DISPLAY_FONT_STACKS } from './tenant-theme'
+import { i18nKey } from '../i18n/key'
 
 /** This composition consumes the same request-local SitePage dictionary as every home. */
 export function photographicContent(messages: Record<string, string>, tenant: SiteTenant) {
+  const prefix = i18nKey('photographic.')
   const copy = (key: string): string => {
-    const value = messages[`photographic.${key}`]
+    const value = messages[`${prefix}${key}`]
     if (typeof value !== 'string' || !value.trim()) throw new Error(`Missing photographic content: ${key}`)
     return value
   }
@@ -16,9 +18,9 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
     }
     return value
   }
-  const support = new URL(tenant.destinations.support ?? '')
+  const support = new URL(tenant.destinations.support ?? tenant.destinations.app ?? '')
   if (support.protocol !== 'https:' || support.username || support.password) {
-    throw new Error('Photographic service requires an HTTPS support destination')
+    throw new Error('Photographic service requires an HTTPS support or app destination')
   }
   const contactHref = (context: string): string => {
     const url = new URL(support)
@@ -46,19 +48,27 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
   const faqs = Array.from({ length: 4 }, (_, index) => ({
     question: copy(`faq.items.${index}.question`), answer: copy(`faq.items.${index}.answer`),
   }))
-  if (copy('calculator.currency') !== 'GTQ' || copy('panel.currency') !== 'GTQ') {
-    throw new Error('This composition currently presents quetzales only')
+  const calculatorMode = messages['photographic.calculator.mode'] ?? 'calculate'
+  if (!['calculate', 'quote'].includes(calculatorMode)) throw new Error('Invalid landing pricing mode')
+  if (calculatorMode === 'calculate' && copy('calculator.currency') !== 'GTQ') {
+    throw new Error('The fixed-rate calculator presents quetzales only')
   }
-  const calculator = {
+  const calculator = calculatorMode === 'calculate' ? {
     currency: 'GTQ' as const,
     commissionBasisPoints: integer('calculator.commissionBasisPoints', 0, 10000),
     changed: copy('calculator.changed'), empty: copy('calculator.empty'), invalid: copy('calculator.invalid'),
-  }
+  } : null
+  const panelCurrency = copy('panel.currency')
+  if (panelCurrency !== 'GTQ' && panelCurrency !== 'USD') throw new Error('Invalid demonstration currency')
+  const amountKey = (current: string, legacy: string) => messages[`${prefix}${current}`] === undefined ? legacy : current
   const panel = {
     summary: copy('panel.summary'), billing: copy('panel.billing'), withdrawals: copy('panel.withdrawals'),
-    currency: 'GTQ' as const,
+    currency: panelCurrency,
     filterStatusOne: copy('ui.movements_one'), filterStatusMany: copy('ui.movements_many'),
-    sample: { creditGTQ: integer('panel.sample.creditGTQ', 0, 999999999), withdrawGTQ: integer('panel.sample.withdrawGTQ', 0, 999999999) },
+    sample: {
+      creditCents: integer(amountKey('panel.sample.creditCents', 'panel.sample.creditGTQ'), 0, 999999999),
+      withdrawCents: integer(amountKey('panel.sample.withdrawCents', 'panel.sample.withdrawGTQ'), 0, 999999999),
+    },
     movements: Array.from({ length: 2 }, (_, index) => {
       const type = copy(`panel.movements.${index}.type`)
       if (type !== 'expense' && type !== 'income') throw new Error('Invalid demonstration movement')
@@ -68,15 +78,17 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
       }
     }),
   }
-  if (panel.movements.reduce((total, movement) => total + movement.cents, 0) !== panel.sample.creditGTQ) {
+  if (panel.movements.reduce((total, movement) => total + movement.cents, 0) !== panel.sample.creditCents) {
     throw new Error('Demonstration credits do not reconcile')
   }
-  const font = DISPLAY_FONT_STACKS[tenant.theme.display_font]
+  const fontKey = messages['photographic.theme.displayFont'] ?? tenant.theme.display_font
+  const font = Object.hasOwn(DISPLAY_FONT_STACKS, fontKey) ? DISPLAY_FONT_STACKS[fontKey as keyof typeof DISPLAY_FONT_STACKS] : undefined
   if (!font || !/^#[\da-f]{6}$/i.test(tenant.theme.accent) || !/^#[\da-f]{6}$/i.test(tenant.theme.accent_contrast)) {
     throw new Error('Invalid photographic theme')
   }
   return {
-    copy, contactHref, navigation, steps, audiences, faqs, calculator, panel,
+    copy, contactHref, navigation, steps, audiences, faqs, calculator, panel, fontKey,
+    palette: messages['photographic.theme.palette'] === 'brand' ? 'brand' : 'service',
     brandStyle: `--accent:${tenant.theme.accent};--accent-ink:${tenant.theme.accent_contrast};--tenant-font-family:${font}`,
     clientConfig: {
       calculator,

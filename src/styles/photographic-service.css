@@ -40,6 +40,83 @@
   --body: var(--tenant-font-family);
   --radius: 24px;
 }
+.photographic-service[data-palette="brand"] {
+  --deep: color-mix(in srgb, var(--accent) 35%, black);
+  --ink: color-mix(in srgb, var(--accent) 20%, black);
+  --muted: color-mix(in srgb, var(--accent) 25%, dimgray);
+  --mint: color-mix(in srgb, var(--accent) 14%, white);
+  --wash: color-mix(in srgb, var(--accent) 4%, white);
+  --line: color-mix(in srgb, var(--accent) 16%, white);
+}
+.photographic-service[data-palette="brand"] .site-header {
+  background: color-mix(in srgb, var(--deep) 75%, transparent);
+}
+.photographic-service[data-palette="brand"] .site-header.is-scrolled {
+  background: color-mix(in srgb, var(--deep) 94%, transparent);
+}
+.photographic-service[data-palette="brand"] .hero-shade {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--deep) 62%, transparent), color-mix(in srgb, var(--deep) 70%, transparent) 70%, var(--deep));
+}
+.photographic-service[data-palette="brand"] .service-stage,
+.photographic-service[data-palette="brand"] .flow-visual,
+.photographic-service[data-palette="brand"] .calculator-form {
+  background: var(--wash);
+}
+.landing-languages {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 2px;
+  font-size: 12px;
+}
+.landing-languages > * {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 44px;
+  border-radius: 999px;
+}
+.landing-languages [aria-current] {
+  background: rgb(255 255 255 / 16%);
+}
+.photographic-service[data-language-choices] .site-header {
+  gap: 12px;
+}
+.photographic-service[data-language-choices] .desktop-nav {
+  gap: clamp(8px, 1.2vw, 20px);
+}
+.photographic-service[data-language-choices] .button-header {
+  margin-left: 0;
+}
+.pricing-card dl {
+  display: grid;
+  gap: 24px;
+  margin-block: 32px;
+}
+.pricing-card dl > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.pricing-card dd {
+  margin: 0;
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 700;
+}
+@media (max-width: 1200px) {
+  .photographic-service[data-language-choices] .button-header {
+    display: none;
+  }
+}
+@media (max-width: 980px) {
+  .landing-languages {
+    margin-left: auto;
+  }
+}
 * {
   box-sizing: border-box;
 }
@@ -2416,3 +2493,7 @@ h3 {
     min-height: 48px;
   }
 }
+
+/* Tenant-published solution directory, absent on a single-page site. */
+.photographic-service .landing-product-links { display: flex; flex-wrap: wrap; gap: 10px 20px; list-style: none; margin: 24px 0; padding: 0; }
+.photographic-service .landing-product-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }

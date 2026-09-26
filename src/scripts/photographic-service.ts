@@ -36,6 +36,15 @@ function initPhotographicService() {
   const { signal } = controller;
   const observers: IntersectionObserver[] = [];
   const config = readConfig(root);
+  root.querySelectorAll<HTMLAnchorElement>('[data-lang-choice]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const language = link.dataset.langChoice;
+      if (language === 'en' || language === 'es') {
+        document.cookie = `1p_lang=${language}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+      }
+    }, { signal });
+  });
   releaseEnhancements = () => {
     controller.abort();
     observers.forEach((observer) => observer.disconnect());

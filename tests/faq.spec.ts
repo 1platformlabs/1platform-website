@@ -11,7 +11,7 @@ test('the home FAQ uses semantic details and remains available without JavaScrip
   // copy, and pinning the exact count turned "we added a question merchants
   // actually ask" into a red build. Zero, or a list that stopped matching the
   // selector, still fails here.
-  const items = page.locator('.product-faq__item');
+  const items = page.locator('#faq-list > details');
   expect(await items.count()).toBeGreaterThanOrEqual(2);
   await items.first().locator('summary').click();
   await expect(items.first()).toHaveAttribute('open', /.*/);

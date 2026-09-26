@@ -1,7 +1,8 @@
-# Medipago: entrega de la landing aprobada
+# Landing compartida: Medipago y 1Platform
 
 Fecha: 2026-09-25. Alcance: migración del prototipo aprobado a la home real de
-Medipago mediante la arquitectura multitenant existente. No implementa toda
+Medipago mediante la arquitectura multitenant existente, ampliada por instrucción
+posterior del usuario a la home de 1platform.pro con la misma composición. No implementa toda
 `website-multitenant`, ni modifica el dashboard autenticado, cobros efectivos,
 comisiones del motor, retiros o emisión de facturas.
 
@@ -34,33 +35,76 @@ apunta ahora al build de este worktree. Para verlo, detener con Ctrl+C el previe
 anterior y volver a ejecutar el lanzador con Node 24. Sigue siendo un preview con
 fixture HTTP, no el banco E2E. La sesión no puede reiniciar el proceso por sí misma.
 
-La home actual de `1platform.pro` ya tiene composición `platform-commerce` y
-`CommerceOrbit.astro`. Ahora `npm run preview:landings` sirve las dos composiciones
-en el mismo build, con fixtures por tenant y locale, a través del resolver real:
+### Ampliación a 1Platform (decisión posterior del usuario)
 
-- Medipago: `http://medipago.localhost:4460/` o `http://127.0.0.1:4460/`.
-- 1Platform español: `http://1platform.localhost:4460/es/`.
-- 1Platform inglés: `http://1platform.localhost:4460/` (la preferencia de idioma del
-  navegador puede redirigir al español; el selector EN permite cambiarla).
+El usuario confirmó que el rediseño debe aplicarse también a `1platform.pro`,
+porque ambos sitios son tenants del mismo website. **Las dos homes seleccionan
+ahora `photographic-service`**; no se ha creado otro prototipo. Esta decisión
+sustituye el alcance anterior que conservaba la home orbital de 1Platform.
 
-`scripts/preview-landings.mjs` deriva el manifest del catálogo local existente y
-el contenido EN/ES del exportador del repositorio; no duplica textos ni modifica
-configuración persistida. Se comparó el export contra
-`api-medipago-approved-landing/scripts/fixtures/site_pages_oneplatform.json`:
-cero documentos distintos y las mismas rutas publicadas. No hace falta cambiar
-esa fixture; los datos persistidos siguen pendientes de verificar en el banco.
-La API fixture usa `127.0.0.1:4461`, rechaza hosts, slugs e idiomas desconocidos y
-sólo acepta GET. Ctrl+C termina sus procesos propios. El lanzador antiguo delega
-a éste para conservar el comando ya compartido. Requisitos: Node 24, dependencias
-instaladas y `npm run build` antes de arrancar.
-`npm run test:preview-landings` pasa sus 4 controles de aislamiento/configuración
-sin abrir puertos; no acredita renderizado ni interacción en navegador.
+1Platform usa su marca/acento, fotografía comercial existente, contenido EN/ES,
+Manrope sólo en esta landing y el mismo panel ficticio con su tipografía original.
+Conserva el tema global `space-grotesk` y las páginas secundarias. Su CTA procede
+de `destinations.app`; no se fabrica un teléfono. El contrato comercial existente
+es saldo prepago USD y tarifa por cuenta: la sección de precios comparte la
+composición, pero no copia la comisión 4.9% ni la calculadora GTQ de Medipago.
 
-No hay otra referencia aprobada de landing 1Platform identificada en esta sesión.
-Su diseño existente se conserva; cualquier migración visual distinta queda
-pendiente de esa referencia. El acceso del navegador al preview fue rechazado
-por la política de permisos, por lo que no se capturó ni verificó visualmente la
-versión nueva. No se intentó eludir esa restricción.
+El export añade `@photographic-home` a `site_pages_oneplatform.json`: 216 claves
+por idioma. Las 26 rutas y las 937 claves anteriores por idioma se conservan.
+El footer mantiene sus 16 destinos públicos y el contenido principal enlaza a las
+soluciones publicadas. `x-default`, alternates OG, RSS y sitemap siguen sujetos
+al manifest. El tenant de regresión Clínica Delta conserva `platform-commerce`.
+
+Worktrees actuales de continuación (los originales se preservaron):
+
+- Website: `/Users/staimer/Documents/1platform/artifacts/landing-review-worktree`,
+  rama `feat/medipago-hero-review`, desde `72a8e70` tras los ajustes `18cd901`.
+- API: `/Users/staimer/Documents/1platform/artifacts/api-landing-review-worktree`,
+  rama `feat/website-two-tenant-landing-api`, desde `1dc7b061`.
+
+El fetch remoto no está disponible en esta continuación; no se atribuye una
+comprobación nueva de `origin/main`. Ningún checkout compartido se modificó.
+
+`npm run preview:landings` sirve ambos tenants desde un build:
+
+- `http://medipago.localhost:4460/` (también `http://127.0.0.1:4460/`).
+- `http://1platform.localhost:4460/es/` y `http://1platform.localhost:4460/`.
+
+El lanzador deriva textos del exportador y el manifest del catálogo del repo.
+API fixture en `127.0.0.1:4461`, sólo GET, desconocidos dan 404; no hay fallback
+remoto. Requiere Node 24, dependencias del lockfile y build actualizado. Detener
+sólo el preview propio con Ctrl+C y ejecutar:
+
+```bash
+cd /Users/staimer/Documents/1platform/artifacts/landing-review-worktree
+npm run build
+npm run preview:landings
+```
+
+**Validación de la ampliación:** build y typecheck pasan (0 errores/0 warnings,
+27 hints); `npm run check` pasa sus 15 reglas y 43 self-tests; 28 pruebas puras de contenido, calculadora, catálogo, tokens, guards y
+resolver pasan; 4 pruebas del lanzador y 4 pruebas del adaptador SSR en memoria
+(`npm run test:landing-ssr`) pasan. Estas últimas ejercitan la respuesta HTML
+de los hosts de ambos tenants, EN/ES, metadatos, los 16 enlaces, cálculo de
+Medipago y rechazo de host desconocido, con dobles HTTP sin sockets. API: 308
+pruebas focalizadas pasan; Ruff mantiene 56 hallazgos preexistentes y cero nuevos.
+Se corrigió además el seed para mantener borrador hasta tener contenido real. El primer intento incluyó cuatro
+pruebas HTTP de rutas que fallaron por no haber servidor; siguen pendientes,
+no se convirtieron en pruebas puras ni se marcaron como aprobadas. Los contratos
+de navegador se adaptaron al cambio de composición, manteniendo inventarios,
+Axe y controles de los componentes anteriores. No se actualizaron baselines.
+
+El acceso al navegador fue denegado; sockets locales y Docker están bloqueados.
+Por eso **esta ampliación no tiene capturas nuevas inspeccionadas ni prueba de
+interacción ejecutada**. Las capturas y resultados de la sección histórica
+siguiente corresponden a `a1d8333`, antes de cambiar la home de 1Platform.
+Los baselines existentes registran la home anterior y deben mostrar diferencias
+en las homes EN/ES; no se modifica el guard para ocultarlas. El resto de rutas
+requiere comparación real en el banco autorizado.
+
+El orden de seeds/publicación, cachés y validación persistida está en
+`/Users/staimer/Documents/1platform/artifacts/api-landing-review-worktree/docs/two-tenant-photographic-landing.md`.
+La fixture no se ha aplicado a ninguna DB. No hubo merge ni deploy.
 
 El gate `/verify-epic-e2e website-multitenant`, autorizado posteriormente con
 «continue», se intentó y quedó bloqueado en preflight: puertos locales y Docker
@@ -119,7 +163,7 @@ documentos persistidos. El contacto público se obtuvo del manifest real en
 lectura: `https://wa.me/50244866448`; los CTA lo reciben por configuración.
 No se inventaron redes, páginas legales ni teléfonos.
 
-## Validación local
+## Validación histórica de Medipago (`a1d8333`, anterior a la ampliación)
 
 | Comprobación | Resultado |
 | --- | --- |
@@ -161,7 +205,7 @@ la nitidez móvil del hero y la apariencia del CTA real del footer; la diferenci
 de altura móvil corresponde a retirar el aviso de prototipo/contacto simulado.
 Estas imágenes son evidencia de revisión, no baselines nuevos ni assets servidos.
 
-## Auditoría acotada
+## Auditoría histórica de la migración original
 
 Arquitectura y multitenant: resolución y cachés existentes por tenant; contenido,
 tema, comisión y destino configurables. Control alterno y regresión de 1Platform
@@ -194,7 +238,7 @@ un PR draft de API dispara `.github/workflows/qa.yml` (`pull_request`
 opened/synchronize → job deploy tras tests); por eso no se abrió ese PR bajo
 la instrucción de no desplegar. Los cambios quedan en commits locales.
 
-Worktrees persistentes:
+Worktrees originales preservados (usar los actuales indicados arriba para continuar):
 
 | Repositorio | Worktree | Rama |
 | --- | --- | --- |
@@ -214,7 +258,8 @@ control negativo contra `origin/main` y activación persistida del tenant.
 
 Prerrequisitos concretos:
 
-1. Ambos worktrees/ramas anteriores; el gate crea además sus controles frescos.
+1. Ambos worktrees/ramas actuales de `artifacts/` indicados arriba; el gate crea
+   además sus controles frescos desde `origin/main` actualizado.
 2. Node 24/dependencias del lockfile; Python 3.14/requirements; Docker/Mongo;
    configuración de arranque y dos tokens de auth generados para el banco local.
 3. Slot propuesto 1/control 2: API `8110`/`8210`, Mongo privado loopback `27101`,
@@ -225,12 +270,16 @@ Prerrequisitos concretos:
    QA/producción no sustituyen este banco.
 5. Website con `SITE_MANIFEST_SOURCE=api`, `SITE_API_BASE_URL=http://127.0.0.1:8110`
    (control `8210`), `HOST=127.0.0.1`, `PORT=4421` (control `4521`). Mapear en
-   navegador el Host `medipago.gt` al proceso local; agregar controles de otros tenants.
+   navegador los hosts `medipago.gt` y `1platform.pro` al proceso local; comprobar
+   `/` y `/es/` de 1Platform y agregar un control de otro tenant.
 6. Seeds idempotentes de manifest/páginas en URI/DB local explícitas: dominio
    `medipago.gt`, alias `www.medipago.gt`/`medipago.localhost`, soporte público
    confirmado, `home_template=photographic-service`, `display_font=manrope`,
    moneda GTQ/comisión 490 bps. Sin migración de esquema de DB. Primero contenido,
    después publicación; reiniciar workers propios para evitar cachés incompatibles.
+   Para 1Platform sembrar también el catálogo EN/ES actualizado y aplicar sólo
+   `home_template=photographic-service` en la activación; conservar sus destinos
+   y tema global. Ver runbook de dos tenants en el worktree API actual.
 
 Los comandos de seed/PATCH local, orden de activación y precaución contra cambiar
 el dominio persistido están en

@@ -23,7 +23,8 @@
     "check:baseline": "./scripts/check-no-regression.sh",
     "typecheck": "astro check",
     "test:deploy": "bash deploy/cpanel/activate-graft.test.sh",
-    "test:deploy:activator": "bash deploy/cpanel/publish-activator.test.sh"
+    "test:deploy:activator": "bash deploy/cpanel/publish-activator.test.sh",
+    "test:landing-ssr": "node --test scripts/photographic-ssr.selftest.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.5",
