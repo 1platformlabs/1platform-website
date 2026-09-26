@@ -552,7 +552,7 @@ const jsonLd = [
 <div class="onboarding-copy">
 <p class="eyebrow">{copy('onboarding.eyebrow')}</p>
 <h2 id="onboarding-title">{copy('onboarding.title')}</h2>
-<p>{copy('onboarding.description')}</p>
+<p><Fragment set:html="<!--email_off-->" />{copy('onboarding.description')}<Fragment set:html="<!--/email_off-->" /></p>
 {productLinks.length > 0 && <ul class="landing-product-links">{productLinks.map(({ href, label }) => <li><a href={href}>{label}</a></li>)}</ul>}
 <a class="button button-teal" data-support-cta="onboarding" href={contactHref('onboarding')}>
 <span>{copy('actions.onboarding')}</span><svg aria-hidden="true" class="icon">
