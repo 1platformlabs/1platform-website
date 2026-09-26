@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **axe también mira un inquilino de la vertical de clínicas** (issue #122).
+  `tests/a11y-home.spec.ts` sólo escaneaba el inquilino de referencia; ahora
+  corre el mismo conjunto WCAG A/AA contra `clinicas.1platform.dev` (plantilla
+  `platform-commerce` con acento propio, como Medipago) a 1440 y 390 px y con
+  una fila del FAQ abierta, con pisos que exigen que el documento escaneado sea
+  el de la clínica. Un acento de bajo contraste en ese inquilino pone la suite
+  en rojo; antes pasaba en verde.
 - **La portada conectada ya es reutilizable por un tenant de una sola página.**
   Conserva la composición de `1platform.pro`, pero usa el soporte del tenant
   como CTA cuando no hay app, mantiene visibles los pasos y audiencias como
