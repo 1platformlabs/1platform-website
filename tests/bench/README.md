@@ -60,10 +60,14 @@ El tercer tenant se compara simultáneamente con ambas APIs y la misma DB.
 ## Cierre
 
 Ejecutar build/suite/gate visual **secuencialmente**: escriben el mismo `dist/`.
-No actualizar baselines. El 26/09/2026 pasaron 12 casos reales, 42 controles
-HTTP/DB y 318 pruebas generales, además de build/check/typecheck. Pendiente:
-[website#124](https://github.com/1platformlabs/1platform-website/issues/124),
-referencias históricas de la home, sin tolerancias ampliadas ni guards omitidos.
+No actualizar baselines para ocultar regresiones. El 26/09/2026 pasaron 12 casos
+reales, 42 controles HTTP/DB y 318 pruebas generales, además de build/check/typecheck.
+El usuario autorizó después resolver
+[website#124](https://github.com/1platformlabs/1platform-website/issues/124):
+se reconciliaron exclusivamente las referencias de las homes aprobadas.
+El procedimiento y los gates constan en
+[`docs/issue-124-home-references.md`](../../docs/issue-124-home-references.md),
+sin tolerancias ampliadas ni guards omitidos.
 
 Detener los cuatro PIDs propios; ejecutar
 `python -m tests.bench.seed_website_landings --teardown`; retirar sólo el

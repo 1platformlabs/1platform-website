@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   las composiciones existentes conservan su comportamiento.
 
 ### Fixed
+- Las referencias HTML y visuales de las homes EN/ES reflejan el rediseño
+  fotográfico aprobado (issue #124). Se conservan las otras 98 rutas, las cuatro
+  referencias de clínica, el umbral visual del 1 % y todos los guards.
 - El hero de la landing fotográfica omite la frase «Para médicos especialistas»
   y el control de pausa, según la revisión solicitada. Conserva movimiento
   reducido y pausa automática al quedar fuera de pantalla.

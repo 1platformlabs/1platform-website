@@ -1,5 +1,12 @@
 # Landing compartida: Medipago y 1Platform
 
+Estado actualizado el 2026-09-26: el banco privado autorizado ya pasó (12 casos
+de navegador y 42 verificaciones HTTP/DB). Las limitaciones de permisos y el
+gate pendiente descritos más abajo son registros de las fases anteriores.
+La reconciliación posterior de las referencias de la home, solicitada por el
+usuario al resolver #124, consta en [su informe](issue-124-home-references.md).
+No se hizo merge, despliegue ni escritura remota de configuración.
+
 Fecha: 2026-09-25. Alcance: migración del prototipo aprobado a la home real de
 Medipago mediante la arquitectura multitenant existente, ampliada por instrucción
 posterior del usuario a la home de 1platform.pro con la misma composición. No implementa toda

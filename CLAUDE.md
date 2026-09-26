@@ -132,7 +132,9 @@ the hero specialty label and pause button; reduced motion and automatic pause
 outside the viewport remain. `CommerceOrbit.astro` remains supported by
 `platform-commerce` tenants such as the clinic regression fixture. Standard
 page chrome remains in `BaseLayout.astro`. See `docs/medipago-implementation.md`
-for scope, test status and the pending private-DB verification gate.
+for scope and historical test status. The private-DB verification passed on
+2026-09-26; `docs/issue-124-home-references.md` records the subsequent approved
+home-reference reconciliation and its local premerge gates.
 
 **Anti-patterns — do not reintroduce** (`scripts/check-tells.sh` enforces these):
 aurora blobs, decorative gradient text, gradient icon tiles,
