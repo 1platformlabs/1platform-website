@@ -355,6 +355,11 @@ test('the invoice mockup carries the TENANT’s mark, not the platform’s', asy
     if (!tenant.pages.includes('/')) continue
     const res = await getWithHost(`${BASE}/`, tenant.domain)
     expect(res.status).toBe(200)
+    if (tenant.home_template === 'photographic-service') {
+      const rendered = /class="product-panel invoice-panel">.*?class="mini-mark">([^<]*)</s.exec(res.body)?.[1]
+      expect(rendered, `${tenant.slug}: photographic invoice must carry its tenant mark`).toBe(tenant.brand_mark ?? tenant.brand_name)
+      continue
+    }
     const rendered = /invoice-preview__number"[^>]*>([^<]*)</.exec(res.body)?.[1]
     expect(rendered, `${tenant.slug}: the invoice mockup rendered no chip at all`).toBeTruthy()
     expect(rendered, `${tenant.slug} is serving somebody else’s mark`).toBe(brandChip(tenant))

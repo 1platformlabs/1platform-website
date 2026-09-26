@@ -13,6 +13,15 @@ import { expect, test, type Page } from '@playwright/test';
  */
 
 async function scan(page: Page) {
+  // Audit the finished page, as this test promises. Sampling halfway through
+  // the photographic hero's opacity entrance invents a transient contrast
+  // failure; await the real finite animation, without disabling any axe rule.
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await Promise.all(document.getAnimations().filter((animation) =>
+      animation instanceof CSSAnimation && animation.animationName === 'hero-enter'
+    ).map((animation) => animation.finished.catch(() => undefined)));
+  });
   return new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
 }
 

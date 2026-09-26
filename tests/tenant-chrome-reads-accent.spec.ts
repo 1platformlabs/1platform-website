@@ -127,6 +127,18 @@ const test = base.extend<{}, { legacyCommerce: LegacyCommerce }>({
 })
 
 test.describe('cross-tenant: the same supported commerce composition under both palettes', () => {
+  test('legacy commerce keeps its platform artwork and tenant invoice chips', async ({ legacyCommerce }) => {
+    for (const [host, chip] of [[PLATFORM_HOST, '1P'], [CLINIC_HOST, 'CD']]) {
+      const { browser, page } = await legacyCommerce.open(host)
+      try {
+        await expect(page.locator('.invoice-preview__number')).toHaveText(chip)
+        if (host === PLATFORM_HOST) {
+          await expect(page.locator('img[src*="platform-modules"]')).toHaveCount(1)
+          await expect(page.locator('.tools-scene')).toHaveCount(0)
+        }
+      } finally { await browser.close() }
+    }
+  })
   const cases: Array<{ name: string; selector: string; property: string }> = [
     { name: 'store preview image (accent-soft wash)', selector: '.store-preview__image', property: 'background-color' },
     { name: 'store preview card edge (accent)', selector: '.store-preview__image span', property: 'border-color' },
