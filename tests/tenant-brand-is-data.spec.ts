@@ -150,9 +150,8 @@ test('the tenant head owns its icon, social card and structured-data logo', asyn
     ...clinicHead.matchAll(/<meta (?:property|name)="(?:og|twitter):image"[^>]*>/g),
     ...clinicHead.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g),
   ].map((match) => match[0]).join('\n')
-  expect(assetSurface, 'the icon, share-card and JSON-LD surfaces must be present').toContain('/brand/icon.svg')
-  expect(assetSurface).toContain('https://clinicas.1platform.dev/brand/social.png')
-  expect(assetSurface).toContain('https://clinicas.1platform.dev/brand/social.png')
+  expect(assetSurface, 'the icon, share-card and JSON-LD surfaces must be present').toMatch(/\/brand\/icon\.svg\?v=[0-9a-f]{12}/)
+  expect(assetSurface).toMatch(/https:\/\/clinicas\.1platform\.dev\/brand\/social\.png\?v=[0-9a-f]{12}/)
   expect(assetSurface).not.toContain('/favicon.svg')
   expect(assetSurface).not.toContain('/og/default.png')
   expect(assetSurface).not.toContain('1platform.pro')

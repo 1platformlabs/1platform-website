@@ -61,7 +61,7 @@ test('the served head gives each tenant its own touch icon and never leaks the p
 
   // The platform's byte contract: the exact literal the frozen baseline holds.
   expect(link(platform.body)).toBe('/logo-oauth-120x120.png')
-  expect(link(clinic.body)).toBe('/brand/apple-touch-icon.png')
+  expect(link(clinic.body)).toMatch(/^\/brand\/apple-touch-icon\.png\?v=[0-9a-f]{12}$/)
   expect(
     clinic.body,
     "a tenant's pages must not name the platform's compiled touch icon anywhere",
