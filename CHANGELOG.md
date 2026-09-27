@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   las composiciones existentes conservan su comportamiento.
 
 ### Fixed
+- Los íconos y la tarjeta social derivados de la marca de un tenant (`/brand/*`)
+  llevan en la URL una versión calculada del dibujo: un cambio de marca (fuente,
+  acento, monograma o nombre) se ve de inmediato en vez de quedar hasta 24 h en
+  la caché del borde (#129).
 - El correo de ejemplo de las landings (`consulta@minombre.com`) queda como texto:
   el borde lo convertía en un enlace ofuscado «[email protected]» visible sin
   JavaScript y para buscadores. Se marca con `email_off`; las referencias de las
