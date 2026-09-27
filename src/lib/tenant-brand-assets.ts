@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import sharp from 'sharp'
 
 import { centredMark, outlineText } from './brand-glyphs'
@@ -53,12 +55,12 @@ export function brandSymbol(tenant: SiteTenant): string {
 
 /** Always returns a path: absence means a same-origin derived SVG. */
 export function resolveIcon(tenant: SiteTenant): string {
-  return publishedPath(tenant.brand_assets?.icon) ?? '/brand/icon.svg'
+  return publishedPath(tenant.brand_assets?.icon) ?? versioned('/brand/icon.svg', tenant, 'icon')
 }
 
 /** Always returns a path: absence means a same-origin derived PNG. */
 export function resolveSocial(tenant: SiteTenant): string {
-  return publishedPath(tenant.brand_assets?.social_image) ?? '/brand/social.png'
+  return publishedPath(tenant.brand_assets?.social_image) ?? versioned('/brand/social.png', tenant, 'social')
 }
 
 export function iconSvg(tenant: SiteTenant): string {
@@ -304,7 +306,7 @@ export function appleTouchIconPng(tenant: SiteTenant): Promise<Buffer | null> {
  * kept there after the tab is closed.
  */
 export function resolveAppleTouchIcon(tenant: SiteTenant): string {
-  return publishedPath(tenant.brand_assets?.apple_touch_icon) ?? '/brand/apple-touch-icon.png'
+  return publishedPath(tenant.brand_assets?.apple_touch_icon) ?? versioned('/brand/apple-touch-icon.png', tenant, 'appleTouch')
 }
 
 /**
@@ -341,4 +343,48 @@ export async function resolveLogo(tenant: SiteTenant): Promise<string | null> {
 export async function socialImageIsAvailable(tenant: SiteTenant): Promise<boolean> {
   if (publishedPath(tenant.brand_assets?.social_image)) return true
   return (await socialPng(tenant)) !== null
+}
+
+type DerivedAsset = 'icon' | 'social' | 'appleTouch'
+
+const DERIVED_SOURCES: Record<DerivedAsset, RenderSvg> = {
+  icon: iconSvg,
+  social: socialSvg,
+  appleTouch: appleTouchIconSvg,
+}
+
+const assetVersions = new Map<string, string>()
+const ASSET_VERSION_CAPACITY = 256
+
+/**
+ * A short fingerprint of the drawing a derived asset is made from (issue #129).
+ *
+ * The derived routes are served `max-age=86400` from URLs that used to carry
+ * no version, so a brand change (font, accent, mark) left the edge serving the
+ * previous drawing for up to a day, and the only cure was a cache purge. The
+ * URL now moves with the drawing instead.
+ *
+ * It hashes the rendered SVG, not the manifest fields: the fields alone would
+ * miss a change to the PROGRAM that draws them (a new glyph table, a new
+ * layout), and that change must reach a browser that already cached the old
+ * bytes just as much as a new accent does. The PNGs are rasterised from exactly
+ * this SVG, so its hash is also theirs. Memoised per brand fingerprint, so a
+ * page view does not re-outline the brand name.
+ */
+export function brandAssetVersion(tenant: SiteTenant, asset: DerivedAsset): string {
+  const key = `${asset}\u0000${rasterKey(tenant)}`
+  const known = assetVersions.get(key)
+  if (known) return known
+
+  const version = createHash('sha256').update(DERIVED_SOURCES[asset](tenant)).digest('hex').slice(0, 12)
+  if (assetVersions.size >= ASSET_VERSION_CAPACITY) {
+    const oldest = assetVersions.keys().next().value
+    if (oldest !== undefined) assetVersions.delete(oldest)
+  }
+  assetVersions.set(key, version)
+  return version
+}
+
+function versioned(path: string, tenant: SiteTenant, asset: DerivedAsset): string {
+  return `${path}?v=${brandAssetVersion(tenant, asset)}`
 }

@@ -99,11 +99,11 @@ test('a tenant-derived og:image is accepted only when its route is actually serv
   const html = await getWithHost(`http://127.0.0.1:${port}/`, 'clinicas.1platform.dev')
   expect(html.status).toBe(200)
   const image = html.body.match(/property="og:image"\s+content="([^"]+)"/)?.[1]
-  expect(image, 'the derived tenant head must declare an OG route').toBe(
-    'https://clinicas.1platform.dev/brand/social.png',
+  expect(image, 'the derived tenant head must declare an OG route').toMatch(
+    /^https:\/\/clinicas\.1platform\.dev\/brand\/social\.png\?v=[0-9a-f]{12}$/,
   )
 
-  const asset = await getWithHost(`http://127.0.0.1:${port}/brand/social.png`, 'clinicas.1platform.dev')
+  const asset = await getWithHost(`http://127.0.0.1:${port}${new URL(image!).pathname}${new URL(image!).search}`, 'clinicas.1platform.dev')
   expect(asset.status, 'a route named in an og:image must be retrievable by a crawler').toBe(200)
   expect(asset.headers['content-type']).toContain('image/png')
 })
