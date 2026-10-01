@@ -64,6 +64,8 @@ const ROUTE_OF = {
   // — Pages: the route is the canonical English-rooted path —
   'pages/home.ts': '/',
   'pages/photographic-home.ts': '@photographic-home',
+  'pages/infrastructure-home.ts': '@infrastructure-home',
+  'pages/photographic-interiors.ts': '@photographic-interiors',
   'pages/about.ts': '/about/',
   'pages/contact.ts': '/contact/',
   'pages/cookies.ts': '/cookies/',
@@ -84,6 +86,7 @@ const ROUTE_OF = {
   // — Shared: read by every page, so they belong to no single URL —
   'common.ts': '@common',
   'content.ts': '@content',
+  'components/site-chrome.ts': '@components/site-chrome',
   'components/card.ts': '@components/card',
   'components/comparison-table.ts': '@components/comparison-table',
   'components/hero.ts': '@components/hero',
@@ -202,7 +205,11 @@ function main() {
     const catalogue = readCatalogue(join(MESSAGES_DIR, file))
     const route = ROUTE_OF[file]
     for (const locale of ['en', 'es']) {
-      const blocks = catalogue[locale]
+      const blocks = { ...catalogue[locale] }
+      if (route === '@components/site-chrome') {
+        const tokens = JSON.parse(readFileSync('src/styles/brand-tokens.json', 'utf8'))
+        for (const [role, value] of Object.entries(tokens)) blocks[`site.theme.${role}`] = value
+      }
       for (const [key, value] of Object.entries(blocks)) {
         if (typeof value !== 'string' || value.trim() === '') {
           console.error(`  ${file}: ${locale} value for ${key} is blank or not a string`)

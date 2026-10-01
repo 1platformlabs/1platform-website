@@ -7,24 +7,20 @@ import { expect, test, type Page } from '@playwright/test';
  * properties that matter are: it keeps you on the page you were reading, it
  * remembers, and it never offers a language that does not exist.
  *
- * Standard pages expose the control in the compact menu. The photographic
- * landing keeps its language control in the floating header. Both surfaces
- * must preserve the page and preference through a language change.
+ * The shared infrastructure chrome exposes the same control below the header
+ * on the landing and interior pages. It must preserve the page and preference
+ * through a language change.
  */
 
-/** Open the header menu so the language control is on screen and clickable. */
-async function openMenu(page: Page) {
+/** The language control remains visible outside the mobile navigation menu. */
+async function exposeLanguageControl(page: Page) {
   await page.setViewportSize({ width: 390, height: 844 });
-  const toggle = page.locator('header [aria-controls="mobile-menu"]');
-  if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
-    await toggle.click();
-    await expect(page.locator('#mobile-menu')).toBeVisible();
-  }
+  await expect(page.locator('.brand-languages')).toBeVisible();
 }
 
 test('switching to English keeps the page and sets the cookie', async ({ context, page }) => {
   await page.goto('/es/precios/');
-  await openMenu(page);
+  await exposeLanguageControl(page);
 
   await page.locator('a[data-lang-choice="en"]').first().click();
   await expect(page).toHaveURL(/\/pricing\/$/);
@@ -38,14 +34,14 @@ test('switching to Spanish keeps the page', async ({ page }) => {
   // "Keeps the page", not "keeps the path": the Spanish tree publishes Spanish
   // slugs, so staying on the same page means landing on its translated address.
   await page.goto('/pricing/');
-  await openMenu(page);
+  await exposeLanguageControl(page);
   await page.locator('a[data-lang-choice="es"]').first().click();
   await expect(page).toHaveURL(/\/es\/precios\/$/);
 });
 
 test('a blog post switches to its own translation, not the index', async ({ page }) => {
   await page.goto('/blog/getting-started-5-minutes/');
-  await openMenu(page);
+  await exposeLanguageControl(page);
   await page.locator('a[data-lang-choice="es"]').first().click();
   await expect(page).toHaveURL(/\/es\/blog\/primeros-pasos-en-5-minutos\/$/);
 });
@@ -58,7 +54,7 @@ test('the cookie is written before language navigation replaces the document', a
   // already exist when that document runs its first-visit detection, or the
   // browser language would undo the explicit choice.
   await page.goto('/es/');
-  await openMenu(page);
+  await exposeLanguageControl(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
   // Assert the destination, not the development port: isolated worktrees run
   // their static server on different ports but still exercise the same route.
@@ -78,7 +74,7 @@ test('the choice survives a new page load', async ({ browser }) => {
   const page = await context.newPage();
 
   await page.goto('/es/');
-  await openMenu(page);
+  await exposeLanguageControl(page);
   await page.locator('a[data-lang-choice="en"]').first().click();
   await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
 
@@ -92,24 +88,24 @@ test('the choice survives a new page load', async ({ browser }) => {
 
 test('the current language is marked, not linked', async ({ page }) => {
   await page.goto('/es/precios/');
-  await openMenu(page);
+  await exposeLanguageControl(page);
 
-  const current = page.locator('.lang [aria-current="true"]');
+  const current = page.locator('.brand-languages [aria-current="true"]');
   await expect(current).toHaveText(/ES/);
   await expect(current).toHaveAttribute('lang', 'es');
 
   // The current language must not be a link to itself.
-  await expect(page.locator('.lang a[data-lang-choice="es"]')).toHaveCount(0);
+  await expect(page.locator('.brand-languages a[data-lang-choice="es"]')).toHaveCount(0);
 });
 
 for (const width of [1440, 390]) {
   test(`the landing language control is keyboard-operable at ${width}px`, async ({ page, context }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/es/');
-    const group = page.locator('.landing-languages');
+    const group = page.locator('.brand-languages');
     await expect(group).toBeVisible();
-    await expect(group).toHaveAttribute('aria-label', 'Idioma');
-    await expect(group.locator('[aria-current="true"]')).toHaveText('ES');
+    await expect(group.getByRole('group', { name: 'Idioma', exact: true })).toBeVisible();
+    await expect(group.locator('[aria-current="true"]')).toHaveText(/^ES(?:\s|$)/);
     await expect(group.locator('[aria-current="true"]')).toHaveAttribute('lang', 'es');
     await expect(group.locator('a[data-lang-choice="es"]')).toHaveCount(0);
 
@@ -122,8 +118,8 @@ for (const width of [1440, 390]) {
     await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
     expect((await context.cookies()).find((cookie) => cookie.name === '1p_lang')?.value).toBe('en');
 
-    await expect(page.locator('.landing-languages [aria-current="true"]')).toHaveText('EN');
-    await expect(page.locator('.landing-languages a[data-lang-choice="es"]')).toHaveAttribute('href', '/es/');
+    await expect(page.locator('.brand-languages [aria-current="true"]')).toHaveText(/^EN(?:\s|$)/);
+    await expect(page.locator('.brand-languages a[data-lang-choice="es"]')).toHaveAttribute('href', '/es/');
   });
 }
 
@@ -133,10 +129,10 @@ test('a language with no translation is offered as unavailable, never as a link'
   // The 404 declares no alternates at all, so neither language is navigable
   // from it and the control must say so rather than link somewhere broken.
   await page.goto('/404.html');
-  await openMenu(page);
+  await exposeLanguageControl(page);
 
-  await expect(page.locator('.lang [aria-disabled="true"]')).toHaveCount(1);
-  await expect(page.locator('.lang a[data-lang-choice]')).toHaveCount(0);
+  await expect(page.locator('.brand-languages [aria-disabled="true"]')).toHaveCount(1);
+  await expect(page.locator('.brand-languages a[data-lang-choice]')).toHaveCount(0);
 });
 
 test('an unavailable language explains itself to the eye, not only to a screen reader', async ({
@@ -147,9 +143,9 @@ test('an unavailable language explains itself to the eye, not only to a screen r
   // greyed "ES" that reads as broken. `cursor: not-allowed` was the sole visual
   // hint and it requires a pointer, which a touch screen does not have.
   await page.goto('/404.html');
-  await openMenu(page);
+  await exposeLanguageControl(page);
 
-  const off = page.locator('.lang [aria-disabled="true"]');
+  const off = page.locator('.brand-languages [aria-disabled="true"]');
   const explanation = await off.getAttribute('title');
 
   expect(explanation, 'the unavailable option carries a visible explanation').toBeTruthy();
@@ -161,9 +157,9 @@ test('an unavailable language explains itself to the eye, not only to a screen r
 
 test('the control is reachable and operable by keyboard alone', async ({ page }) => {
   await page.goto('/es/precios/');
-  await openMenu(page);
+  await exposeLanguageControl(page);
 
-  const link = page.locator('.lang a[data-lang-choice="en"]');
+  const link = page.locator('.brand-languages a[data-lang-choice="en"]');
   await link.focus();
   await expect(link).toBeFocused();
 
@@ -174,8 +170,8 @@ test('the control is reachable and operable by keyboard alone', async ({ page })
 test('each option names its language in that language', async ({ page }) => {
   for (const path of ['/pricing/', '/es/precios/']) {
     await page.goto(path);
-    await openMenu(page);
-    const group = page.locator('.lang');
+    await exposeLanguageControl(page);
+    const group = page.locator('.brand-languages');
     await expect(group.locator('[lang="en"]')).toHaveCount(1);
     await expect(group.locator('[lang="es"]')).toHaveCount(1);
     // The accessible name carries the endonym even though the visible label is
@@ -188,10 +184,10 @@ test('each option names its language in that language', async ({ page }) => {
 test('the active nav item is marked in Spanish', async ({ page }) => {
   // This is the regression the epic had to fix: the header compared the path
   // against English root hrefs, so under /es/ nothing was ever active.
-  await page.goto('/es/soluciones/');
-  const active = page.locator('.site-header__nav .nav-link.is-active');
+  await page.goto('/es/blog/');
+  const active = page.locator('.brand-nav [aria-current="page"]');
   await expect(active).toHaveCount(1);
-  await expect(active).toHaveText('Soluciones');
+  await expect(active).toHaveText('Blog');
 });
 
 test('the active legal document is marked in Spanish', async ({ page }) => {
@@ -203,7 +199,7 @@ test('the active legal document is marked in Spanish', async ({ page }) => {
 
 test('the logo returns to the home page of the language being read', async ({ page }) => {
   await page.goto('/es/nosotros/');
-  await page.locator('header a.logo').click();
+  await page.locator('header a.brand-lockup').click();
   await expect(page).toHaveURL(/\/es\/$/);
 });
 
@@ -213,7 +209,7 @@ test('a modifier click does not record a preference in this tab', async ({ conte
   // reader never switched it to — and because the preference outranks
   // detection, it would keep doing so on every later visit.
   await page.goto('/pricing/');
-  await openMenu(page);
+  await exposeLanguageControl(page);
   await page.locator('a[data-lang-choice="es"]').first().click({ modifiers: ['ControlOrMeta'] });
 
   await expect(page).toHaveURL(/\/pricing\/$/);
@@ -225,8 +221,8 @@ test('the language code carries lang, the accessible name does not', async ({ pa
   // whole anchor as the OTHER language made a screen reader read an English
   // sentence with Spanish phonemes.
   await page.goto('/pricing/');
-  await openMenu(page);
-  const link = page.locator('.lang a[data-lang-choice="es"]');
+  await exposeLanguageControl(page);
+  const link = page.locator('.brand-languages a[data-lang-choice="es"]');
 
   await expect(link).toHaveAttribute('hreflang', 'es');
   await expect(link).not.toHaveAttribute('lang', /.*/);

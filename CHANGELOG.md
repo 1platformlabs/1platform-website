@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- 1Platform presenta la infraestructura aprobada para crear productos, conectar
+  sistemas e incorporar IA, con API como recorrido principal y capacidades en
+  preparación identificadas. Manrope, tokens de marca y navegación compartida
+  se activan desde contenido del tenant; Medipago y perfiles anteriores conservan
+  su identidad y destinos.
+- Blog, artículos y Tienda online ES/EN adoptan los interiores aprobados. El
+  archivo conserva sus Markdown, slugs, fechas y traducciones, con categorías
+  laterales, resúmenes breves y filtros que sobreviven a recarga e historial.
+- Las entradas antiguas de desarrolladores redirigen a Primeros pasos; canonical,
+  hreflang, rutas técnicas y sitemap conservan su contrato público.
+- El Panel ilustrativo de Medipago distingue cobros brutos, comisiones y saldo
+  retirable, con importes de ejemplo y copy formal del prototipo vigente.
 - Las dos landings reproducen automáticamente tarjetas y recorrido al entrar
   en pantalla, sin controles de repetición. El correo con dominio propio
   también se presenta en 1Platform EN/ES desde su contenido de tenant.
@@ -19,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Contenido y elección de plantilla permanecen en configuración del tenant.
 
 ### Added
+- Configuración de destinos por entorno mediante `SITE_DESTINATION_ORIGINS`,
+  validada por origen y protocolo sin mezclar enlaces entre marcas.
 - Lanzador local `preview:landings` para revisar Medipago y 1Platform por hosts
   separados en el mismo build, con contenido de fixture por tenant e idioma.
   No sustituye la verificación con API y DB reales.

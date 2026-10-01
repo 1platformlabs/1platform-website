@@ -82,59 +82,42 @@ scripts/
   generate-og-images.py, generate-og-default.py
 ```
 
-## Design System — editorial paper and cobalt
+## Design system — approved infrastructure and tenant profiles
 
-The site is **light**: `color-scheme: light`, `theme-color: #F5F1E8`. Ink on
-warm paper, cobalt navigation and dark editorial footer surfaces establish the
-system across every public route.
+The public 1Platform profile uses self-hosted Manrope, navy chrome, white reading
+surfaces and the approved infrastructure prototype. Canonical tokens live in
+`src/styles/brand-tokens.json`: navy `#0d1c3a`, deep navy `#08152f`, blue `#2854a7`,
+text `#172640`, secondary text `#5c697b`, secondary surface `#f2f5f7` and selection
+`#edf2fa`. Developer mirrors these roles in `src/css/brand-tokens.json`.
 
-- **Palette (tokens in `src/styles/global.css`)** — `--ink #13151A`,
-  `--paper #F5F1E8`, `--surface #FFFDF8`, `--recessed #ECE5D8`,
-  `--cobalt #1748A7`, `--cobalt-deep #10377F`, `--cobalt-bright #78A6FF`,
-  `--cobalt-wash #E5EDFC`, `--muted #555A64`, `--subtle #626873`, and the
-  dark-footer aliases `--color-footer-*`. Prefer semantic aliases inside
-  components. Status colours are functional only, never decoration.
-  `tests/contrast.spec.ts` pins every foreground/surface pair used by the
-  public chrome at AA or better.
-- **Typography — self-hosted, latin subsets, in `public/fonts/` (SIL OFL):**
-  **Space Grotesk** display (500/700) for headings and the logo · **Inter** text
-  (400/500/600) · **JetBrains Mono** (400) for labels, data and code ·
-  **Instrument Serif** (400) — the home system's display serif (56 px openers,
-  the footer card's heading) for legacy commerce compositions. `@font-face` with
-  `font-display: swap` in `global.css`; display 700, text 400 and the serif are
-  preloaded in `BaseLayout.astro`. Four families, weights deliberately limited
-  — the serif ships exactly one.
-- **Structural devices:** `.eyebrow` (mono, uppercase, tracked) names a section;
-  `.section__rule` puts that label against a hairline. Section openers are **left-aligned**
-  (the home is the one exception — see "The home system"). Headings use sentence case,
-  except the brand line "One Platform. Every Solution."
-- **Signature motif:** `InterconnectDiagram.astro` — the platform drawn as a schematic.
-  Real capabilities enter from the top, resolve through one API spine, and leave as
-  storefront / payments / invoicing, with an amber signal travelling the traces. It appears
-  on the **home hero only** (`<Hero motif />`); `ProcessSpine.astro` reuses its node
-  language for "how it works". Keeping it singular is what makes it a signature.
-- **Logo:** the "1" is set as a node — the same cobalt rounded square the schematic uses.
-- `text-wrap: balance` on headings, `text-wrap: pretty` on body copy.
+The API's tenant content selects `site.theme.profile=infrastructure` for shared
+chrome and `photographic.theme.layout=infrastructure` for the home; the existing
+`photographic-service` manifest enum remains valid. Colors can be overridden by
+`site.theme.<role>` content. Do not infer a profile from a hostname or brand name.
+`global.css` retains the previous tokens for existing compositions; changing
+those defaults would repaint unrelated tenants.
 
-### The home system
+### Homes and interiors
 
-The homes of 1Platform (`/`, `/es/`) and Medipago use the shared
-`photographic-service` composition: fixed floating navigation, animated photograph,
-three service cards, payment-to-invoice flow, fictitious interactive panel and a
-dark footer. This follows the approved Medipago prototype and the user's explicit
-request to apply that design to both tenants. Brand, content, destinations and
-pricing remain tenant data. 1Platform keeps USD/account pricing and its app CTA;
-Medipago keeps its GTQ 4.9% calculator. Never copy a tenant's commercial terms.
+1Platform uses `InfrastructureHome.astro`: API integration is the primary path,
+Panel is a secondary tool. The hero starts automatically, pauses outside the
+viewport or with a hidden document, resumes when visible and has a static
+reduced-motion presentation. Capability switches are illustrative and never
+provision services. Keep payment subscriptions, Tap to Phone charging, digital
+advertising and WhatsApp sales marked according to their current availability.
 
-The landing uses self-hosted Manrope while the demo keeps PanelInter. The
-1Platform global theme remains Space Grotesk for standard pages. The user removed
-the hero specialty label and pause button; reduced motion and automatic pause
-outside the viewport remain. `CommerceOrbit.astro` remains supported by
-`platform-commerce` tenants such as the clinic regression fixture. Standard
-page chrome remains in `BaseLayout.astro`. See `docs/medipago-implementation.md`
-for scope and historical test status. The private-DB verification passed on
-2026-09-26; `docs/issue-124-home-references.md` records the subsequent approved
-home-reference reconciliation and its local premerge gates.
+Medipago retains its `PhotographicServiceHome.astro` composition, Manrope and
+PanelInter demo, its own configured commercial destinations and GTQ calculator.
+The collections demo distinguishes gross receipts before fees from the amount
+available to withdraw; amounts are examples. No removed animation controls or
+specialty label may return. `platform-commerce` and `service-lead` remain supported.
+
+Blog, articles and the online-store interior opt into the approved photographic
+interior through the same infrastructure profile. Other tenant profiles keep the
+legacy renderers and require no new `interiors.*` content. Markdown bodies, dates,
+translation keys and slugs are editorial source; never replace them with prototype
+snapshots. The new archive has a featured article, category filters and short
+summaries, with browser history and a server-rendered no-JavaScript path.
 
 **Anti-patterns — do not reintroduce** (`scripts/check-tells.sh` enforces these):
 aurora blobs, decorative gradient text, gradient icon tiles,
@@ -171,57 +154,28 @@ Restrained by design — over-animation was one of the tells this site was rebui
 - **View Transitions:** `<ViewTransitions />` in `BaseLayout.astro` for smooth page transitions
 - LCP < 2s, INP < 200ms, CLS < 0.1
 
-## Navbar & Footer Harmony Rule (MUST)
+## Navbar and footer harmony
 
-The website **navbar AND footer** must stay in sync with the developer docs counterparts — users should perceive `1platform.pro` and `developer.1platform.pro` as one product.
+The 1Platform website and Developer share Manrope, the seven tokens, logo,
+round navy navbar and this order: Solutions / Soluciones, Infrastructure /
+Infraestructura, AI / IA, Blog, Documentation / Documentación, Contact / Contacto.
+The CTA is “Hablemos de su proyecto” in Spanish. Contact is the tenant's support
+destination, configured for 1Platform as `https://wa.me/50253946564`.
+Documentation opens `/docs/saas/1platform-api/getting-started`; the former
+`/for-developers/` routes redirect there for this profile and are omitted from
+its sitemap. Footer groups are Explore, Resources and 1Platform, with legal
+links to published routes. Developer retains native search and technical
+navigation; the website retains its real locale selector.
 
-**The two sides share the design system itself, not just the link lists.**
-Both chromes draw with the shared editorial tokens (this repo is upstream:
-`src/styles/global.css` first, `../1platform-api-developer/src/css/custom.css`
-follows), the four self-hosted typefaces and the cobalt-node logo. The icon
-registry (`src/components/icons.ts`) is likewise upstream of
-`../1platform-api-developer/src/components/Icon/icons.ts`.
+Website sources: `InfrastructureHeader.astro`, `InfrastructureFooter.astro`,
+`site-chrome.css`, `site-chrome.ts` and the `components/site-chrome.ts` catalogue.
+The original Header/Footer serve other profiles. Developer is a single public
+1Platform identity and must never acquire tenant resolution.
 
-**Language is the one deliberate difference:** this site is English, the developer
-portal is Spanish. The harmony contract is about **order, destinations and
-structure**, never about the literal strings.
-
-**Source of truth on each side:**
-- Website — `src/components/Header.astro` (navbar), `src/components/Footer.astro` (footer),
-  `src/components/AnnouncementBar.astro` (bar), `src/components/Logo.astro` (mark),
-  `src/styles/global.css` (tokens), `src/components/icons.ts` (icons)
-- Developer docs — `../1platform-api-developer/docusaurus.config.ts` (navbar),
-  `.../src/theme/Footer/` (footer), `.../src/theme/Navbar/MobileSidebar/` (panel),
-  `.../src/theme/Logo/` (mark), `.../src/css/custom.css` (tokens)
-
-**Navbar contract:** a floating, paper-coloured rail holds the logo, Solutions
-with its seven destinations, Features, Pricing, Docs, Blog and the CTA. A
-circular menu opens the compact navigation and the `EN | ES` control at small
-viewports; without JavaScript the compact menu remains available. The docs side
-keeps the same destinations and CTA in its desktop rail, plus search.
-
-**Solutions destinations (order matters, mirror in `docusaurus.config.ts`):**
-Online Store → `/solutions/online-store/` · Website Builder →
-`/solutions/website/` · AI Content → `/solutions/content/` · Deliveries →
-`/solutions/deliveries/` · Advertising → `/solutions/ads/` · Whitelabel
-Dashboard → `/solutions/whitelabel/` · Payments & Invoicing →
-`/payments-invoicing/` · then a divider and "View all solutions" →
-`/solutions/`.
-
-**Footer contract:** a dark editorial band opens with the logo, brand line and
-CTA, followed by a `mailto:` sign-up, three columns — PRODUCT (the seven
-solutions + All Solutions), COMPANY (About · Pricing · For Agencies · For
-Developers · Blog), RESOURCES (Documentation · API Reference · Code Examples ·
-Changelog) — and a legal row (copyright · Terms · Privacy · Cookie preferences).
-`tests/footer-system.spec.ts` pins the exact link set and keyboard behaviour.
-
-**If you add/remove/rename a navbar item or footer column/link on this site, update the developer docs in the same change.**
-
-**Exemption — language controls.** The `EN | ES` control in the menu panel is exempt
-from the rule above. It is a control over how the current page is presented, not an
-entry in the information architecture, and the developer docs cannot mirror it —
-that site is Spanish-only (`docusaurus.config.ts`), so it has no second language
-to offer.
+External links read tenant destinations. `SITE_DESTINATION_ORIGINS` can map
+specific HTTPS origins to configured QA or loopback origins for isolated review.
+It does not invent destinations for tenants that lack them. Never ship prototype
+localhost links or copy prototype `noindex,nofollow` to indexable public pages.
 
 ## Internationalisation
 
@@ -322,7 +276,7 @@ Verify with `npm test` (the complete Playwright suite against the real `dist/ser
 - **Pillars:** Unified Platform, AI-Powered Pipeline, End-to-End Ecosystem, Scalable by Design, Interconnected Services
 - **Pattern:** Comparison framed as unified vs fragmented — by capability and experience, never by invented competitor pricing. Header, page and footer CTAs are derived from the tenant's configured destinations; omit them when the destination is absent rather than inventing a link.
 - **"Replaces" positioning:** Each solution names generic tool categories it replaces (never competitor brand names)
-- **Interconnection narrative:** Emphasize that all services work together (keywords → content → images → publish → index → backlinks → payments → invoicing)
+- **Infrastructure narrative:** Build a platform, connect existing systems and incorporate AI. Content and SEO remain editorial capabilities, not the primary commercial pitch. Atlas and Bowerbird are independent products by 1Platform Labs.
 
 ## Restrictions (NEVER)
 

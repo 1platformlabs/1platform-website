@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro'
 
 import { publishedUrls } from '@lib/site-routes'
+import { infrastructureChrome } from '@lib/site-chrome'
 
 /**
  * The sitemap, rendered per request because it is per TENANT.
@@ -35,7 +36,8 @@ export const GET: APIRoute = async ({ locals }) => {
     })
   }
 
-  const urls = await publishedUrls(tenant)
+  const excluded = infrastructureChrome(locals.messages) && tenant.destinations.docs ? ['/for-developers/'] : []
+  const urls = await publishedUrls(tenant, excluded)
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',

@@ -37,7 +37,7 @@ test('Medipago retains the configured GTQ illustration without platform copy lea
   assert.equal(medipago.slug, 'medipago');
   assert.equal(medipago.messages['photographic.calculator.currency'], 'GTQ');
   assert.equal(medipago.messages['photographic.calculator.commissionBasisPoints'], '490');
-  assert.equal(medipago.messages['photographic.hero.title1'], 'Cobre con tarjeta.');
+  assert.equal(medipago.messages['photographic.hero.title1'], 'Cobre con tarjeta');
 });
 
 test('unknown hosts, slugs and unsupported locales never fall back to another tenant', () => {

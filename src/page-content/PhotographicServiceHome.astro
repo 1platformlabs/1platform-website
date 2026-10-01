@@ -121,7 +121,7 @@ const jsonLd = [
       }
     </script>}
   </head>
-<body class="photographic-service" data-home-template="photographic-service" data-palette={palette} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
+<body class="photographic-service" data-home-template="photographic-service" data-panel-mode={panel.mode === 'collections' ? panel.mode : undefined} data-palette={palette} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
 <a class="skip-link" href="#contenido">{copy('ui.skip_link')}</a>
 <svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg">
 <symbol id="i-arrow" viewBox="0 0 24 24">
@@ -450,7 +450,7 @@ const jsonLd = [
 <span class="panel-chip">{panel.currency}</span>
 </div>
 <div class="panel-credit-body">
-<strong class="panel-money" data-panel-money="credit">{money(panel.sample.creditCents)}</strong>
+<strong class="panel-money" data-panel-money={panel.mode === 'collections' ? 'collected' : 'credit'}>{money(panel.sample.balanceCents)}</strong>
 <p>{copy('ui.label17')}</p>
 <button class="panel-primary" data-panel-go="billing" hidden="" type="button">{copy('ui.panel_primary')}<svg aria-hidden="true" class="icon">
 <use href="#i-arrow"></use>
@@ -467,14 +467,14 @@ const jsonLd = [
 <div class="panel-between">
 <span class="panel-eyebrow">{copy('ui.credit_title')}</span><span class="panel-chip">{panel.currency}</span>
 </div>
-<strong class="panel-money" data-panel-money="credit">{money(panel.sample.creditCents)}</strong>
+<strong class="panel-money" data-panel-money={panel.mode === 'collections' ? 'collected' : 'credit'}>{money(panel.sample.balanceCents)}</strong>
 <p class="panel-callout">{copy('ui.panel_callout')}</p>
 </section>
 <section aria-labelledby="transactions-title" class="panel-card panel-transactions">
 <div class="panel-transactions-head">
 <h4 id="transactions-title">{copy('ui.transactions_title')}</h4>
 <div aria-label={copy('ui.panel_filters_aria_label')} class="panel-filters" role="group">
-<button aria-pressed="true" data-panel-filter="all" hidden="" type="button">{copy('ui.label23')}</button><button aria-pressed="false" data-panel-filter="expense" hidden="" type="button">{copy('ui.label24')}</button><button aria-pressed="false" data-panel-filter="income" hidden="" type="button">{copy('ui.label25')}</button>
+<button aria-pressed="true" data-panel-filter="all" hidden="" type="button">{copy('ui.label23')}</button>{panel.filterTypes.map((type, index) => <button aria-pressed="false" data-panel-filter={type} hidden="" type="button">{copy(index === 0 ? 'ui.label24' : 'ui.label25')}</button>)}
 </div>
 </div>
 <table>
@@ -486,7 +486,7 @@ const jsonLd = [
 <th scope="col">{copy('ui.label29')}</th>
 </tr>
 </thead>
-<tbody id="panel-transaction-rows">{panel.movements.map((item) => <tr data-panel-movement={item.type}><td>{item.text}</td><td>{item.date}</td><td class={item.type}>{money(item.cents)}</td></tr>)}</tbody>
+<tbody id="panel-transaction-rows">{panel.movements.map((item) => <tr data-panel-movement={item.type}><td>{item.text}</td><td>{item.date}</td><td class={panel.mode === 'collections' ? 'income' : item.type}>{money(item.cents)}</td></tr>)}</tbody>
 </table>
 <p class="panel-filter-status" id="panel-filter-status" role="status">{copy('ui.movements_fictional')}</p>
 </section>

@@ -103,12 +103,12 @@ export interface SiteUrl {
  * actually served by a file. A manifest naming a page nobody implemented is a
  * sitemap entry that 404s, which is worse than omitting it.
  */
-export async function publishedUrls(tenant: SiteTenant): Promise<SiteUrl[]> {
+export async function publishedUrls(tenant: SiteTenant, excludedRoutes: readonly string[] = []): Promise<SiteUrl[]> {
   const locales = localesOf(tenant)
   const localise = makeLocalizePath(tenant)
   const bilingual = locales.includes('en') && locales.includes('es')
 
-  const canonical = tenant.pages.filter((p) => !NEVER_INDEXED.has(p))
+  const canonical = tenant.pages.filter((p) => !NEVER_INDEXED.has(p) && !excludedRoutes.includes(p))
 
   const all = [
     ...new Set(canonical.flatMap((path) => locales.map((locale) => localise(path, locale)))),

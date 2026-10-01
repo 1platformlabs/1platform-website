@@ -57,6 +57,14 @@ test('the map is a bijection and both sides of every pair answer', async () => {
     // claim, made against the thing that serves it rather than a file that
     // happened to be next to it.
     const [en, es] = await Promise.all([servedHead(canonical), servedHead(translated)]);
+    if (canonical === '/for-developers/') {
+      for (const [path, response] of [[canonical, en], [translated, es]] as const) {
+        expect(response.status, path).toBe(301);
+        expect(response.location, path).toBe('https://developer.1platform.pro/docs/saas/1platform-api/getting-started');
+        expect(response.body, path).not.toMatch(/<html|<title|<body[\s>]/i);
+      }
+      continue;
+    }
     if (en.status !== 200) offences.push(`${canonical} — no English page (HTTP ${en.status})`);
     if (es.status !== 200) offences.push(`${translated} — no Spanish page (HTTP ${es.status})`);
   }

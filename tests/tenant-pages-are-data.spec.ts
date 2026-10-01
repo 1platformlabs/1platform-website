@@ -11,6 +11,7 @@ import { createServer, type Plugin, type ViteDevServer } from 'vite'
 
 import type { SiteTenant } from '../src/lib/site-api'
 import { getWithHost } from './helpers/http-host'
+import { expectPublishedResponse } from './helpers/published-response'
 
 /**
  * `SiteTenant.pages` is a DATUM, and this file is what makes that true.
@@ -98,11 +99,7 @@ test('POSITIVE CONTROL: 1platform.pro serves those same routes', async () => {
   // than evidence of an outage.
   for (const route of PLATFORM_ONLY_ROUTES) {
     const res = await getWithHost(`${BASE}${route}`, PLATFORM_HOST)
-    expect(
-      res.status,
-      `${PLATFORM_HOST}${route} answered ${res.status}. The tenant that DOES publish this ` +
-        `route must serve it, or the clinic's 404 proves nothing.`,
-    ).toBe(200)
+    expectPublishedResponse(res, { slug: 'oneplatform', url: route })
   }
 })
 

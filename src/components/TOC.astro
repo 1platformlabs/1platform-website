@@ -3,19 +3,21 @@ const { t } = useI18n(Astro.url.pathname, Astro.locals);
 
 
 interface Props {
+  photographic?: boolean;
+  title?: string;
   headings: { depth: number; slug: string; text: string }[];
 }
 
-const { headings } = Astro.props;
-const tocHeadings = headings.filter((h) => h.depth <= 3);
+const { headings, photographic = false, title = t('toc.title') } = Astro.props;
+const tocHeadings = headings.filter((h) => photographic ? h.depth === 2 : h.depth <= 3);
 ---
 
 {tocHeadings.length > 0 && (
-  <nav class="toc" aria-label={t('toc.aria')}>
-    <h2 class="eyebrow toc__title">{t('toc.title')}</h2>
-    <ul class="toc__list">
+  <nav class={photographic ? 'interior-toc' : 'toc'} aria-label={t('toc.aria')}>
+    <h2 class="eyebrow toc__title">{title}</h2>
+    <ul class={photographic ? 'interior-toc-list' : 'toc__list'}>
       {tocHeadings.map((heading) => (
-        <li class:list={['toc__item', `toc__item--${heading.depth}`]}>
+        <li class:list={[!photographic && 'toc__item', !photographic && `toc__item--${heading.depth}`]}>
           <a href={`#${heading.slug}`}>{heading.text}</a>
         </li>
       ))}

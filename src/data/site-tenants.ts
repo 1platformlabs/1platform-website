@@ -51,33 +51,14 @@ const ONEPLATFORM: SiteTenant = {
   default_locale: 'en',
   home_template: 'photographic-service',
   theme: {
-    // The values the site ships today, read from src/styles/global.css so the
-    // conversion changes the SOURCE of the tokens and not the tokens.
-    //
-    // ⚠️ This said `#1f4fe0` and that was NOT what the site ships. `global.css`
-    // sets `--color-accent: var(--cobalt)` and `--cobalt: #1748A7`; the wrong
-    // value came from the neighbouring `--color-accent-glow: rgba(31, 79, 224,
-    // …)`, which is `#1f4fe0` and disagrees with the accent it is supposedly
-    // derived from — a pre-existing inconsistency in the stylesheet, still
-    // there.
-    //
-    // It went unnoticed because nothing rendered this field. The moment
-    // `tenant-theme.ts` started honouring it, the manifest being wrong about
-    // tenant #1's own colour would have REPAINTED 1platform.pro — the exact
-    // regression the epic's byte-for-byte criterion exists to catch. Verified
-    // against live production: `1platform.pro` serves `--cobalt:#1748a7`.
-    accent: '#1748a7',
+    accent: '#2854a7',
     accent_contrast: '#ffffff',
-    // This is the family `global.css` already compiles. The former
-    // `instrument-serif` value described loaded-but-unused data and would have
-    // repainted tenant #1 once the manifest started driving the document.
-    // Matching the real default lets the request-scoped emitter stay silent.
-    display_font: 'space-grotesk',
+    display_font: 'manrope',
   },
   destinations: {
     docs: 'https://developer.1platform.pro/',
     app: 'https://app.1platform.pro/app/',
-    support: null,
+    support: 'https://wa.me/50253946564',
     status: null,
   },
   // Data, not a branch for tenant #1: these are exactly the compiled assets
@@ -222,4 +203,16 @@ export function repoTenantForHost(host: string): SiteTenant | null {
 /** Every tenant the repo manifest knows, for guards that need the full set. */
 export function repoTenants(): SiteTenant[] {
   return [...new Set(REPO_TENANTS.map(([, t]) => t))]
+}
+
+/** Explicit local content configuration. API mode resolves each tenant's own SitePages.
+ * The compiled catalogue contains 1Platform's new profile, so other repository
+ * fixtures must opt in explicitly instead of inheriting that commercial design. */
+const REPO_CONTENT_PROFILES: Record<string, string> = {
+  oneplatform: 'infrastructure',
+  clinicas: 'classic',
+}
+export function repoContentOverrides(tenant: SiteTenant): Record<string, string> {
+  const profile = REPO_CONTENT_PROFILES[tenant.slug] ?? 'classic'
+  return { 'site.theme.profile': profile, 'photographic.theme.layout': profile }
 }

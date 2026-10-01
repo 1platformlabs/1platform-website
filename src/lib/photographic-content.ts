@@ -45,7 +45,14 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
     if (!['person', 'clock', 'team'].includes(icon)) throw new Error('Unrecognised audience icon')
     return { icon, title: copy(`audience.items.${index}.title`), text: copy(`audience.items.${index}.text`) }
   })
-  const faqs = Array.from({ length: 4 }, (_, index) => ({
+  const faqIndexes = [...new Set(Object.keys(messages).flatMap((key) => {
+    const match = /^photographic\.faq\.items\.(\d+)\.(question|answer)$/.exec(key)
+    return match ? [Number(match[1])] : []
+  }))].sort((a, b) => a - b)
+  if (faqIndexes.length < 1 || faqIndexes.length > 20 || faqIndexes.some((value, index) => value !== index)) {
+    throw new Error('Invalid photographic FAQ configuration')
+  }
+  const faqs = faqIndexes.map((index) => ({
     question: copy(`faq.items.${index}.question`), answer: copy(`faq.items.${index}.answer`),
   }))
   const calculatorMode = messages['photographic.calculator.mode'] ?? 'calculate'
@@ -60,26 +67,33 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
   } : null
   const panelCurrency = copy('panel.currency')
   if (panelCurrency !== 'GTQ' && panelCurrency !== 'USD') throw new Error('Invalid demonstration currency')
+  const panelMode = messages['photographic.panel.mode'] ?? 'credits'
+  if (panelMode !== 'credits' && panelMode !== 'collections') throw new Error('Invalid demonstration mode')
   const amountKey = (current: string, legacy: string) => messages[`${prefix}${current}`] === undefined ? legacy : current
   const panel = {
+    mode: panelMode,
     summary: copy('panel.summary'), billing: copy('panel.billing'), withdrawals: copy('panel.withdrawals'),
     currency: panelCurrency,
     filterStatusOne: copy('ui.movements_one'), filterStatusMany: copy('ui.movements_many'),
+    filterTypes: panelMode === 'collections' ? ['card', 'link'] : ['expense', 'income'],
     sample: {
-      creditCents: integer(amountKey('panel.sample.creditCents', 'panel.sample.creditGTQ'), 0, 999999999),
+      // Collections are gross receipts. They are never treated as service
+      // credits or as a settlement estimate available for withdrawal.
+      balanceCents: integer(panelMode === 'collections' ? 'panel.sample.collectedCents' : amountKey('panel.sample.creditCents', 'panel.sample.creditGTQ'), 0, 999999999),
       withdrawCents: integer(amountKey('panel.sample.withdrawCents', 'panel.sample.withdrawGTQ'), 0, 999999999),
     },
     movements: Array.from({ length: 2 }, (_, index) => {
       const type = copy(`panel.movements.${index}.type`)
-      if (type !== 'expense' && type !== 'income') throw new Error('Invalid demonstration movement')
+      const validTypes = panelMode === 'collections' ? ['card', 'link'] : ['expense', 'income']
+      if (!validTypes.includes(type)) throw new Error('Invalid demonstration movement')
       return {
         type, text: copy(`panel.movements.${index}.text`), date: copy(`panel.movements.${index}.date`),
-        cents: integer(`panel.movements.${index}.cents`, -999999999, 999999999),
+        cents: integer(`panel.movements.${index}.cents`, panelMode === 'collections' ? 0 : -999999999, 999999999),
       }
     }),
   }
-  if (panel.movements.reduce((total, movement) => total + movement.cents, 0) !== panel.sample.creditCents) {
-    throw new Error('Demonstration credits do not reconcile')
+  if (panel.movements.reduce((total, movement) => total + movement.cents, 0) !== panel.sample.balanceCents) {
+    throw new Error('Demonstration movements do not reconcile')
   }
   const fontKey = messages['photographic.theme.displayFont'] ?? tenant.theme.display_font
   const font = Object.hasOwn(DISPLAY_FONT_STACKS, fontKey) ? DISPLAY_FONT_STACKS[fontKey as keyof typeof DISPLAY_FONT_STACKS] : undefined

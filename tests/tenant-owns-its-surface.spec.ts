@@ -317,10 +317,13 @@ test('CONTROL: the platform DOES render its own destinations', async () => {
   expect(platform.status).toBe(200)
   expect(
     platform.body,
-    'the platform home no longer links to its own dashboard — the destination ' +
+    'the platform home no longer links to its own documentation — the destination ' +
       'helper is returning null for everyone, which makes the D-7 test vacuous',
-  ).toContain('app.1platform.pro')
+  ).toContain('developer.1platform.pro')
 
+  const commerce = await serve(PLATFORM_HOST, '/solutions/online-store/')
+  expect(commerce.status).toBe(200)
+  expect(commerce.body).toContain('https://app.1platform.pro/app/?intent=store')
   const deadAnchors = platform.body.match(/<a[\s>](?![^>]*href)/g) ?? []
   expect(deadAnchors.length, 'the platform rendered anchors without an href').toBe(0)
 })

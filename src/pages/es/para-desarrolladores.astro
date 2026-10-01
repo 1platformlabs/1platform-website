@@ -1,5 +1,9 @@
 ---
 import ForDevelopers from '@page-content/ForDevelopers.astro';
+import { infrastructureChrome } from '@lib/site-chrome';
+import { docsUrl } from '@lib/site-destinations';
+const guide = docsUrl(Astro.locals, '/docs/saas/1platform-api/getting-started');
+if (infrastructureChrome(Astro.locals.messages) && guide) return Astro.redirect(`${guide}${Astro.url.search}`, 301); // campaign/query parameters survive (real-bank E2E)
 ---
 
 <ForDevelopers />
