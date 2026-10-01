@@ -226,7 +226,11 @@ test('the sitemap exists and carries alternates', async () => {
 
   const body = await servedText('/sitemap-0.xml');
   const alternates = [...body.matchAll(/xhtml:link/g)].length;
-  expect(alternates).toBeGreaterThan(100);
+  const listed = [...body.matchAll(/<loc>/g)].length;
+  expect(listed).toBeGreaterThan(45);
+  expect(alternates).toBe(listed * 2);
+  expect(body).not.toContain('/for-developers/');
+  expect(body).not.toContain('/es/para-desarrolladores/');
   expect(body).toContain('https://1platform.pro/es/precios/');
 });
 
@@ -387,6 +391,13 @@ test('the English tree kept every address it had before the epic', async () => {
     if (published.has(address)) continue;
 
     const { status, location } = await servedHead(address);
+    // This approved retirement has one explicit external destination. Other
+    // legacy routes must still resolve to a published page on this website.
+    if (address === '/for-developers/') {
+      expect(status).toBe(301);
+      expect(location).toBe('https://developer.1platform.pro/docs/saas/1platform-api/getting-started');
+      continue;
+    }
     if (status !== 301 && status !== 308) {
       gone.push(`${address}: is not published and answered ${status} instead of a redirect`);
       continue;

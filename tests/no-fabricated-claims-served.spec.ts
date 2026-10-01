@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 
 import { getWithHost } from './helpers/http-host'
 import { surface } from './helpers/site-surface'
+import { expectPublishedResponse } from './helpers/published-response'
 
 /**
  * Rules 3 and 4 of `scripts/check-tells.sh`, over the SERVED HTML of EVERY
@@ -103,7 +104,7 @@ test('no tenant serves a fabricated price or vanity metric, on any page, in any 
 
   for (const page of surface()) {
     const res = await getWithHost(BASE + page.url, page.host)
-    expect(res.status, `${page.host}${page.url} is published but answered ${res.status}`).toBe(200)
+    expectPublishedResponse(res, page)
     scanned += 1
     if (banned.test(res.body)) leaks.push(`${page.host}${page.url}`)
   }
@@ -124,7 +125,7 @@ test('no tenant serves an unverifiable "replaces N tools" claim, in either langu
       continue
     }
     const res = await getWithHost(BASE + page.url, page.host)
-    expect(res.status, `${page.host}${page.url} is published but answered ${res.status}`).toBe(200)
+    expectPublishedResponse(res, page)
     scanned += 1
     if (en.test(res.body) || es.test(res.body)) leaks.push(`${page.host}${page.url}`)
   }

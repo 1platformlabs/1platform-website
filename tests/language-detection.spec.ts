@@ -190,14 +190,18 @@ test.describe('the document language survives a soft navigation', () => {
   test.use({ locale: 'es-MX' });
 
   test('lang stays es after the client router swaps the document', async ({ page }) => {
-    // Standard pages retain the Astro client router; the photographic landing
-    // uses native document navigation. Keep this regression on a standard page
-    // so it continues to prove that a client-router swap copies <html lang>.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    // The shared chrome retains Astro navigation. Observe the swap itself so a
+    // hard load cannot pass a regression intended to exercise the client router.
     await page.goto('/es/nosotros/');
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
 
-    await page.getByRole('link', { name: 'Precios', exact: true }).first().click();
-    await expect(page).toHaveURL(/\/es\/precios\/$/);
+    await page.evaluate(() => {
+      document.addEventListener('astro:after-swap', () => { document.documentElement.dataset.testSwapped = 'true'; }, { once: true });
+    });
+    await page.locator('.brand-nav').getByRole('link', { name: 'Blog', exact: true }).click();
+    await expect(page).toHaveURL(/\/es\/blog\/$/);
+    await expect(page.locator('html')).toHaveAttribute('data-test-swapped', 'true');
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
   });
 });
@@ -228,16 +232,16 @@ test.describe('without JavaScript', () => {
 });
 
 
-test.describe('photographic home language detection', () => {
+test.describe('infrastructure home language detection', () => {
   test.describe('Spanish browser', () => {
     test.use({ locale: 'es-MX' });
 
     test('the home redirects to its translation with query and fragment intact', async ({ page }) => {
-      await page.goto('/?utm_source=landing-test#preguntas');
-      await expect(page).toHaveURL('/es/?utm_source=landing-test#preguntas');
-      await expect(page.locator('body')).toHaveAttribute('data-home-template', 'photographic-service');
+      await page.goto('/?utm_source=landing-test#capacidades');
+      await expect(page).toHaveURL('/es/?utm_source=landing-test#capacidades');
+      await expect(page.locator('[data-infrastructure-home]')).toBeVisible();
       await expect(page.locator('html')).toHaveAttribute('lang', /^es(?:-|$)/);
-      await expect(page.locator('.hero h1')).toContainText('Venda en línea.');
+      await expect(page.locator('.hero h1')).toContainText('Infraestructura para');
     });
   });
 
@@ -247,15 +251,15 @@ test.describe('photographic home language detection', () => {
     test('an English home stays English until the visitor chooses Spanish', async ({ context, page }) => {
       await page.goto('/');
       await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
-      await expect(page.locator('.hero h1')).toContainText('Sell online.');
-      await page.locator('.landing-languages a[data-lang-choice="es"]').click();
+      await expect(page.locator('.hero h1')).toContainText('Infrastructure for');
+      await page.locator('.brand-languages a[data-lang-choice="es"]').click();
       await expect(page).toHaveURL(/\/es\/$/);
       expect((await context.cookies()).find((cookie) => cookie.name === '1p_lang')?.value).toBe('es');
 
       // A new document must honour the choice over this context's en-US locale.
       await page.goto('/');
       await expect(page).toHaveURL(/\/es\/$/);
-      await expect(page.locator('.hero h1')).toContainText('Venda en línea.');
+      await expect(page.locator('.hero h1')).toContainText('Infraestructura para');
     });
   });
 
@@ -267,8 +271,9 @@ test.describe('photographic home language detection', () => {
       expect(response?.status()).toBe(200);
       await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
       await expect(page.locator('.hero h1')).toBeVisible();
-      await expect(page.locator('.service-card')).toHaveCount(3);
-      await expect(page.locator('.landing-languages a[data-lang-choice="es"]')).toHaveAttribute('href', '/es/');
+      await expect(page.locator('.outcome-grid article')).toHaveCount(3);
+      await expect(page.locator('.capability')).toHaveCount(10);
+      await expect(page.locator('.brand-languages a[data-lang-choice="es"]')).toHaveAttribute('href', '/es/');
     });
   });
 });

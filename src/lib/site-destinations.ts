@@ -29,6 +29,30 @@ import type { SiteTenant } from './site-api'
 
 type DestinationLocals = { tenant: SiteTenant }
 
+/** Explicit origin-to-origin substitutions for an isolated preview/QA environment.
+ * An absent mapping preserves the tenant's destination; it never invents one. */
+export function environmentDestination(destination: string): string {
+  const original = new URL(destination)
+  const local = ['localhost', '127.0.0.1', '[::1]'].includes(original.hostname) || original.hostname.endsWith('.localhost')
+  if ((original.protocol !== 'https:' && !(original.protocol === 'http:' && local)) || original.username || original.password) throw new Error('Invalid tenant destination')
+  const raw = typeof process !== 'undefined' ? process.env?.SITE_DESTINATION_ORIGINS : undefined
+  if (!raw) return destination
+  const mappings: unknown = JSON.parse(raw)
+  if (!mappings || typeof mappings !== 'object' || Array.isArray(mappings)) throw new Error('Invalid destination origin map')
+  const replacement = (mappings as Record<string, unknown>)[original.origin]
+  if (replacement === undefined) return destination
+  if (typeof replacement !== 'string') throw new Error('Invalid destination origin')
+  const target = new URL(replacement)
+  const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(target.hostname) || target.hostname.endsWith('.localhost')
+  if ((target.protocol !== 'https:' && !(target.protocol === 'http:' && loopback)) || target.username || target.password || target.pathname !== '/' || target.search || target.hash) throw new Error('Invalid destination origin')
+  return `${target.origin}${original.pathname}${original.search}${original.hash}`
+}
+
+export function supportUrl(locals: DestinationLocals): string | null {
+  const destination = locals.tenant.destinations.support
+  return destination ? environmentDestination(destination) : null
+}
+
 /**
  * The tenant's product, optionally carrying an intent.
  *
@@ -39,20 +63,20 @@ type DestinationLocals = { tenant: SiteTenant }
 export function appUrl(locals: DestinationLocals, intent?: string): string | null {
   const base = locals.tenant.destinations.app
   if (!base) return null
-  if (!intent) return base
+  if (!intent) return environmentDestination(base)
   // `new URL` rather than concatenation: a tenant may store an app URL that
   // already carries a query string or lacks a trailing slash, and string
   // arithmetic on either produces a link that 404s at the other end.
   const url = new URL(base)
   url.searchParams.set('intent', intent)
-  return url.toString()
+  return environmentDestination(url.toString())
 }
 
 /** The tenant's developer documentation, optionally a sub-path of it. */
 export function docsUrl(locals: DestinationLocals, path?: string): string | null {
   const base = locals.tenant.destinations.docs
   if (!base) return null
-  return path ? new URL(path, base).toString() : base
+  return environmentDestination(path ? new URL(path, base).toString() : base)
 }
 
 /**

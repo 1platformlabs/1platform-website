@@ -1,47 +1,69 @@
-# Banco real de las landings
+# Banco real de infraestructura y Medipago
 
-Alcance: WMT-05/06/11, Medipago y ampliación autorizada a 1Platform EN/ES.
-No modifica/verifica el dashboard autenticado ni el motor de pagos. Aplican
-**`.claude/commands/verify-epic-e2e.md` y `levantar.md` DEL MONOREPO**.
-La suite general omite `landings.real.spec.ts` sin `WEBSITE_E2E_PORT`; no lo
-reemplaza con mocks. Los 12 casos se ejecutan separadamente en el banco real.
+Alcance vigente: `1platform-infraestructura-branding`. El harness conserva los
+controles de aislamiento y cálculo de la épica anterior, adaptados a las
+composiciones aprobadas: infraestructura 1Platform EN/ES y cobros Medipago.
+No verifica Dashboard, Consola como producto ni transacciones de pago reales.
 
-## Preparación y orden
+La ejecución requiere autorización para **`/verify-epic-e2e
+1platform-infraestructura-branding`**, usando **`.claude/commands/verify-epic-e2e.md`
+DEL MONOREPO** y su flujo `/levantar`. Esta implementación no ejecutó el banco.
+La suite general omite estos casos si falta `WEBSITE_E2E_PORT`; no sustituye
+servicios por mocks, interceptores, fixtures HTTP ni contenido repo.
 
-1. Worktree website `feat/medipago-hero-review`, API
-   `feat/website-two-tenant-landing-api` y controles independientes de
-   `origin/main` actualizado. Node 24 con cada lock, Python 3.14 con un venv
-   privado por API instalado desde `requirements.txt`.
-2. Banco canónico `/levantar website --e2e-local website-multitenant --slot 1
-   --api-worktree <worktree-api>`; control slot 2. Mongo propio
-   `127.0.0.1:27101`, DB `e2e_website_multitenant`; APIs 8110/8210;
-   website 4421/4521. Cada website usa `SITE_MANIFEST_SOURCE=api` y
-   `SITE_API_BASE_URL=http://127.0.0.1:<su-api>` (sin `/api/v1`).
-   Ejecutar `npm run build` y `HOST=127.0.0.1 PORT=<puerto> node dist/server/entry.mjs`.
-3. Entorno privado, sin importar el `.env` compartido: `MONGODB_URL`,
-   `MONGODB_DB_NAME`, secretos locales aleatorios para JWT/app/admin y Fernet
-   válido. No cargar credenciales de proveedores ni apuntar a QA/PROD.
-4. Desde el API de la rama con ese entorno:
-   `python -m tests.bench.seed_website_landings --out <privado>/auth.json`.
-   Es idempotente; usa modelos reales y reproduce las formas del censo:
-   plantillas anteriores, 24 documentos por lengua de 1Platform, región
-   ausente y aprovisionamiento separado. Incluye otro tenant, un borrador y
-   dos apps para los rechazos de auth. Arrancar primero la API de la rama y
-   esperar health antes del control para evitar carreras de bootstrap.
-5. Definir `WEBSITE_E2E_EVIDENCE` como directorio absoluto de esta corrida.
-   **Antes de activar**, desde el website:
-   `node tests/bench/capture-landings-control.mjs`.
-6. Desde API: `python -m tests.bench.seed_website_landings --content`.
-   Aplica los seeds de operador y verifica 50/2 documentos y 26/1 rutas.
-   La API cachea `PlatformSettings` en proceso y lo refresca cada 60 s: si ya
-   estaba arriba al sembrar, esperar ese refresco (o reiniciarla) antes de la
-   sonda; si no, el staff recibe 401 «Staff session invalid» (medido 2026-09-26).
-   Después: `python -m tests.bench.probe_website_landings
-   --auth <privado>/auth.json --out <evidencia>/http-db-results.json`.
-   Intercambia app JWT por HTTP real, firma sólo al staff del banco y ejerce
-   las dependencias reales. Mismo PATCH/control 422 y rama 200. No efectúa pagos.
-7. Reiniciar sólo los workers propios del website tras la activación para
-   vaciar cachés. Crear temporalmente `playwright.bank.config.ts`:
+## Prerrequisitos y activación privada
+
+1. Website en
+   `/Users/staimer/Documents/1platform-worktrees/infraestructura-branding-website`
+   y developer en
+   `/Users/staimer/Documents/1platform-worktrees/infraestructura-branding-developer`,
+   ambos en `feat/1platform-infraestructura-branding`. Preparar un worktree
+   aislado del API desde su `origin/main` actualizado, más controles de main.
+   Instalar Node/npm y pnpm desde los manifiestos actuales, Python/venv del API.
+2. Levantar el banco mediante el comando canónico del monorepo con un slot no
+   cero, Mongo local privado, DB exclusiva y APIs de rama/control. Los defaults
+   del harness son website `4421` y control `4521`; se ajustan mediante
+   `WEBSITE_E2E_PORT` y `WEBSITE_E2E_CONTROL_PORT` a los puertos asignados.
+   No reutilizar QA, producción ni la DB compartida. Mantener el tercer tenant
+   `aurora.example` y una ruta Medipago no publicada como controles de aislamiento.
+3. Usar secretos locales aleatorios y aplicaciones/staff del banco. Las lecturas
+   administrativas requieren JWT de la aplicación Consola y JWT `staff_access`
+   en `x-user-token`; un token de usuario tenant no los sustituye. Nunca volcar
+   tokens, claves o respuestas de autenticación al repositorio ni a los logs.
+4. Obtener el snapshot administrativo completo de cada tenant, incluyendo
+   documentos no publicados, y seguir
+   [el runbook de activación](../../docs/infrastructure-branding-activation.md).
+   Ese snapshot y el seed privado de aplicaciones/staff son prerrequisitos;
+   el export público o las fixtures del preview no prueban completitud real.
+   No imponer conteos históricos como 50/2 documentos: usar los del snapshot
+   completo y el reporte del preparador offline.
+5. Configurar ambos websites con `SITE_MANIFEST_SOURCE=api` y sus propias
+   `SITE_API_BASE_URL` locales, sin `/api/v1` al final. Configurar en la rama
+   `SITE_DESTINATION_ORIGINS` para el origen local del developer; en developer,
+   `WEBSITE_URL` y `DEVELOPER_URL`. Las URLs públicas almacenadas se conservan.
+   Los previews 4460/4461/4468 y developer4473 de implementación no constituyen
+   por sí solos este banco de persistencia y autenticación.
+6. Definir `WEBSITE_E2E_EVIDENCE` como carpeta absoluta y privada de esta corrida.
+   **Antes de aplicar el overlay** en la DB privada, servir origin/main con su
+   API de control y ejecutar `node tests/bench/capture-landings-control.mjs`.
+   Captura las homes previas y los cuerpos de Precios/Soluciones. Que main ya
+   admita `photographic-service` es válido: el cambio vigente es el overlay de
+   infraestructura. No tocar los prototipos para construir estos controles.
+7. Revisar el paquete offline, hacer `seed_site_pages.py --dry` con URI/DB locales
+   explícitas y aplicar únicamente en ese banco autorizado **sin `--dry` y con
+   `--verify`**. Aplicar el patch revisado de 1Platform por el mecanismo
+   administrativo existente. El manifiesto Medipago se conserva. Verificar por
+   lectura administrativa flags `published`, conteos y rutas; `--verify` no
+   comprueba todos los flags. Repetir para probar idempotencia sin pérdida de
+   documentos. Reiniciar únicamente los workers propios para vaciar cachés.
+8. Registrar pruebas HTTP/DB de autenticación, aislamiento, rutas no publicadas,
+   paridad, persistencia y segundo seed. El harness de navegador no reemplaza
+   esas lecturas ni demuestra el backend mirando HTML. No efectuar cobros ni
+   habilitar capacidades comerciales reales.
+
+## Ejecución de navegador después de la autorización
+
+Crear un config local temporal, sin `webServer` ni fallback:
 
 ```ts
 import { defineConfig } from '@playwright/test';
@@ -54,27 +76,36 @@ export default defineConfig({
 });
 ```
 
-Ejecutar `WEBSITE_E2E_PORT=4421 npx playwright test --config playwright.bank.config.ts`.
-Los hosts reales se resuelven en Chromium, sin cambiar `/etc/hosts`. Abrir las
-capturas desktop/mobile, panel y prototipo intacto. Los controles de páginas
-secundarias se capturan antes de activar: main no puede leer el enum nuevo.
-El tercer tenant se compara simultáneamente con ambas APIs y la misma DB.
+Ejecutar `WEBSITE_E2E_PORT=<puerto-rama> WEBSITE_E2E_CONTROL_PORT=<puerto-control>
+npx playwright test --config playwright.bank.config.ts`. Chromium resuelve
+los hosts reales por loopback, sin cambiar `/etc/hosts`. La suite tiene 24 casos:
+las tres homes en 1440, 360, 390, 430 y horizontal 844×390, más nueve controles
+de interacción, contenido, animación, navegación y aislamiento.
 
-## Cierre
+La captura de cada home es evidencia para inspección, no una aprobación visual
+automática. Comparar personalmente prototipo/producto a igual contenido, viewport
+y estado, con tolerancia ±2 px. Precios y Soluciones conservan sus cuerpos
+editoriales pero reciben el nuevo chrome; por eso se compara su texto y el
+contrato de navegación. El tercer tenant se compara **bit a bit** contra su
+control origin/main con la misma DB y las mismas fuentes.
 
-Ejecutar build/suite/gate visual **secuencialmente**: escriben el mismo `dist/`.
-No actualizar baselines para ocultar regresiones. El 26/09/2026 pasaron 12 casos
-reales, 42 controles HTTP/DB y 318 pruebas generales, además de build/check/typecheck.
-El usuario autorizó después resolver
-[website#124](https://github.com/1platformlabs/1platform-website/issues/124):
-se reconciliaron exclusivamente las referencias de las homes aprobadas.
-El procedimiento y los gates constan en
-[`docs/issue-124-home-references.md`](../../docs/issue-124-home-references.md),
-sin tolerancias ampliadas ni guards omitidos.
+El caso de blog/artículo verifica idiomas, recarga, Atrás/Adelante y el destino
+de Primeros pasos. Completar además el recorrido real hasta guía → referencia
+API → regreso, con búsqueda, autenticación documentada, esquemas, ejemplos y
+enlaces profundos de Scalar nativo. Usar las pruebas actuales del proyecto
+developer y revisión personal; la cantidad de operaciones procede del contrato
+vigente, no del snapshot del prototipo. No enviar solicitudes mutantes desde
+“Try it” ni copiar credenciales de ejemplos.
 
-Detener los cuatro PIDs propios; ejecutar
-`python -m tests.bench.seed_website_landings --teardown`; retirar sólo el
-contenedor `mongo-e2e-website-multitenant` y los controles de esta corrida.
-Borrar el config Playwright temporal antes del commit. Conservar las ramas de
-implementación y sus dependencias. Los secretos locales no van al repositorio.
-No hacer merge, deploy ni escrituras remotas.
+## Cierre y límites
+
+Build, suite y gate visual se ejecutan secuencialmente porque comparten `dist/`.
+Los 14 casos omitidos de la antigua épica en una corrida general no eran una
+aprobación de esta nueva composición; el harness se actualizó sin ejecutarlo.
+La evidencia histórica del 26/09 pertenece a aquella rama y no certifica esta.
+
+Detener sólo los procesos/contenedores creados por esta corrida y retirar el
+config temporal. Conservar las ramas y las evidencias sanitizadas. Los snapshots
+privados no se versionan. No hacer merge, deploy, DNS, seeds remotos ni activar
+producción dentro de esta preparación. Cada pendiente que la compuerta real
+no pueda cerrar debe convertirse en issue según el comando del monorepo.

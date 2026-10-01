@@ -1,0 +1,22 @@
+{
+  "es": {
+    "launch-online-store-30-minutes": "Guía para conectar catálogo, checkout, pagos, facturación y dominio al preparar una tienda online",
+    "integrating-payments-into-your-saas": "Decisiones de integración para manejar checkout, webhooks, saldos y reembolsos en un SaaS",
+    "electronic-invoicing-online-business": "Cómo conectar el pago y la factura electrónica en el flujo de pedidos, con atención a errores y reembolsos",
+    "automate-seo-pipeline": "Un recorrido por la extracción de palabras clave, la generación de artículos y su publicación mediante API",
+    "ai-content-best-practices": "Criterios para estructurar, revisar y medir contenido generado con IA según la intención de búsqueda",
+    "programmatic-link-building": "Cómo integrar la adquisición de enlaces en un flujo de contenido y evaluar su calidad y relevancia",
+    "getting-started-5-minutes": "Un tutorial de autenticación, registro de sitios y seguimiento de trabajos para generar un artículo por API",
+    "1platform-vs-custom-toolchain": "Factores de integración y mantenimiento para comparar herramientas SEO independientes con una API unificada"
+  },
+  "en": {
+    "launch-online-store-30-minutes": "A guide to connecting catalog, checkout, payments, invoicing, and a domain when preparing an online store",
+    "integrating-payments-into-your-saas": "Integration decisions for handling checkout, webhooks, balances, and refunds in a SaaS product",
+    "electronic-invoicing-online-business": "How to connect payments and electronic invoices in an order flow, including failures and refunds",
+    "automate-seo-pipeline": "A walkthrough of keyword extraction, article generation, and publishing through a single API",
+    "ai-content-best-practices": "How to structure, review, and measure AI-generated content around the reader's search intent",
+    "programmatic-link-building": "How to add link acquisition to a content workflow and assess link quality and relevance",
+    "getting-started-5-minutes": "A tutorial covering authentication, website registration, and job tracking to generate an article through the API",
+    "1platform-vs-custom-toolchain": "Integration and maintenance factors to compare a custom SEO toolchain with a unified API"
+  }
+}

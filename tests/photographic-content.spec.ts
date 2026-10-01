@@ -12,11 +12,16 @@ test('the public contract selects a composition with tenant-owned money, brand a
   expect(isTenant(tenant)).toBe(true)
   const site = photographicContent(messages, tenant)
   expect(site.calculator?.commissionBasisPoints).toBe(490)
-  expect(site.panel.sample).toEqual({ creditCents: 48000, withdrawCents: 0 })
+  expect(site.panel.sample).toEqual({ balanceCents: 48000, withdrawCents: 0 })
   const href = new URL(site.contactHref('calculator'))
   expect(href.origin + href.pathname).toBe(tenant.destinations.support)
   expect(href.searchParams.get('text')).toContain('4.9%')
   expect(site.faqs[2].answer).toContain('automáticamente')
+  expect(site.faqs).toHaveLength(3)
+  expect(site.panel.mode).toBe('collections')
+  expect(site.panel.movements.map(({ type, cents }) => ({ type, cents }))).toEqual([{ type: 'card', cents: 30000 }, { type: 'link', cents: 18000 }])
+  expect(site.copy('ui.panel_callout')).toContain('antes de comisiones')
+  expect(site.copy('panel.note')).toContain('ficticios')
   expect(site.brandStyle).toContain('--tenant-font-family:\'Manrope\'')
 })
 
@@ -32,8 +37,12 @@ test('missing copy, unsafe theme, absent destinations and invalid numeric config
     (d) => { d.messages['photographic.calculator.commissionBasisPoints'] = '10001' },
     (d) => { d.messages['photographic.calculator.currency'] = 'USD' },
     (d) => { d.messages['photographic.panel.currency'] = 'INVALID' },
-    (d) => { d.messages['photographic.panel.sample.creditGTQ'] = '48001' },
+    (d) => { d.messages['photographic.panel.sample.collectedCents'] = '48001' },
     (d) => { d.messages['photographic.panel.movements.0.type'] = 'payment' },
+    (d) => { d.messages['photographic.panel.mode'] = 'settlements' },
+    (d) => { d.messages['photographic.panel.movements.0.cents'] = '-2000' },
+    (d) => { delete d.messages['photographic.faq.items.1.answer'] },
+    (d) => { delete d.messages['photographic.faq.items.1.question']; delete d.messages['photographic.faq.items.1.answer'] },
     (d) => { d.messages['photographic.audience.items.0.icon'] = 'unknown' },
   ]
   for (const change of cases) {
@@ -68,10 +77,10 @@ test('tenant strings cannot terminate a JSON script element', () => {
 })
 
 for (const locale of ['en', 'es'] as const) {
-  test(`1Platform ${locale} shares the layout while keeping its app, USD pricing and brand`, () => {
+  test(`legacy ${locale} content keeps its app, USD service credits and brand`, () => {
     const tenant = structuredClone(repoTenantForHost('1platform.pro')!)
     expect(tenant.home_template).toBe('photographic-service')
-    expect(tenant.theme.display_font).toBe('space-grotesk')
+    tenant.destinations.support = null
     const site = photographicContent(messages[locale], tenant)
     expect(site.fontKey).toBe('manrope')
     expect(site.palette).toBe('brand')
@@ -81,7 +90,7 @@ for (const locale of ['en', 'es'] as const) {
     expect(site.copy('onboarding.description')).toContain('consulta@minombre.com')
     expect(site.calculator).toBeNull()
     expect(site.panel.currency).toBe('USD')
-    expect(site.panel.sample).toEqual({ creditCents: 48000, withdrawCents: 0 })
+    expect(site.panel.sample).toEqual({ balanceCents: 48000, withdrawCents: 0 })
     expect(Object.values(messages[locale]).join(' ')).not.toMatch(/Medipago|médicos?|consultorio|4\.9%|WhatsApp|\bGTQ\b/i)
     expect(site.brandStyle).toContain(tenant.theme.accent)
     const medical = data()
@@ -92,6 +101,7 @@ for (const locale of ['en', 'es'] as const) {
 
 test('app fallback and home font remain validated tenant configuration', () => {
   const tenant = structuredClone(repoTenantForHost('1platform.pro')!)
+  tenant.destinations.support = null
   tenant.destinations.app = 'javascript:alert(1)'
   expect(() => photographicContent(messages.en, tenant)).toThrow()
   tenant.destinations.app = null

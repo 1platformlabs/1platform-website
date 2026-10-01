@@ -9,10 +9,11 @@ import { chromium, expect, test as base, type Browser, type Page } from '@playwr
 import { openTenantPage, computedProperty } from './helpers/tenant-browser'
 import { getWithHost } from './helpers/http-host'
 import { repoTenants } from '../src/data/site-tenants'
+import { COMPILED_DEFAULTS } from '../src/lib/tenant-theme'
 
 /**
  * Issues #93 and #94: tokens must reach rendered elements, not just CSS text.
- * The photographic landing supersedes the platform home. CommerceOrbit remains
+ * The infrastructure landing supersedes the platform home. CommerceOrbit remains
  * a supported composition, so its original cross-tenant regressions run against
  * two explicit platform-commerce manifests through the normal API resolver.
  * Standard page chrome and the new landing are also checked on their real repo
@@ -61,7 +62,10 @@ const test = base.extend<{}, { legacyCommerce: LegacyCommerce }>({
     let app: ChildProcessWithoutNullStreams | undefined
     const manifests = repoTenants()
       .filter((tenant) => [PLATFORM_HOST, CLINIC_HOST].includes(tenant.domain))
-      .map((tenant) => ({ ...tenant, home_template: 'platform-commerce' as const }))
+      .map((tenant) => ({ ...tenant, home_template: 'platform-commerce' as const,
+        theme: tenant.domain === PLATFORM_HOST ? { ...COMPILED_DEFAULTS } : tenant.theme,
+        destinations: { ...tenant.destinations, support: null },
+      }))
     let documents: ExportedPage[] = []
     const api = createServer((request, response) => {
       const url = new URL(request.url ?? '/', 'http://fixture')
@@ -75,7 +79,9 @@ const test = base.extend<{}, { legacyCommerce: LegacyCommerce }>({
       const locale = url.searchParams.get('locale') ?? tenant?.default_locale
       if (tenant && locale && tenant.locales.includes(locale)) {
         const pages = documents.filter((item) => item.locale === locale)
-        const messages = Object.assign({}, ...pages.map((item) => item.blocks)) as Record<string, string>
+        const messages = Object.assign({}, ...pages.map((item) => item.blocks), {
+          'site.theme.profile': 'classic', 'photographic.theme.layout': 'classic',
+        }) as Record<string, string>
         return void response.end(JSON.stringify({ success: true, data: { slug: tenant.slug, locale, pages, messages }, msg: 'ok' }))
       }
       response.statusCode = 404
@@ -96,7 +102,8 @@ const test = base.extend<{}, { legacyCommerce: LegacyCommerce }>({
       let logs = ''
       app.stdout.on('data', (chunk) => { logs = (logs + String(chunk)).slice(-8192) })
       app.stderr.on('data', (chunk) => { logs = (logs + String(chunk)).slice(-8192) })
-      const deadline = Date.now() + 30_000
+      // Report adapter diagnostics before the worker fixture's 30 s timeout.
+      const deadline = Date.now() + 15_000
       let ready = false
       while (Date.now() < deadline) {
         if (app.exitCode !== null) throw new Error(`Commerce fixture exited early: ${logs}`)
@@ -216,30 +223,29 @@ test.describe('explicit tenant mark and platform-only regression sites', () => {
     }
   })
 
-  test('the standard footer logo mark and CTA still carry the compiled --cobalt-bright on the platform', async () => {
+  test('the shared infrastructure footer and contact CTA carry the approved palette', async () => {
     const { browser, page } = await openTenantPage(PLATFORM_HOST, '/about/')
     try {
-      expect(await computedProperty(page, '.site-footer .logo__mark', 'background-color')).toBe('rgb(120, 166, 255)')
-      expect(await computedProperty(page, '.btn--footer', 'background-color')).toBe('rgb(120, 166, 255)')
-      expect(await computedProperty(page, '.btn--footer', 'border-color')).toBe('rgb(120, 166, 255)')
-    } finally {
-      await browser.close()
-    }
+      expect(await computedProperty(page, '.brand-footer', 'background-color')).toBe('rgb(8, 21, 47)')
+      expect(await computedProperty(page, '.brand-footer .brand-symbol', 'color')).toBe('rgb(40, 84, 167)')
+      expect(await computedProperty(page, '.brand-cta', 'background-color')).toBe('rgb(255, 255, 255)')
+      expect(await computedProperty(page, '.brand-cta', 'color')).toBe('rgb(13, 28, 58)')
+    } finally { await browser.close() }
   })
 
-  test('the process spine node still carries the compiled accent, on a page the clinic does not publish', async () => {
+  test('the process spine node carries the current tenant accent, on a page the clinic does not publish', async () => {
     const { browser, page } = await openTenantPage(PLATFORM_HOST, '/pricing/')
     try {
-      expect(await computedProperty(page, '.spine__node', 'background-color')).toBe('rgb(23, 72, 167)')
+      expect(await computedProperty(page, '.spine__node', 'background-color')).toBe('rgb(40, 84, 167)')
     } finally {
       await browser.close()
     }
   })
 
-  test('the changelog entry node still carries the compiled accent, on a page the clinic does not publish', async () => {
+  test('the changelog entry node carries the current tenant accent, on a page the clinic does not publish', async () => {
     const { browser, page } = await openTenantPage(PLATFORM_HOST, '/changelog/')
     try {
-      expect(await computedProperty(page, '.entry__node', 'background-color')).toBe('rgb(23, 72, 167)')
+      expect(await computedProperty(page, '.entry__node', 'background-color')).toBe('rgb(40, 84, 167)')
     } finally {
       await browser.close()
     }
@@ -273,18 +279,18 @@ test('the unreachable interconnect motif stays on the bridged primitive — meas
  * color tokens got above.
  */
 test.describe('display_font reaches the element (issue #94)', () => {
-  test('the clinic\'s declared serif reaches .logo, and the platform keeps Space Grotesk', async () => {
+  test('the clinic\'s declared serif reaches .logo, and the platform uses its approved Manrope', async () => {
     const platform = await openTenantPage(PLATFORM_HOST, '/about/')
     const clinic = await openTenantPage(CLINIC_HOST, '/')
     try {
-      const platformFont = await computedProperty(platform.page, '.logo', 'font-family')
+      const platformFont = await computedProperty(platform.page, '.brand-lockup', 'font-family')
       const clinicFont = await computedProperty(clinic.page, '.logo', 'font-family')
 
-      expect(platformFont, 'tenant #1 must still title in the compiled default').toContain('Space Grotesk')
+      expect(platformFont, 'the platform must use its declared brand font').toContain('Manrope')
       expect(
         clinicFont,
-        `the clinic declares system-serif but .logo computed to "${clinicFont}" — the same as the platform`,
-      ).not.toContain('Space Grotesk')
+        `the clinic declares Instrument Serif but .logo computed to "${clinicFont}"`,
+      ).not.toContain('Manrope')
       expect(clinicFont).toContain('Georgia')
     } finally {
       await platform.browser.close()
@@ -294,18 +300,16 @@ test.describe('display_font reaches the element (issue #94)', () => {
 })
 
 
-test('the photographic platform home uses its cobalt palette and Manrope without repainting standard pages', async () => {
+test('the infrastructure home and its interior pages share Manrope and configured colors', async () => {
   const { browser, page } = await openTenantPage(PLATFORM_HOST, '/')
   try {
-    await expect(page.locator('body')).toHaveAttribute('data-home-template', 'photographic-service')
-    await expect(page.locator('body')).toHaveAttribute('data-palette', 'brand')
+    await expect(page.locator('[data-infrastructure-home]')).toBeVisible()
     expect(await computedProperty(page, '.hero h1', 'font-family')).toContain('Manrope')
-    expect(await computedProperty(page, '.brand-mark', 'color')).toBe('rgb(23, 72, 167)')
-    expect(await computedProperty(page, '.button-teal', 'background-color')).toBe('rgb(23, 72, 167)')
+    expect(await computedProperty(page, '.brand-symbol', 'color')).toBe('rgb(40, 84, 167)')
+    expect(await computedProperty(page, '.contact .button', 'background-color')).toBe('rgb(13, 28, 58)')
     await page.goto(`http://${PLATFORM_HOST}:${process.env.PLAYWRIGHT_PORT ?? 4321}/about/`)
-    expect(await computedProperty(page, '.logo', 'font-family')).toContain('Space Grotesk')
-    expect(await computedProperty(page, '.logo__mark', 'background-color')).toBe('rgb(23, 72, 167)')
-  } finally {
-    await browser.close()
-  }
+    expect(await computedProperty(page, '.brand-lockup', 'font-family')).toContain('Manrope')
+    expect(await computedProperty(page, '.brand-symbol', 'color')).toBe('rgb(40, 84, 167)')
+    await expect(page.locator('[data-infrastructure-home]')).toHaveCount(0)
+  } finally { await browser.close() }
 })

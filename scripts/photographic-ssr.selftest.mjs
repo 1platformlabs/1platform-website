@@ -49,46 +49,55 @@ const stableLinks = [
   '/for-developers/', '/solutions/', '/blog/', '/changelog/', '/about/', '/pricing/',
   '/terms/', '/privacy/', '/cookies/',
 ];
-for (const [path, title] of [['/', 'Sell online.'], ['/es/', 'Venda en línea.']]) {
-  test(`1Platform ${path}: real SSR composition, tenant pricing, metadata and published links`, async () => {
+for (const [path, title] of [['/', 'Infrastructure for'], ['/es/', 'Infraestructura para']]) {
+  test(`1Platform ${path}: real infrastructure SSR, metadata, navigation and preserved routes`, async () => {
     const { status, html } = await render('1platform.pro', path);
     assert.equal(status, 200);
-    assert.match(html, /data-home-template="photographic-service"/);
+    assert.match(html, /data-infrastructure-home/);
     assert.ok(html.includes(title));
-    assert.match(html, /pricing-card/);
-    assert.match(html, /USD/);
-    assert.doesNotMatch(html, /Medipago|4\.9%|id="price-calculator"|hero-motion-toggle|Para médicos especialistas/);
-    assert.match(html, /href="https:\/\/app\.1platform\.pro\/app\/"/);
+    assert.doesNotMatch(html, /Medipago|4\.9%|id="price-calculator"|data-panel-money|hero-motion-toggle|Para médicos especialistas/);
+    assert.match(html, /href="https:\/\/wa\.me\/50253946564"/);
+    assert.match(html, /href="https:\/\/developer\.1platform\.pro\/docs\/saas\/1platform-api\/getting-started\/?"/);
     assert.match(html, /hreflang="x-default" href="https:\/\/1platform\.pro\/"/);
     assert.match(html, /property="og:locale:alternate"/);
     assert.match(html, /rel="sitemap" href="\/sitemap-index.xml"/);
     assert.match(html, /type="application\/rss\+xml"/);
+    assert.match(html, /--site-navy:#0d1c3a/);
     const footer = html.match(/<footer[\s>][\s\S]*?<\/footer>/)?.[0] ?? '';
     const links = [...footer.matchAll(/href="([^"#]*)"/g)].map((match) => match[1]);
-    assert.ok(links.length >= 16);
-    for (const link of stableLinks) assert.ok(links.includes(path === '/' ? link : translateToEs(link)), `Footer lost ${link}`);
-    const credit = html.match(/data-panel-money="credit">([^<]+)/)?.[1];
-    const withdrawal = html.match(/data-panel-money="withdraw">([^<]+)/)?.[1];
-    assert.equal(credit?.replaceAll('\u00a0', ' '), path === '/' ? '$480.00' : '480,00 $');
-    assert.equal(withdrawal?.replaceAll('\u00a0', ' '), path === '/' ? '$0.00' : '0,00 $');
+    for (const link of ['/blog/', '/terms/', '/privacy/', '/cookies/']) {
+      assert.ok(links.includes(path === '/' ? link : translateToEs(link)), `Footer lost ${link}`);
+    }
+    assert.ok(links.includes('https://developer.1platform.pro/api-reference/1platform-api'));
+    // The former extensive footer is replaced by the approved navigation; its
+    // published destinations stay available and developer aliases redirect.
+    for (const link of stableLinks) {
+      const result = await render('1platform.pro', path === '/' ? link : translateToEs(link));
+      assert.equal(result.status, link === '/for-developers/' ? 301 : 200, `Published route lost ${link}`);
+    }
   });
 }
 
 test('Medipago retains its SSR calculation, configured support and single-language surface', async () => {
   const { status, html } = await render('medipago.gt');
   assert.equal(status, 200);
-  assert.match(html, /Cobre con tarjeta\./);
+  assert.match(html, /Cobre con tarjeta/);
   assert.match(html, /id="calc-net">Q\s*95\.10/);
   assert.match(html, /id="calc-fee">Q\s*4\.90/);
   assert.match(html, /id="price-calculator"/);
+  assert.match(html, /data-panel-mode="collections"/);
+  assert.match(html, /data-panel-money="collected">Q\s*480\.00/);
+  assert.match(html, /data-panel-money="withdraw">Q\s*0\.00/);
+  assert.match(html, /antes de comisiones/);
+  assert.match(html, /ficticios/);
   assert.match(html, /href="https:\/\/wa\.me\/50244866448\?text=/);
   assert.doesNotMatch(html, /pricing-card|hreflang="en"|application\/rss\+xml|hero-motion-toggle|Para médicos especialistas/);
 });
 
-test('secondary pages retain standard chrome and unavailable tenants fail closed', async () => {
+test('secondary pages retain the shared infrastructure chrome and unavailable tenants fail closed', async () => {
   const { status, html } = await render('1platform.pro', '/about/');
   assert.equal(status, 200);
-  assert.match(html, /site-header__rail/);
-  assert.doesNotMatch(html, /data-home-template="photographic-service"/);
+  assert.match(html, /class="brand-header"/);
+  assert.doesNotMatch(html, /data-infrastructure-home/);
   assert.equal((await render('unknown.example')).status, 404);
 });

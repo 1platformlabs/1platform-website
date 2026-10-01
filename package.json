@@ -24,7 +24,8 @@
     "typecheck": "astro check",
     "test:deploy": "bash deploy/cpanel/activate-graft.test.sh",
     "test:deploy:activator": "bash deploy/cpanel/publish-activator.test.sh",
-    "test:landing-ssr": "node --test scripts/photographic-ssr.selftest.mjs"
+    "test:landing-ssr": "node --test scripts/photographic-ssr.selftest.mjs",
+    "test:branding-content": "node --test scripts/prepare-branding-content.selftest.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.5",

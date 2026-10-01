@@ -7,6 +7,7 @@ import type { SiteTenant } from '../src/lib/site-api'
 import { ogLocaleOf } from '../src/lib/site-locale'
 import {
   COMPILED_SUCCESS,
+  COMPILED_DEFAULTS,
   paintsCompiledAccent,
   successFollowsAccent,
   themeColorOf,
@@ -37,8 +38,8 @@ function withAccent(accent: string): SiteTenant {
   return { ...clinic, theme: { ...clinic.theme, accent } }
 }
 
-test('the address bar follows a repainted accent and stays white for tenant #1', () => {
-  expect(themeColorOf(platform)).toBe('#FFFFFF')
+test('the address bar follows each configured tenant accent', () => {
+  expect(themeColorOf(platform)).toBe(platform.theme.accent)
   expect(themeColorOf(withAccent('#0F766E'))).toBe('#0f766e')
   // A value that never reaches the stylesheet never reaches the head either.
   expect(themeColorOf(withAccent('red;x'))).toBe('#FFFFFF')
@@ -71,23 +72,25 @@ test('status follows the brand only when the two greens would read as one', () =
   expect(teal).toContain('--color-success:#0f766e')
   expect(teal).toContain('--color-success-bg:')
   expect(themeDeclarations(withAccent('#b4291f'))).not.toContain('--color-success')
-  expect(themeDeclarations(platform)).toBe('')
+  expect(themeDeclarations(platform)).toContain('--color-accent:#2854a7')
+  expect(themeDeclarations(platform)).not.toContain('--color-success:')
 })
 
 test('only the compiled palette gets the platform artwork', () => {
-  expect(paintsCompiledAccent(platform)).toBe(true)
+  expect(paintsCompiledAccent(platform)).toBe(false)
+  expect(paintsCompiledAccent({ ...platform, theme: { ...COMPILED_DEFAULTS } })).toBe(true)
   expect(paintsCompiledAccent(clinic)).toBe(false)
 })
 
-test('the SERVED heads preserve standard chrome and apply the photographic tenant theme', async () => {
+test('the SERVED heads and home composition follow each tenant configuration', async () => {
   const platformStandard = await getWithHost(`${BASE}/pricing/`, platform.domain)
   expect(platformStandard.status).toBe(200)
-  expect(platformStandard.body).toContain('<meta name="theme-color" content="#FFFFFF">')
+  expect(platformStandard.body).toContain(`<meta name="theme-color" content="${platform.theme.accent}">`)
   const platformHome = await getWithHost(`${BASE}/`, platform.domain)
   expect(platformHome.status).toBe(200)
   expect(platformHome.body).toContain(`<meta name="theme-color" content="${platform.theme.accent}">`)
-  expect(platformHome.body).toContain('data-home-template="photographic-service"')
-  expect(platformHome.body).toContain('showcase-store-bg')
+  expect(platformHome.body).toContain('data-infrastructure-home')
+  expect(platformHome.body).toContain('hero-wire-travel')
   expect(platformHome.body).not.toContain('tools-scene')
 
   const clinicHome = await getWithHost(`${BASE}/`, clinic.domain)

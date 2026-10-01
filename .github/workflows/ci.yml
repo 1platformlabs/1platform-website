@@ -56,6 +56,12 @@ jobs:
           set -euo pipefail
           npm run typecheck
 
+      - name: Preparación de contenido por tenant
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run test:branding-content
+
       # El build va ANTES del guard a propósito: dos de sus reglas —el
       # presupuesto de 64 KB de JS público y el «motion CSS-first»— miden lo que
       # el build emite, y sin él el guard aborta diciendo que no encuentra el
