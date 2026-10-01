@@ -45,3 +45,16 @@ for (const width of [360, 1440]) {
     });
   }
 }
+
+test('dark hero controls keep their rendered white foreground on hover', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/es/');
+  const toggle = page.locator('.brand-menu-toggle');
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveCSS('color', 'rgb(255, 255, 255)');
+  const alternate = page.locator('.brand-languages [data-lang-choice="en"]');
+  await expect(alternate).toHaveCSS('color', 'rgb(255, 255, 255)');
+  await alternate.hover();
+  await expect(alternate).toHaveCSS('color', 'rgb(255, 255, 255)');
+  await expect(alternate).toHaveCSS('background-color', 'rgba(255, 255, 255, 0.13)');
+});

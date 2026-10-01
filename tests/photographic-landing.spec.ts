@@ -326,8 +326,7 @@ test('the demonstration has keyboard tabs, payment-channel filters and separate 
   await expect(page.locator('#withdraw-reason')).toHaveText('Esta vista de ejemplo no presenta saldo disponible ni una cuenta de retiro configurada.');
   await expect(page.locator('#method-title')).toHaveText('Cuenta de retiro no configurada');
   await expect(page.locator('#method-title')).toHaveCSS('color', 'rgb(32, 36, 34)');
-  await expect(page.locator('.panel-footnote p')).toHaveCSS('text-wrap', 'wrap');
-  await expect(page.locator('.panel-explanation')).toHaveCSS('text-wrap', 'wrap');
+  expect(await page.locator('.panel-section p').evaluateAll((paragraphs) => paragraphs.every((paragraph) => getComputedStyle(paragraph).textWrap === 'wrap'))).toBe(true);
   await expect(page.locator('#panel-withdrawals details summary')).toHaveText('Requisitos para solicitar un retiro');
   await expect(page.locator('#panel-withdrawals details li')).toHaveText(['Una cuenta de retiro configurada.', 'Saldo retirable suficiente en quetzales.', 'Confirmar el importe y la cuenta de destino.']);
   await expect(page.locator('#panel-withdrawals')).not.toContainText(/saldo mínimo|Sin métodos|Pedir retiro/);

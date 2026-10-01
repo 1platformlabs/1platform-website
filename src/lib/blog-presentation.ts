@@ -26,5 +26,13 @@ export function editorialOrder(posts: CollectionEntry<'blog'>[]): CollectionEntr
 }
 
 export function displayHeading(value: string): string {
-  return value.replace(/[.\s]+$/, '');
+  let end = value.length;
+  while (end > 0) {
+    const character = value[end - 1];
+    // trim() on one code unit retains ECMAScript whitespace semantics while
+    // the suffix scan visits each trailing character at most once.
+    if (character !== '.' && character.trim() !== '') break;
+    end -= 1;
+  }
+  return value.slice(0, end);
 }

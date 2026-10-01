@@ -15,6 +15,7 @@ const RETIRED_FAQ = {
 };
 const own = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 const object = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+const byText = (left, right) => left.localeCompare(right);
 const hash = (value) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const fail = (message) => { throw new PreparationError(message); };
 export class PreparationError extends Error {}
@@ -76,8 +77,8 @@ function validateManifest(snapshot, tenant) {
   if (!object(manifest) || manifest.slug !== tenant) fail('Manifest tenant mismatch');
   uniqueStrings(manifest.locales, 'manifest.locales');
   uniqueStrings(manifest.pages, 'manifest.pages');
-  if (JSON.stringify([...manifest.locales].sort()) !== JSON.stringify([...snapshot.locales].sort())) fail('Manifest locales differ from snapshot');
-  if (JSON.stringify([...manifest.pages].sort()) !== JSON.stringify([...snapshot.published_routes].sort())) fail('Manifest routes differ from snapshot');
+  if (JSON.stringify([...manifest.locales].sort(byText)) !== JSON.stringify([...snapshot.locales].sort(byText))) fail('Manifest locales differ from snapshot');
+  if (JSON.stringify([...manifest.pages].sort(byText)) !== JSON.stringify([...snapshot.published_routes].sort(byText))) fail('Manifest routes differ from snapshot');
   if (manifest.default_locale !== undefined && !manifest.locales.includes(manifest.default_locale)) fail('Manifest default locale is not declared');
   if (snapshot.default_locale !== undefined && snapshot.default_locale !== manifest.default_locale) fail('Manifest default locale differs from snapshot');
   if (!object(manifest.theme) || !object(manifest.destinations)) fail('Manifest theme and destinations are required');
@@ -107,8 +108,8 @@ export function loadOverlay(tenant) {
   const all = {tenant_slug: tenant, published_routes: fixture.tenant.pages, locales: fixture.tenant.locales, documents: data.pages};
   validateSnapshot(all, tenant);
   const messages = Object.assign({}, ...data.pages.map(page => page.blocks));
-  const messageKeys = Object.keys(messages).sort();
-  if (JSON.stringify(messageKeys) !== JSON.stringify(Object.keys(data.messages).sort()) || messageKeys.some(key => messages[key] !== data.messages[key])) fail('Approved Medipago fixture messages differ from its documents');
+  const messageKeys = Object.keys(messages).sort(byText);
+  if (JSON.stringify(messageKeys) !== JSON.stringify(Object.keys(data.messages).sort(byText)) || messageKeys.some(key => messages[key] !== data.messages[key])) fail('Approved Medipago fixture messages differ from its documents');
   const documents = data.pages.map(document => ({...document, blocks: Object.fromEntries(Object.entries(document.blocks).filter(([key]) => key.startsWith('photographic.')))})).filter(document => Object.keys(document.blocks).length);
   return {tenant_slug: tenant, published_routes: [], locales: all.locales, documents};
 }

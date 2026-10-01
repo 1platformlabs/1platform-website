@@ -34,12 +34,16 @@ consultar antes de preparar el PR y seguía en ese commit.
 | `npm run test:landing-ssr` | 4/4 PASS; doubles HTTP en memoria, no API/DB real |
 | Comparación visual Linux con config vigente | 8/8 PASS, sin modificar tolerancias |
 | `npm run check:baseline` | 100 idénticas, 0 diferencias, 0 respuestas incorrectas |
-| Focal posterior al último CSS Medipago | PASS, texto, color, líneas, teclado, colecciones y retiros |
+| Focal posterior a los últimos ajustes CSS | 10/10 PASS: 8 páginas/tamaños con Axe de idiomas, controles blancos/hover y Panel Medipago |
 | `git diff --check` | PASS |
 
-La suite completa precedió únicamente al ajuste final de color de
-`#method-title` y `text-wrap` de los dos párrafos inferiores; después se
-repitieron build, el caso focal, SSR y el comparador HTML con 100/100 idénticas.
+La suite completa precedió al ajuste final de color de `#method-title`,
+`text-wrap` de los párrafos del Panel y la herencia de color de los controles
+del navbar. Después se repitieron build, diez casos focales, SSR y el comparador
+HTML con 100/100 idénticas. La auditoría de CI también llevó a expresar la
+comparación exacta de un enlace sin ambigüedad, declarar comparadores de orden
+en el preparador y reemplazar el recorte de títulos por un recorrido lineal.
+Los 12 casos del preparador y los 15 casos focales de títulos pasaron.
 El CI del PR vuelve a ejecutar los gates sobre su SHA; este documento registra
 pruebas locales y no declara CI, E2E, merge ni producción aprobados.
 
@@ -58,10 +62,12 @@ El informe compacto de interiores está en `artifacts/interior-fidelity/`.
 Para Retiros Medipago se midieron 15 elementos contra el inicio de `#su-panel`,
 en 1440×900, 360×800, 390×844, 430×932 y 844×390: los **75 comparables tuvieron
 delta máximo 0 px** en x/y/ancho/alto y ninguna diferencia en tamaño, interlineado,
-color, fondo o display. Las líneas de ambos párrafos inferiores coinciden
-exactamente, comprobadas mediante Range del DOM. Se corrigieron la etiqueta
+color, fondo o display. Se amplió la comprobación mediante Range del DOM a
+todos los párrafos visibles en las tres pestañas y los cinco tamaños:
+**105 observaciones** con texto, líneas, dimensiones y estilos coincidentes.
+Se corrigieron la etiqueta
 inline heredada, el SVG block heredado, el color global de la cuenta y el ajuste
-`pretty` heredado de los párrafos; las fuentes efectivamente usadas son
+`pretty` heredado de todos los párrafos de esta sección; las fuentes usadas son
 Manrope/PanelInter, aunque el fallback de sistema difiere en el CSS.
 
 La ausencia de la ceja comercial del hero Medipago conserva la decisión posterior
@@ -70,7 +76,7 @@ encabezados semánticos accesibles. Estas decisiones no se ocultaron ajustando
 los prototipos ni los umbrales.
 
 Evidencia local no versionada: logs y resultados bajo `artifacts/final-verification/`,
-10 capturas finales y `medipago-panels/geometry.json`, y los pares completos de
+10 capturas finales, `medipago-panels/geometry.json` y `medipago-panels/paragraphs.json`, y los pares completos de
 interiores. Se excluyen del PR los PNG de evidencia y los directorios de resultados;
 los únicos PNG modificados/versionados son las cuatro referencias Linux aprobadas.
 

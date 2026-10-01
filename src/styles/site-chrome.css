@@ -14,7 +14,7 @@ html.infrastructure-site { scroll-padding-top: 130px; }
 .brand-cta { display: inline-flex; align-items: center; justify-content: center; gap: 20px; min-height: 56px; padding: 14px 24px; margin-left: 2px; border: 1px solid transparent; border-radius: 999px; background: white; color: var(--site-navy); font-size: 16px; font-weight: 700; line-height: 1.35; text-align: center; text-decoration: none; white-space: nowrap; transition: background-color .2s, transform .2s; }
 .brand-cta:hover { background: var(--site-selection); transform: translateY(-2px); }
 .brand-cta svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.brand-menu-toggle { display: none; flex: none; width: 48px; height: 48px; margin-left: auto; padding: 11px; border: 0; border-radius: 50%; background: rgb(255 255 255 / 13%); color: white; cursor: pointer; }
+.brand-menu-toggle { display: none; flex: none; width: 48px; height: 48px; margin-left: auto; padding: 11px; border: 0; border-radius: 50%; background: rgb(255 255 255 / 13%); color: inherit; cursor: pointer; }
 .brand-menu-toggle span { display: block; height: 1.5px; margin-block: 5px; background: currentColor; transition: transform .2s; }
 .brand-menu-toggle[aria-expanded='true'] span:first-child { transform: translateY(3.25px) rotate(45deg); }
 .brand-menu-toggle[aria-expanded='true'] span:last-child { transform: translateY(-3.25px) rotate(-45deg); }
@@ -68,7 +68,7 @@ body.brand-menu-open { overflow: hidden; }
 .infrastructure-site .brand-languages .lang__item { display: inline-flex; flex: none; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 999px; color: white; background: transparent; font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: 0; text-decoration: none; }
 .infrastructure-site .brand-languages .lang__item--current { background: white; color: var(--site-navy); }
 .infrastructure-site .brand-languages .lang__item--off { opacity: .6; }
-.infrastructure-site .brand-languages a.lang__item:hover { background: rgb(255 255 255 / 13%); color: white; }
+.infrastructure-site .brand-languages a.lang__item:hover { background: rgb(255 255 255 / 13%); color: inherit; }
 
 /* The shared chrome also serves legacy pages with a white hero. */
 .infrastructure-site body:not(:has(.infrastructure-home, .photographic-interior)) .brand-languages { color: var(--site-navy); }

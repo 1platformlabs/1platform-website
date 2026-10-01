@@ -68,7 +68,7 @@ for (const [path, title] of [['/', 'Infrastructure for'], ['/es/', 'Infraestruct
     for (const link of ['/blog/', '/terms/', '/privacy/', '/cookies/']) {
       assert.ok(links.includes(path === '/' ? link : translateToEs(link)), `Footer lost ${link}`);
     }
-    assert.ok(links.includes('https://developer.1platform.pro/api-reference/1platform-api'));
+    assert.ok(links.some((href) => href === 'https://developer.1platform.pro/api-reference/1platform-api'));
     // The former extensive footer is replaced by the approved navigation; its
     // published destinations stay available and developer aliases redirect.
     for (const link of stableLinks) {

@@ -28,7 +28,7 @@ function snapshot(tenant = 'oneplatform') {
 }
 
 test('uses only the three source catalogues and derives the real approved palette', () => {
-  assert.deepEqual([...new Set(platformOverlay.documents.map(d => d.route))].sort(), ['@components/site-chrome', '@infrastructure-home', '@photographic-interiors']);
+  assert.deepEqual([...new Set(platformOverlay.documents.map(d => d.route))].sort((a, b) => a.localeCompare(b)), ['@components/site-chrome', '@infrastructure-home', '@photographic-interiors']);
   assert.equal(platformOverlay.documents.length, 6);
   assert.equal(platformOverlay.documents.find(d => d.route === '@components/site-chrome' && d.locale === 'es').blocks['site.theme.navy'], '#0d1c3a');
 });

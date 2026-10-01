@@ -447,8 +447,7 @@
 .photographic-service[data-panel-mode="collections"] #method-title {
   color: var(--panel-text);
 }
-.photographic-service[data-panel-mode="collections"] .panel-footnote p,
-.photographic-service[data-panel-mode="collections"] .panel-explanation {
+.photographic-service[data-panel-mode="collections"] .panel-section p {
   text-wrap: wrap;
 }
 .photographic-service .panel-empty > p {
