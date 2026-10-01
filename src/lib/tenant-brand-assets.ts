@@ -433,7 +433,7 @@ const ASSET_VERSION_CAPACITY = 256
 export function brandAssetVersion(tenant: SiteTenant, asset: DerivedAsset): string {
   const key = `${asset}\u0000${rasterKey(tenant)}`
   const known = assetVersions.get(key)
-  if (known) return known
+  if (known !== undefined) return known
 
   // The logo's hash rides along: the SVG alone does not change when only the
   // composited logo does (two different logos draw the same white plate).
@@ -530,7 +530,7 @@ export function logoBytes(tenant: SiteTenant): Promise<Buffer | null> {
   if (!logo) return Promise.resolve(null)
   const key = `${tenant.slug}\u0000${logo.sha256}`
   const known = logoEntries.get(key)
-  if (known) return known
+  if (known !== undefined) return known
   const pending = logoFetcher(tenant.slug, logo.sha256).then((bytes) => {
     if (bytes === null) logoEntries.delete(key)
     return bytes
