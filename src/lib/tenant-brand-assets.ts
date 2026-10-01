@@ -331,6 +331,14 @@ const logoIconRaster = new BrandRasterCache(
   logoIconSvg,
 )
 
+/**
+ * The monogram as a PNG, for the favicon URL of a tenant WITH a logo whose bytes
+ * cannot be served right now: a tab keeps an icon instead of losing it.
+ */
+export function monogramIconPng(tenant: SiteTenant): Promise<Buffer> {
+  return sharp(Buffer.from(iconSvg(tenant))).resize(ICON_SIZE, ICON_SIZE).png().toBuffer()
+}
+
 /** The favicon raster made from the uploaded logo, or null without one. */
 export async function logoIconPng(tenant: SiteTenant): Promise<Buffer | null> {
   if (!uploadedLogo(tenant)) return null
@@ -437,12 +445,12 @@ export function brandAssetVersion(tenant: SiteTenant, asset: DerivedAsset): stri
 
   // The logo's hash rides along: the SVG alone does not change when only the
   // composited logo does (two different logos draw the same white plate).
-  const version = createHash('sha256')
-    .update(DERIVED_SOURCES[asset](tenant))
-    .update('\u0000')
-    .update(uploadedLogo(tenant)?.sha256 ?? '')
-    .digest('hex')
-    .slice(0, 12)
+  // ONLY when there is a logo: without one the version must stay exactly
+  // `sha256(svg)`, or every tenant's `?v=` would move the day this ships.
+  const hash = createHash('sha256').update(DERIVED_SOURCES[asset](tenant))
+  const logo = uploadedLogo(tenant)
+  if (logo) hash.update('\u0000').update(logo.sha256)
+  const version = hash.digest('hex').slice(0, 12)
   if (assetVersions.size >= ASSET_VERSION_CAPACITY) {
     const oldest = assetVersions.keys().next().value
     if (oldest !== undefined) assetVersions.delete(oldest)
@@ -516,23 +524,42 @@ const fetchLogoFromApi: LogoFetcher = async (slug, sha256) => {
 }
 
 let logoFetcher: LogoFetcher = fetchLogoFromApi
+let logoClock: () => number = () => Date.now()
 const logoEntries = new Map<string, Promise<Buffer | null>>()
+/** When each slug+hash last failed, for the short negative cache. */
+const logoFailures = new Map<string, number>()
+const LOGO_FAILURE_TTL_MS = 30_000
 const LOGO_CAPACITY = 64
 
 /**
  * The bytes of the tenant's CURRENT uploaded logo, cached per slug+hash.
  *
- * The hash is immutable, so a hit never goes stale; a failure is forgotten so
- * the next request retries instead of pinning a tenant to "no logo".
+ * The hash is immutable, so a hit never goes stale. A failure is remembered
+ * only briefly (`LOGO_FAILURE_TTL_MS`): long enough that a degraded API does
+ * not make EVERY page render of the tenant wait out the timeout again, short
+ * enough that recovery shows within the minute.
  */
 export function logoBytes(tenant: SiteTenant): Promise<Buffer | null> {
   const logo = uploadedLogo(tenant)
   if (!logo) return Promise.resolve(null)
   const key = `${tenant.slug}\u0000${logo.sha256}`
+  const failedAt = logoFailures.get(key)
+  if (failedAt !== undefined) {
+    if (logoClock() - failedAt < LOGO_FAILURE_TTL_MS) return Promise.resolve(null)
+    logoFailures.delete(key)
+  }
   const known = logoEntries.get(key)
   if (known !== undefined) return known
   const pending = logoFetcher(tenant.slug, logo.sha256).then((bytes) => {
-    if (bytes === null) logoEntries.delete(key)
+    if (bytes === null) {
+      logoEntries.delete(key)
+      logoFailures.set(key, logoClock())
+      while (logoFailures.size > LOGO_CAPACITY) {
+        const oldest = logoFailures.keys().next().value
+        if (oldest === undefined) break
+        logoFailures.delete(oldest)
+      }
+    }
     return bytes
   })
   logoEntries.set(key, pending)
@@ -570,5 +597,10 @@ export const __logoTesting = {
   setFetcher(fetcher: LogoFetcher | null): void {
     logoFetcher = fetcher ?? fetchLogoFromApi
     logoEntries.clear()
+    logoFailures.clear()
+    logoClock = () => Date.now()
+  },
+  setClock(clock: () => number): void {
+    logoClock = clock
   },
 }

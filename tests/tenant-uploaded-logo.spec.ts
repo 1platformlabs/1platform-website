@@ -7,6 +7,8 @@
  * the API fetch replaced through the module's test seam. The served suite keeps
  * proving that tenants WITHOUT a logo render exactly as before.
  */
+import { createHash } from 'node:crypto'
+
 import { expect, test } from '@playwright/test'
 import sharp from 'sharp'
 
@@ -16,7 +18,9 @@ import type { SiteTenant } from '../src/lib/site-api'
 import {
   __logoTesting,
   appleTouchIconPng,
+  appleTouchIconSvg,
   brandAssetVersion,
+  iconSvg,
   iconMimeType,
   logoBytes,
   logoIconPng,
@@ -26,6 +30,7 @@ import {
   resolveSocial,
   resolveUploadedLogo,
   socialPng,
+  socialSvg,
 } from '../src/lib/tenant-brand-assets'
 import { getWithHost } from './helpers/http-host'
 import { GET as getLogo } from '../src/pages/brand/logo/[hash].png'
@@ -98,6 +103,21 @@ test('the ?v= of every derived asset moves when the logo changes or goes away (w
   expect(resolveAppleTouchIcon(a)).not.toBe(resolveAppleTouchIcon(none))
 })
 
+test('without a logo every ?v= is exactly what it was before the logo existed', () => {
+  // The pre-logo contract (origin/main before api#519): sha256 of the drawing,
+  // nothing else. A separator hashed in even without a logo would move the
+  // `?v=` of EVERY tenant using derived assets the day this ships.
+  for (const slug of ['clinicas']) {
+    const tenant = base(slug)
+    const before = (svg: string) => createHash('sha256').update(svg).digest('hex').slice(0, 12)
+    expect(brandAssetVersion(tenant, 'icon')).toBe(before(iconSvg(tenant)))
+    expect(brandAssetVersion(tenant, 'social')).toBe(before(socialSvg(tenant)))
+    expect(brandAssetVersion(tenant, 'appleTouch')).toBe(before(appleTouchIconSvg(tenant)))
+    // Control: with a logo the version is something else.
+    expect(brandAssetVersion(withLogo(slug), 'icon')).not.toBe(before(iconSvg(withLogo(slug))))
+  }
+})
+
 test('the favicon type follows its extension', () => {
   expect(iconMimeType('/favicon.svg')).toBe('image/svg+xml')
   expect(iconMimeType('/brand/icon.svg?v=abc')).toBe('image/svg+xml')
@@ -138,17 +158,22 @@ test('the logo route serves only the current hash of THIS tenant, immutable', as
   expect(asked).toEqual([])
 })
 
-test('an API that cannot serve the logo is a 404, retried next time, never a 500', async () => {
+test('an API that cannot serve the logo is a 404, remembered for 30 s, then retried, never a 500', async () => {
   let calls = 0
+  let now = 1_000_000
   __logoTesting.setFetcher(async () => {
     calls += 1
     return null
   })
+  __logoTesting.setClock(() => now)
   const tenant = withLogo('clinicas')
   const call = () => (getLogo as unknown as (ctx: unknown) => Promise<Response>)({ params: { hash: SHA_A }, locals: { tenant } })
   expect((await call()).status).toBe(404)
   expect((await call()).status).toBe(404)
-  expect(calls, 'a failure must not be cached').toBe(2)
+  expect(calls, 'a fresh failure is not asked again: renders must not wait out the timeout').toBe(1)
+  now += 30_001
+  expect((await call()).status).toBe(404)
+  expect(calls, 'after the window the API is asked again').toBe(2)
   expect(await resolveLogo(tenant), 'no logo is advertised while its bytes cannot be served').toBeNull()
 })
 
@@ -168,10 +193,16 @@ test('the default fetch accepts only a real PNG from the API', async () => {
   }) as typeof fetch
   try {
     __logoTesting.setFetcher(null)
+    let now = 0
+    __logoTesting.setClock(() => now)
     const tenant = withLogo('clinicas')
+    // Each refusal is remembered for 30 s; step past it to ask again.
     expect(await logoBytes(tenant)).toBeNull()
+    now += 30_001
     expect(await logoBytes(tenant)).toBeNull()
+    now += 30_001
     expect(await logoBytes(tenant)).toBeNull()
+    now += 30_001
     expect((await logoBytes(tenant))?.equals(png)).toBe(true)
     expect(urls[0]).toMatch(new RegExp(`/api/v1/sites/clinicas/logo/${SHA_A}\\.png$`))
   } finally {
@@ -235,4 +266,13 @@ test('without a logo the served favicon is still the SVG it was', async () => {
   expect(iconLink(clinic.body)).toMatch(/href="\/brand\/icon\.svg\?v=[0-9a-f]{12}"/)
   expect(iconLink(clinic.body)).toContain('type="image/svg+xml"')
   expect(logoRoute.status, 'a tenant without a logo has no logo route').toBe(404)
+})
+
+test('with the logo unavailable the PNG favicon falls back to the monogram, uncached', async () => {
+  __logoTesting.setFetcher(async () => null)
+  const response = await (getIconPng as unknown as (ctx: unknown) => Promise<Response>)({ locals: { tenant: withLogo('clinicas', SHA_B) } })
+  expect(response.status, 'a tab keeps an icon').toBe(200)
+  expect(response.headers.get('content-type')).toBe('image/png')
+  expect(response.headers.get('cache-control'), 'never cached under the logo version').toBe('no-store')
+  expect((await sharp(Buffer.from(await response.arrayBuffer())).metadata()).width).toBe(192)
 })
