@@ -3,7 +3,8 @@ import { createHash } from 'node:crypto'
 import sharp from 'sharp'
 
 import { centredMark, outlineText } from './brand-glyphs'
-import type { SiteTenant } from './site-api'
+import { API_TIMEOUT_MS, apiBaseUrl, normalizeBrandLogo } from './site-api'
+import type { SiteBrandLogo, SiteTenant } from './site-api'
 
 /** A manifest value that can safely be emitted as a same-origin URL. */
 const PUBLISHED_PATH = /^\/(?!\/)[A-Za-z0-9._~!$&'()*+,;=:@%/-]*$/
@@ -53,9 +54,28 @@ export function brandSymbol(tenant: SiteTenant): string {
   return Array.from(initials || '?').slice(0, 3).join('')
 }
 
-/** Always returns a path: absence means a same-origin derived SVG. */
+/**
+ * Always returns a path. Order: declared icon → the uploaded logo (as a PNG
+ * favicon) → the derived monogram SVG.
+ */
 export function resolveIcon(tenant: SiteTenant): string {
-  return publishedPath(tenant.brand_assets?.icon) ?? versioned('/brand/icon.svg', tenant, 'icon')
+  const declared = publishedPath(tenant.brand_assets?.icon)
+  if (declared) return declared
+  if (uploadedLogo(tenant)) return versioned('/brand/icon.png', tenant, 'icon')
+  return versioned('/brand/icon.svg', tenant, 'icon')
+}
+
+/**
+ * The `type` of a `<link rel="icon">` for a path, from its extension. The
+ * favicon used to be SVG for every tenant; with an uploaded logo it is a PNG,
+ * and advertising `image/svg+xml` for PNG bytes makes some browsers drop it.
+ */
+export function iconMimeType(href: string): string | undefined {
+  const path = href.split(/[?#]/, 1)[0]?.toLowerCase() ?? ''
+  if (path.endsWith('.svg')) return 'image/svg+xml'
+  if (path.endsWith('.png')) return 'image/png'
+  if (path.endsWith('.ico')) return 'image/x-icon'
+  return undefined
 }
 
 /** Always returns a path: absence means a same-origin derived PNG. */
@@ -171,6 +191,13 @@ export function socialSvg(tenant: SiteTenant): string {
   const accent = colour(tenant.theme.accent, SAFE_INK)
   const ink = colour(tenant.theme.accent_contrast, SAFE_PAPER)
   const display = tenant.theme.display_font
+  if (uploadedLogo(tenant)) {
+    // A white plate where the monogram sat; the logo is composited onto it by
+    // the raster step (`SOCIAL_LOGO_BOX`). White, not the accent: a logo is
+    // drawn for a light background far more often than for the brand colour.
+    const plate = `<rect x="${SOCIAL_PLATE.x}" y="${SOCIAL_PLATE.y}" width="${SOCIAL_PLATE.width}" height="${SOCIAL_PLATE.height}" rx="28" fill="${SAFE_PAPER}"/>`
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="${accent}"/>${plate}<rect x="72" y="340" width="88" height="8" rx="4" fill="${ink}"/>${socialTitle(tenant.brand_name, display, ink)}</svg>`
+  }
   const symbol = brandSymbol(tenant)
   const mark = centredMark(symbol, display, 56, 132, 132, ink)
     ?? `<text x="132" y="151" fill="${ink}" font-family="DejaVu Sans, sans-serif" font-size="56" font-weight="700" text-anchor="middle">${xmlText(symbol)}</text>`
@@ -191,6 +218,10 @@ export function socialSvg(tenant: SiteTenant): string {
  * cannot overflow the square the way a fixed size would.
  */
 export function appleTouchIconSvg(tenant: SiteTenant): string {
+  if (uploadedLogo(tenant)) {
+    // Opaque white under the logo: iOS draws transparency as black.
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="${xmlText(tenant.brand_name)}"><rect width="180" height="180" fill="${SAFE_PAPER}"/></svg>`
+  }
   const accent = colour(tenant.theme.accent, SAFE_INK)
   const ink = colour(tenant.theme.accent_contrast, SAFE_PAPER)
   const symbol = brandSymbol(tenant)
@@ -208,10 +239,13 @@ export function appleTouchIconSvg(tenant: SiteTenant): string {
 function rasterKey(tenant: SiteTenant): string {
   // The display face is part of the drawing now: without it here, a tenant
   // that changes typography keeps its old raster until the worker restarts.
-  return `${tenant.slug}\u0000${tenant.brand_name}\u0000${tenant.brand_mark ?? ''}\u0000${tenant.theme.accent}\u0000${tenant.theme.accent_contrast}\u0000${tenant.theme.display_font}`
+  // The uploaded logo's hash too (api#519): without it, a new or removed logo
+  // would keep the previous raster — the trap of website#129, one field later.
+  return `${tenant.slug}\u0000${tenant.brand_name}\u0000${tenant.brand_mark ?? ''}\u0000${tenant.theme.accent}\u0000${tenant.theme.accent_contrast}\u0000${tenant.theme.display_font}\u0000${uploadedLogo(tenant)?.sha256 ?? ''}`
 }
 
-type Rasterize = (svg: string) => Promise<Buffer>
+/** `null` means "cannot make it right now": the cache forgets it and retries. */
+type Rasterize = (svg: string, tenant: SiteTenant) => Promise<Buffer | null>
 type RenderSvg = (tenant: SiteTenant) => string
 
 interface BrandRasterEntry {
@@ -253,7 +287,11 @@ export class BrandRasterCache {
 
     let pending: Promise<Buffer | null>
     pending = Promise.resolve()
-      .then(() => this.rasterize(this.render(tenant)))
+      .then(async () => {
+        const raster = await this.rasterize(this.render(tenant), tenant)
+        if (raster === null) throw new Error('raster unavailable')
+        return raster
+      })
       .catch(() => {
         if (this.entries.get(tenant.slug)?.pending === pending) {
           this.entries.delete(tenant.slug)
@@ -273,14 +311,31 @@ export class BrandRasterCache {
 }
 
 const socialRaster = new BrandRasterCache(
-  (svg) => sharp(Buffer.from(svg)).png().toBuffer(),
+  (svg, tenant) => rasterWithLogo(svg, tenant, SOCIAL_LOGO_BOX),
 )
 
 const appleTouchRaster = new BrandRasterCache(
-  (svg) => sharp(Buffer.from(svg)).png().toBuffer(),
+  (svg, tenant) => rasterWithLogo(svg, tenant, TOUCH_LOGO_BOX),
   64,
   appleTouchIconSvg,
 )
+
+/** The favicon PNG exists only for a tenant with an uploaded logo. */
+function logoIconSvg(): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="0 0 ${ICON_SIZE} ${ICON_SIZE}"></svg>`
+}
+
+const logoIconRaster = new BrandRasterCache(
+  (svg, tenant) => rasterWithLogo(svg, tenant, { left: 0, top: 0, width: ICON_SIZE, height: ICON_SIZE }),
+  64,
+  logoIconSvg,
+)
+
+/** The favicon raster made from the uploaded logo, or null without one. */
+export async function logoIconPng(tenant: SiteTenant): Promise<Buffer | null> {
+  if (!uploadedLogo(tenant)) return null
+  return logoIconRaster.get(tenant)
+}
 
 /**
  * Rasterise once per in-process brand. A failure is intentionally represented
@@ -333,6 +388,10 @@ export async function resolveLogo(tenant: SiteTenant): Promise<string | null> {
   if (declaredIcon) return declaredIcon
   const declaredSocial = publishedPath(tenant.brand_assets?.social_image)
   if (declaredSocial) return declaredSocial
+  // The uploaded logo itself, re-served from this origin — advertised only
+  // once its bytes can actually be served.
+  const logo = uploadedLogo(tenant)
+  if (logo) return (await logoBytes(tenant)) ? uploadedLogoPath(logo) : null
   return (await socialPng(tenant)) ? resolveSocial(tenant) : null
 }
 
@@ -376,7 +435,14 @@ export function brandAssetVersion(tenant: SiteTenant, asset: DerivedAsset): stri
   const known = assetVersions.get(key)
   if (known) return known
 
-  const version = createHash('sha256').update(DERIVED_SOURCES[asset](tenant)).digest('hex').slice(0, 12)
+  // The logo's hash rides along: the SVG alone does not change when only the
+  // composited logo does (two different logos draw the same white plate).
+  const version = createHash('sha256')
+    .update(DERIVED_SOURCES[asset](tenant))
+    .update('\u0000')
+    .update(uploadedLogo(tenant)?.sha256 ?? '')
+    .digest('hex')
+    .slice(0, 12)
   if (assetVersions.size >= ASSET_VERSION_CAPACITY) {
     const oldest = assetVersions.keys().next().value
     if (oldest !== undefined) assetVersions.delete(oldest)
@@ -387,4 +453,122 @@ export function brandAssetVersion(tenant: SiteTenant, asset: DerivedAsset): stri
 
 function versioned(path: string, tenant: SiteTenant, asset: DerivedAsset): string {
   return `${path}?v=${brandAssetVersion(tenant, asset)}`
+}
+
+
+// ── The uploaded logo (api#519) ─────────────────────────────────────────────
+
+const ICON_SIZE = 192
+/** The white plate on the social card and the box the logo fits inside it. */
+const SOCIAL_PLATE = { x: 72, y: 72, width: 480, height: 180 } as const
+const SOCIAL_LOGO_BOX = { left: 92, top: 92, width: 440, height: 140 } as const
+/** The touch icon keeps a margin so a square mask never clips the logo. */
+const TOUCH_LOGO_BOX = { left: 15, top: 15, width: 150, height: 150 } as const
+/** A logo the API re-encoded is at most 1024 px; anything near this is not one. */
+const MAX_LOGO_BYTES = 4 * 1024 * 1024
+const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+
+/** The tenant's uploaded logo, or null. Declared assets are checked by callers. */
+export function uploadedLogo(tenant: SiteTenant): SiteBrandLogo | null {
+  return normalizeBrandLogo(tenant.brand_logo)
+}
+
+/**
+ * The uploaded logo's same-origin path when it is what this tenant's brand
+ * resolves to — no declared asset outranks it — and its bytes can be served;
+ * otherwise null. For heads that otherwise publish the social card as the
+ * Organization logo and must keep doing so for every tenant without one.
+ */
+export async function resolveUploadedLogo(tenant: SiteTenant): Promise<string | null> {
+  if (publishedPath(tenant.brand_assets?.icon) || publishedPath(tenant.brand_assets?.social_image)) return null
+  const logo = uploadedLogo(tenant)
+  if (!logo) return null
+  return (await logoBytes(tenant)) ? uploadedLogoPath(logo) : null
+}
+
+/** Same-origin URL of the uploaded logo. The hash IS the version. */
+export function uploadedLogoPath(logo: SiteBrandLogo): string {
+  return `/brand/logo/${logo.sha256}.png`
+}
+
+type LogoFetcher = (slug: string, sha256: string) => Promise<Buffer | null>
+
+/**
+ * Ask the API for the bytes — the base URL is this server's configuration,
+ * never anything the manifest says, so there is no address to inject. Only a
+ * 200 that is really a PNG and is not absurdly large is accepted; every other
+ * outcome is "not now" (null), never an exception into a page render.
+ */
+const fetchLogoFromApi: LogoFetcher = async (slug, sha256) => {
+  const url = `${apiBaseUrl()}/api/v1/sites/${encodeURIComponent(slug)}/logo/${sha256}.png`
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS), headers: { accept: 'image/png' } })
+    if (response.status !== 200) return null
+    if (!(response.headers.get('content-type') ?? '').startsWith('image/png')) return null
+    const declared = Number(response.headers.get('content-length') ?? '0')
+    if (declared > MAX_LOGO_BYTES) return null
+    const bytes = Buffer.from(await response.arrayBuffer())
+    if (bytes.byteLength > MAX_LOGO_BYTES || !bytes.subarray(0, 8).equals(PNG_MAGIC)) return null
+    return bytes
+  } catch {
+    return null
+  }
+}
+
+let logoFetcher: LogoFetcher = fetchLogoFromApi
+const logoEntries = new Map<string, Promise<Buffer | null>>()
+const LOGO_CAPACITY = 64
+
+/**
+ * The bytes of the tenant's CURRENT uploaded logo, cached per slug+hash.
+ *
+ * The hash is immutable, so a hit never goes stale; a failure is forgotten so
+ * the next request retries instead of pinning a tenant to "no logo".
+ */
+export function logoBytes(tenant: SiteTenant): Promise<Buffer | null> {
+  const logo = uploadedLogo(tenant)
+  if (!logo) return Promise.resolve(null)
+  const key = `${tenant.slug}\u0000${logo.sha256}`
+  const known = logoEntries.get(key)
+  if (known) return known
+  const pending = logoFetcher(tenant.slug, logo.sha256).then((bytes) => {
+    if (bytes === null) logoEntries.delete(key)
+    return bytes
+  })
+  logoEntries.set(key, pending)
+  while (logoEntries.size > LOGO_CAPACITY) {
+    const oldest = logoEntries.keys().next().value
+    if (oldest === undefined) break
+    logoEntries.delete(oldest)
+  }
+  return pending
+}
+
+interface Box { left: number; top: number; width: number; height: number }
+
+/**
+ * Rasterise a drawing and, for a tenant with a logo, composite the logo into
+ * `box` (contained, centred). Without the logo's bytes there is no honest
+ * raster: null, and the caller omits the asset rather than draw a wrong one.
+ */
+async function rasterWithLogo(svg: string, tenant: SiteTenant, box: Box): Promise<Buffer | null> {
+  const base = sharp(Buffer.from(svg))
+  if (!uploadedLogo(tenant)) return base.png().toBuffer()
+  const bytes = await logoBytes(tenant)
+  if (!bytes) return null
+  const fitted = await sharp(bytes)
+    .resize({ width: box.width, height: box.height, fit: 'inside', withoutEnlargement: false })
+    .png()
+    .toBuffer({ resolveWithObject: true })
+  const left = box.left + Math.round((box.width - fitted.info.width) / 2)
+  const top = box.top + Math.round((box.height - fitted.info.height) / 2)
+  return base.composite([{ input: fitted.data, left, top }]).png().toBuffer()
+}
+
+/** Test seam: replace the API fetch and forget every cached logo. */
+export const __logoTesting = {
+  setFetcher(fetcher: LogoFetcher | null): void {
+    logoFetcher = fetcher ?? fetchLogoFromApi
+    logoEntries.clear()
+  },
 }
