@@ -23,6 +23,6 @@ const current = (href: string) => href.endsWith('/blog/') && Astro.originPathnam
   {navigation.map(({ label, href }) => <a href={href} aria-current={current(href)}>{label}</a>)}
   {contact && <a href={contact}>{copy('cta')}</a>}
 </nav>
-{isMultilingual(tenant) && <div class="brand-languages"><span>{copy('language')}</span><LanguageSwitcher alternates={alternates} /></div>}
+{isMultilingual(tenant) && <nav class="brand-languages" aria-label={copy('language')}><span aria-hidden="true">{copy('language')}</span><LanguageSwitcher alternates={alternates} /></nav>}
 <noscript><nav class="brand-noscript-nav" aria-label={copy('mobileNav')}>{navigation.map(({label,href}) => <a href={href} aria-current={current(href)}>{label}</a>)}{contact && <a href={contact}>{copy('cta')}</a>}</nav></noscript>
 <script>import '@scripts/site-chrome';</script>

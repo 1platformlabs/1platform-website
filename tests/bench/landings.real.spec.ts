@@ -8,6 +8,9 @@ import { join } from 'node:path';
 const port = Number(process.env.WEBSITE_E2E_PORT || 4421);
 const controlPort = Number(process.env.WEBSITE_E2E_CONTROL_PORT || 4521);
 const output = process.env.WEBSITE_E2E_EVIDENCE || 'test-results/real-landings';
+// The tenant's own support destination is DATA: read it from the bench API rather
+// than freezing a number (the first real run found the hardcoded one was stale).
+const apiPort = Number(process.env.WEBSITE_E2E_API_PORT || 8110);
 let browser: Browser;
 const hosts = ['medipago.gt', '1platform.pro', 'aurora.example', 'unknown.example', 'www.medipago.gt'];
 const test = base.extend<{ live: Page }>({
@@ -21,6 +24,12 @@ test.skip(!process.env.WEBSITE_E2E_PORT, 'Requires the authorized private real-s
 test.beforeAll(async () => {
   mkdirSync(output, { recursive: true });
   browser = await chromium.launch({ args: [`--host-resolver-rules=${hosts.map(h => `MAP ${h} 127.0.0.1`).join(', ')}`] });
+  const response = await fetch(`http://127.0.0.1:${apiPort}/api/v1/sites/by-host?host=medipago.gt`);
+  expect(response.status).toBe(200);
+  const support = (await response.json()).data.destinations.support as string;
+  expect(support).toMatch(/^https:\/\/wa\.me\/\d+$/);
+  expect(support).not.toBe('https://wa.me/50253946564');
+  homes[0].cta = support;
 });
 test.afterAll(async () => { await browser?.close(); });
 async function visit(page: Page, host = 'medipago.gt', path = '/') {
@@ -28,7 +37,7 @@ async function visit(page: Page, host = 'medipago.gt', path = '/') {
   await page.evaluate(() => document.fonts.ready);
 }
 const homes = [
-  { host: 'medipago.gt', path: '/', id: 'medipago', title: 'Cobre con tarjeta', locale: 'es-GT', cta: 'https://wa.me/50244866448' },
+  { host: 'medipago.gt', path: '/', id: 'medipago', title: 'Cobre con tarjeta', locale: 'es-GT', cta: '' },
   { host: '1platform.pro', path: '/', id: 'oneplatform-en', title: 'Infrastructure foryour next solution', locale: 'en', cta: 'https://wa.me/50253946564' },
   { host: '1platform.pro', path: '/es/', id: 'oneplatform-es', title: 'Infraestructura parasu próxima solución', locale: 'es', cta: 'https://wa.me/50253946564' },
 ];
@@ -56,7 +65,7 @@ for (const home of homes) {
         await expect(page.locator('.panel-footnote p')).toHaveCSS('font-size', '16px');
         await expect(page.locator('[data-panel-mode="collections"]')).toHaveCount(1);
         await expect(page.locator('#faq-list details')).toHaveCount(3);
-        expect(copy).toMatch(/datos.*ficticios/i);
+        expect(copy).toContain('Los importes y movimientos de esta demostración son ficticios');
         expect(copy).toMatch(/facturación automática/i);
         expect(copy).not.toMatch(/\bUSD\b|\$480/);
         await expect(page.locator('#calc-net')).toHaveText(/Q\s?95\.10/);
@@ -236,7 +245,7 @@ test('secondary routes preserve their content with approved chrome and the indep
       const baseline = JSON.parse(readFileSync(join(output, 'control-render.json'), 'utf8'));
       expect(text).toBe(baseline[id].text);
       await expect(page.locator('.brand-header')).toBeVisible();
-      await expect(page.locator('.brand-name')).toHaveText('1Platform');
+      await expect(page.locator('#site-header .brand-lockup')).toHaveAttribute('aria-label', /^1Platform\b/);
       await expect(page.locator('.brand-cta')).toHaveAttribute('href', 'https://wa.me/50253946564');
       continue;
     }
@@ -266,6 +275,8 @@ test('published blog, article and guide destinations preserve locale, history an
   const href = await article.getAttribute('href');
   expect(href).toBeTruthy();
   await article.click();
+  // Wait for the ARTICLE, not any h1: the archive's own h1 is visible before the navigation commits.
+  await expect(page).toHaveURL(new URL(href!, page.url()).href);
   await expect(page.locator('h1')).toBeVisible();
   await page.reload();
   await expect(page.locator('h1')).toBeVisible();

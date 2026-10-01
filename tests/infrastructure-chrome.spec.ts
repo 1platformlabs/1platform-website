@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { environmentDestination, supportUrl } from '../src/lib/site-destinations';
 import { repoContentOverrides, repoTenantForHost } from '../src/data/site-tenants';
@@ -53,6 +54,9 @@ test('commercial navigation, locale and redirects preserve the current routes', 
     const response = await request.get(path, { maxRedirects: 0 });
     expect(response.status()).toBe(301);
     expect(response.headers().location).toBe('https://developer.1platform.pro/docs/saas/1platform-api/getting-started');
+    const tagged = await request.get(`${path}?utm_source=newsletter&ref=a%20b`, { maxRedirects: 0 });
+    expect(tagged.status()).toBe(301);
+    expect(tagged.headers().location).toBe('https://developer.1platform.pro/docs/saas/1platform-api/getting-started?utm_source=newsletter&ref=a%20b');
   }
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   expect(sitemap).not.toMatch(/for-developers|para-desarrolladores/);
@@ -71,4 +75,15 @@ test('compact navigation traps focus, closes with Escape and keeps language cont
   await page.keyboard.press('Escape');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(page.locator('.brand-languages')).toBeVisible();
+});
+
+test('every chrome control lives inside a landmark, language selector included', async ({ page }) => {
+  // Found by the real-bank E2E: the language selector sat outside every landmark (axe `region`).
+  for (const [path, width] of [['/', 1440], ['/es/', 390], ['/es/blog/', 1440]] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(path);
+    await expect(page.locator('nav.brand-languages')).toHaveAttribute('aria-label', /Language|Idioma/);
+    const axe = await new AxeBuilder({ page }).withRules(['region']).analyze();
+    expect(axe.violations.map(v => v.nodes.map(n => n.target))).toEqual([]);
+  }
 });

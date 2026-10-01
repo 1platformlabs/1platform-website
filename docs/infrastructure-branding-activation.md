@@ -184,6 +184,42 @@ Dentro del banco autorizado, el procedimiento del backend para cada fixture es:
    usuario con API real por landing, blog, artículo, guía y Scalar; comprobar
    ambos tenants, idiomas, menús, búsqueda y recarga profunda
 
+## Orden obligatorio y reversión (medido en el banco real, 2026-10-01)
+
+El paquete **no es compatible hacia atrás**: el código anterior (`origin/main`
+08c0a61) no puede servir el contenido activado. En el banco, con los mismos datos
+y la misma API, `origin/main` respondió **503** en las homes de 1Platform (EN/ES)
+y de Medipago y en todas las páginas interiores de 1Platform:
+
+- 1Platform: al tener `destinations.support`, el código anterior exige
+  `photographic.contact.messages.*` y `cta.scheduleDemo`, que el paquete no trae
+- Medipago: el código anterior exige exactamente cuatro FAQ y el paquete retira
+  la cuarta (la retirada autorizada de arriba)
+
+Por eso el orden es estricto:
+
+1. Desplegar el website de esta épica y comprobar que sirve el contenido
+   **vigente** sin cambios. Con los datos de producción censados, la rama es
+   idéntica píxel a píxel a `origin/main` en 23 de 24 capturas (la restante sólo
+   cambia el corte de línea del título ES a 390 px)
+2. Recién entonces activar (seed + PATCH) con autorización separada
+3. **No revertir el código del website mientras el contenido siga activado.**
+   Para volver atrás, revertir primero los datos y después el código:
+   - re-sembrar el snapshot `*-current.json` (es una fixture válida del seed):
+     restaura los bloques de los documentos existentes, incluida la cuarta FAQ.
+     **Sin `--verify`**: no existe borrado de documentos, así que los seis
+     documentos nuevos de 1Platform quedan almacenados y el conteo no coincide.
+     El código anterior los ignora (medido)
+   - PATCH del manifiesto de 1Platform con `home_template`, `theme` y
+     `destinations` del snapshot (`support: null` se acepta y se persiste)
+   - en el banco, este procedimiento devolvió `origin/main` a 200 y a capturas
+     idénticas píxel a píxel al estado previo a la activación (10 de 10)
+
+El website cachea manifiesto y copia 60 s y luego sirve la copia anterior mientras
+refresca en segundo plano (`src/lib/tenant-cache.ts`): un cambio de datos se ve
+a partir de la segunda visita pasado el minuto. Reiniciar los workers propios lo
+hace inmediato.
+
 La activación en un entorno compartido/producción es un paso posterior al merge
 **con autorización separada**, snapshot reciente y revisión del paquete exacto.
 Nada de lo preparado aquí autoriza ni realiza ese paso. Las lecturas públicas de

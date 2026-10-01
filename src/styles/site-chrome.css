@@ -80,3 +80,10 @@ body.brand-menu-open { overflow: hidden; }
 
 .infrastructure-site :is(.brand-header, .brand-mobile-nav, .brand-footer, .brand-languages, .infrastructure-home .hero, .photographic-interior .hero, .photographic-interior .story-copy, .section--navy) :focus-visible { outline-color: #88b6ff; }
 .infrastructure-site body:not(:has(.infrastructure-home, .photographic-interior)) .brand-languages :focus-visible { outline-color: var(--site-blue); }
+
+/* Legacy white-hero pages were laid out for the previous 90px rail (`--header-offset`),
+   and the legal/contact/changelog pages for none at all. Under this chrome the fixed rail
+   ends at 102px and the language selector row at 176px (141px on phones), so their first
+   line sat under the navbar or the selector (real-bank E2E, every legacy route measured).
+   Reserve the chrome's height once, for legacy pages only; dark-hero pages own their top. */
+.infrastructure-site body:not(:has(.infrastructure-home, .photographic-interior)) #main-content { padding-top: 108px; }

@@ -76,7 +76,7 @@ export default defineConfig({
 });
 ```
 
-Ejecutar `WEBSITE_E2E_PORT=<puerto-rama> WEBSITE_E2E_CONTROL_PORT=<puerto-control>
+Ejecutar `WEBSITE_E2E_PORT=<puerto-rama> WEBSITE_E2E_CONTROL_PORT=<puerto-control> WEBSITE_E2E_API_PORT=<puerto-api-rama>
 npx playwright test --config playwright.bank.config.ts`. Chromium resuelve
 los hosts reales por loopback, sin cambiar `/etc/hosts`. La suite tiene 24 casos:
 las tres homes en 1440, 360, 390, 430 y horizontal 844×390, más nueve controles
