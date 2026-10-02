@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- 1Platform presenta la infraestructura aprobada para crear productos, conectar
+  sistemas e incorporar IA, con API como recorrido principal y capacidades en
+  preparación identificadas. Manrope, tokens de marca y navegación compartida
+  se activan desde contenido del tenant; Medipago y perfiles anteriores conservan
+  su identidad y destinos.
+- Blog, artículos y Tienda online ES/EN adoptan los interiores aprobados. El
+  archivo conserva sus Markdown, slugs, fechas y traducciones, con categorías
+  laterales, resúmenes breves y filtros que sobreviven a recarga e historial.
+- Las entradas antiguas de desarrolladores redirigen a Primeros pasos; canonical,
+  hreflang, rutas técnicas y sitemap conservan su contrato público.
+- El Panel ilustrativo de Medipago distingue cobros brutos, comisiones y saldo
+  retirable, con importes de ejemplo y copy formal del prototipo vigente.
+- Las dos landings reproducen automáticamente tarjetas y recorrido al entrar
+  en pantalla, sin controles de repetición. El correo con dominio propio
+  también se presenta en 1Platform EN/ES desde su contenido de tenant.
+- Medipago presenta el correo con dominio personal como beneficio adicional,
+  con `consulta@minombre.com` sólo como ejemplo y consulta al contacto configurado.
+- Las homes de 1Platform EN/ES y Medipago comparten el rediseño fotográfico
+  aprobado. 1Platform conserva su marca, foto comercial existente, destinos,
+  precios USD por cuenta y páginas secundarias; Medipago conserva GTQ y 4.9%.
+  Contenido y elección de plantilla permanecen en configuración del tenant.
+
+### Added
+- Configuración de destinos por entorno mediante `SITE_DESTINATION_ORIGINS`,
+  validada por origen y protocolo sin mezclar enlaces entre marcas.
+- Lanzador local `preview:landings` para revisar Medipago y 1Platform por hosts
+  separados en el mismo build, con contenido de fixture por tenant e idioma.
+  No sustituye la verificación con API y DB reales.
+- Composición multitenant `photographic-service` y fuente Manrope para migrar la
+  landing aprobada de Medipago: fotografía animada, panel ilustrativo y calculadora
+  en centavos enteros. Marca, contenido, comisión y contacto proceden del tenant;
+  las composiciones existentes conservan su comportamiento.
+
 ### Fixed
 - **Las reglas 3 y 4 del guardián miran también lo que sirve producción**
   (issue #101). Hasta ahora sólo escaneaban los inquilinos escritos en el repo;
@@ -16,6 +50,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   indexables con `GET /api/v1/sites/published-hosts`, lee sus páginas del API y
   escanea cada una en su dirección real. Una lista con menos de 2 hosts, o sin
   `1platform.pro`, es rojo.
+- Los íconos y la tarjeta social derivados de la marca de un tenant (`/brand/*`)
+  llevan en la URL una versión calculada del dibujo: un cambio de marca (fuente,
+  acento, monograma o nombre) se ve de inmediato en vez de quedar hasta 24 h en
+  la caché del borde (#129).
+- El correo de ejemplo de las landings (`consulta@minombre.com`) queda como texto:
+  el borde lo convertía en un enlace ofuscado «[email protected]» visible sin
+  JavaScript y para buscadores. Se marca con `email_off`; las referencias de las
+  homes EN/ES sólo suman ese marcador.
+- Las referencias HTML y visuales de las homes EN/ES reflejan el rediseño
+  fotográfico aprobado (issue #124). Se conservan las otras 98 rutas, las cuatro
+  referencias de clínica, el umbral visual del 1 % y todos los guards.
+- El hero de la landing fotográfica omite la frase «Para médicos especialistas»
+  y el control de pausa, según la revisión solicitada. Conserva movimiento
+  reducido y pausa automática al quedar fuera de pantalla.
 - **axe también mira un inquilino de la vertical de clínicas** (issue #122).
   `tests/a11y-home.spec.ts` sólo escaneaba el inquilino de referencia; ahora
   corre el mismo conjunto WCAG A/AA contra `clinicas.1platform.dev` (plantilla

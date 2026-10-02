@@ -1,6 +1,6 @@
 import type { MiddlewareHandler, MiddlewareNext } from 'astro'
 
-import { manifestSource } from './data/site-tenants'
+import { manifestSource, repoContentOverrides } from './data/site-tenants'
 import { dictionaryFor } from './i18n'
 import type { Locale } from './i18n/ui'
 import { resolveTenant } from './lib/resolve-tenant'
@@ -260,7 +260,7 @@ async function copyFor(
   if (manifestSource() === 'repo') {
     // The repo catalogues, for a laptop and the browser suite. Explicitly
     // chosen, never a fallback — see `src/data/site-tenants.ts`.
-    return carryOn({ messages: dictionaryFor(locale), ageMs: null })
+    return carryOn({ messages: { ...dictionaryFor(locale), ...repoContentOverrides(tenant) }, ageMs: null })
   }
 
   const content = await resolveContent(tenant.slug, locale)

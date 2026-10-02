@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 
-import { getWithHost } from './helpers/http-host'
+import { getWithHost, type HostResponse } from './helpers/http-host'
+import { expectPublishedResponse } from './helpers/published-response'
 import {
   MIN_PRODUCTION_HOSTS,
   productionSurface,
@@ -86,12 +87,14 @@ async function servedSurface(): Promise<SurfacePage[]> {
   return scanningProduction() ? productionSurface() : surface()
 }
 
-async function fetchServed(page: SurfacePage): Promise<{ status: number; body: string }> {
+async function fetchServed(page: SurfacePage): Promise<HostResponse> {
   if (!scanningProduction()) return getWithHost(BASE + page.url, page.host)
   // `manual`: a published page that redirects is a finding to report, not
-  // something to follow silently onto another page.
+  // something to follow silently onto another page. The one sanctioned
+  // redirect (a retired address) is judged by `expectPublishedResponse`,
+  // which needs `location` — so headers travel in both modes.
   const res = await fetch(`https://${page.host}${page.url}`, { redirect: 'manual' })
-  return { status: res.status, body: await res.text() }
+  return { status: res.status, headers: Object.fromEntries(res.headers), body: await res.text() }
 }
 
 /**
@@ -128,7 +131,7 @@ test('no tenant serves a fabricated price or vanity metric, on any page, in any 
 
   for (const page of await servedSurface()) {
     const res = await fetchServed(page)
-    expect(res.status, `${page.host}${page.url} is published but answered ${res.status}`).toBe(200)
+    expectPublishedResponse(res, page)
     scanned += 1
     if (banned.test(res.body)) leaks.push(`${page.host}${page.url}`)
   }
@@ -149,7 +152,7 @@ test('no tenant serves an unverifiable "replaces N tools" claim, in either langu
       continue
     }
     const res = await fetchServed(page)
-    expect(res.status, `${page.host}${page.url} is published but answered ${res.status}`).toBe(200)
+    expectPublishedResponse(res, page)
     scanned += 1
     if (en.test(res.body) || es.test(res.body)) leaks.push(`${page.host}${page.url}`)
   }

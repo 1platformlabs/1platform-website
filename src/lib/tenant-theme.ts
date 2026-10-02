@@ -130,6 +130,7 @@ export const DISPLAY_FONT_STACKS = {
   'system-serif': "ui-serif, Georgia, 'Times New Roman', serif",
   'system-sans': "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   'system-mono': "ui-monospace, 'SF Mono', Consolas, 'Liberation Mono', monospace",
+  'manrope': "'Manrope', system-ui, sans-serif",
 } satisfies Record<DisplayFont, string>
 
 export interface AccentRamp {

@@ -57,12 +57,14 @@ test('the clinic tenant renders, and the platform host still renders', async () 
 
 test('the wordmark is the tenant\'s, not the platform\'s', async () => {
   const { html: clinic } = await serve(CLINIC_HOST)
-  const { html: platform } = await serve(PLATFORM_HOST)
+  // The shared Logo component remains on standard pages; the photographic
+  // home has its own approved lockup, checked separately below.
+  const { html: platform } = await serve(PLATFORM_HOST, '/pricing/')
 
-  const mark = (html: string) => html.match(/logo__mark"[^>]*>([^<]*)</)?.[1] ?? null
-  const text = (html: string) => html.match(/logo__text"[^>]*>([^<]*)</)?.[1] ?? null
+  const mark = (html: string) => html.match(/(?:logo__mark|brand-symbol)"[^>]*>([^<]*)</)?.[1] ?? null
+  const text = (html: string) => html.match(/(?:logo__text|brand-name)"[^>]*>([^<]*)</)?.[1] ?? null
   const label = (html: string) =>
-    html.match(/class="logo[^"]*"[^>]*aria-label="([^"]+)"/)?.[1] ?? null
+    html.match(/class="(?:logo|brand-lockup)[^"]*"[^>]*aria-label="([^"]+)"/)?.[1] ?? null
 
   // POSITIVE CONTROL: the platform draws its own, or the scan is broken. Its
   // "1" is a numeral doing the work of a glyph, so it still gets boxed.
@@ -78,6 +80,10 @@ test('the wordmark is the tenant\'s, not the platform\'s', async () => {
   expect(label(clinic), 'the accessible name must use the complete semantic brand name').toBe(
     'Clínica Delta',
   )
+  const { html: home } = await serve(PLATFORM_HOST)
+  expect(home).toMatch(/class="brand-symbol"[^>]*>1<\/span>/)
+  expect(home).toMatch(/class="brand-name">Platform<\/span>/)
+  expect(home).toContain('aria-label="1Platform, back to home"')
 })
 
 test('the leak that is LEFT is content, and its size is pinned', async () => {
@@ -144,9 +150,8 @@ test('the tenant head owns its icon, social card and structured-data logo', asyn
     ...clinicHead.matchAll(/<meta (?:property|name)="(?:og|twitter):image"[^>]*>/g),
     ...clinicHead.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g),
   ].map((match) => match[0]).join('\n')
-  expect(assetSurface, 'the icon, share-card and JSON-LD surfaces must be present').toContain('/brand/icon.svg')
-  expect(assetSurface).toContain('https://clinicas.1platform.dev/brand/social.png')
-  expect(assetSurface).toContain('https://clinicas.1platform.dev/brand/social.png')
+  expect(assetSurface, 'the icon, share-card and JSON-LD surfaces must be present').toMatch(/\/brand\/icon\.svg\?v=[0-9a-f]{12}/)
+  expect(assetSurface).toMatch(/https:\/\/clinicas\.1platform\.dev\/brand\/social\.png\?v=[0-9a-f]{12}/)
   expect(assetSurface).not.toContain('/favicon.svg')
   expect(assetSurface).not.toContain('/og/default.png')
   expect(assetSurface).not.toContain('1platform.pro')

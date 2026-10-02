@@ -12,6 +12,7 @@ import {
   appleTouchIconSvg,
   brandSymbol,
   BrandRasterCache,
+  brandAssetVersion,
   iconSvg,
   resolveAppleTouchIcon,
   resolveIcon,
@@ -35,11 +36,11 @@ test('declared platform assets preserve their compiled paths while a tenant with
   expect(resolveIcon(platform)).toBe('/favicon.svg')
   expect(resolveSocial(platform)).toBe('/og/default.png')
   expect(resolveAppleTouchIcon(platform)).toBe('/logo-oauth-120x120.png')
-  expect(resolveIcon(clinic)).toBe('/brand/icon.svg')
-  expect(resolveSocial(clinic)).toBe('/brand/social.png')
-  expect(resolveAppleTouchIcon(clinic)).toBe('/brand/apple-touch-icon.png')
+  expect(resolveIcon(clinic)).toMatch(/^\/brand\/icon\.svg\?v=[0-9a-f]{12}$/)
+  expect(resolveSocial(clinic)).toMatch(/^\/brand\/social\.png\?v=[0-9a-f]{12}$/)
+  expect(resolveAppleTouchIcon(clinic)).toMatch(/^\/brand\/apple-touch-icon\.png\?v=[0-9a-f]{12}$/)
   expect(await resolveLogo(platform)).toBe('/favicon.svg')
-  expect(await resolveLogo(clinic)).toBe('/brand/social.png')
+  expect(await resolveLogo(clinic)).toBe(resolveSocial(clinic))
 })
 
 test('a declared social image can be the logo without invoking the derived raster', async () => {
@@ -49,7 +50,7 @@ test('a declared social image can be the logo without invoking the derived raste
     brand_assets: { social_image: '/assets/clinic-social.png' },
   }
 
-  expect(resolveIcon(partial)).toBe('/brand/icon.svg')
+  expect(resolveIcon(partial)).toBe(resolveIcon(clinic))
   expect(await resolveLogo(partial)).toBe('/assets/clinic-social.png')
 })
 
@@ -69,7 +70,7 @@ test('a rolling deploy accepts an old or partially projected brand-assets field'
       const resolved = await fetchTenantByHost('clinic.example')
       expect(resolved).not.toBeNull()
       expect(resolveIcon(resolved!)).toBe(
-        'brand_assets' in manifest ? '/assets/clinic-icon.svg' : '/brand/icon.svg',
+        'brand_assets' in manifest ? '/assets/clinic-icon.svg' : resolveIcon(clinic),
       )
     }
   } finally {
@@ -199,14 +200,14 @@ test('no tenant can be handed the platform touch icon it did not declare', () =>
 
   for (const assets of [null, undefined, {}, { icon: '/assets/clinic-icon.svg' }, { apple_touch_icon: '' }]) {
     const candidate = { ...clinic, brand_assets: assets } as typeof clinic
-    expect(resolveAppleTouchIcon(candidate), JSON.stringify(assets)).toBe('/brand/apple-touch-icon.png')
+    expect(resolveAppleTouchIcon(candidate), JSON.stringify(assets)).toMatch(/^\/brand\/apple-touch-icon\.png\?v=/)
   }
 
   // And the shape check is the same one the other two assets get: a value that
   // is not a publishable same-origin path derives rather than being emitted.
   for (const hostile of ['https://evil.example/icon.png', '//evil.example/icon.png', 'javascript:alert(1)']) {
     const candidate = { ...clinic, brand_assets: { apple_touch_icon: hostile } } as typeof clinic
-    expect(resolveAppleTouchIcon(candidate), hostile).toBe('/brand/apple-touch-icon.png')
+    expect(resolveAppleTouchIcon(candidate), hostile).toMatch(/^\/brand\/apple-touch-icon\.png\?v=/)
   }
 })
 
@@ -255,4 +256,40 @@ test('an unrasterisable touch icon is omitted rather than advertised, and a decl
     throw new Error('raster unavailable')
   }, 2, appleTouchIconSvg)
   expect(await failing.get(clinic), 'a failure must be null, not a platform fallback').toBeNull()
+})
+
+/**
+ * Issue #129. The derived routes are cached for a day at the edge, so their
+ * URL has to change whenever the drawing does — or a brand change stays
+ * invisible for up to 24 h behind a cache HIT.
+ */
+test('a derived asset URL moves with its drawing and only with its drawing', () => {
+  const clinic = tenant('clinicas')
+  const urls = (value: typeof clinic) => [resolveIcon(value), resolveSocial(value), resolveAppleTouchIcon(value)]
+  const base = urls(clinic)
+
+  // Stable: the same brand yields the same URLs, so the edge keeps its hits.
+  expect(urls({ ...clinic })).toEqual(base)
+  expect(brandAssetVersion(clinic, 'icon')).not.toBe(brandAssetVersion(clinic, 'social'))
+
+  // Every field the drawings are made from moves all three URLs.
+  const otherFont = clinic.theme.display_font === 'manrope' ? 'space-grotesk' : 'manrope'
+  const changes = [
+    { ...clinic, theme: { ...clinic.theme, display_font: otherFont } },
+    { ...clinic, theme: { ...clinic.theme, accent: clinic.theme.accent === '#123456' ? '#654321' : '#123456' } },
+    { ...clinic, theme: { ...clinic.theme, accent_contrast: clinic.theme.accent_contrast === '#fafafa' ? '#0a0a0a' : '#fafafa' } },
+    { ...clinic, brand_mark: clinic.brand_mark === 'ZQ' ? 'QZ' : 'ZQ' },
+    { ...clinic, brand_name: `${clinic.brand_name} Nueva` },
+  ] as (typeof clinic)[]
+  for (const changed of changes) {
+    const next = urls(changed)
+    for (let index = 0; index < base.length; index += 1) {
+      expect(next[index], JSON.stringify(changed.theme) + changed.brand_mark).not.toBe(base[index])
+      expect(next[index].split('?')[0]).toBe(base[index].split('?')[0])
+    }
+  }
+
+  // A declared asset is the tenant's own URL and is never rewritten.
+  const declared = { ...clinic, brand_assets: { icon: '/assets/clinic-icon.svg' } }
+  expect(resolveIcon(declared)).toBe('/assets/clinic-icon.svg')
 })

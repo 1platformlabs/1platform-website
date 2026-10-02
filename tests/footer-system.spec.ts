@@ -2,16 +2,11 @@ import { expect, test } from '@playwright/test';
 import { translateToEs } from '../src/i18n/routes';
 import { servedHtml } from './helpers/served';
 
-const stableLinks = [
-  '/solutions/online-store/', '/solutions/content/', '/solutions/deliveries/',
-  '/solutions/ads/', '/solutions/whitelabel/', '/payments-invoicing/', '/for-agencies/',
-  '/for-developers/', '/solutions/', '/blog/', '/changelog/', '/about/', '/pricing/',
-  '/terms/', '/privacy/', '/cookies/',
-];
+const stableLinks = ['/blog/', '/terms/', '/privacy/', '/cookies/'];
 
 function footerLinks(html: string) {
   const footer = html.match(/<footer[\s>][\s\S]*?<\/footer>/)?.[0] ?? '';
-  return [...footer.matchAll(/href="([^"#]*)"/g)].map((match) => match[1]);
+  return [...footer.matchAll(/href="([^"]*)"/g)].map((match) => match[1]);
 }
 
 // The Spanish footer no longer carries `/es` + the English path: each entry
@@ -41,23 +36,26 @@ for (const [route, locale] of [['/', 'en'], ['/es/', 'es']] as const) {
         `destinations asserted below. That is a probe that stopped seeing the footer, not a pass.`,
     ).toBeGreaterThanOrEqual(stableLinks.length);
 
+    for (const href of ['https://wa.me/50253946564', 'https://developer.1platform.pro/docs/saas/1platform-api/getting-started', 'https://developer.1platform.pro/api-reference/1platform-api']) expect(links).toContain(href);
+    for (const anchor of ['capacidades', 'arquitectura', 'inteligencia']) expect(links).toContain(`${locale === 'es' ? '/es/' : '/'}#${anchor}`);
     for (const link of stableLinks) {
       expect(links).toContain(locale === 'en' ? link : translateToEs(link));
     }
   });
 }
 
-test('the footer CTA and columns are usable at desktop and mobile widths', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
+test('the footer columns and legal links are usable at desktop and mobile widths', async ({ page }) => {
   await page.goto('/about/');
-  await expect(page.locator('.site-footer .btn--footer')).toHaveAttribute('href', 'https://app.1platform.pro/app/');
-  await expect(page.locator('.footer-col')).toHaveCount(3);
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  const firstColumn = page.locator('.footer-col').first();
-  await firstColumn.locator('summary').click();
-  await firstColumn.locator('summary').click();
-  await expect(firstColumn).toHaveAttribute('open', /.*/);
+  for (const width of [1440, 360, 390, 430, 844]) {
+    await page.setViewportSize({ width, height: width === 844 ? 390 : 900 });
+    await expect(page.locator('.brand-footer-column')).toHaveCount(3);
+    const contact = page.locator('.brand-footer-column a[href="https://wa.me/50253946564"]');
+    await expect(contact).toBeVisible();
+    await contact.focus();
+    await expect(contact).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expect(page.locator('.brand-footer-bottom a')).toHaveCount(3);
+  }
 });
 
 /**
@@ -72,7 +70,7 @@ test('the footer CTA and columns are usable at desktop and mobile widths', async
  */
 test('the footer collects nothing from the visitor', async ({ page }) => {
   await page.goto('/es/');
-  const footer = page.locator('.site-footer');
+  const footer = page.locator('.brand-footer');
   await expect(footer).toBeVisible();
   await expect(footer.locator('form')).toHaveCount(0);
   await expect(footer.locator('input, textarea, select')).toHaveCount(0);

@@ -1,0 +1,19 @@
+---
+import { siteChrome } from '@lib/site-chrome';
+import { docsUrl } from '@lib/site-destinations';
+import { useI18n } from '@i18n';
+const { tenant, messages, locale } = Astro.locals;
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
+const { copy, home, navigation } = siteChrome(tenant, messages, locale);
+const legal = [['/terms/', 'footer.link.terms'], ['/privacy/', 'footer.link.privacy'], ['/cookies/', 'footer.link.cookiePreferences']].filter(([route]) => tenant.pages.includes(route));
+const reference = docsUrl(Astro.locals, '/api-reference/1platform-api');
+---
+<footer class="brand-footer">
+  <div class="brand-footer-main">
+    <div><a class="brand-lockup" href={home} aria-label={copy('homeLabel').replace('{brand}', tenant.brand_name)}><span class="brand-symbol" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><span class="brand-name">{tenant.brand_wordmark ?? tenant.brand_name}</span></a><p>{copy('footer.description')}</p></div>
+    <nav class="brand-footer-column" aria-label={copy('footer.explore')}><h2>{copy('footer.explore')}</h2>{navigation.filter(({position}) => position < 3).map(({label,href}) => <a href={href}>{label}</a>)}</nav>
+    <nav class="brand-footer-column" aria-label={copy('footer.resources')}><h2>{copy('footer.resources')}</h2>{navigation.filter(({position}) => position === 3 || position === 4).reverse().map(({label,href}) => <a href={href}>{label}</a>)}{reference && <a href={reference}>{copy('footer.reference')}</a>}</nav>
+    <nav class="brand-footer-column" aria-label={copy('footer.company')}><h2>{copy('footer.company')}</h2>{navigation.filter(({position}) => position === 5).map(({label,href}) => <a href={href}>{label}</a>)}</nav>
+  </div>
+  <div class="brand-footer-bottom"><p>{copy('footer.copyright').replace('{year}', String(new Date().getFullYear()))}</p><ul>{legal.map(([href,key]) => <li><a href={l(href)}>{t(key)}</a></li>)}</ul></div>
+</footer>

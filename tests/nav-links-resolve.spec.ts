@@ -26,8 +26,8 @@ import { servedHead, servedHtml } from './helpers/served';
  * `dist/client` would be worse, because it would quietly go green while proving
  * nothing about the ~17 links it is here to protect.
  *
- * So both halves moved to the server: the header markup comes from the home
- * page as it is SERVED, and "resolves" is now the HTTP question it always
+ * So both halves moved to the server: the global header markup comes from the standard
+ * about page as it is SERVED, and "resolves" is now the HTTP question it always
  * really was.
  *
  * WHY A 301 STILL COUNTS AS RESOLVING
@@ -52,20 +52,20 @@ import { servedHead, servedHtml } from './helpers/served';
  */
 
 const LOCALES = [
-  { label: 'en', home: '/' },
-  { label: 'es', home: '/es/' },
+  { label: 'en', standardPage: '/about/' },
+  { label: 'es', standardPage: '/es/nosotros/' },
 ];
 
 const REGIONS: Record<string, RegExp> = {
-  'desktop rail': /<nav class="site-header__nav"[\s\S]*?<\/nav>/,
-  'mobile menu': /<div class="mobile-menu"[\s\S]*?<\/header>/,
+  'desktop rail': /<nav class="brand-nav"[\s\S]*?<\/nav>/,
+  'mobile menu': /<nav class="brand-mobile-nav"[\s\S]*?<\/nav>/,
 };
 
 /** Internal hrefs (leading "/") found inside one region of the header markup. */
 function internalHrefs(html: string, region: RegExp, label: string): string[] {
   const block = html.match(region)?.[0];
   if (!block) throw new Error(`the ${label} region did not match — the selector went stale`);
-  return [...new Set([...block.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]))];
+  return [...new Set([...block.matchAll(/href="(\/[^"]*)"/g)].map((m) => m[1]))];
 }
 
 /**
@@ -110,12 +110,12 @@ async function resolveLink(href: string): Promise<{ ok: boolean; trail: string }
   return { ok: false, trail: `${hops.join(' -> ')} (redirect chain longer than ${MAX_HOPS} hops)` };
 }
 
-for (const { label, home } of LOCALES) {
+for (const { label, standardPage } of LOCALES) {
   for (const [region, pattern] of Object.entries(REGIONS)) {
     test(`every ${region} link on the ${label} header resolves to a served page`, async () => {
       // Fetched inside the test, not at module scope: module scope runs before
       // Playwright has started the server, so there would be nothing to ask.
-      const html = await servedHtml(home);
+      const html = await servedHtml(standardPage);
       const hrefs = internalHrefs(html, pattern, region);
 
       // Floor, not an inventory, and it counts the unit the loop below iterates:
@@ -127,7 +127,7 @@ for (const { label, home } of LOCALES) {
         hrefs.length,
         `no internal links found in the ${label} ${region} — a probe that enumerates ` +
           `nothing is a broken probe, not a pass`,
-      ).toBeGreaterThan(5);
+      ).toBe(4);
 
       // Sequential on purpose. `served.ts` sends `Connection: close`, so every
       // request is its own socket; firing all four tests' links at once made the
@@ -137,7 +137,9 @@ for (const { label, home } of LOCALES) {
       // for.
       const unresolved: string[] = [];
       for (const href of hrefs) {
-        const { ok, trail } = await resolveLink(href);
+        const target = new URL(href, 'https://example.test');
+        const { ok, trail } = await resolveLink(target.pathname);
+        if (target.hash) expect(await servedHtml(target.pathname)).toContain(`id="${target.hash.slice(1)}"`);
         if (!ok) unresolved.push(trail);
       }
 

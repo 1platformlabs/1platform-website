@@ -7,7 +7,7 @@ import { openTenantPage } from './helpers/tenant-browser';
 
 /**
  * axe over the finished home (LMW-12 CA-4): both languages, the menu closed
- * AND open, a FAQ row open — `color-contrast` fully on, no rule disabled.
+ * AND open, the interactive infrastructure preview — `color-contrast` fully on, no rule disabled.
  * The tag scope is the WCAG A/AA set: that is the bar the repo mandates
  * (Accessibility 100), and it includes every rule this epic could break.
  *
@@ -17,6 +17,15 @@ import { openTenantPage } from './helpers/tenant-browser';
  */
 
 async function scan(page: Page) {
+  // Audit the finished page, as this test promises. Sampling halfway through
+  // the photographic hero's opacity entrance invents a transient contrast
+  // failure; await the real finite animation, without disabling any axe rule.
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await Promise.all(document.getAnimations().filter((animation) =>
+      animation instanceof CSSAnimation && animation.animationName === 'hero-enter'
+    ).map((animation) => animation.finished.catch(() => undefined)));
+  });
   return new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
 }
 
@@ -43,16 +52,16 @@ for (const path of ['/', '/es/']) {
   });
 }
 
-test('/ with the compact menu and a FAQ row open: still zero violations', async ({ page }) => {
+test('/ with the compact infrastructure menu open: still zero violations', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await page.locator('#menu-toggle').click();
-  await expect(page.locator('#mobile-menu')).toBeVisible();
-  await page.locator('.product-faq__item').first().evaluate((item) => item.setAttribute('open', ''));
+  await page.locator('.brand-menu-toggle').click();
+  await expect(page.locator('#brand-mobile-nav')).toBeVisible();
+  await expect(page.locator('#brand-mobile-nav a')).toHaveCount(7);
 
   const results = await scan(page);
   // Floor: the open panel was in the tree axe walked.
-  const sawPanel = results.passes.some((p) => p.nodes.some((n) => n.html.includes('mobile-menu')));
+  const sawPanel = results.passes.some((p) => p.nodes.some((n) => n.html.includes('brand-mobile-nav')));
   expect(sawPanel || results.violations.length > 0).toBe(true);
   expect(
     results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(' | ')}`),

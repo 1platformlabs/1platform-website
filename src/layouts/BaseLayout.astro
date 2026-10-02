@@ -3,6 +3,10 @@ import { ClientRouter } from 'astro:transitions';
 import AnnouncementBar from '@components/AnnouncementBar.astro';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
+import InfrastructureHeader from '@components/InfrastructureHeader.astro';
+import InfrastructureFooter from '@components/InfrastructureFooter.astro';
+import { infrastructureChrome, siteChrome } from '@lib/site-chrome';
+import '@styles/site-chrome.css';
 import { pickAnnouncement } from '@components/announcement';
 import { useI18n, type Locale } from '@i18n';
 import { getLocalized } from '@i18n/collections';
@@ -59,6 +63,9 @@ const {
 const { locale, t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
 const tenant = Astro.locals.tenant;
+const modernChrome = infrastructureChrome(Astro.locals.messages);
+const chrome = modernChrome ? siteChrome(tenant, Astro.locals.messages, locale) : null;
+const usesManrope = modernChrome || tenant.theme.display_font === 'manrope';
 // The manifest is the source of both declared and derived brand assets. Tenant
 // #1 declares the compiled paths, so these expressions render the same literal
 // bytes it historically carried without a branch on slug.
@@ -184,17 +191,20 @@ const changelog = publishesChangelog ? await getLocalized('changelog', locale) :
 const announcement = pickAnnouncement(
   changelog.map((entry) => ({ title: entry.data.title, date: entry.data.date })),
 );
-const visibleAnnouncement = showAnnouncement ? announcement : null;
+const visibleAnnouncement = showAnnouncement && !modernChrome ? announcement : null;
 ---
 
 <!doctype html>
-<html lang={locale} class:list={[visibleAnnouncement && 'has-announcement']}>
+<html lang={locale} class:list={[visibleAnnouncement && 'has-announcement', modernChrome && 'infrastructure-site']}>
   <head>
+    {usesManrope && <style is:inline>@font-face{font-family:Manrope;src:url('/fonts/manrope-variable.woff2') format('woff2');font-style:normal;font-weight:200 800;font-display:swap}</style>}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content={themeColorOf(tenant)} />
 
+    {usesManrope && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
+    {!usesManrope && <Fragment>
     <!-- Self-hosted display + text faces; the rest load on demand with swap. -->
     <link
       rel="preload"
@@ -218,6 +228,8 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
       type="font/woff2"
       crossorigin
     />
+
+    </Fragment>}
 
     <link rel="icon" type="image/svg+xml" href={icon} />
     {appleTouchIconAvailable && <link rel="apple-touch-icon" href={appleTouchIcon} />}
@@ -386,14 +398,14 @@ const visibleAnnouncement = showAnnouncement ? announcement : null;
     */}
     {themeCss && <style set:html={themeCss} />}
   </head>
-  <body>
+  <body style={chrome?.style}>
     <a href="#main-content" class="skip-link">{t('layout.skipToContent')}</a>
     {visibleAnnouncement && <AnnouncementBar entry={visibleAnnouncement} />}
-    <Header alternates={alternates} />
+    {modernChrome ? <InfrastructureHeader alternates={alternates} /> : <Header alternates={alternates} />}
     <main id="main-content">
       <slot />
     </main>
-    <Footer />
+    {modernChrome ? <InfrastructureFooter /> : <Footer />}
 
     <script>
       import '@scripts/lenis-init';

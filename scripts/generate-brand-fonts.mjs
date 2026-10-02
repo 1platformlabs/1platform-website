@@ -16,6 +16,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 export const BRAND_FONT_FILES = {
   'space-grotesk': 'public/fonts/space-grotesk-latin-700-normal.woff2',
   'instrument-serif': 'public/fonts/instrument-serif-latin-400-normal.woff2',
+  // Static instance of the page's variable face at the logo's CSS weight.
+  'manrope': 'public/fonts/manrope-700-normal.woff2',
 }
 
 const entries = Object.entries(BRAND_FONT_FILES).map(([key, path]) => {

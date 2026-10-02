@@ -1,0 +1,28 @@
+---
+import { siteChrome } from '@lib/site-chrome';
+import type { Locale } from '@i18n';
+import LanguageSwitcher from '@components/LanguageSwitcher.astro';
+import { isMultilingual } from '@lib/site-locale';
+interface Props { alternates: Partial<Record<Locale, string>> }
+const { alternates } = Astro.props;
+const { tenant, messages, locale } = Astro.locals;
+const { copy, home, navigation, contact } = siteChrome(tenant, messages, locale);
+const current = (href: string) => href.endsWith('/blog/') && Astro.originPathname.startsWith(href) ? 'page' : undefined;
+---
+<header class="brand-header" id="site-header">
+  <a class="brand-lockup" href={home} aria-label={copy('homeLabel').replace('{brand}', tenant.brand_name)}>
+    <span class="brand-symbol" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><span class="brand-name">{tenant.brand_wordmark ?? tenant.brand_name}</span>
+  </a>
+  <nav class="brand-nav" aria-label={copy('mainNav')}>
+    {navigation.map(({ label, href }) => <a href={href} aria-current={current(href)}>{label}</a>)}
+  </nav>
+  {contact && <a class="brand-cta" href={contact}>{copy('cta')}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12" /></svg></a>}
+  <button class="brand-menu-toggle" type="button" aria-label={copy('openMenu')} data-open-label={copy('openMenu')} data-close-label={copy('closeMenu')} aria-controls="brand-mobile-nav" aria-expanded="false"><span></span><span></span></button>
+</header>
+<nav class="brand-mobile-nav" id="brand-mobile-nav" aria-label={copy('mobileNav')} hidden>
+  {navigation.map(({ label, href }) => <a href={href} aria-current={current(href)}>{label}</a>)}
+  {contact && <a href={contact}>{copy('cta')}</a>}
+</nav>
+{isMultilingual(tenant) && <nav class="brand-languages" aria-label={copy('language')}><span aria-hidden="true">{copy('language')}</span><LanguageSwitcher alternates={alternates} /></nav>}
+<noscript><nav class="brand-noscript-nav" aria-label={copy('mobileNav')}>{navigation.map(({label,href}) => <a href={href} aria-current={current(href)}>{label}</a>)}{contact && <a href={contact}>{copy('cta')}</a>}</nav></noscript>
+<script>import '@scripts/site-chrome';</script>

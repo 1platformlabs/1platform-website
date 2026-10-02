@@ -1,0 +1,369 @@
+{
+  "cases": 30,
+  "comparisons": 990,
+  "fontFamilyNote": "Both surfaces load Manrope. Declared fallback stacks differ only by system-ui.",
+  "maxDelta": 0,
+  "failures": [],
+  "details": [
+    {
+      "route": "blog",
+      "locale": "es",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "es",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "es",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "es",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "es",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "es",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "es",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "es",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "es",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "es",
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "es",
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "es",
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "es",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "es",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "es",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "en",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "en",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "en",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "en",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "en",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "en",
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "en",
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "en",
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "blog",
+      "locale": "en",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "comparisonCount": 29,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "store",
+      "locale": "en",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "comparisonCount": 16,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    },
+    {
+      "route": "article",
+      "locale": "en",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "comparisonCount": 54,
+      "maxDelta": 0,
+      "geometryDifferences": [],
+      "styleDifferences": []
+    }
+  ]
+}

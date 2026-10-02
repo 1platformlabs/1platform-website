@@ -5,6 +5,7 @@ import { repoTenants } from '../src/data/site-tenants'
 import { localesOf, makeLocalizePath } from '../src/lib/site-locale'
 import { getWithHost } from './helpers/http-host'
 import { surface } from './helpers/site-surface'
+import { expectPublishedResponse } from './helpers/published-response'
 
 /**
  * The provider and cross-brand scan, over the SERVED HTML of EVERY tenant.
@@ -87,7 +88,7 @@ test('no provider name reaches any tenant, on any page, in any language', async 
     const res = await getWithHost(BASE + page.url, page.host)
     // A route the manifest publishes must be servable. A 404 here is a defect
     // in its own right, and skipping it silently would shrink the surface.
-    expect(res.status, `${page.host}${page.url} is published but answered ${res.status}`).toBe(200)
+    expectPublishedResponse(res, page)
     scanned += 1
     if (banned.test(res.body)) leaks.push(`${page.host}${page.url}`)
   }
@@ -151,7 +152,7 @@ test('no tenant serves another tenant’s domain', async () => {
     const others = foreign.get(page.slug) ?? []
     if (others.length === 0) continue
     const res = await getWithHost(BASE + page.url, page.host)
-    expect(res.status).toBe(200)
+    expectPublishedResponse(res, page)
     scanned += 1
     const body = res.body.toLowerCase()
     for (const domain of others) {

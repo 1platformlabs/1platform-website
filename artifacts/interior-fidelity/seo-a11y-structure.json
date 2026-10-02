@@ -1,0 +1,300 @@
+[
+  {
+    "route": "/blog/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/solutions/online-store/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Service",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/solutions/online-store/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/soluciones/tienda-online/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Service",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/soluciones/tienda-online/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/blog/1platform-vs-custom-toolchain/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/1platform-vs-custom-toolchain/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/blog/ai-content-best-practices/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/ai-content-best-practices/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/blog/automate-seo-pipeline/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/automate-seo-pipeline/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/blog/electronic-invoicing-online-business/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/electronic-invoicing-online-business/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/blog/getting-started-5-minutes/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/getting-started-5-minutes/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/blog/integrating-payments-into-your-saas/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/integrating-payments-into-your-saas/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/blog/launch-online-store-30-minutes/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/launch-online-store-30-minutes/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/blog/programmatic-link-building/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/blog/programmatic-link-building/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/1platform-vs-herramientas-seo-propias/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/1platform-vs-herramientas-seo-propias/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/automatizar-el-pipeline-de-seo/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/automatizar-el-pipeline-de-seo/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/contenido-con-ia-buenas-practicas-seo/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/contenido-con-ia-buenas-practicas-seo/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/facturacion-electronica-para-negocios-online/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/facturacion-electronica-para-negocios-online/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/integrar-pagos-en-tu-saas/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/integrar-pagos-en-tu-saas/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/lanzar-una-tienda-online-en-30-minutos/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/lanzar-una-tienda-online-en-30-minutos/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/link-building-programatico/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/link-building-programatico/",
+    "description": true,
+    "noindex": false
+  },
+  {
+    "route": "/es/blog/primeros-pasos-en-5-minutos/",
+    "h1": 1,
+    "duplicateIds": [],
+    "unlabelledImages": 0,
+    "brokenLocalAnchors": [],
+    "schemas": [
+      "Article",
+      "BreadcrumbList",
+      "Organization"
+    ],
+    "canonical": "https://1platform.pro/es/blog/primeros-pasos-en-5-minutos/",
+    "description": true,
+    "noindex": false
+  }
+]

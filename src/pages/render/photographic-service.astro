@@ -1,0 +1,7 @@
+---
+import PhotographicServiceHome from '@page-content/PhotographicServiceHome.astro';
+import InfrastructureHome from '@page-content/InfrastructureHome.astro';
+const infrastructure = Astro.locals.messages['photographic.theme.layout'] === 'infrastructure';
+---
+
+{infrastructure ? <InfrastructureHome /> : <PhotographicServiceHome />}
