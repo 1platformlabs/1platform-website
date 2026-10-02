@@ -4,6 +4,7 @@ import { useI18n, type Locale } from '@i18n';
 import consultorio from '@assets/photographic/consultorio-hero.webp';
 import commerce from '@assets/product/showcase-store-bg.webp';
 import { photographicContent, safeJson } from '@lib/photographic-content';
+import { ACCESS_ROUTE, hasTenantAccess, tenantAccess } from '@lib/tenant-access';
 import { calculateLandingAmount } from '@lib/landing-calculator';
 import { siteOrigin } from '@lib/site-origin';
 import { alternatesForTenantPath, defaultLocaleOf, makeLocalizePath, ogLocaleOf } from '@lib/site-locale';
@@ -28,6 +29,7 @@ const socialImage = await socialImageIsAvailable(tenant) ? new URL(resolveSocial
 const touchIcon = await appleTouchIconIsAvailable(tenant) ? resolveAppleTouchIcon(tenant) : null;
 const locale = Astro.locals.locale;
 const localize = makeLocalizePath(tenant);
+const access = hasTenantAccess(tenant) ? tenantAccess(tenant, Astro.locals.messages) : null;
 const pricingHref = tenant.pages.includes('/pricing/') ? localize('/pricing/', locale) : contactHref('calculator');
 const defaultAlternate = alternates[defaultLocaleOf(tenant)];
 const rssPath = tenant.pages.includes('/blog/') ? localize('/rss.xml', locale) : null;
@@ -173,13 +175,14 @@ const jsonLd = [
 <path d="M12 3v12m-5-5 5 5 5-5M4 15v6h16v-6"></path>
 </symbol>
 </svg>
-<header class="site-header">
+<header class="site-header" data-tenant-access={access ? '' : undefined}>
 <a aria-label={copy('ui.brand_home').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio">
 <span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
 <span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span>
 </a>
 <nav aria-label={copy('ui.desktop_nav_aria_label')} class="desktop-nav">{navigation.map((item) => <a href={item.href}>{item.label}</a>)}</nav>
 {languageChoices.length > 1 && <nav class="landing-languages" aria-label={copy('ui.language_label')}>{languageChoices.map(([language, path]) => language === locale ? <span aria-current="true" lang={language}>{copy(`ui.language_${language}`)}</span> : <a href={path} hreflang={language} lang={language} data-lang-choice={language}>{copy(`ui.language_${language}`)}</a>)}</nav>}
+{access && <a class="header-access" data-access-entry href={localize(ACCESS_ROUTE, locale)}>{access.copy('entry')}</a>}
 <a class="button button-header" data-support-cta="header" href={contactHref('header')}>
 <span>{copy('actions.header')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg>
 </a>
@@ -662,6 +665,7 @@ const jsonLd = [
 </nav>
 <nav aria-label={copy('ui.footer_column_aria_label63')} class="footer-column">
 <h2>{tenant.brand_name}</h2>
+{access && <a data-access-entry href={localize(ACCESS_ROUTE, locale)}>{access.copy('entry')}</a>}
 {companyLinks.length > 0 ? companyLinks.map(({ href, label }) => <a href={href}>{label}</a>) : <>
 <a href="#como-funciona">{copy('ui.label42')}</a>
 <a href="#su-panel">{copy('ui.label43')}</a>
