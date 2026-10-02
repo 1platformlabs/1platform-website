@@ -36,6 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Contenido y elección de plantilla permanecen en configuración del tenant.
 
 ### Added
+- Recorrido de acceso por tenant: «Acceder» abre una página de marca con inicio
+  de sesión y solicitud de alta por WhatsApp. Sólo aparece al publicar ambas
+  páginas; destinos, mensajes y presentación proceden del tenant.
 - Configuración de destinos por entorno mediante `SITE_DESTINATION_ORIGINS`,
   validada por origen y protocolo sin mezclar enlaces entre marcas.
 - Lanzador local `preview:landings` para revisar Medipago y 1Platform por hosts

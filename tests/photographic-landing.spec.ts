@@ -8,6 +8,8 @@ import { chromium, expect, test as base, type Browser, type Page } from '@playwr
 import type { SiteTenant } from '../src/lib/site-api';
 import { repoTenantForHost } from '../src/data/site-tenants';
 import { getWithHost } from './helpers/http-host';
+import accessMessages from '../src/i18n/messages/pages/access';
+import requestAccessMessages from '../src/i18n/messages/pages/request-access';
 
 /**
  * Built Astro/Node integration with contractual HTTP responses and actual Host
@@ -48,6 +50,20 @@ alternate.tenant = {
   destinations: { ...alternate.tenant.destinations, support: 'https://contacto.aurora.example/alta' },
 };
 alternate.pagesResponse.data.slug = alternate.tenant.slug;
+const ACCESS_HOST = 'commerce-access.example';
+const accessFixture: SiteFixture = JSON.parse(JSON.stringify(fixture).replaceAll('Medipago', 'Comercio Aurora'));
+accessFixture.tenant = {
+  ...accessFixture.tenant,
+  slug: 'commerce-access', domain: ACCESS_HOST, brand_name: 'Comercio Aurora',
+  brand_wordmark: 'Comercio Aurora', brand_mark: 'C', brand_assets: null,
+  pages: ['/', '/access/', '/request-access/'],
+  theme: { accent: '#1748a7', accent_contrast: '#ffffff', display_font: 'manrope' },
+  destinations: { ...accessFixture.tenant.destinations, app: 'https://panel.commerce.example/auth/login', support: 'https://wa.me/15035550123' },
+};
+accessFixture.pagesResponse.data.slug = accessFixture.tenant.slug;
+Object.assign(accessFixture.pagesResponse.data.messages, accessMessages.es, requestAccessMessages.es, {
+  'photographic.theme.palette': 'brand', 'photographic.hero.image': 'commerce',
+});
 alternate.pagesResponse.data.messages['photographic.calculator.commissionBasisPoints'] = '350';
 for (const page of alternate.pagesResponse.data.pages) {
   if ('photographic.calculator.commissionBasisPoints' in page.blocks) {
@@ -134,13 +150,13 @@ test.beforeAll(async () => {
       const host = url.searchParams.get('host') ?? '';
       resolvedHosts.add(host);
       if (host === PLATFORM_HOST) return response.end(JSON.stringify({ success: true, data: platformTenant, msg: 'Site resolved' }));
-      const selected = host === HOST ? fixture : host === ALTERNATE_HOST ? alternate : null;
+      const selected = host === HOST ? fixture : host === ALTERNATE_HOST ? alternate : host === ACCESS_HOST ? accessFixture : null;
       if (selected) return response.end(JSON.stringify({ success: true, data: selected.tenant, msg: 'Site resolved' }));
     } else {
       const match = /\/sites\/([^/]+)\/pages$/.exec(url.pathname);
       const content = match?.[1] === platformTenant.slug ? platformContent.get(url.searchParams.get('locale') ?? '') : null;
       if (content) return response.end(JSON.stringify(content));
-      const selected = [fixture, alternate].find((candidate) => candidate.tenant.slug === match?.[1]);
+      const selected = [fixture, alternate, accessFixture].find((candidate) => candidate.tenant.slug === match?.[1]);
       if (selected && url.searchParams.get('locale') === selected.tenant.default_locale) {
         return response.end(JSON.stringify(selected.pagesResponse));
       }
@@ -165,7 +181,7 @@ test.beforeAll(async () => {
     try { return (await getWithHost(`${appBaseUrl}/`, HOST)).status; } catch { return 0; }
   }, { timeout: 30_000, message: 'The built tenant route must start' }).toBe(200);
   tenantBrowser = await chromium.launch({
-    args: [`--host-resolver-rules=MAP ${HOST} 127.0.0.1, MAP ${ALTERNATE_HOST} 127.0.0.1, MAP ${PLATFORM_HOST} 127.0.0.1`],
+    args: [`--host-resolver-rules=MAP ${HOST} 127.0.0.1, MAP ${ALTERNATE_HOST} 127.0.0.1, MAP ${PLATFORM_HOST} 127.0.0.1, MAP ${ACCESS_HOST} 127.0.0.1`],
   });
 });
 
@@ -581,3 +597,42 @@ for (const [locale, path] of [['en', '/'], ['es', '/es/']] as const) {
     });
   }
 }
+
+test('tenant access keeps login and WhatsApp onboarding reachable with tenant-owned destinations', async ({ landingPage: page }) => {
+  await gotoLanding(page, ACCESS_HOST);
+  await expect(page.locator('[data-access-entry]')).toHaveCount(2);
+  await page.locator('.header-access').click();
+  await expect(page).toHaveURL(new RegExp('/acceso/$'));
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Su panel,a un paso');
+  await expect(page.locator('[data-access-action="login"]')).toHaveAttribute('href', 'https://panel.commerce.example/auth/login');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://${ACCESS_HOST}/acceso/`);
+  await page.getByRole('link', { name: 'Solicitar acceso', exact: true }).click();
+  await expect(page).toHaveURL(new RegExp('/solicitar-acceso/$'));
+  const contact = new URL((await page.locator('[data-access-action="support"]').getAttribute('href'))!);
+  expect(contact.origin + contact.pathname).toBe('https://wa.me/15035550123');
+  expect(contact.searchParams.get('text')).toContain('Comercio Aurora');
+  await expect(page.locator('body')).not.toContainText('Medipago');
+  await expect(page.getByRole('link', { name: 'Ya tengo usuario', exact: true })).toHaveAttribute('href', 'https://panel.commerce.example/auth/login');
+  const result = await new AxeBuilder({ page }).analyze();
+  expect(result.violations).toEqual([]);
+  await page.getByRole('link', { name: 'Volver al inicio', exact: true }).click();
+  await expect(page).toHaveURL(`http://${ACCESS_HOST}:${appPort}/`);
+  await gotoLanding(page);
+  await expect(page.locator('[data-access-entry]')).toHaveCount(0);
+  expect((await getWithHost(`${appBaseUrl}/acceso/`, HOST)).status).toBe(404);
+});
+
+test('tenant access remains readable and navigable on narrow and landscape screens', async ({ landingPage: page }) => {
+  for (const [width, height] of [[320, 740], [390, 844], [844, 390], [1440, 900]]) {
+    await page.setViewportSize({ width, height });
+    await gotoLanding(page, ACCESS_HOST);
+    await expect(page.locator('.header-access')).toBeVisible();
+    await checkOverflow(page);
+    await page.locator('.header-access').click();
+    await expect(page.locator('[data-access-action="login"]')).toBeVisible();
+    await checkOverflow(page);
+    await page.getByRole('link', { name: 'Solicitar acceso', exact: true }).click();
+    await expect(page.locator('[data-access-action="support"]')).toBeVisible();
+    await checkOverflow(page);
+  }
+});
