@@ -129,6 +129,10 @@ test('optional verticals, shortcuts and route stay absent for a tenant that does
   expect(site.heroFeatures.map((feature) => feature.icon)).toEqual(['phone', 'link', 'receipt'])
   expect(site.footerAction).toBe(site.copy('actions.header'))
   expect(site.linkFootnote).toBe(site.copy('hero.feature2'))
+  // Optional texts fall back when blank instead of taking the page down.
+  const blank = photographicContent({ ...messages, 'photographic.actions.footer': ' ', 'photographic.illustrations.linkFootnote': '' }, tenant)
+  expect(blank.footerAction).toBe(site.copy('actions.header'))
+  expect(blank.linkFootnote).toBe(site.copy('hero.feature2'))
 })
 
 test('a commerce tenant publishes five solutions, two verticals, a four-step route and a visitor-rate calculator', () => {

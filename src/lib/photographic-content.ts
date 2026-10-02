@@ -13,6 +13,8 @@ const SOLUTION_ANCHORS = { '#cobros-presenciales': 'card1', '#enlaces-de-cobro':
 export function photographicContent(messages: Record<string, string>, tenant: SiteTenant) {
   const prefix = i18nKey('photographic.')
   const has = (key: string): boolean => messages[`${prefix}${key}`] !== undefined
+  /** Optional text: absent or blank falls back instead of failing the page. */
+  const filled = (key: string): boolean => (messages[`${prefix}${key}`] ?? '').trim() !== ''
   const adsChannel = messages['photographic.verticals.ads.mode']
   if (adsChannel !== undefined && !isAdvertisingChannel(adsChannel)) throw new Error('Unrecognised advertising channel')
   const copy = (key: string): string => {
@@ -131,7 +133,7 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
       throw new Error('Unrecognised photographic solution anchor')
     }
     const label = copy(`solutions.links.${index}.label`)
-    return { href, label, footerLabel: has(`solutions.links.${index}.footerLabel`) ? copy(`solutions.links.${index}.footerLabel`) : label }
+    return { href, label, footerLabel: filled(`solutions.links.${index}.footerLabel`) ? copy(`solutions.links.${index}.footerLabel`) : label }
   })
   const route = listIndexes(/^photographic\.route\.items\.(\d+)\.(title|text|icon)$/, 2, 6, 'route').map((index) => ({
     title: copy(`route.items.${index}.title`), text: copy(`route.items.${index}.text`),
@@ -182,8 +184,8 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
     heroFeatures, delivery, ads, solutionLinks, route, typeScale,
     routeLabel: route.length > 0 ? copy('route.label') : null,
     // The link card's footnote historically repeats the second hero capability.
-    linkFootnote: has('illustrations.linkFootnote') ? copy('illustrations.linkFootnote') : copy('hero.feature2'),
-    footerAction: has('actions.footer') ? copy('actions.footer') : copy('actions.header'),
+    linkFootnote: filled('illustrations.linkFootnote') ? copy('illustrations.linkFootnote') : copy('hero.feature2'),
+    footerAction: filled('actions.footer') ? copy('actions.footer') : copy('actions.header'),
     /** Optional symbols the sprite must carry, beyond the composition's fixed set. */
     extraIcons: (['truck', 'megaphone'] as const).filter((name) => icons.has(name)),
     palette: messages['photographic.theme.palette'] === 'brand' ? 'brand' : 'service',
