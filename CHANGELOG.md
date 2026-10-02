@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- La composición fotográfica admite, sólo por contenido del tenant, las
+  verticales Delivery y de anuncios con su consulta propia, cinco accesos
+  directos, el recorrido comercial, íconos configurables, una calculadora con el
+  porcentaje que escribe el visitante (vacío al inicio, sin tarifa del tenant) y
+  la escala tipográfica compacta del prototipo. Medipago sirve el mismo HTML.
+- El canal publicitario que un tenant vende como servicio propio se nombra desde
+  `src/lib/advertising-channels.ts`, habilitado por configuración de staff; la
+  regla 10 lo exime sólo en ese archivo y para esos nombres.
+
+### Fixed
+- El menú móvil abierto se desplaza cuando no cabe en una pantalla horizontal;
+  sus últimos destinos ya no quedan fuera de alcance.
 - 1Platform presenta la infraestructura aprobada para crear productos, conectar
   sistemas e incorporar IA, con API como recorrido principal y capacidades en
   preparación identificadas. Manrope, tokens de marca y navegación compartida
