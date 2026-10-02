@@ -1,0 +1,338 @@
+[
+  {
+    "network": "facebook",
+    "href": "https://www.facebook.com/medipago",
+    "problem": null,
+    "normalized": "https://www.facebook.com/medipago"
+  },
+  {
+    "network": "facebook",
+    "href": "https://m.facebook.com/x",
+    "problem": null,
+    "normalized": "https://m.facebook.com/x"
+  },
+  {
+    "network": "facebook",
+    "href": "https://facebook.com/profile.php?id=1",
+    "problem": null,
+    "normalized": "https://facebook.com/profile.php?id=1"
+  },
+  {
+    "network": "facebook",
+    "href": "https://fb.com/medipago",
+    "problem": null,
+    "normalized": "https://fb.com/medipago"
+  },
+  {
+    "network": "tiktok",
+    "href": "https://www.tiktok.com/@medipago",
+    "problem": null,
+    "normalized": "https://www.tiktok.com/@medipago"
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com/x",
+    "problem": null,
+    "normalized": "https://www.instagram.com/x"
+  },
+  {
+    "network": "instagram",
+    "href": "https://instagr.am/medipago",
+    "problem": null,
+    "normalized": "https://instagr.am/medipago"
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com/x?utm_source=facebook",
+    "problem": null,
+    "normalized": "https://www.instagram.com/x?utm_source=facebook"
+  },
+  {
+    "network": "linkedin",
+    "href": "https://www.linkedin.com/company/medipago",
+    "problem": null,
+    "normalized": "https://www.linkedin.com/company/medipago"
+  },
+  {
+    "network": "x",
+    "href": "https://x.com/medipago",
+    "problem": null,
+    "normalized": "https://x.com/medipago"
+  },
+  {
+    "network": "x",
+    "href": "https://twitter.com/medipago",
+    "problem": null,
+    "normalized": "https://twitter.com/medipago"
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com",
+    "problem": null,
+    "normalized": "https://www.instagram.com"
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com:443/x",
+    "problem": null,
+    "normalized": "https://www.instagram.com:443/x"
+  },
+  {
+    "network": "instagram",
+    "href": "HTTPS://WWW.Instagram.COM/MediPago",
+    "problem": null,
+    "normalized": "https://www.instagram.com/MediPago"
+  },
+  {
+    "network": "instagram",
+    "href": "https://WWW.Instagram.com/x",
+    "problem": null,
+    "normalized": "https://www.instagram.com/x"
+  },
+  {
+    "network": "linkedin",
+    "href": "https://www.linkedin.com/in/{x}",
+    "problem": null,
+    "normalized": "https://www.linkedin.com/in/{x}"
+  },
+  {
+    "network": "x",
+    "href": "https://X.com?ref=1",
+    "problem": null,
+    "normalized": "https://x.com?ref=1"
+  },
+  {
+    "network": "x",
+    "href": "https://x.com#top",
+    "problem": null,
+    "normalized": "https://x.com#top"
+  },
+  {
+    "network": "instagram",
+    "href": "http://www.instagram.com/x",
+    "problem": "scheme",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://evil.io\\.instagram.com/x",
+    "problem": "charset",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://u@instagram.com/x",
+    "problem": "credentials",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://@instagram.com/x",
+    "problem": "credentials",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://instagram.com:99999/x",
+    "problem": "port",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://instagram.com:8443/x",
+    "problem": "port",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://[x",
+    "problem": "charset",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "problem": "length",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.facebook.com/x",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://instagram.com.evil.io/x",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://xn--nstagram-6za.com/x",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com./x",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://l.facebook.com/l.php?u=https://evil.io",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://lm.facebook.com/l.php?u=https://evil.io",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://www.facebook.com/l.php?u=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://www.facebook.com/x/../l.php?u=https://evil.io",
+    "problem": "path",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://www.facebook.com/L.php?u=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://www.facebook.com//l.php?u=https://evil.io",
+    "problem": "path",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://www.facebook.com/%6c.php?u=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://www.facebook.com/./x",
+    "problem": "path",
+    "normalized": null
+  },
+  {
+    "network": "linkedin",
+    "href": "https://www.linkedin.com/redir/redirect?url=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "linkedin",
+    "href": "https://www.linkedin.com/a/%2e%2e/redir/x",
+    "problem": "path",
+    "normalized": null
+  },
+  {
+    "network": "linkedin",
+    "href": "https://www.linkedin.com/a/%2E%2E/x",
+    "problem": "path",
+    "normalized": null
+  },
+  {
+    "network": "facebook",
+    "href": "https://fb.me/x",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "linkedin",
+    "href": "https://lnkd.in/x",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://openai.instagram.com/x",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com/</script>",
+    "problem": "charset",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com/\"x",
+    "problem": "charset",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com/'x",
+    "problem": "charset",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com/x y",
+    "problem": "charset",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "https://www.instagram.com/ñ",
+    "problem": "charset",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "javascript:alert(1)",
+    "problem": "scheme",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "www.instagram.com/x",
+    "problem": "scheme",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": "",
+    "problem": "scheme",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": 123,
+    "problem": "type",
+    "normalized": null
+  },
+  {
+    "network": "instagram",
+    "href": null,
+    "problem": "type",
+    "normalized": null
+  },
+  {
+    "network": "whatsapp",
+    "href": "https://wa.me/1",
+    "problem": "network",
+    "normalized": null
+  },
+  {
+    "network": null,
+    "href": "https://x.com/a",
+    "problem": "network",
+    "normalized": null
+  }
+]

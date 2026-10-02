@@ -10,6 +10,8 @@
  * silently and the reviewer sees a lockfile.
  */
 
+import type { SiteSocialLinks } from './social-links'
+
 /** Closed values accepted by the API and safe to map to local code. */
 export const DISPLAY_FONTS = [
   'space-grotesk',
@@ -70,6 +72,13 @@ export interface SiteTenant {
   // Optional during a rolling deploy: an API from before this additive field
   // means exactly the same as null (derive), not "take every tenant offline".
   brand_assets?: SiteBrandAssets | null
+  /**
+   * The site's social profiles (WRS-04). Optional and outside `isTenant()` on
+   * purpose, like `brand_assets`: an API from before the field omits it, and a
+   * malformed value must switch off icons, never the tenant. Read it only
+   * through `socialLinksOf()`, which re-runs the platform's rule.
+   */
+  social_links?: SiteSocialLinks | null
   pages: string[]
   /**
    * The Search Console ownership token, without the `.html` suffix, or null.

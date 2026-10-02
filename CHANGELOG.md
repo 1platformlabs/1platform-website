@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Los tres pies del sitio (infraestructura, portada fotográfica y el clásico) muestran los íconos de las redes
+  sociales que el inquilino cargó, en el orden Facebook · TikTok · Instagram · LinkedIn · X, y las mismas URLs viajan
+  como `sameAs` en los datos estructurados de la organización. Sin redes, el marcado no cambia.
+
 ### Changed
 - 1Platform presenta la infraestructura aprobada para crear productos, conectar
   sistemas e incorporar IA, con API como recorrido principal y capacidades en
