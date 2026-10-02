@@ -197,6 +197,26 @@ test('the footer passes axe; every target is at least 44×44 with a visible focu
   }
 });
 
+test('the classic footer rings every link in its own ink, never the tenant accent', async () => {
+  // Found by /verify-epic-e2e (2026-10-02): the global ring is the accent, and a
+  // navy accent on this footer measured 2.5:1. The logo is the first stop.
+  const page = await open('medipago.gt', '/no-existe/', 404);
+  const links = page.locator('footer.site-footer a:not([data-social-links] a)');
+  expect(await links.count()).toBeGreaterThan(0);
+  for (const link of await links.all()) {
+    await link.focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    const ring = await link.evaluate((a) => {
+      const style = getComputedStyle(a);
+      return { style: style.outlineStyle, color: style.outlineColor, ink: style.color, focused: a.matches(':focus-visible') };
+    });
+    expect(ring.focused).toBe(true);
+    if (ring.style !== 'none') expect(ring.color).toBe(ring.ink);
+  }
+  await page.context().close();
+});
+
 test('sameAs equals the footer in BaseLayout and the photographic home', async () => {
   for (const [host, path, status] of [['1platform.pro', '/pricing/', 200], ['medipago.gt', '/', 200], ['medipago.gt', '/no-existe/', 404]] as const) {
     const page = await open(host, path, status);
