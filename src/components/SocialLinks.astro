@@ -1,0 +1,73 @@
+---
+/**
+ * The tenant's social icons, in the bottom strip of a footer (WRS-04).
+ *
+ * Names no network: every name, host, glyph and label comes from
+ * `@lib/social-links`, the one file the provider rule exempts (D-4). With no
+ * valid link it renders NOTHING, so a footer without links keeps its markup.
+ *
+ * Styles live here, anchored to this component's root, and never `:global()`:
+ * scoped selectors cannot reach the footer's legal links, and they still beat
+ * the footers' own `a` and `:focus-visible` rules on specificity (D-5). The
+ * focus ring is `currentColor`, not the tenant accent, which reads at ~2.5:1
+ * on these dark footers.
+ */
+import { socialGroupLabel, socialLinkLabel, socialLinksOf } from '@lib/social-links';
+
+interface Props {
+  variant: 'infrastructure' | 'photographic' | 'classic';
+}
+
+const { variant } = Astro.props;
+const { tenant, locale } = Astro.locals;
+const links = socialLinksOf(tenant);
+---
+{links.length > 0 && (
+  <nav class:list={['social-links', `social-links--${variant}`]} data-social-links aria-label={socialGroupLabel(locale)}>
+    <ul>
+      {links.map((link) => (
+        <li>
+          <a href={link.href} target="_blank" rel="noopener noreferrer" data-net={link.code} aria-label={socialLinkLabel(tenant.brand_name, link.network, locale)}>
+            <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d={link.path} /></svg>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .social-links ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .social-links li {
+    margin: 0;
+  }
+  .social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 44px;
+    block-size: 44px;
+    min-height: 44px;
+    border-radius: 999px;
+    color: inherit;
+  }
+  .social-links a:hover {
+    opacity: 0.8;
+  }
+  .social-links a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+  .social-links svg {
+    inline-size: 20px;
+    block-size: 20px;
+  }
+</style>

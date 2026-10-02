@@ -12,49 +12,49 @@
       "route": "/",
       "status": 200,
       "file": "index.html",
-      "sha256": "02300a42b5384ad9e31d58b26dd301bcee48997089ebd0906ae2d1f5e29c845d",
+      "sha256": "99e347c7f226b1a6d1801302c64d30033af6722da96b9354a9413e8022437020",
       "bytes": 31540
     },
     {
       "route": "/404.html",
       "status": 404,
       "file": "404.html",
-      "sha256": "5226c88e56406533a361d135d9fe64ac03cee7855dd370a4096be598026b401d",
+      "sha256": "5d2c5f39902088f99f2521bc1503eecfee5f244867d2de35f000656a040b807c",
       "bytes": 21107
     },
     {
       "route": "/about/",
       "status": 200,
       "file": "about/index.html",
-      "sha256": "99ceeb6d902ee469309d32b98347eb6375c16a5d8f1d882ad0e7451f308de87a",
+      "sha256": "aa071275162952dad6a3e84acf8c9a5fddf4bb85e659731694e5a388028bf08e",
       "bytes": 43756
     },
     {
       "route": "/blog/",
       "status": 200,
       "file": "blog/index.html",
-      "sha256": "206976282a3312edb88cc64469f6d8b59bb1cd59bb9e98484a31d7c1edb09a1d",
+      "sha256": "2962aa6985712939cfdd3088c1f97501a85b7913308a38149dbbcf5cc3020540",
       "bytes": 29086
     },
     {
       "route": "/blog/1platform-vs-custom-toolchain/",
       "status": 200,
       "file": "blog/1platform-vs-custom-toolchain/index.html",
-      "sha256": "dbd721fe47e54ea6a7e0007d246b349b8c0a561205227c3751727f63d6aac478",
+      "sha256": "0009333d505da379ae156c826b4c8f64d8ab90f543cf4e8b9c5688adf04df69e",
       "bytes": 21022
     },
     {
       "route": "/blog/ai-content-best-practices/",
       "status": 200,
       "file": "blog/ai-content-best-practices/index.html",
-      "sha256": "8e64ca21b1041a8a606285f0add0b06a0c2c14cab196b276324bcfb6ff220a96",
+      "sha256": "95c8c6a4a07e62b1b66a813bda5e70ca808f371790247af13b1fecf52ea8ec6f",
       "bytes": 21369
     },
     {
       "route": "/blog/automate-seo-pipeline/",
       "status": 200,
       "file": "blog/automate-seo-pipeline/index.html",
-      "sha256": "8e5e052e8786eecfe220fa638f9d1c22d72ee69853e4af864140dbc563444bcd",
+      "sha256": "40e0452e4f5e3b72c1d0f1576b702f591d1a6e09db71aa64680f775d238a7f39",
       "bytes": 22933
     },
     {
@@ -91,42 +91,42 @@
       "route": "/blog/electronic-invoicing-online-business/",
       "status": 200,
       "file": "blog/electronic-invoicing-online-business/index.html",
-      "sha256": "6717e2190e0156abd3cad851b54c2d6a0bb980a6bd133e7dccc8833b17e270c4",
+      "sha256": "5624fd79c41864d51a2f2a07d623bd6e7af83fd9a5ec87eb156526e8c69f5a7e",
       "bytes": 32946
     },
     {
       "route": "/blog/getting-started-5-minutes/",
       "status": 200,
       "file": "blog/getting-started-5-minutes/index.html",
-      "sha256": "19104d3ec84b08b5c151f2cca6f5cdae697498f15217a5be69040b8d425a7f78",
+      "sha256": "b3d9d58d52bb545d9ca85a58e74b8eaa001da3611827f310923dc1c9e0408fb9",
       "bytes": 23151
     },
     {
       "route": "/blog/integrating-payments-into-your-saas/",
       "status": 200,
       "file": "blog/integrating-payments-into-your-saas/index.html",
-      "sha256": "2651bbecf6f14e8c13ba0eece5fb8db4555c34515ff166758dd9be848fa06828",
+      "sha256": "0ccdce1747a988f9fa7bf4131b4da8aefa366cefebcdce359aa51a0725e3b41e",
       "bytes": 35878
     },
     {
       "route": "/blog/launch-online-store-30-minutes/",
       "status": 200,
       "file": "blog/launch-online-store-30-minutes/index.html",
-      "sha256": "6e578eb97e7118b1783c4d7bc534ebda19af6448236236b729ea242319e498ca",
+      "sha256": "4b52b25ce93484db44bab93687c04445e2b781388c1e1f24dbc8cbdf27f0dbb8",
       "bytes": 31736
     },
     {
       "route": "/blog/programmatic-link-building/",
       "status": 200,
       "file": "blog/programmatic-link-building/index.html",
-      "sha256": "a273335209fde1533dca74d7bb5930c3b3c875589eac817e3695046c27fc77d6",
+      "sha256": "f02a8261e71f7dff10541c4b2d3f40cb2c93953882d9255bb52654e8ece992aa",
       "bytes": 20977
     },
     {
       "route": "/changelog/",
       "status": 200,
       "file": "changelog/index.html",
-      "sha256": "7c6e9992f001fcb67b22d27a7dacc01bbf87546f9414e6ca6ac3330ba91fc1f7",
+      "sha256": "9e0421364dd42c6d37ed46a154c424c4bae49f3b75b8d4477e829a25c723d1f7",
       "bytes": 34976
     },
     {
@@ -148,21 +148,21 @@
       "route": "/contact/",
       "status": 200,
       "file": "contact/index.html",
-      "sha256": "9467f2baa31018b406542b9e6f6866b4a19053ccc9bfe45ef28bde8fabe27895",
+      "sha256": "f9bf0c5a21834c325aea13b87011e77c14f81172aae711c5a2f10cc14a51b9eb",
       "bytes": 25437
     },
     {
       "route": "/cookies/",
       "status": 200,
       "file": "cookies/index.html",
-      "sha256": "40add732dc62328c2263d9513531d5142a64e8a0411e08290acced7313bdd84f",
+      "sha256": "3a9ee3329e976fd4659928a7448a7f01c26b36e3b4c41bb5867b52712f7388e8",
       "bytes": 21970
     },
     {
       "route": "/es/",
       "status": 200,
       "file": "es/index.html",
-      "sha256": "0c3f4980e04e540ef41404035c51479c2bba540f8d6983b030ae650bbf41a565",
+      "sha256": "f6dd562aed2b77f840815c92c6a193dce82e642f61213ef77079580cbb8c347d",
       "bytes": 31735
     },
     {
@@ -174,7 +174,7 @@
       "route": "/es/blog/",
       "status": 200,
       "file": "es/blog/index.html",
-      "sha256": "d473d093de45c277c9abf9f5442c1300504ada6b592089e76cd269d4e778632c",
+      "sha256": "52a2e0a14f53f36643ca921440ae1a28225299479a52f224f56545b7f7aea58d",
       "bytes": 29715
     },
     {
@@ -186,7 +186,7 @@
       "route": "/es/blog/1platform-vs-herramientas-seo-propias/",
       "status": 200,
       "file": "es/blog/1platform-vs-herramientas-seo-propias/index.html",
-      "sha256": "f5c4fda1b65a9a00878b6a74c78e10281616ecdcb86877ee7378f1cbeff3621c",
+      "sha256": "39a6b8ff846924997e946e945633da44bec2342a76bf42fddb528aee5e6b55e4",
       "bytes": 22041
     },
     {
@@ -203,7 +203,7 @@
       "route": "/es/blog/automatizar-el-pipeline-de-seo/",
       "status": 200,
       "file": "es/blog/automatizar-el-pipeline-de-seo/index.html",
-      "sha256": "94b0b658883e7792087ea679491b0d9001e474dbab181f23103945db36556016",
+      "sha256": "a7ae1afcf5e70c24e1dc20171cc6723b0f61113abb4c844c16408981968e2dd7",
       "bytes": 23725
     },
     {
@@ -240,7 +240,7 @@
       "route": "/es/blog/contenido-con-ia-buenas-practicas-seo/",
       "status": 200,
       "file": "es/blog/contenido-con-ia-buenas-practicas-seo/index.html",
-      "sha256": "6a05da322d763a1d586639c82fdded4425f3a3a2ad05c508707b09932a3dfc38",
+      "sha256": "35ea6988dcd843e15ab71b14827e9851336050a0280abb9521a9209c9447e26f",
       "bytes": 22139
     },
     {
@@ -252,7 +252,7 @@
       "route": "/es/blog/facturacion-electronica-para-negocios-online/",
       "status": 200,
       "file": "es/blog/facturacion-electronica-para-negocios-online/index.html",
-      "sha256": "5e93d91be2bac7d2dc1c0f1e997dfc32722555a36571b10fd7bfbca3488b7183",
+      "sha256": "98be7bb9fe82fc0f7e8c3a25009a26e85884536fbaf8ef7c904784b4653a3e1b",
       "bytes": 35009
     },
     {
@@ -264,7 +264,7 @@
       "route": "/es/blog/integrar-pagos-en-tu-saas/",
       "status": 200,
       "file": "es/blog/integrar-pagos-en-tu-saas/index.html",
-      "sha256": "d9d1035d6fc6be80ed528c80796c2eba9ec00ced5260b908e875c39699c470ff",
+      "sha256": "956fe7500d3cb7c352c6ec96ca5e112da25def2f5a7573004626b525214aaed7",
       "bytes": 37512
     },
     {
@@ -276,7 +276,7 @@
       "route": "/es/blog/lanzar-una-tienda-online-en-30-minutos/",
       "status": 200,
       "file": "es/blog/lanzar-una-tienda-online-en-30-minutos/index.html",
-      "sha256": "8bfbe0e1a36558c65f9c1d52a80ef9eadf7f1ae7d0fd4554c7d19c4f80bc1cdb",
+      "sha256": "d0090e9636b0f2d7503e21d62c5c7e4f2e1880797ae5243a194e7e93859f26b6",
       "bytes": 33437
     },
     {
@@ -288,14 +288,14 @@
       "route": "/es/blog/link-building-programatico/",
       "status": 200,
       "file": "es/blog/link-building-programatico/index.html",
-      "sha256": "4e1a9acfa1e32d3a08b1336c71d57d39ce8258a6f870d25f02a3a728a14d05b9",
+      "sha256": "b35c2101c385eb7d48fd79f2dd0177b13eebd2a41262c736d546d73ba3b659fc",
       "bytes": 21741
     },
     {
       "route": "/es/blog/primeros-pasos-en-5-minutos/",
       "status": 200,
       "file": "es/blog/primeros-pasos-en-5-minutos/index.html",
-      "sha256": "4f27ef597df576079b67e41471ec6b76123c10d9a256df157c734a3259c1c058",
+      "sha256": "1d06ec18d735b82d9e5e4d4eb1fd06d5b024acb10334a0a4f2314576e5fc0ce0",
       "bytes": 23653
     },
     {
@@ -332,14 +332,14 @@
       "route": "/es/contacto/",
       "status": 200,
       "file": "es/contacto/index.html",
-      "sha256": "5543a7aa6f2a9174d53af1e871e7890d905852a756436ee1b3a72d2d68555051",
+      "sha256": "6b7539a6982aa8571a667249f1da0188a82b43773d037e0514d578a6a848606c",
       "bytes": 25825
     },
     {
       "route": "/es/cookies/",
       "status": 200,
       "file": "es/cookies/index.html",
-      "sha256": "057ec7e5832e223ce217effacb6aaa237f83836bd8457dcf261da7e2dbced6aa",
+      "sha256": "b26a4f4cef893e84c65d1fb8cce29a48afb41f41c2e4802d2e4b1baa56cdf19c",
       "bytes": 22535
     },
     {
@@ -361,28 +361,28 @@
       "route": "/es/nosotros/",
       "status": 200,
       "file": "es/nosotros/index.html",
-      "sha256": "4ad06a4786b8ebce4a74c5ec7f760bde7e4b7a3f22fc87427ac271096dd686fc",
+      "sha256": "0e7f81eb704240f7c1125f91c7ac4233f2dc155ad4337ee53a2777245249dcee",
       "bytes": 44396
     },
     {
       "route": "/es/novedades/",
       "status": 200,
       "file": "es/novedades/index.html",
-      "sha256": "0076b9ee9a425abcd669ec3be3c23420a085707330d6b40d965eeecca2fee1e3",
+      "sha256": "648983bff9462e364a52d4a1d032cda785bdb464c73939fa57e88180a36726b7",
       "bytes": 37926
     },
     {
       "route": "/es/pagos-y-facturacion/",
       "status": 200,
       "file": "es/pagos-y-facturacion/index.html",
-      "sha256": "770907fb9a7054930f4edb3e90c62b50251e95b421ee7618303e2c5710bd0214",
+      "sha256": "462c128be2977e8bd1a4da6c8f9328161a1cb693ecfe4d23e2bfb36dc91c626f",
       "bytes": 39631
     },
     {
       "route": "/es/para-agencias/",
       "status": 200,
       "file": "es/para-agencias/index.html",
-      "sha256": "c886a985f45f9bde779713d95d40285b65c00b69460ef6bfb2febec615d46634",
+      "sha256": "6e51854a937376d0d4f91a49f206a3a360d105f4ab9ff320155e8b0d64f2a4cf",
       "bytes": 35481
     },
     {
@@ -399,7 +399,7 @@
       "route": "/es/precios/",
       "status": 200,
       "file": "es/precios/index.html",
-      "sha256": "ec7a60a8f302718e5a3c44656036dba2e1d304372ffd767363629db439b1348f",
+      "sha256": "65cfe08af292bddc3a8a9d5a481a951d6ed0fdea3a922b86ac64a1801eabb0a6",
       "bytes": 56274
     },
     {
@@ -411,7 +411,7 @@
       "route": "/es/privacidad/",
       "status": 200,
       "file": "es/privacidad/index.html",
-      "sha256": "b5e1dd4f08923126330fe654ca97e546b675b097d5370438f71100b388cbefc2",
+      "sha256": "7de4fe3b9952372a0edfb12d00458e5786762235dabf0365e2a3577cb6041db3",
       "bytes": 27707
     },
     {
@@ -423,42 +423,42 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "337e0f35188581a0f6a889d0db33377debbac06a9f290cb6d828bd62c846bb54",
+      "sha256": "9e21fdc623ae41497f41176a394b451a91ddb3e2b833e6ab615313e7d00e2dcb",
       "bytes": 75089
     },
     {
       "route": "/es/soluciones/envios/",
       "status": 200,
       "file": "es/soluciones/envios/index.html",
-      "sha256": "288827422c357dde2a37e35904baf5baa338257dfd9be31797caf9792bb63b9d",
+      "sha256": "fcb903ef6c7f0072113e2b8cfb7bf04a2096bb057cd29886977188b07c2d5231",
       "bytes": 49930
     },
     {
       "route": "/es/soluciones/marca-blanca/",
       "status": 200,
       "file": "es/soluciones/marca-blanca/index.html",
-      "sha256": "24864e0d8e4b81d1968648851fe9ea75dc7b0397bf730717aeeac7cf7e341c20",
+      "sha256": "295e80c5a2d8c7d66684533e33d1ad03b1c2c37d6cf1455ebbf9ebd56718c174",
       "bytes": 36470
     },
     {
       "route": "/es/soluciones/publicidad/",
       "status": 200,
       "file": "es/soluciones/publicidad/index.html",
-      "sha256": "49f6859b7730da24fcdc75425639ff847e7834c1008882d47d214c03f1586055",
+      "sha256": "76bb74a5cbf49bd84bb8ffd7aea50f7949e6dde54b3188744576a90f8981d316",
       "bytes": 47385
     },
     {
       "route": "/es/soluciones/sitio-web-y-contenido/",
       "status": 200,
       "file": "es/soluciones/sitio-web-y-contenido/index.html",
-      "sha256": "a6529f5705c7c0badbb8e3cc403efae18eb0c3bd617e805eca1fae7e739c93fc",
+      "sha256": "e1cc12dbf23cbb9c349f37a24cf46e9dec40575423c7533fd53a51fadfaf7102",
       "bytes": 44587
     },
     {
       "route": "/es/soluciones/tienda-online/",
       "status": 200,
       "file": "es/soluciones/tienda-online/index.html",
-      "sha256": "05371e1329fb49b5959345420ee485ff0fd01e87cf22c64fed800cbd41f586e6",
+      "sha256": "4292af029f271b9ae5a4b38dd113c9f9aaa11a66b1f6939bb6528e5fa21dc141",
       "bytes": 38869
     },
     {
@@ -500,7 +500,7 @@
       "route": "/es/terminos/",
       "status": 200,
       "file": "es/terminos/index.html",
-      "sha256": "9b4661e85744d94e65d1f4502913df064f81c8b79d0af2e7ca8d17c18b920234",
+      "sha256": "bac76313c0b62c2a83c7e7ff4c2b818504a400c7cdef8ebe9e4bf49e2c749063",
       "bytes": 27253
     },
     {
@@ -517,7 +517,7 @@
       "route": "/for-agencies/",
       "status": 200,
       "file": "for-agencies/index.html",
-      "sha256": "b03fc60a7a19fa59a73299f0228472ce1c1ae58381e8e5063c99f6e275842558",
+      "sha256": "a2ed92b272f3a7ffb4e185074e10521f255a02e6f81959ec274d60c64afa287d",
       "bytes": 35023
     },
     {
@@ -536,56 +536,56 @@
       "route": "/payments-invoicing/",
       "status": 200,
       "file": "payments-invoicing/index.html",
-      "sha256": "58e2143fbbe61e7fb9270cf048c3e686c838e81c63680862bea7a87afa272c59",
+      "sha256": "6c9f18ea11ab6ae827e0b112f6e51a4f6c5f5929092fdebea1bdc6dc07463e82",
       "bytes": 38969
     },
     {
       "route": "/pricing/",
       "status": 200,
       "file": "pricing/index.html",
-      "sha256": "ba00929d0838f299e70a4fa6cfda117f8224bcd6ec66837ad9ac47af509f01d1",
+      "sha256": "317b69cedb3f79657efba2a528b1b6784acf19edce1b3a6db00d9e7e5f85c100",
       "bytes": 55170
     },
     {
       "route": "/privacy/",
       "status": 200,
       "file": "privacy/index.html",
-      "sha256": "9814963d1899ee2190442f9dc20890366cb91ac9250de14727ff961afc5c179b",
+      "sha256": "8ca43901c2c6b992a8a2911e095f4afea1b94e67bc88be3f30d16fe9fbec8594",
       "bytes": 25885
     },
     {
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "78736e7e2f44b816cc98d1662a69f28ebb6612fad934bb763a52aa0664d8714e",
+      "sha256": "08604faea8c972c0a88f65ce8998363a7577608085d1117c5902b428b857e1bd",
       "bytes": 73050
     },
     {
       "route": "/solutions/ads/",
       "status": 200,
       "file": "solutions/ads/index.html",
-      "sha256": "10f6021374baef45d40409704a63196613d64cf94ab90a46e960c4109c330024",
+      "sha256": "6ab59a49a9895332dc40afd28c011abc4565b34f4e08d700c1715ec382843deb",
       "bytes": 46785
     },
     {
       "route": "/solutions/content/",
       "status": 200,
       "file": "solutions/content/index.html",
-      "sha256": "703e0782dbe380af1a27714592b64f527b5f76f6929eeb63255447881d76c046",
+      "sha256": "2872a0345b95f4e119d2af7eb3356c2e8e70fb8d6443c65be57f2483ba2336f8",
       "bytes": 43892
     },
     {
       "route": "/solutions/deliveries/",
       "status": 200,
       "file": "solutions/deliveries/index.html",
-      "sha256": "ecb558a1aeb689d243f575b2ef7ca92d96af119b0676b3c527ab4ee831de37b2",
+      "sha256": "fa95d2fa182beedf04dcaac0d95e8b2cfa860508e0f5c9686567fb362c9e27d1",
       "bytes": 49175
     },
     {
       "route": "/solutions/online-store/",
       "status": 200,
       "file": "solutions/online-store/index.html",
-      "sha256": "ae200be29709e54aef05e43cd8360dc6399925dec7e2ddc12c7479dc59bb9811",
+      "sha256": "adeb8de0b59d739595fea17e51cb2c36416d2107834380c3cf205b16f425b8d0",
       "bytes": 38449
     },
     {
@@ -597,14 +597,14 @@
       "route": "/solutions/whitelabel/",
       "status": 200,
       "file": "solutions/whitelabel/index.html",
-      "sha256": "30d571bb6f955112a5f44911153fe5d7e7a9b714428243a6573a900e181be871",
+      "sha256": "7202db9a276842420d2de0bbac3a31f448245be37082f8f6dd607febf94f1ffc",
       "bytes": 35747
     },
     {
       "route": "/terms/",
       "status": 200,
       "file": "terms/index.html",
-      "sha256": "b188cf239e88dfd5010aa9953e1e591c65aaecb830c57dcde185ec5d537af427",
+      "sha256": "1db826e94733b7518ab8d4a125129aa0e47f76978cfe67a01b6f98db58f78e40",
       "bytes": 25675
     },
     {

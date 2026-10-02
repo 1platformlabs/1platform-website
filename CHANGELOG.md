@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Los tres pies del sitio (infraestructura, portada fotográfica y el clásico) muestran los íconos de las redes
+  sociales que el inquilino cargó, en el orden Facebook · TikTok · Instagram · LinkedIn · X, y las mismas URLs viajan
+  como `sameAs` en los datos estructurados de la organización. Sin redes, el marcado no cambia.
+
 ### Changed
 - La composición fotográfica admite, sólo por contenido del tenant, las
   verticales Delivery y de anuncios con su consulta propia, cinco accesos

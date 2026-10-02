@@ -4,6 +4,8 @@ import { useI18n, type Locale } from '@i18n';
 import consultorio from '@assets/photographic/consultorio-hero.webp';
 import commerce from '@assets/product/showcase-store-bg.webp';
 import { photographicContent, safeJson } from '@lib/photographic-content';
+import { socialLinksOf } from '@lib/social-links';
+import SocialLinks from '@components/SocialLinks.astro';
 import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, hasTenantAccess, tenantAccess } from '@lib/tenant-access';
 import { calculateLandingAmount } from '@lib/landing-calculator';
 import { siteOrigin } from '@lib/site-origin';
@@ -72,9 +74,10 @@ const calculatorMoney = (cents: number) => new Intl.NumberFormat(formatLocale, {
 const rateLabel = calculator ? new Intl.NumberFormat(formatLocale, { style: 'percent', maximumFractionDigits: 2 }).format(calculator.commissionBasisPoints / 10000) : null;
 const defaultCalculation = calculator ? calculateLandingAmount('100.00', calculator.commissionBasisPoints) : null;
 if (defaultCalculation && !defaultCalculation.ok) throw new Error('Invalid landing calculator configuration');
+const sameAs = socialLinksOf(tenant).map((link) => link.href);
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: tenant.brand_name, url: canonical.toString(), description },
-  { '@context': 'https://schema.org', '@type': 'Organization', name: tenant.brand_name, url: canonical.toString(), ...(socialImage ? { logo: socialImage.toString() } : {}) },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: tenant.brand_name, url: canonical.toString(), ...(socialImage ? { logo: socialImage.toString() } : {}), ...(sameAs.length > 0 ? { sameAs } : {}) },
   { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) },
 ];
 ---
@@ -758,6 +761,7 @@ const jsonLd = [
 </div>
 <div class="wrap footer-bottom">
 <span>{copy('footer.copyright')}</span>
+<SocialLinks variant="photographic" />
 <a class="back-to-top" href="#inicio"><span>{copy('footer.back')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg></a>
 </div>
 </footer>

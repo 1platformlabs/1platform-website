@@ -1,5 +1,6 @@
 ---
 import Logo from '@components/Logo.astro';
+import SocialLinks from '@components/SocialLinks.astro';
 import { useI18n } from '@i18n';
 
 const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
@@ -129,6 +130,7 @@ const year = new Date().getFullYear();
 
     <div class="site-footer__bottom">
       <p>{t('footer.copyright', { year })}</p>
+      <SocialLinks variant="classic" />
       {legal.length > 0 && <ul>{legal.map((link) => <li><a href={link.href}>{link.label}</a></li>)}</ul>}
     </div>
   </div>
@@ -160,6 +162,11 @@ const year = new Date().getFullYear();
   .footer-col ul { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
   .footer-col a, .site-footer__bottom a { color: var(--color-footer-muted); font-size: var(--text-sm); }
   .footer-col a:hover, .footer-col a:focus-visible, .site-footer__bottom a:hover { color: var(--color-footer-text); }
+  /* The global focus ring is the tenant ACCENT, and on this dark footer a navy
+     accent drops it to 2.5:1 (1Platform's own blue, measured 2026-10-02) — under
+     WCAG 1.4.11. Every link here rings in its own ink instead, like the social
+     icons (D-5); the button keeps its own ring (outline stays `none`). */
+  .site-footer :global(a:focus-visible) { outline-color: currentColor; }
   .site-footer__bottom { display: flex; justify-content: space-between; align-items: center; gap: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--color-footer-line); }
   .site-footer__bottom p { color: var(--color-footer-muted); font-size: var(--text-xs); }
   .site-footer__bottom ul { display: flex; flex-wrap: wrap; gap: var(--space-5); }
