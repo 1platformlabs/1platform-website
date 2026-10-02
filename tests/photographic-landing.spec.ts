@@ -798,6 +798,10 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
       const toggle = page.locator('.menu-toggle');
       await toggle.click();
       await expect(page.locator('#mobile-menu a')).toHaveText(['Soluciones', 'Cómo funciona', 'Su panel', 'Para quién', 'Calculadora', 'Preguntas']);
+      // The last destination stays reachable even when the menu is taller than a landscape screen.
+      const last = page.locator('#mobile-menu a').last();
+      await last.focus();
+      await expect(last).toBeInViewport({ ratio: 1 });
       await page.keyboard.press('Escape');
       await expect(toggle).toBeFocused();
     } else {

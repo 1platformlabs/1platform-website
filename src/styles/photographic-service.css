@@ -2963,3 +2963,14 @@ body.photographic-service {
     gap: 22px;
   }
 }
+
+/* The open menu hangs below a fixed header. On a short landscape screen it is
+   taller than the viewport and its last destinations sat out of reach; it now
+   scrolls inside itself. A menu that fits is unaffected. */
+@media (max-width: 980px) {
+  .photographic-service[data-enhanced] .mobile-nav {
+    max-height: calc(100svh - 110px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
