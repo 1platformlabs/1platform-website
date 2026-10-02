@@ -27,3 +27,17 @@ export function calculateLandingAmount(
   const fee = Number((BigInt(amount) * BigInt(commissionBasisPoints) + 5_000n) / 10_000n);
   return { ok: true, amount, fee, net: amount - fee };
 }
+
+/** A visitor-typed percentage from 0 to 100 with up to two decimals, as basis points. */
+export function percentageToBasisPoints(value: string): number | null {
+  const basisPoints = decimalToCents(value);
+  return basisPoints === null || basisPoints > 10_000 ? null : basisPoints;
+}
+
+/**
+ * Illustrative estimate with a percentage the VISITOR enters. The page holds no
+ * tenant rate: an empty or invalid percentage is an error, never a default.
+ */
+export function calculateWithPercentage(amount: string, percentage: string): LandingCalculation {
+  return calculateLandingAmount(amount, percentageToBasisPoints(percentage) ?? -1);
+}

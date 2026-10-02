@@ -4,7 +4,7 @@ import { useI18n, type Locale } from '@i18n';
 import consultorio from '@assets/photographic/consultorio-hero.webp';
 import commerce from '@assets/product/showcase-store-bg.webp';
 import { photographicContent, safeJson } from '@lib/photographic-content';
-import { ACCESS_ROUTE, hasTenantAccess, tenantAccess } from '@lib/tenant-access';
+import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, hasTenantAccess, tenantAccess } from '@lib/tenant-access';
 import { calculateLandingAmount } from '@lib/landing-calculator';
 import { siteOrigin } from '@lib/site-origin';
 import { alternatesForTenantPath, defaultLocaleOf, makeLocalizePath, ogLocaleOf } from '@lib/site-locale';
@@ -13,7 +13,7 @@ import '@styles/photographic-service.css';
 import '@styles/photographic-panel.css';
 
 const tenant = Astro.locals.tenant;
-const { copy, contactHref, navigation, steps, audiences, faqs, calculator, panel, brandStyle, clientConfig, fontKey, palette } = photographicContent(Astro.locals.messages, tenant);
+const { copy, contactHref, navigation, steps, audiences, faqs, calculator, manualCalculator, panel, brandStyle, clientConfig, fontKey, palette, heroFeatures, delivery, ads, solutionLinks, route, routeLabel, typeScale, footerAction, extraIcons, linkFootnote } = photographicContent(Astro.locals.messages, tenant);
 const photographs = { consultorio, commerce };
 const photoKey = copy('hero.image');
 if (!Object.hasOwn(photographs, photoKey)) throw new Error('Unrecognised photographic asset');
@@ -31,6 +31,8 @@ const locale = Astro.locals.locale;
 const localize = makeLocalizePath(tenant);
 const access = hasTenantAccess(tenant) ? tenantAccess(tenant, Astro.locals.messages) : null;
 const pricingHref = tenant.pages.includes('/pricing/') ? localize('/pricing/', locale) : contactHref('calculator');
+// Card anchors exist only for a tenant that publishes shortcuts to them.
+const cardId = (id: string) => solutionLinks.length > 0 ? id : undefined;
 const defaultAlternate = alternates[defaultLocaleOf(tenant)];
 const rssPath = tenant.pages.includes('/blog/') ? localize('/rss.xml', locale) : null;
 const languageChoices = Object.entries(alternates).filter(([language]) => language === 'en' || language === 'es');
@@ -123,7 +125,7 @@ const jsonLd = [
       }
     </script>}
   </head>
-<body class="photographic-service" data-home-template="photographic-service" data-panel-mode={panel.mode === 'collections' ? panel.mode : undefined} data-palette={palette} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
+<body class="photographic-service" data-home-template="photographic-service" data-panel-mode={panel.mode === 'collections' ? panel.mode : undefined} data-palette={palette} data-type-scale={typeScale} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
 <a class="skip-link" href="#contenido">{copy('ui.skip_link')}</a>
 <svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg">
 <symbol id="i-arrow" viewBox="0 0 24 24">
@@ -174,6 +176,8 @@ const jsonLd = [
 <symbol id="i-download" viewBox="0 0 24 24">
 <path d="M12 3v12m-5-5 5 5 5-5M4 15v6h16v-6"></path>
 </symbol>
+{extraIcons.includes('truck') && <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 5h11v12H3Zm11 5h4l3 4v3h-7M5 17a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0M3 9h5"></path></symbol>}
+{extraIcons.includes('megaphone') && <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m4 9 13-5v16L4 15Zm0 0H2v6h2m3 1 2 5h3l-2-4M21 8v8"></path></symbol>}
 </svg>
 <header class="site-header" data-tenant-access={access ? '' : undefined}>
 <a aria-label={copy('ui.brand_home').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio">
@@ -213,12 +217,7 @@ const jsonLd = [
 <div class="hero-caption">
 <p>{copy('hero.location')}</p>
 </div>
-<div class="hero-capabilities">
-<span><svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg><span>{copy('hero.feature1')}</span></span>
-<span><svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg><span>{copy('hero.feature2')}</span></span>
-<span><svg aria-hidden="true" class="icon">
-<use href="#i-receipt"></use></svg><span>{copy('hero.feature3')}</span></span>
-</div>
+<div class="hero-capabilities">{heroFeatures.map((feature) => <span><svg aria-hidden="true" class="icon"><use href={`#i-${feature.icon}`}></use></svg><span>{feature.label}</span></span>)}</div>
 </div>
 </section>
 <section aria-labelledby="solutions-title" class="solutions section-pad wrap" id="como-cobras">
@@ -228,8 +227,9 @@ const jsonLd = [
 <h2 id="solutions-title">{copy('solutions.title')}</h2>
 </div>
 </div>
+{solutionLinks.length > 0 && <nav aria-label={copy('solutions.linksLabel').replace('{brand}', tenant.brand_name)} class="solution-navigation"><ul class="landing-product-links">{solutionLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}</ul></nav>}
 <div class="solutions-grid">
-<article class="service-card service-presencial" data-sequence="">
+<article class="service-card service-presencial" data-sequence="" id={cardId('cobros-presenciales')}>
 <div class="service-copy">
 <h3>{copy('solutions.card1.title')}</h3>
 <p>{copy('solutions.card1.description')}</p>
@@ -259,7 +259,7 @@ const jsonLd = [
 <svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg><span>{copy('illustrations.device')}</span>
 </div>
 </article>
-<article class="service-card service-link" data-sequence="">
+<article class="service-card service-link" data-sequence="" id={cardId('enlaces-de-cobro')}>
 <div class="service-copy">
 <h3>{copy('solutions.card2.title')}</h3>
 <p>{copy('solutions.card2.description')}</p>
@@ -287,10 +287,10 @@ const jsonLd = [
 </div>
 </div>
 <div class="service-footnote">
-<svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg><span>{copy('hero.feature2')}</span>
+<svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg><span>{linkFootnote}</span>
 </div>
 </article>
-<article class="service-card service-invoice" data-sequence="">
+<article class="service-card service-invoice" data-sequence="" id={cardId('facturacion')}>
 <div class="service-copy">
 <h3>{copy('solutions.card3.title')}</h3>
 <p>{copy('solutions.card3.description')}</p>
@@ -326,6 +326,33 @@ const jsonLd = [
 </div>
 </article>
 </div>
+{(delivery || ads) && <div class="business-verticals">
+{delivery && <article aria-labelledby="delivery-title" class="business-card delivery-card" data-sequence="" id="delivery" tabindex="-1">
+<div class="business-copy"><p class="eyebrow">{delivery.eyebrow}</p><h3 id="delivery-title">{delivery.title}</h3><p>{delivery.description}</p></div>
+<div aria-label={delivery.stageLabel} class="service-stage vertical-visual" role="img">
+<div class="vertical-panel">
+<div class="vertical-panel-heading"><span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><strong>{delivery.panelTitle}</strong><span class="vertical-tag">{delivery.tag}</span></div>
+<div class="delivery-order"><svg aria-hidden="true" class="icon"><use href="#i-truck"></use></svg><div><strong>{delivery.orderTitle}</strong><span>{delivery.orderNote}</span></div></div>
+<ol class="delivery-progress">{delivery.milestones.map((milestone) => <li class="delivery-milestone"><span aria-hidden="true" class="milestone-dot"></span><div><strong>{milestone.title}</strong><span>{milestone.text}</span></div><svg aria-hidden="true" class="icon"><use href="#i-check"></use></svg></li>)}</ol>
+</div>
+</div>
+<ul class="vertical-benefits">{delivery.benefits.map((benefit) => <li>{benefit}</li>)}</ul>
+<a class="button button-teal" data-support-cta="delivery" href={contactHref('delivery')}><span>{delivery.cta}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg></a>
+</article>}
+{ads && <article aria-labelledby="ads-title" class="business-card ads-card" data-sequence="" id="anuncios" tabindex="-1">
+<div class="business-copy"><p class="eyebrow">{ads.eyebrow}</p><h3 id="ads-title">{ads.title}</h3><p>{ads.description}</p></div>
+<div aria-label={ads.stageLabel} class="service-stage vertical-visual" role="img">
+<div class="vertical-panel">
+<div class="vertical-panel-heading"><span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><strong>{ads.panelTitle}</strong><span class="vertical-tag">{ads.tag}</span></div>
+<div class="campaign-creative"><span class="campaign-brand">{ads.brand}</span><svg aria-hidden="true" class="icon"><use href="#i-megaphone"></use></svg><strong>{ads.creative}</strong><span class="campaign-channels">{ads.channels}</span></div>
+<dl class="campaign-plan">{ads.plan.map((row) => <div><dt>{row.term}</dt><dd>{row.value}</dd></div>)}</dl>
+</div>
+</div>
+<ul class="vertical-benefits">{ads.benefits.map((benefit) => <li>{benefit}</li>)}</ul>
+<a class="button button-teal" data-support-cta="ads" href={contactHref('ads')}><span>{ads.cta}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg></a>
+</article>}
+</div>}
+{route.length > 0 && <ol aria-label={routeLabel!} class="business-route">{route.map((step) => <li><svg aria-hidden="true" class="icon"><use href={`#i-${step.icon}`}></use></svg><div><strong>{step.title}</strong><span>{step.text}</span></div></li>)}</ol>}
 </section>
 <section aria-labelledby="how-title" class="how-section" id="como-funciona">
 <div class="wrap how-grid">
@@ -569,7 +596,47 @@ const jsonLd = [
 </div>
 </section>
 <section aria-labelledby="calculator-title" class="calculator-section section-pad wrap" id="calculadora">
-{defaultCalculation?.ok ? <>
+{manualCalculator ? <>
+<form class="calculator-form" id="price-calculator" novalidate="">
+<h3>{copy('calculator.formTitle')}</h3>
+<div class="calc-field amount-field">
+<label for="calc-amount">{copy('calculator.amount')}</label>
+<div class="amount-input">
+<span aria-hidden="true">Q</span><input aria-describedby="calc-error" autocomplete="off" disabled="" id="calc-amount" inputmode="decimal" maxlength="10" name="amount" required="" type="text" value="100.00"/>
+</div>
+</div>
+<div class="calc-field rate-field">
+<label for="calc-rate">{copy('calculator.rate')}</label>
+<div class="amount-input">
+<span aria-hidden="true">%</span><input aria-describedby="calc-rate-help calc-error" autocomplete="off" disabled="" id="calc-rate" inputmode="decimal" maxlength="6" name="rate" placeholder={copy('calculator.ratePlaceholder')} required="" type="text"/>
+</div>
+<p id="calc-rate-help">{copy('calculator.rateHelp')}</p>
+</div>
+<button class="button button-teal calc-submit" disabled="" type="submit">
+<span>{copy('calculator.submit')}</span><svg aria-hidden="true" class="icon"><use href="#i-arrow"></use></svg>
+</button>
+<p class="calc-error" id="calc-error" role="alert"></p>
+<div aria-atomic="true" aria-live="polite" class="calc-result" role="status">
+<span>{copy('calculator.result')}</span><output for="calc-amount calc-rate" id="calc-net">—</output>
+<dl>
+<div>
+<dt>{copy('calculator.fee')}</dt>
+<dd id="calc-fee">—</dd>
+</div>
+</dl>
+<p id="calc-status">{copy('ui.calculator_nojs')}</p>
+</div>
+</form>
+<div class="calculator-copy">
+<p class="eyebrow">{copy('calculator.eyebrow')}</p>
+<h2 id="calculator-title">{copy('calculator.title')}</h2>
+<p class="calculator-intro">{copy('calculator.description')}</p>
+<a class="button button-teal" data-support-cta="calculator" href={contactHref('calculator')}>
+<span>{copy('calculator.contact')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg>
+</a>
+<p class="calculator-note">{copy('calculator.note')}</p>
+</div>
+</> : defaultCalculation?.ok ? <>
 <form class="calculator-form" id="price-calculator" novalidate="">
 <h3>{copy('calculator.formTitle')}</h3>
 <div class="calc-field amount-field">
@@ -657,7 +724,7 @@ const jsonLd = [
 </div>
 <nav aria-label={copy('ui.footer_column_aria_label')} class="footer-column">
 <h2>{copy('footer.solutions')}</h2>
-{productLinks.length > 0 ? productLinks.map(({ href, label }) => <a href={href}>{label}</a>) : <>
+{productLinks.length > 0 ? productLinks.map(({ href, label }) => <a href={href}>{label}</a>) : solutionLinks.length > 0 ? solutionLinks.map(({ href, footerLabel }) => <a href={href}>{footerLabel}</a>) : <>
 <a href="#como-cobras">{copy('hero.feature1')}</a>
 <a href="#como-cobras">{copy('hero.feature2')}</a>
 <a href="#como-funciona">{copy('hero.feature3')}</a>
@@ -665,7 +732,6 @@ const jsonLd = [
 </nav>
 <nav aria-label={copy('ui.footer_column_aria_label63')} class="footer-column">
 <h2>{tenant.brand_name}</h2>
-{access && <a data-access-entry href={localize(ACCESS_ROUTE, locale)}>{access.copy('entry')}</a>}
 {companyLinks.length > 0 ? companyLinks.map(({ href, label }) => <a href={href}>{label}</a>) : <>
 <a href="#como-funciona">{copy('ui.label42')}</a>
 <a href="#su-panel">{copy('ui.label43')}</a>
@@ -673,12 +739,14 @@ const jsonLd = [
 <a href="#calculadora">{copy('ui.label45')}</a>
 <a href="#preguntas">{copy('ui.label46')}</a>
 </>}
+{access && <a data-access-entry href={localize(ACCESS_ROUTE, locale)}>{access.copy('entry')}</a>}
+{access && <a href={localize(REQUEST_ACCESS_ROUTE, locale)}>{access.copy('request')}</a>}
 </nav>
 <div class="footer-column">
 <h2>{copy('footer.contact')}</h2>
 <p>{copy('footer.coverage')}</p>
 <a class="footer-contact" data-support-cta="footer" href={contactHref('footer')}>
-<svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('actions.header')}</span><svg aria-hidden="true" class="icon">
+<svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{footerAction}</span><svg aria-hidden="true" class="icon">
 <use href="#i-up-right"></use>
 </svg>
 </a>
