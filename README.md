@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://1platform.pro"><img src="https://img.shields.io/badge/Visit-1platform.pro-3b82f6?style=flat-square" alt="Website" /></a>
-  <img src="https://img.shields.io/badge/Astro-5-BC52EE?logo=astro&logoColor=white&style=flat-square" alt="Astro 5" />
+  <img src="https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white&style=flat-square" alt="Astro 7" />
   <img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="MIT License" />
 </p>
 
@@ -16,19 +16,19 @@
 
 ## Stack
 
-- **[Astro 5](https://astro.build/)** — static site generator, zero JS by default
+- **[Astro 7](https://astro.build/)** — server rendering with the Node adapter and tenant configuration per request
 - **Islands architecture** — JS ships only for interactive components
 - **Content Collections** — type-safe Markdown/MDX with Zod schemas (blog, docs, changelog)
 - **Lenis** smooth scroll · **View Transitions** · `@astrojs/sitemap` · `@astrojs/rss`
-- **Dark mode only**, accent `#3b82f6`, typography: monospace + sans-serif pair
-- Output: 100% static HTML/CSS/JS in `dist/` — deployable anywhere
+- **Tenant-configured identity** — 1Platform uses Manrope, navy `#0d1c3a` and blue `#2854a7`; Medipago and other tenants retain their own branding
+- Output: `dist/server` and `dist/client` — one Node process, tenant-aware routes
 
 ## Development
 
 ```bash
 npm install
 npm run dev          # → http://localhost:4321 (hot reload)
-npm run build        # → dist/ (static output)
+npm run build        # → dist/server and dist/client (Node SSR)
 npm run preview      # Preview built output locally
 ```
 

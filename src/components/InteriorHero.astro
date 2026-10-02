@@ -1,0 +1,24 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { displayHeading } from '@lib/blog-presentation';
+interface Props {
+  variant: 'store' | 'blog' | 'article';
+  image: ImageMetadata;
+  kicker: string;
+  title: string;
+  description: string;
+}
+const { variant, image, kicker, title, description } = Astro.props;
+---
+<section class:list={['hero', `hero--${variant}`]}>
+  <Image class="hero-photo" src={image} alt="" widths={[640, 960, 1440, 1920]} sizes="100vw" loading="eager" fetchpriority="high" />
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="hero-content">
+    <p class="hero-kicker">{kicker}</p>
+    <h1>{displayHeading(title)}</h1>
+    <p class="hero-lede">{displayHeading(description)}</p>
+    <slot />
+  </div>
+  <slot name="bottom" />
+</section>

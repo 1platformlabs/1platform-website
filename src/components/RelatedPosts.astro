@@ -1,75 +1,21 @@
 ---
-import BlogPostCard from './BlogPostCard.astro';
 import { bareSlug, getLocalized } from '@i18n/collections';
-
 import { useI18n } from '@i18n';
-const { t, locale } = useI18n(Astro.url.pathname, Astro.locals);
-
-interface Props {
-  currentSlug: string;
-  currentCategory: string;
-}
-
-const { currentSlug, currentCategory } = Astro.props;
-
-// Same language only: an unfiltered read here would have put English posts
-// under a Spanish article, which is the most visible form of language leak.
-const allPosts = await getLocalized('blog', locale);
-const related = allPosts
-  .filter((p) => bareSlug(p.id) !== currentSlug)
-  .sort((a, b) => {
-    const aMatch = a.data.category === currentCategory ? 1 : 0;
-    const bMatch = b.data.category === currentCategory ? 1 : 0;
-    return bMatch - aMatch || b.data.pubDate.getTime() - a.data.pubDate.getTime();
-  })
-  .slice(0, 3);
+import { displayHeading, editorialOrder } from '@lib/blog-presentation';
+interface Props { currentSlug: string; currentCategory: string; }
+const { currentSlug } = Astro.props;
+const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
+const related = editorialOrder(await getLocalized('blog', locale))
+  .filter((post) => bareSlug(post.id) !== currentSlug).slice(0, 2);
 ---
-
-{related.length > 0 && (
-  <section class="related section section--alt" aria-labelledby="related-heading">
-    <div class="container">
-      <div class="section__rule">
-        <h2 class="eyebrow" id="related-heading">{t('related.title')}</h2>
-      </div>
-
-      <div class="related__grid">
-        {related.map((post) => (
-          <BlogPostCard
-            variant="card"
-            title={post.data.title}
-            description={post.data.description}
-            pubDate={post.data.pubDate}
-            category={post.data.category}
-            slug={bareSlug(post.id)}
-            author={post.data.author}
-            readingTime={post.data.readingTime}
-            class="reveal"
-          />
-        ))}
-      </div>
-    </div>
-  </section>
-)}
-
-<style>
-  /* The inline `style="margin-top"` and the shared .grid-3 went: this is the
-     one place on the blog where posts genuinely sit side by side, so it owns
-     its own column rule and can drop to two columns before it drops to one. */
-  .related__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-6);
-  }
-
-  @media (max-width: 1024px) {
-    .related__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 640px) {
-    .related__grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-</style>
+{related.length > 0 && <section class="section section--wash" aria-label={t('related.title')}>
+  <div class="wrap">
+    <p class="eyebrow">{t('interiors.related')}</p><h2 class="section-title">{t('interiors.related_lede')}</h2>
+    <div class="related-grid">{related.map((post) =>
+      <a class="related-card" href={l(`/blog/${bareSlug(post.id)}/`)}>
+        <span class="eyebrow">{t(`interiors.category.${post.data.category}`)}</span>
+        <h3>{displayHeading(post.data.title)}</h3><p>{displayHeading(post.data.description)}</p>
+      </a>
+    )}</div>
+  </div>
+</section>}

@@ -1,0 +1,281 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import TOC from '@components/TOC.astro';
+import ShareButtons from '@components/ShareButtons.astro';
+import RelatedPosts from '@components/LegacyRelatedPosts.astro';
+import { formatDate, useI18n, type Locale } from '@i18n';
+import { localizedOgImage } from '@i18n/og';
+import { siteOrigin } from '@lib/site-origin';
+import { resolveLogo } from '@lib/tenant-brand-assets';
+import { socialLinksOf } from '@lib/social-links';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate?: Date;
+    author: string;
+    category: string;
+    image?: string;
+    ogImage?: string;
+    readingTime?: number;
+    tags?: string[];
+  };
+  headings?: { depth: number; slug: string; text: string }[];
+  slug: string;
+  /** Omitting a locale here is how a post with no twin declares that. */
+  alternates?: Partial<Record<Locale, string>>;
+}
+
+const { frontmatter, headings = [], slug, alternates } = Astro.props;
+const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
+
+const categoryLabel = t(`blog.category.${frontmatter.category}`);
+const brandName = Astro.locals.tenant.brand_name;
+const tenantLogo = await resolveLogo(Astro.locals.tenant);
+const sameAs = socialLinksOf(Astro.locals.tenant).map((link) => link.href);
+
+// Built from the page's own locale so the canonical, the share URL and the
+// Article @id all point at the language being read. These used to be pinned to
+// the English origin, so a Spanish post advertised the English URL as its
+// canonical identity.
+const postPath = l(`/blog/${slug}/`);
+const postURL = new URL(postPath, siteOrigin(Astro.locals)).href;
+
+/** Only worth showing when it actually says something new. */
+const showUpdated =
+  frontmatter.updatedDate &&
+  frontmatter.updatedDate.valueOf() !== frontmatter.pubDate.valueOf();
+
+const ogImage = frontmatter.ogImage || frontmatter.image || '/og/default.png';
+// Same swap as BaseLayout, and it has to happen here too: this URL is what
+// goes into the Article JSON-LD `image`, which search engines read separately
+// from the `og:image` meta. Leaving one of the two in English would make the
+// page describe itself in two languages at once.
+const ogImageURL = new URL(localizedOgImage(ogImage, locale), siteOrigin(Astro.locals)).href;
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: frontmatter.title,
+  description: frontmatter.description,
+  image: ogImageURL,
+  author: {
+    '@type': 'Person',
+    name: frontmatter.author,
+  },
+  datePublished: frontmatter.pubDate.toISOString(),
+  dateModified: (frontmatter.updatedDate || frontmatter.pubDate).toISOString(),
+  // ⚠️ THE SECOND Organization BLOCK. `BaseLayout` has one too, and only that
+  // one was made tenant-aware — so a blog post kept publishing the platform's
+  // name, domain and logo under a client's domain long after the home page
+  // stopped. It is the reason a post left 27 brand mentions against the home
+  // page's 13, and a sweep for `Astro.site` never found it: every value here
+  // was a literal.
+  publisher: {
+    '@type': 'Organization',
+    name: brandName,
+    url: siteOrigin(Astro.locals),
+    ...(tenantLogo
+      ? {
+          logo: {
+            '@type': 'ImageObject',
+            url: new URL(tenantLogo, siteOrigin(Astro.locals)).href,
+          },
+        }
+      : {}),
+    // The same list the footer draws (D-7); absent — not `[]` — without links.
+    ...(sameAs.length > 0 ? { sameAs } : {}),
+  },
+  inLanguage: locale,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': postURL,
+  },
+};
+---
+
+<BaseLayout
+  title={t('blog.post.title', { title: frontmatter.title })}
+  description={frontmatter.description}
+  ogImage={frontmatter.ogImage}
+  jsonLd={articleJsonLd}
+  alternates={alternates}
+>
+  <article class="blog-post section">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('blog.h1'), href: l('/blog/') },
+        { label: frontmatter.title },
+      ]} />
+
+      <header class="blog-post__header">
+        {/* The label stays, the link is gone: the category pages it pointed at
+            held one or two posts each and no prose of their own, so they were
+            twelve indexable pages whose content already sat on /blog/. */}
+        <p class="eyebrow blog-post__category">{categoryLabel}</p>
+
+        <h1>{frontmatter.title}</h1>
+
+        <p class="blog-post__standfirst">{frontmatter.description}</p>
+
+        <!-- Byline data, set in the label voice and divided by rules rather
+             than by a punctuation glyph. -->
+        <dl class="blog-post__byline">
+          <div class="blog-post__byline-item">
+            <dt>{t('blog.writtenBy')}</dt>
+            <dd>{frontmatter.author}</dd>
+          </div>
+          <div class="blog-post__byline-item">
+            <dt>{t('blog.published')}</dt>
+            <dd>
+              <time datetime={frontmatter.pubDate.toISOString()}>
+                {formatDate(frontmatter.pubDate, locale)}
+              </time>
+            </dd>
+          </div>
+          {showUpdated && frontmatter.updatedDate && (
+            <div class="blog-post__byline-item">
+              <dt>{t('blog.updated')}</dt>
+              <dd>
+                <time datetime={frontmatter.updatedDate.toISOString()}>
+                  {formatDate(frontmatter.updatedDate, locale)}
+                </time>
+              </dd>
+            </div>
+          )}
+          {frontmatter.readingTime && (
+            <div class="blog-post__byline-item">
+              <dt>{t('blog.length')}</dt>
+              <dd>{t('blog.readingTime', { n: frontmatter.readingTime })}</dd>
+            </div>
+          )}
+        </dl>
+      </header>
+
+      <div class="blog-post__layout">
+        <aside class="blog-post__sidebar">
+          <TOC headings={headings} />
+        </aside>
+        <div class="blog-post__content prose">
+          <slot />
+        </div>
+      </div>
+
+      <footer class="blog-post__footer">
+        <ShareButtons title={frontmatter.title} url={postURL} />
+      </footer>
+    </div>
+  </article>
+
+  <RelatedPosts currentSlug={slug} currentCategory={frontmatter.category} />
+</BaseLayout>
+
+<style>
+  /* The title block keeps to a reading measure rather than running the full
+     grid width — a headline set across 1200px is a landing page, not an
+     article. */
+  .blog-post__header {
+    max-width: 44rem;
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .blog-post__category {
+    display: inline-block;
+    min-height: 24px;
+  }
+
+  .blog-post__category:hover {
+    color: var(--color-accent);
+  }
+
+  .blog-post__header h1 {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-5);
+    font-size: var(--text-4xl);
+  }
+
+  .blog-post__standfirst {
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    margin-bottom: var(--space-8);
+  }
+
+  .blog-post__byline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+  }
+
+  .blog-post__byline-item {
+    display: grid;
+    gap: var(--space-1);
+    padding-left: var(--space-4);
+    border-left: 1px solid var(--color-border-strong);
+  }
+
+  .blog-post__byline dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .blog-post__byline dd {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .blog-post__layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .blog-post__sidebar {
+    position: sticky;
+    top: calc(var(--header-offset) + var(--space-8));
+    min-width: 0;
+  }
+
+  .blog-post__content {
+    min-width: 0;
+  }
+
+  .blog-post__footer {
+    max-width: 70ch;
+    margin-top: var(--space-12);
+    margin-left: calc(220px + var(--space-12));
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  @media (max-width: 900px) {
+    .blog-post__layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-8);
+    }
+
+    .blog-post__sidebar {
+      position: static;
+      order: -1;
+    }
+
+    .blog-post__footer {
+      margin-left: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .blog-post__byline {
+      gap: var(--space-4);
+    }
+  }
+</style>

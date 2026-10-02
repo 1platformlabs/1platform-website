@@ -61,10 +61,10 @@ test('the wordmark is the tenant\'s, not the platform\'s', async () => {
   // home has its own approved lockup, checked separately below.
   const { html: platform } = await serve(PLATFORM_HOST, '/pricing/')
 
-  const mark = (html: string) => html.match(/logo__mark"[^>]*>([^<]*)</)?.[1] ?? null
-  const text = (html: string) => html.match(/logo__text"[^>]*>([^<]*)</)?.[1] ?? null
+  const mark = (html: string) => html.match(/(?:logo__mark|brand-symbol)"[^>]*>([^<]*)</)?.[1] ?? null
+  const text = (html: string) => html.match(/(?:logo__text|brand-name)"[^>]*>([^<]*)</)?.[1] ?? null
   const label = (html: string) =>
-    html.match(/class="logo[^"]*"[^>]*aria-label="([^"]+)"/)?.[1] ?? null
+    html.match(/class="(?:logo|brand-lockup)[^"]*"[^>]*aria-label="([^"]+)"/)?.[1] ?? null
 
   // POSITIVE CONTROL: the platform draws its own, or the scan is broken. Its
   // "1" is a numeral doing the work of a glyph, so it still gets boxed.
@@ -81,9 +81,9 @@ test('the wordmark is the tenant\'s, not the platform\'s', async () => {
     'Clínica Delta',
   )
   const { html: home } = await serve(PLATFORM_HOST)
-  expect(home).toMatch(/class="brand-mark">1<\/span>/)
-  expect(home).toMatch(/class="wordmark">Platform<\/span>/)
-  expect(home).toContain('aria-label="1Platform, home"')
+  expect(home).toMatch(/class="brand-symbol"[^>]*>1<\/span>/)
+  expect(home).toMatch(/class="brand-name">Platform<\/span>/)
+  expect(home).toContain('aria-label="1Platform, back to home"')
 })
 
 test('the leak that is LEFT is content, and its size is pinned', async () => {

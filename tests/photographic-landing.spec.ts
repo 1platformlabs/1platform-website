@@ -8,6 +8,8 @@ import { chromium, expect, test as base, type Browser, type Page } from '@playwr
 import type { SiteTenant } from '../src/lib/site-api';
 import { repoTenantForHost } from '../src/data/site-tenants';
 import { getWithHost } from './helpers/http-host';
+import accessMessages from '../src/i18n/messages/pages/access';
+import requestAccessMessages from '../src/i18n/messages/pages/request-access';
 
 /**
  * Built Astro/Node integration with contractual HTTP responses and actual Host
@@ -48,6 +50,20 @@ alternate.tenant = {
   destinations: { ...alternate.tenant.destinations, support: 'https://contacto.aurora.example/alta' },
 };
 alternate.pagesResponse.data.slug = alternate.tenant.slug;
+const ACCESS_HOST = 'commerce-access.example';
+const accessFixture: SiteFixture = JSON.parse(JSON.stringify(fixture).replaceAll('Medipago', 'Comercio Aurora'));
+accessFixture.tenant = {
+  ...accessFixture.tenant,
+  slug: 'commerce-access', domain: ACCESS_HOST, brand_name: 'Comercio Aurora',
+  brand_wordmark: 'Comercio Aurora', brand_mark: 'C', brand_assets: null,
+  pages: ['/', '/access/', '/request-access/'],
+  theme: { accent: '#1748a7', accent_contrast: '#ffffff', display_font: 'manrope' },
+  destinations: { ...accessFixture.tenant.destinations, app: 'https://panel.commerce.example/auth/login', support: 'https://wa.me/15035550123' },
+};
+accessFixture.pagesResponse.data.slug = accessFixture.tenant.slug;
+Object.assign(accessFixture.pagesResponse.data.messages, accessMessages.es, requestAccessMessages.es, {
+  'photographic.theme.palette': 'brand', 'photographic.hero.image': 'commerce',
+});
 alternate.pagesResponse.data.messages['photographic.calculator.commissionBasisPoints'] = '350';
 for (const page of alternate.pagesResponse.data.pages) {
   if ('photographic.calculator.commissionBasisPoints' in page.blocks) {
@@ -134,13 +150,13 @@ test.beforeAll(async () => {
       const host = url.searchParams.get('host') ?? '';
       resolvedHosts.add(host);
       if (host === PLATFORM_HOST) return response.end(JSON.stringify({ success: true, data: platformTenant, msg: 'Site resolved' }));
-      const selected = host === HOST ? fixture : host === ALTERNATE_HOST ? alternate : null;
+      const selected = host === HOST ? fixture : host === ALTERNATE_HOST ? alternate : host === ACCESS_HOST ? accessFixture : null;
       if (selected) return response.end(JSON.stringify({ success: true, data: selected.tenant, msg: 'Site resolved' }));
     } else {
       const match = /\/sites\/([^/]+)\/pages$/.exec(url.pathname);
       const content = match?.[1] === platformTenant.slug ? platformContent.get(url.searchParams.get('locale') ?? '') : null;
       if (content) return response.end(JSON.stringify(content));
-      const selected = [fixture, alternate].find((candidate) => candidate.tenant.slug === match?.[1]);
+      const selected = [fixture, alternate, accessFixture].find((candidate) => candidate.tenant.slug === match?.[1]);
       if (selected && url.searchParams.get('locale') === selected.tenant.default_locale) {
         return response.end(JSON.stringify(selected.pagesResponse));
       }
@@ -165,7 +181,7 @@ test.beforeAll(async () => {
     try { return (await getWithHost(`${appBaseUrl}/`, HOST)).status; } catch { return 0; }
   }, { timeout: 30_000, message: 'The built tenant route must start' }).toBe(200);
   tenantBrowser = await chromium.launch({
-    args: [`--host-resolver-rules=MAP ${HOST} 127.0.0.1, MAP ${ALTERNATE_HOST} 127.0.0.1, MAP ${PLATFORM_HOST} 127.0.0.1`],
+    args: [`--host-resolver-rules=MAP ${HOST} 127.0.0.1, MAP ${ALTERNATE_HOST} 127.0.0.1, MAP ${PLATFORM_HOST} 127.0.0.1, MAP ${ACCESS_HOST} 127.0.0.1`],
   });
 });
 
@@ -200,7 +216,7 @@ test('actual tenant Host renders the approved SSR page, metadata and configured 
   await expect(page.locator('.panel-footnote p')).toHaveCSS('font-size', '16px');
   const text = await page.locator('body').innerText();
   expect(text).toMatch(/facturación automática/i);
-  expect(text).toMatch(/datos.*ficticios/i);
+  expect(text).toContain('Los importes y movimientos de esta demostración son ficticios');
   expect(text).not.toMatch(/factura asistida|Android|prototipo|contacto simulado|tarifas pendientes|\bUSD\b/i);
   // The approved personal address is illustrative copy, never a contact link.
   await expect(page.locator('.onboarding-copy')).toContainText('como consulta@minombre.com');
@@ -239,8 +255,12 @@ test('without JavaScript copy, all demonstration views, FAQ and default calculat
     await expect(page.locator('.hero-motion')).toHaveCount(0);
     await expect(page.locator('.hero-eyebrow')).toHaveCount(0);
     await expect(page.locator('#mobile-menu')).toBeVisible();
-    await page.locator('#faq-list summary').first().click();
-    await expect(page.locator('#faq-list details').first()).toHaveAttribute('open', '');
+    // The semantic FAQ contract belongs to the tenant that publishes it.
+    const questions = page.locator('#faq-list > details');
+    expect(await questions.count()).toBeGreaterThanOrEqual(2);
+    await questions.first().locator('summary').click();
+    await expect(questions.first()).toHaveAttribute('open', '');
+    await expect(questions.first().locator('p')).toBeVisible();
     await checkOverflow(page);
   } finally { await context.close(); }
 
@@ -253,6 +273,8 @@ test('without JavaScript copy, all demonstration views, FAQ and default calculat
     await auditPage.goto(`http://${HOST}:${appPort}/`);
     await expect(auditPage.locator('body')).not.toHaveAttribute('data-enhanced');
     await expect(auditPage.locator('[data-panel-screen]:visible')).toHaveCount(3);
+    await auditPage.locator('#faq-list > details').first().locator('summary').click();
+    await expect(auditPage.locator('#faq-list > details').first().locator('p')).toBeVisible();
     const accessibility = await new AxeBuilder({ page: auditPage }).analyze();
     expect(accessibility.violations).toEqual([]);
   } finally { await auditContext.close(); }
@@ -287,7 +309,7 @@ test('mobile navigation stays fixed and supports native anchors, focus and Escap
   expect(focus.outline !== 'none' || focus.shadow !== 'none').toBe(true);
 });
 
-test('the demonstration has keyboard tabs, local filters and separate credits and withdrawals', async ({ landingPage: page }) => {
+test('the demonstration has keyboard tabs, payment-channel filters and separate gross collections and withdrawals', async ({ landingPage: page }) => {
   await gotoLanding(page);
   const summary = page.locator('[data-panel-tab="summary"]');
   const billing = page.locator('[data-panel-tab="billing"]');
@@ -298,13 +320,16 @@ test('the demonstration has keyboard tabs, local filters and separate credits an
   await expect(billing).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#panel-billing')).toBeVisible();
   await expect(page.locator('#panel-summary')).toBeHidden();
-  await expect(page.locator('#panel-billing [data-panel-money="credit"]')).toHaveText(/Q\s?480\.00/);
-  await page.locator('[data-panel-filter="expense"]').click();
+  await expect(page.locator('#panel-billing .panel-callout')).toContainText('antes de comisiones');
+  await expect(page.locator('#faq-list details')).toHaveCount(3);
+  await expect(page.locator('.panel-sidebar-note')).toHaveText('Cobros y retirospor separado');
+  await expect(page.locator('#panel-billing [data-panel-money="collected"]')).toHaveText(/Q\s?480\.00/);
+  await page.locator('[data-panel-filter="card"]').click();
   await expect(page.locator('#panel-transaction-rows tr:visible')).toHaveCount(1);
-  await expect(page.locator('#panel-transaction-rows tr:visible')).toContainText(/-Q\s*20\.00/);
+  await expect(page.locator('#panel-transaction-rows tr:visible')).toContainText(/Q\s*300\.00/);
   await expect(page.locator('#panel-filter-status')).toContainText('1');
-  await page.locator('[data-panel-filter="income"]').click();
-  await expect(page.locator('#panel-transaction-rows tr:visible')).toContainText(/Q\s*500\.00/);
+  await page.locator('[data-panel-filter="link"]').click();
+  await expect(page.locator('#panel-transaction-rows tr:visible')).toContainText(/Q\s*180\.00/);
   await page.locator('[data-panel-filter="all"]').click();
   await expect(page.locator('#panel-transaction-rows tr:visible')).toHaveCount(2);
   await billing.focus();
@@ -312,7 +337,19 @@ test('the demonstration has keyboard tabs, local filters and separate credits an
   await expect(withdrawals).toBeFocused();
   await expect(page.locator('#panel-withdrawals [data-panel-money="withdraw"]')).toHaveText(/Q\s?0\.00/);
   await expect(page.locator('#panel-withdrawals .panel-disabled')).toBeDisabled();
-  await expect(page.locator('#withdraw-reason')).not.toBeEmpty();
+  await expect(page.locator('#panel-withdrawals .panel-page-desc')).toHaveText('Consulte el saldo disponible y los requisitos para solicitar un retiro.');
+  await expect(page.locator('#panel-withdrawals .panel-disabled')).toHaveText('Solicitar retiro');
+  await expect(page.locator('#withdraw-reason')).toHaveText('Esta vista de ejemplo no presenta saldo disponible ni una cuenta de retiro configurada.');
+  await expect(page.locator('#method-title')).toHaveText('Cuenta de retiro no configurada');
+  await expect(page.locator('#method-title')).toHaveCSS('color', 'rgb(32, 36, 34)');
+  expect(await page.locator('.panel-section p').evaluateAll((paragraphs) => paragraphs.every((paragraph) => getComputedStyle(paragraph).textWrap === 'wrap'))).toBe(true);
+  await expect(page.locator('#panel-withdrawals details summary')).toHaveText('Requisitos para solicitar un retiro');
+  await expect(page.locator('#panel-withdrawals details li')).toHaveText(['Una cuenta de retiro configurada.', 'Saldo retirable suficiente en quetzales.', 'Confirmar el importe y la cuenta de destino.']);
+  await expect(page.locator('#panel-withdrawals')).not.toContainText(/saldo mínimo|Sin métodos|Pedir retiro/);
+  await expect(page.locator('#su-panel')).toHaveCSS('scroll-margin-top', '0px');
+  await expect(page.locator('#su-panel .eyebrow')).toHaveCSS('font-family', /Manrope/);
+  await expect(page.locator('#su-panel .eyebrow')).toHaveCSS('display', 'block');
+  await expect(page.locator('.panel-empty > .icon')).toHaveCSS('display', 'inline');
   await page.setViewportSize({ width: 360, height: 800 });
   await expect(page.locator('.panel-tabs')).toHaveAttribute('aria-orientation', 'horizontal');
   await page.keyboard.press('ArrowRight');
@@ -396,7 +433,7 @@ test('photograph and flow play automatically, restart on re-entry and respect re
   await expect(page.locator('#calc-amount')).toBeEnabled();
 });
 
-for (const [host, path] of [[HOST, '/'], [PLATFORM_HOST, '/'], [PLATFORM_HOST, '/es/']] as const) {
+for (const [host, path] of [[HOST, '/']] as const) {
   for (const width of [1440, 390]) {
     test(`illustrations autoplay when visible and on return: ${host}${path} ${width}px`, async ({ landingPage: page }) => {
       await page.setViewportSize({ width, height: width === 1440 ? 900 : 844 });
@@ -435,7 +472,7 @@ for (const [host, path] of [[HOST, '/'], [PLATFORM_HOST, '/'], [PLATFORM_HOST, '
   }
 }
 
-for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 360, height: 800 }]) {
+for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 360, height: 800 }, { width: 430, height: 932 }, { width: 844, height: 390 }]) {
   test(`all page sections and panel views reflow and pass Axe at ${viewport.width}px`, async ({ landingPage: page }, testInfo) => {
     test.setTimeout(90_000);
     await page.setViewportSize(viewport);
@@ -491,41 +528,111 @@ test('another tenant reuses the composition with its own brand, destination, fon
 });
 
 for (const [locale, path] of [['en', '/'], ['es', '/es/']] as const) {
-  test(`1Platform ${locale} resolves the shared design with its own pricing and CTA`, async ({ landingPage: page }) => {
+  test(`1Platform ${locale} resolves infrastructure from API content with independent brand and destinations`, async ({ landingPage: page }) => {
     const response = await page.goto(`http://${PLATFORM_HOST}:${appPort}${path}`);
     expect(response?.status()).toBe(200);
-    await expect(page.locator('body')).toHaveAttribute('data-home-template', 'photographic-service');
-    await expect(page.locator('body')).toHaveAttribute('data-enhanced', 'true');
+    await expect(page.locator('[data-infrastructure-home]')).toBeVisible();
+    await expect(page.locator('.photographic-service')).toHaveCount(0);
     expect(resolvedHosts.has(PLATFORM_HOST)).toBe(true);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://${PLATFORM_HOST}${path}`);
-    await expect(page.locator('.site-header .wordmark')).toHaveText('Platform');
+    await expect(page.locator('.brand-header .brand-lockup')).toContainText(platformTenant.brand_wordmark!);
     await expect(page.locator('link[hreflang="x-default"]')).toHaveAttribute('href', `https://${PLATFORM_HOST}/`);
     await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveCount(1);
     await expect(page.locator('link[rel="sitemap"]')).toHaveAttribute('href', '/sitemap-index.xml');
     await expect(page.locator('link[type="application/rss+xml"]')).toHaveAttribute('href', locale === 'en' ? '/rss.xml' : '/es/rss.xml');
     await expect(page.locator('h1')).toHaveCSS('font-family', /Manrope/);
-    await expect(page.locator('.panel-demo')).toHaveCSS('font-family', /PanelInter/);
-    await expect(page.locator('.pricing-card')).toBeVisible();
-    await expect(page.locator('#price-calculator')).toHaveCount(0);
-    await expect(page.locator('.pricing-card')).toContainText('USD');
+    await expect(page.locator('.pricing-card, #price-calculator, .panel-demo')).toHaveCount(0);
     const text = await page.locator('body').innerText();
-    expect(text).not.toMatch(/Medipago|médicos?|consultorio|4\.9%|WhatsApp|\bGTQ\b/i);
+    expect(text).not.toMatch(/Medipago|médicos?|consultorio|4\.9%|\bGTQ\b|\bUSD\b/i);
     const configured = platformContent.get(locale)!.data.messages;
-    await expect(page.locator('.onboarding-copy h2')).toHaveText(configured['photographic.onboarding.title']);
-    await expect(page.locator('.onboarding-copy p').last()).toHaveText(configured['photographic.onboarding.description']);
-    await expect(page.locator('.onboarding-copy')).toContainText('consulta@minombre.com');
-    await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
-    expect(text).toMatch(locale === 'en' ? /fictional/i : /fictici/i);
-    for (const href of await page.locator('[data-support-cta]').evaluateAll((links) => links.map((link) => link.getAttribute('href')))) {
-      expect(href).toBe(platformTenant.destinations.app);
-    }
-    await expect(page.locator('.landing-product-links a')).toHaveCount(7);
-    await expect(page.locator('.site-footer a[href^="/es/"]')).toHaveCount(locale === 'es' ? 16 : 0);
+    await expect(page.locator('.hero h1')).toHaveText(configured['infrastructure.hero.title'] + configured['infrastructure.hero.titleEmphasis']);
+    await expect(page.locator('.brand-cta')).toHaveAttribute('href', platformTenant.destinations.support!);
+    await expect(page.locator('.developers .button')).toHaveAttribute('href', new URL('/docs/saas/1platform-api/getting-started/', platformTenant.destinations.docs!).toString());
+    await expect(page.locator('.brand-nav a')).toHaveText(Array.from({ length: 6 }, (_, index) => configured[`site.navigation.${index}.label`]));
+    await expect(page.locator('[data-capability]')).toHaveCount(10);
+    await expect(page.locator('[data-capability][aria-pressed="true"]')).toHaveCount(3);
     await page.setViewportSize({ width: 390, height: 844 });
     await checkOverflow(page);
-    await expect(page.locator('.site-header')).toHaveCSS('position', 'fixed');
-    await expect(page.locator('.menu-toggle')).toBeVisible();
+    await expect(page.locator('.brand-header')).toHaveCSS('position', 'fixed');
+    const menu = page.locator('.brand-menu-toggle');
+    await menu.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#brand-mobile-nav')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeFocused();
+    await expect(page.locator('#brand-mobile-nav')).toBeHidden();
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(results.violations).toEqual([]);
+    // A subsequent host resolution in the same browser must restore Medipago's
+    // own composition, commission and contact, without retaining brand tokens.
+    await gotoLanding(page, HOST);
+    await expect(page.locator('[data-infrastructure-home], .brand-header')).toHaveCount(0);
+    await expect(page.locator('[data-commission]')).toHaveText('4.9%');
+    await expect(page.locator('.site-header .wordmark')).toHaveText('Medipago');
+    await expect(page.locator('[data-support-cta="header"]')).toHaveAttribute('href', /^https:\/\/wa\.me\/50244866448\?text=/);
   });
+
+  for (const width of [1440, 390]) {
+    test(`infrastructure autoplay is continuous, visibility-aware and reduced-motion safe: ${locale} ${width}px`, async ({ landingPage: page }) => {
+      await page.setViewportSize({ width, height: width === 1440 ? 900 : 844 });
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      await page.goto(`http://${PLATFORM_HOST}:${appPort}${path}`);
+      const wire = page.locator('.hero-wire-travel').first();
+      await expect(wire).toHaveCSS('animation-iteration-count', 'infinite');
+      await expect(wire).toHaveCSS('animation-play-state', 'running');
+      const first = await wire.evaluate((element) => getComputedStyle(element).strokeDashoffset);
+      await expect.poll(() => wire.evaluate((element) => getComputedStyle(element).strokeDashoffset)).not.toBe(first);
+      await page.locator('#arquitectura').scrollIntoViewIfNeeded();
+      await expect(wire).toHaveCSS('animation-play-state', 'paused');
+      await wire.evaluate(async (element) => { await Promise.all(element.getAnimations().map((animation) => animation.ready)); });
+      const paused = await wire.evaluate((element) => getComputedStyle(element).strokeDashoffset);
+      await page.waitForTimeout(200);
+      expect(await wire.evaluate((element) => getComputedStyle(element).strokeDashoffset)).toBe(paused);
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+      await expect(wire).toHaveCSS('animation-play-state', 'running');
+      await expect.poll(() => wire.evaluate((element) => getComputedStyle(element).strokeDashoffset)).not.toBe(paused);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await expect(wire).toHaveCSS('animation-name', 'none');
+      await expect(page.locator('[data-replay], .hero-motion')).toHaveCount(0);
+    });
+  }
 }
+
+test('tenant access keeps login and WhatsApp onboarding reachable with tenant-owned destinations', async ({ landingPage: page }) => {
+  await gotoLanding(page, ACCESS_HOST);
+  await expect(page.locator('[data-access-entry]')).toHaveCount(2);
+  await page.locator('.header-access').click();
+  await expect(page).toHaveURL(new RegExp('/acceso/$'));
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Su panel,a un paso');
+  await expect(page.locator('[data-access-action="login"]')).toHaveAttribute('href', 'https://panel.commerce.example/auth/login');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://${ACCESS_HOST}/acceso/`);
+  await page.getByRole('link', { name: 'Solicitar acceso', exact: true }).click();
+  await expect(page).toHaveURL(new RegExp('/solicitar-acceso/$'));
+  const contact = new URL((await page.locator('[data-access-action="support"]').getAttribute('href'))!);
+  expect(contact.origin + contact.pathname).toBe('https://wa.me/15035550123');
+  expect(contact.searchParams.get('text')).toContain('Comercio Aurora');
+  await expect(page.locator('body')).not.toContainText('Medipago');
+  await expect(page.getByRole('link', { name: 'Ya tengo usuario', exact: true })).toHaveAttribute('href', 'https://panel.commerce.example/auth/login');
+  const result = await new AxeBuilder({ page }).analyze();
+  expect(result.violations).toEqual([]);
+  await page.getByRole('link', { name: 'Volver al inicio', exact: true }).click();
+  await expect(page).toHaveURL(`http://${ACCESS_HOST}:${appPort}/`);
+  await gotoLanding(page);
+  await expect(page.locator('[data-access-entry]')).toHaveCount(0);
+  expect((await getWithHost(`${appBaseUrl}/acceso/`, HOST)).status).toBe(404);
+});
+
+test('tenant access remains readable and navigable on narrow and landscape screens', async ({ landingPage: page }) => {
+  for (const [width, height] of [[320, 740], [390, 844], [844, 390], [1440, 900]]) {
+    await page.setViewportSize({ width, height });
+    await gotoLanding(page, ACCESS_HOST);
+    await expect(page.locator('.header-access')).toBeVisible();
+    await checkOverflow(page);
+    await page.locator('.header-access').click();
+    await expect(page.locator('[data-access-action="login"]')).toBeVisible();
+    await checkOverflow(page);
+    await page.getByRole('link', { name: 'Solicitar acceso', exact: true }).click();
+    await expect(page.locator('[data-access-action="support"]')).toBeVisible();
+    await checkOverflow(page);
+  }
+});

@@ -1,0 +1,62 @@
+[
+  {
+    "role": "body",
+    "text": "#172640",
+    "background": "#ffffff",
+    "ratio": 15.13
+  },
+  {
+    "role": "secondary",
+    "text": "#5c697b",
+    "background": "#ffffff",
+    "ratio": 5.58
+  },
+  {
+    "role": "secondary surface",
+    "text": "#5c697b",
+    "background": "#f2f5f7",
+    "ratio": 5.1
+  },
+  {
+    "role": "links",
+    "text": "#2854a7",
+    "background": "#ffffff",
+    "ratio": 7.2
+  },
+  {
+    "role": "toc",
+    "text": "#586779",
+    "background": "#ffffff",
+    "ratio": 5.78
+  },
+  {
+    "role": "feature description",
+    "text": "#536175",
+    "background": "#f5f7f7",
+    "ratio": 5.86
+  },
+  {
+    "role": "article body",
+    "text": "#334258",
+    "background": "#ffffff",
+    "ratio": 10.19
+  },
+  {
+    "role": "button",
+    "text": "#ffffff",
+    "background": "#0d1c3a",
+    "ratio": 16.88
+  },
+  {
+    "role": "feature metadata",
+    "text": "#b4c8e8",
+    "background": "#0d1c3a",
+    "ratio": 9.94
+  },
+  {
+    "role": "steps",
+    "text": "#bfccdf",
+    "background": "#0d1c3a",
+    "ratio": 10.38
+  }
+]

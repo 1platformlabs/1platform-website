@@ -68,7 +68,7 @@ function pathOfPageModule(file: string): string | null {
  * `/404` is not a page anyone should be sent to, and the two `.well-known`-ish
  * files are not pages at all.
  */
-const NEVER_INDEXED = new Set(['/404/'])
+const NEVER_INDEXED = new Set(['/404/', '/access/', '/request-access/'])
 
 export interface SiteUrl {
   /** Root-relative, always with a trailing slash except the root itself. */
@@ -103,12 +103,12 @@ export interface SiteUrl {
  * actually served by a file. A manifest naming a page nobody implemented is a
  * sitemap entry that 404s, which is worse than omitting it.
  */
-export async function publishedUrls(tenant: SiteTenant): Promise<SiteUrl[]> {
+export async function publishedUrls(tenant: SiteTenant, excludedRoutes: readonly string[] = []): Promise<SiteUrl[]> {
   const locales = localesOf(tenant)
   const localise = makeLocalizePath(tenant)
   const bilingual = locales.includes('en') && locales.includes('es')
 
-  const canonical = tenant.pages.filter((p) => !NEVER_INDEXED.has(p))
+  const canonical = tenant.pages.filter((p) => !NEVER_INDEXED.has(p) && !excludedRoutes.includes(p))
 
   const all = [
     ...new Set(canonical.flatMap((path) => locales.map((locale) => localise(path, locale)))),

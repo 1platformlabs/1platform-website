@@ -57,15 +57,15 @@ const LOCALES = [
 ];
 
 const REGIONS: Record<string, RegExp> = {
-  'desktop rail': /<nav class="site-header__nav"[\s\S]*?<\/nav>/,
-  'mobile menu': /<div class="mobile-menu"[\s\S]*?<\/header>/,
+  'desktop rail': /<nav class="brand-nav"[\s\S]*?<\/nav>/,
+  'mobile menu': /<nav class="brand-mobile-nav"[\s\S]*?<\/nav>/,
 };
 
 /** Internal hrefs (leading "/") found inside one region of the header markup. */
 function internalHrefs(html: string, region: RegExp, label: string): string[] {
   const block = html.match(region)?.[0];
   if (!block) throw new Error(`the ${label} region did not match — the selector went stale`);
-  return [...new Set([...block.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]))];
+  return [...new Set([...block.matchAll(/href="(\/[^"]*)"/g)].map((m) => m[1]))];
 }
 
 /**
@@ -127,7 +127,7 @@ for (const { label, standardPage } of LOCALES) {
         hrefs.length,
         `no internal links found in the ${label} ${region} — a probe that enumerates ` +
           `nothing is a broken probe, not a pass`,
-      ).toBeGreaterThan(5);
+      ).toBe(4);
 
       // Sequential on purpose. `served.ts` sends `Connection: close`, so every
       // request is its own socket; firing all four tests' links at once made the
@@ -137,7 +137,9 @@ for (const { label, standardPage } of LOCALES) {
       // for.
       const unresolved: string[] = [];
       for (const href of hrefs) {
-        const { ok, trail } = await resolveLink(href);
+        const target = new URL(href, 'https://example.test');
+        const { ok, trail } = await resolveLink(target.pathname);
+        if (target.hash) expect(await servedHtml(target.pathname)).toContain(`id="${target.hash.slice(1)}"`);
         if (!ok) unresolved.push(trail);
       }
 

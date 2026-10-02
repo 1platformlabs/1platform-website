@@ -90,13 +90,11 @@ test('the accent ramp matches the API golden vectors channel for channel', () =>
 })
 
 test('a tenant whose accent IS the compiled one emits nothing', () => {
-  // This is not a micro-optimisation: it is the byte-for-byte no-regression of
-  // 1platform.pro. An unconditional block took the comparator from 51 identical
-  // to 1 — measured, not feared.
-  const platform = repoTenants().find((t) => t.slug === 'oneplatform')
-  expect(platform, 'the platform tenant is missing from the repo manifest').toBeTruthy()
-  expect(platform!.theme.accent.toLowerCase()).toBe(COMPILED_DEFAULTS.accent)
-  expect(themeDeclarations(platform!)).toBe('')
+  // The legacy emitter still suppresses its compiled defaults. 1Platform now
+  // opts into a new palette, so this control declares the historical data.
+  const base = repoTenants().find((t) => t.slug === 'oneplatform')!
+  const legacy = { ...base, theme: { ...COMPILED_DEFAULTS } }
+  expect(themeDeclarations(legacy)).toBe('')
 })
 
 test('a tenant with its own accent emits it, with its derivatives', () => {
@@ -174,16 +172,14 @@ test('a manifest cannot write a stylesheet through the accent', () => {
  * tenant #1 declared `instrument-serif` while the site drew Space Grotesk, and
  * every tenant titled the same regardless of what it declared.
  */
-test('tenant #1’s corrected font IS the compiled default, so it stays untouched', () => {
-  // This is the other half of the byte-for-byte guarantee: fixing the DATA
-  // (site-tenants.ts) rather than inventing a mapping is only safe if the
-  // corrected value actually resolves to what global.css compiles.
+test('1Platform declares its approved Manrope font and blue, while compiled defaults remain supported', () => {
   const platform = repoTenants().find((t) => t.slug === 'oneplatform')!
-  expect(
-    platform.theme.display_font,
-    'tenant #1 must declare the family its own site draws, or this test would not catch a re-introduced mismatch',
-  ).toBe(COMPILED_DEFAULTS.display_font)
-  expect(themeDeclarations(platform)).toBe('')
+  expect(platform.theme.display_font).toBe('manrope')
+  expect(platform.theme.accent).toBe('#2854a7')
+  const emitted = themeDeclarations(platform)
+  expect(emitted).toContain(`--font-display:${DISPLAY_FONT_STACKS.manrope}`)
+  expect(emitted).toContain('--color-accent:#2854a7')
+  expect(themeDeclarations({ ...platform, theme: { ...COMPILED_DEFAULTS } })).toBe('')
 })
 
 test('a tenant with its own display_font emits --font-display', () => {
@@ -250,7 +246,7 @@ test('Logo consumes the explicit lockup and never cuts the brand name', () => {
   ])
 })
 
-test('the SERVED page carries the tenant’s accent, and tenant #1 is untouched', async () => {
+test('the SERVED page carries each tenant’s declared accent', async () => {
   // The story is explicit that the config object is not enough: it has to be in
   // what the browser receives.
   for (const tenant of repoTenants()) {
@@ -334,7 +330,7 @@ test('the browser computes the clinic accent, ink and display face', async ({ br
  * page. `aria-hidden`, so nothing announced it, but plainly visible, and no
  * sweep could have caught it: "1P" is far too short to blocklist.
  */
-test('the invoice mockup carries the TENANT’s mark, not the platform’s', async () => {
+test('the infrastructure and invoice illustrations carry the TENANT’s mark', async () => {
   const { brandChip } = await import('../src/lib/tenant-theme')
 
   // Tenant #1 must be unchanged — `1P` is what the frozen baseline holds, and
@@ -355,6 +351,11 @@ test('the invoice mockup carries the TENANT’s mark, not the platform’s', asy
     if (!tenant.pages.includes('/')) continue
     const res = await getWithHost(`${BASE}/`, tenant.domain)
     expect(res.status).toBe(200)
+    if (res.body.includes('data-infrastructure-home')) {
+      const rendered = /class="integration-logo"[^>]*>([^<]*)</s.exec(res.body)?.[1]
+      expect(rendered, `${tenant.slug}: infrastructure must carry its tenant mark`).toBe(tenant.brand_mark ?? tenant.brand_name)
+      continue
+    }
     if (tenant.home_template === 'photographic-service') {
       const rendered = /class="product-panel invoice-panel">.*?class="mini-mark">([^<]*)</s.exec(res.body)?.[1]
       expect(rendered, `${tenant.slug}: photographic invoice must carry its tenant mark`).toBe(tenant.brand_mark ?? tenant.brand_name)

@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { ES_PATHS, movedEsPaths } from '../src/i18n/routes';
+import { repoTenantForHost } from '../src/data/site-tenants';
 import { publishedPages, publishedRoutes, servedHead, servedText } from './helpers/served';
 
 /**
@@ -57,6 +58,21 @@ test('the map is a bijection and both sides of every pair answer', async () => {
     // claim, made against the thing that serves it rather than a file that
     // happened to be next to it.
     const [en, es] = await Promise.all([servedHead(canonical), servedHead(translated)]);
+    // Route translations also describe opt-in pages. An unpublished page must
+    // remain a 404 on this host; its enabled tenant is exercised separately.
+    if (!canonical.startsWith('/blog/') && !repoTenantForHost('1platform.pro')!.pages.includes(canonical)) {
+      expect(en.status, canonical).toBe(404);
+      expect(es.status, translated).toBe(404);
+      continue;
+    }
+    if (canonical === '/for-developers/') {
+      for (const [path, response] of [[canonical, en], [translated, es]] as const) {
+        expect(response.status, path).toBe(301);
+        expect(response.location, path).toBe('https://developer.1platform.pro/docs/saas/1platform-api/getting-started');
+        expect(response.body, path).not.toMatch(/<html|<title|<body[\s>]/i);
+      }
+      continue;
+    }
     if (en.status !== 200) offences.push(`${canonical} — no English page (HTTP ${en.status})`);
     if (es.status !== 200) offences.push(`${translated} — no Spanish page (HTTP ${es.status})`);
   }

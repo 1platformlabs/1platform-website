@@ -34,38 +34,15 @@ test('the picker chooses the newest entry and returns null for an empty changelo
   expect(picked?.title).toBe('newest');
 });
 
-for (const [path, locale, cta] of [
-  ['/pricing/', 'en', 'See what changed'],
-  ['/es/precios/', 'es', 'Ver qué cambió'],
-] as const) {
-  test(`${path}: a 40 px fixed bar shows the newest ${locale} changelog title and links to the changelog`, async ({
-    page,
-  }) => {
+for (const [path, locale] of [['/pricing/', 'en'], ['/es/precios/', 'es']] as const) {
+  test(`${path}: infrastructure chrome preserves its approved position and the changelog stays accessible`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(path);
-
-    const bar = page.locator('aside.announcement[role="note"]');
-    await expect(bar).toBeVisible();
-    const box = await bar.evaluate((el) => {
-      const r = el.getBoundingClientRect();
-      return { top: r.top, height: r.height, position: getComputedStyle(el).position };
-    });
-    expect(box.top).toBe(0);
-    expect(box.height).toBe(40);
-    expect(box.position).toBe('fixed');
-
-    await expect(bar.locator('.announcement__title')).toHaveText(newestTitle(locale));
-    const link = bar.locator('a.announcement__link');
-    await expect(link).toHaveText(new RegExp(cta));
-    await expect(link).toHaveAttribute('href', locale === 'es' ? '/es/novedades/' : '/changelog/');
-
-    // The rail keeps a breathing gap below the announcement and remains fixed.
-    const headerTop = () => page.locator('header.site-header').evaluate((el) => el.getBoundingClientRect().top);
-    expect(await headerTop()).toBe(72);
-    await page.mouse.wheel(0, 1600);
-    await page.waitForTimeout(300);
-    expect(await headerTop()).toBe(72);
-    expect(await bar.evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
+    await expect(page.locator('aside.announcement')).toHaveCount(0);
+    await expect(page.locator('header.brand-header')).toBeVisible();
+    expect(await page.locator('header.brand-header').evaluate(el => el.getBoundingClientRect().top)).toBe(24);
+    await page.goto(locale === 'es' ? '/es/novedades/' : '/changelog/');
+    await expect(page.locator('main')).toContainText(newestTitle(locale));
   });
 }
 
@@ -111,14 +88,14 @@ test('the offset the bar adds reaches every anchor: a hash navigation leaves the
  */
 test('the changelog strip appears only for a tenant that publishes the changelog', async () => {
   const { getWithHost } = await import('./helpers/http-host')
-  const { repoTenants } = await import('../src/data/site-tenants')
+  const { repoTenants, repoContentOverrides } = await import('../src/data/site-tenants')
   const base = `http://127.0.0.1:${process.env.PLAYWRIGHT_PORT ?? '4321'}`
 
   const tenants = repoTenants()
   expect(tenants.length, 'a cross-tenant assertion needs at least two tenants').toBeGreaterThanOrEqual(2)
 
   for (const tenant of tenants) {
-    const publishes = tenant.pages.includes('/changelog/')
+    const publishes = tenant.pages.includes('/changelog/') && repoContentOverrides(tenant)['site.theme.profile'] !== 'infrastructure'
     // The 404 page is the one page EVERY tenant renders, and the only one a
     // page-set enumeration can never reach — which is exactly where the leak
     // was found. Asking for a route nobody publishes is how we get it.

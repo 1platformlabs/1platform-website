@@ -7,6 +7,12 @@
  * tables used entity glyphs. Adding an icon means adding it here.
  */
 export type IconName =
+  | 'arrow-up-right'
+  | 'arrow-right-short'
+  | 'payment-card'
+  | 'receipt'
+  | 'storefront'
+  | 'globe-meridian'
   | 'cart'
   | 'content'
   | 'dashboard'
@@ -55,6 +61,13 @@ export type IconName =
   | 'store';
 
 export const iconPaths: Record<IconName, string> = {
+  // Approved photographic interiors; existing glyphs remain stable for other tenants.
+  'arrow-up-right': '<path d="M6 18 18 6M6 6h12v12"/>',
+  'arrow-right-short': '<path d="M4 12h15m-6-6 6 6-6 6"/>',
+  'payment-card': '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20M6 15h4"/>',
+  receipt: '<path d="M5 3v18l3-2 4 2 4-2 3 2V3l-3 2-4-2-4 2-3-2Zm4 6h6m-6 4h6"/>',
+  storefront: '<path d="M3 9h18l-2-6H5L3 9Zm1 0v12h16V9M9 21v-7h6v7"/>',
+  'globe-meridian': '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
   cart: '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
   content: '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>',
   dashboard: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 7h20"/><path d="M7 12h2"/><path d="M11 12h6"/><path d="M7 15h10"/>',
