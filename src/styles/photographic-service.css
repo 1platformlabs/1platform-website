@@ -2944,3 +2944,22 @@ body.photographic-service {
 .photographic-service .rate-field + .calc-submit {
   margin-top: 24px;
 }
+
+/* Compact type scale (`theme.typeScale`): the composition's own sizes. The page
+   still bundles the legacy layout typography, so the eyebrow keeps the tenant
+   font the readability revision restores, and the navigation its base rhythm. */
+.photographic-service[data-type-scale="compact"] .eyebrow {
+  display: block;
+  font-family: var(--body);
+}
+.photographic-service[data-type-scale="compact"] [data-tenant-access] .desktop-nav {
+  gap: clamp(14px, 1.8vw, 28px);
+}
+.photographic-service[data-type-scale="compact"] .panel-intro {
+  margin-bottom: 44px;
+}
+@media (max-width: 760px) {
+  .photographic-service[data-type-scale="compact"] .panel-intro {
+    gap: 22px;
+  }
+}
