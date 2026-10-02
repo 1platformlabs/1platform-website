@@ -64,6 +64,16 @@ accessFixture.pagesResponse.data.slug = accessFixture.tenant.slug;
 Object.assign(accessFixture.pagesResponse.data.messages, accessMessages.es, requestAccessMessages.es, {
   'photographic.theme.palette': 'brand', 'photographic.hero.image': 'commerce',
 });
+// A commerce tenant with every optional block: Delivery, the named advertising
+// channel, five shortcuts, the sales route and a visitor-entered percentage.
+const COMMERCE_HOST = 'vendefacil.1platform.pro';
+const commerce = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/vendefacil-site.json'), 'utf8')) as SiteFixture;
+// The same tenant's content as PROD served it on 2026-10-02, before it opts in:
+// deploying this renderer ahead of the content activation must keep it serving.
+const PLAIN_COMMERCE_HOST = 'commerce-plain.example';
+const plainCommerce = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/vendefacil-live-site.json'), 'utf8')) as SiteFixture;
+plainCommerce.tenant = { ...plainCommerce.tenant, slug: 'commerce-plain', domain: PLAIN_COMMERCE_HOST };
+plainCommerce.pagesResponse.data.slug = plainCommerce.tenant.slug;
 alternate.pagesResponse.data.messages['photographic.calculator.commissionBasisPoints'] = '350';
 for (const page of alternate.pagesResponse.data.pages) {
   if ('photographic.calculator.commissionBasisPoints' in page.blocks) {
@@ -150,13 +160,13 @@ test.beforeAll(async () => {
       const host = url.searchParams.get('host') ?? '';
       resolvedHosts.add(host);
       if (host === PLATFORM_HOST) return response.end(JSON.stringify({ success: true, data: platformTenant, msg: 'Site resolved' }));
-      const selected = host === HOST ? fixture : host === ALTERNATE_HOST ? alternate : host === ACCESS_HOST ? accessFixture : null;
+      const selected = ({ [HOST]: fixture, [ALTERNATE_HOST]: alternate, [ACCESS_HOST]: accessFixture, [COMMERCE_HOST]: commerce, [PLAIN_COMMERCE_HOST]: plainCommerce } as Record<string, SiteFixture>)[host] ?? null;
       if (selected) return response.end(JSON.stringify({ success: true, data: selected.tenant, msg: 'Site resolved' }));
     } else {
       const match = /\/sites\/([^/]+)\/pages$/.exec(url.pathname);
       const content = match?.[1] === platformTenant.slug ? platformContent.get(url.searchParams.get('locale') ?? '') : null;
       if (content) return response.end(JSON.stringify(content));
-      const selected = [fixture, alternate, accessFixture].find((candidate) => candidate.tenant.slug === match?.[1]);
+      const selected = [fixture, alternate, accessFixture, commerce, plainCommerce].find((candidate) => candidate.tenant.slug === match?.[1]);
       if (selected && url.searchParams.get('locale') === selected.tenant.default_locale) {
         return response.end(JSON.stringify(selected.pagesResponse));
       }
@@ -181,7 +191,7 @@ test.beforeAll(async () => {
     try { return (await getWithHost(`${appBaseUrl}/`, HOST)).status; } catch { return 0; }
   }, { timeout: 30_000, message: 'The built tenant route must start' }).toBe(200);
   tenantBrowser = await chromium.launch({
-    args: [`--host-resolver-rules=MAP ${HOST} 127.0.0.1, MAP ${ALTERNATE_HOST} 127.0.0.1, MAP ${PLATFORM_HOST} 127.0.0.1, MAP ${ACCESS_HOST} 127.0.0.1`],
+    args: [`--host-resolver-rules=${[HOST, ALTERNATE_HOST, PLATFORM_HOST, ACCESS_HOST, COMMERCE_HOST, PLAIN_COMMERCE_HOST].map((name) => `MAP ${name} 127.0.0.1`).join(', ')}`],
   });
 });
 
@@ -634,5 +644,204 @@ test('tenant access remains readable and navigable on narrow and landscape scree
     await page.getByRole('link', { name: 'Solicitar acceso', exact: true }).click();
     await expect(page.locator('[data-access-action="support"]')).toBeVisible();
     await checkOverflow(page);
+  }
+});
+
+const commerceMessages = commerce.pagesResponse.data.messages;
+const commerceSupport = commerce.tenant.destinations.support!;
+
+test('a commerce tenant serves five solutions, Delivery, the named ad channel and the sales route with its own WhatsApp messages', async ({ landingPage: page }) => {
+  const raw = await getWithHost(`${appBaseUrl}/`, COMMERCE_HOST);
+  expect(raw.status).toBe(200);
+  expect(raw.body).not.toMatch(/contact-dialog|copy-message|PROTOTYPE|prototipo|\{ads(Name|Network)/);
+  await gotoLanding(page, COMMERCE_HOST);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+  await expect(page.locator('body')).toHaveAttribute('data-type-scale', 'compact');
+  await expect(page.locator('.solution-navigation a')).toHaveText(['Cobros presenciales', 'Enlaces de cobro', 'Facturación', 'Delivery', 'Meta Ads']);
+  await expect(page.locator('.service-card')).toHaveCount(3);
+  await expect(page.locator('.business-card')).toHaveCount(2);
+  await expect(page.locator('#delivery .delivery-milestone strong')).toHaveText(['Preparado', 'En camino', 'Entregado']);
+  await expect(page.locator('#anuncios .campaign-channels')).toHaveText('Facebook · Instagram');
+  await expect(page.locator('#anuncios .eyebrow')).toHaveText('Meta Ads');
+  await expect(page.locator('.business-route strong')).toHaveText(['Meta Ads', 'Cobros', 'Facturación', 'Delivery']);
+  expect(await page.locator('.hero-capabilities use').evaluateAll((uses) => uses.map((use) => use.getAttribute('href')))).toEqual(['#i-receipt', '#i-truck', '#i-megaphone']);
+  for (const id of ['i-truck', 'i-megaphone']) await expect(page.locator(`symbol#${id}`)).toHaveCount(1);
+  await expect(page.locator('.button-header')).toContainText('Quiero cobrar');
+  await expect(page.locator('.site-footer .footer-contact')).toContainText('Quiero empezar');
+  await expect(page.locator('.site-footer a[href="/solicitar-acceso/"]')).toHaveText('Solicitar acceso');
+  // Every contact goes to the tenant's own WhatsApp with the message of its context.
+  const destinations = await page.locator('[data-support-cta]').evaluateAll((links) => links.map((link) => ({
+    placement: link.getAttribute('data-support-cta')!, href: link.getAttribute('href')!,
+  })));
+  expect(new Set(destinations.map((item) => item.placement))).toEqual(new Set(['header', 'hero', 'panel', 'onboarding', 'calculator', 'question', 'closing', 'footer', 'delivery', 'ads']));
+  for (const { placement, href } of destinations) {
+    const url = new URL(href);
+    expect(`${url.origin}${url.pathname}`).toBe(commerceSupport);
+    const expected = commerceMessages[`photographic.contact.messages.${placement}`]
+      .replaceAll('{adsName}', 'Meta Ads').replaceAll('{adsNetwork1}', 'Facebook').replaceAll('{adsNetwork2}', 'Instagram');
+    expect(url.searchParams.get('text'), placement).toBe(expected);
+  }
+  // Shortcuts and footer links land on blocks this page renders; Meta Ads is a tenant service, not a hidden provider.
+  const anchors = await page.locator('a[href^="#"]').evaluateAll((links) => links.map((link) => link.getAttribute('href')!.slice(1)));
+  for (const id of new Set(anchors)) await expect(page.locator(`[id="${id}"]`)).toHaveCount(1);
+  await page.locator('.solution-navigation a[href="#anuncios"]').click();
+  await expect(page).toHaveURL(/#anuncios$/);
+  const text = await page.locator('body').innerText();
+  expect(text).not.toMatch(/Medipago|médic|consultorio|4\.9|\{ads/i);
+});
+
+test('the visitor types the commission: empty at first, validated per field and never a tenant rate', async ({ landingPage: page }) => {
+  await gotoLanding(page, COMMERCE_HOST);
+  const amount = page.locator('#calc-amount');
+  const rate = page.locator('#calc-rate');
+  const submit = page.locator('#price-calculator button[type="submit"]');
+  await expect(rate).toHaveValue('');
+  await expect(rate).toHaveAttribute('placeholder', 'Ingrese un porcentaje');
+  await expect(page.locator('[data-commission], .calc-pricing')).toHaveCount(0);
+  await expect(page.locator('#calc-net')).toHaveText('—');
+  await expect(page.locator('#calc-status')).toHaveText(commerceMessages['photographic.calculator.empty']);
+  await submit.click();
+  await expect(rate).toBeFocused();
+  await expect(rate).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#calc-error')).toHaveText(commerceMessages['photographic.calculator.invalidRate']);
+  await expect(page.locator('#calc-status')).toHaveText(commerceMessages['photographic.calculator.incomplete']);
+  await amount.fill('250');
+  await rate.fill('3,50');
+  await expect(rate).not.toHaveAttribute('aria-invalid');
+  await expect(page.locator('#calc-error')).toBeEmpty();
+  await rate.press('Enter');
+  await expect(page.locator('#calc-net')).toHaveText(/Q\s?241\.25/);
+  await expect(page.locator('#calc-fee')).toHaveText(/Q\s?8\.75/);
+  await expect(page.locator('#calc-status')).toHaveText(commerceMessages['photographic.calculator.done']);
+  await amount.fill('0');
+  await expect(page.locator('#calc-net')).toHaveText('—');
+  await expect(page.locator('#calc-status')).toHaveText(commerceMessages['photographic.calculator.changed']);
+  await submit.click();
+  await expect(amount).toBeFocused();
+  await expect(amount).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#calc-error')).toHaveText(commerceMessages['photographic.calculator.invalidAmount']);
+  for (const invalid of ['100.01', '-1', '1e2', '3.333']) {
+    await amount.fill('100');
+    await rate.fill(invalid);
+    await submit.click();
+    await expect(rate, invalid).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#calc-fee')).toHaveText('—');
+  }
+  await rate.fill('100');
+  await submit.click();
+  await expect(page.locator('#calc-net')).toHaveText(/Q\s?0\.00/);
+});
+
+test('without JavaScript the commerce landing keeps every block and explains the disabled simulation', async () => {
+  if (!tenantBrowser) throw new Error('Tenant browser is not running');
+  const context = await tenantBrowser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  try {
+    expect((await page.goto(`http://${COMMERCE_HOST}:${appPort}/`))?.status()).toBe(200);
+    await expect(page.locator('#calc-amount')).toBeDisabled();
+    await expect(page.locator('#calc-rate')).toBeDisabled();
+    await expect(page.locator('#price-calculator button[type="submit"]')).toBeDisabled();
+    await expect(page.locator('#calc-status')).toHaveText(commerceMessages['photographic.ui.calculator_nojs']);
+    for (const name of ['summary', 'billing', 'withdrawals']) await expect(page.locator(`#panel-${name}`)).toBeVisible();
+    await expect(page.locator('.business-card .vertical-panel')).toHaveCount(2);
+    for (const panel of await page.locator('.business-card .vertical-panel').all()) await expect(panel).toBeVisible();
+    await expect(page.locator('#faq-list > details')).toHaveCount(6);
+    await checkOverflow(page);
+  } finally { await context.close(); }
+});
+
+test('the verticals animate on entry and re-entry, pause with the tab hidden and stay still with reduced motion', async ({ landingPage: page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await gotoLanding(page, COMMERCE_HOST);
+  await expect(page.locator('[data-replay], .hero-motion, [data-motion-toggle]')).toHaveCount(0);
+  for (const card of await page.locator('.business-card').all()) {
+    await card.locator('.service-stage').scrollIntoViewIfNeeded();
+    await expect(card).toHaveAttribute('data-animated', '');
+    await expect(card).toHaveAttribute('data-playing', 'true');
+    await expect.poll(() => card.evaluate((element) => element.getAnimations({ subtree: true }).filter((animation) => animation.playState === 'running').length)).toBeGreaterThan(0);
+    const firstStart = await card.evaluate((element) => element.getAnimations({ subtree: true })[0].startTime);
+    // A hidden tab pauses the sequence where it is, without restarting it.
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect(card).toHaveAttribute('data-playing', 'false');
+    await expect(card).toHaveAttribute('data-animated', '');
+    await expect.poll(() => card.evaluate((element) => element.getAnimations({ subtree: true }).every((animation) => animation.playState !== 'running'))).toBe(true);
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect(card).toHaveAttribute('data-playing', 'true');
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await expect(card).not.toHaveAttribute('data-animated');
+    await card.locator('.service-stage').scrollIntoViewIfNeeded();
+    await expect.poll(() => card.evaluate((element) => element.getAnimations({ subtree: true })[0]?.startTime)).toBeGreaterThan(Number(firstStart));
+  }
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const card of await page.locator('.business-card').all()) {
+    await expect(card).not.toHaveAttribute('data-animated');
+    expect(await card.evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(0);
+  }
+});
+
+for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 844, height: 390 }]) {
+  test(`the commerce landing reflows, keeps its menu, panel and FAQ usable and passes Axe at ${viewport.width}×${viewport.height}`, async ({ landingPage: page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await gotoLanding(page, COMMERCE_HOST);
+    await page.locator('.onboarding-photo').scrollIntoViewIfNeeded();
+    await expect.poll(() => page.locator('img').evaluateAll((images) => images.every((image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0))).toBe(true);
+    await checkOverflow(page);
+    if (viewport.width < 981) {
+      const toggle = page.locator('.menu-toggle');
+      await toggle.click();
+      await expect(page.locator('#mobile-menu a')).toHaveText(['Soluciones', 'Cómo funciona', 'Su panel', 'Para quién', 'Calculadora', 'Preguntas']);
+      await page.keyboard.press('Escape');
+      await expect(toggle).toBeFocused();
+    } else {
+      await expect(page.locator('.desktop-nav a')).toHaveCount(6);
+      await expect(page.locator('.header-access')).toBeVisible();
+    }
+    await page.locator('[data-panel-tab="billing"]').click();
+    await expect(page.locator('#panel-billing [data-panel-money="collected"]')).toHaveText(/Q\s?480\.00/);
+    await page.locator('[data-panel-filter="link"]').click();
+    await expect(page.locator('#panel-transaction-rows tr:visible')).toHaveCount(1);
+    await expect(page.locator('#panel-transaction-rows tr:visible')).toContainText(/Q\s?180\.00/);
+    await page.locator('[data-panel-tab="withdrawals"]').click();
+    await expect(page.locator('#panel-withdrawals [data-panel-money="withdraw"]')).toHaveText(/Q\s?0\.00/);
+    await expect(page.locator('#panel-withdrawals .panel-disabled')).toBeDisabled();
+    const faq = page.locator('#faq-list > details').last();
+    await faq.locator('summary').click();
+    await expect(faq).toHaveAttribute('open', '');
+    await expect(faq.locator('p')).toContainText('Facebook e Instagram');
+    await checkOverflow(page);
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations, JSON.stringify(results.violations)).toEqual([]);
+  });
+}
+
+test('commerce verticals never leak into the medical tenant, and the same tenant without them still serves', async ({ landingPage: page }) => {
+  for (const host of [COMMERCE_HOST, HOST, PLAIN_COMMERCE_HOST, COMMERCE_HOST, HOST]) {
+    await gotoLanding(page, host);
+    const full = host === COMMERCE_HOST;
+    await expect(page.locator('.business-card, .business-route, .solution-navigation')).toHaveCount(full ? 4 : 0);
+    await expect(page.locator('symbol#i-truck, symbol#i-megaphone')).toHaveCount(full ? 2 : 0);
+    await expect(page.locator('#calc-rate')).toHaveCount(full ? 1 : 0);
+    await expect(page.locator('[data-commission]')).toHaveCount(host === HOST ? 1 : 0);
+    await expect(page.locator('.pricing-card')).toHaveCount(host === PLAIN_COMMERCE_HOST ? 1 : 0);
+    if (full) await expect(page.locator('body')).toHaveAttribute('data-type-scale', 'compact');
+    else await expect(page.locator('body')).not.toHaveAttribute('data-type-scale');
+    const body = await page.locator('body').innerText();
+    if (host === HOST) {
+      expect(body).not.toMatch(/Vende Fácil|Meta Ads|Facebook|Instagram|Delivery/);
+      await expect(page.locator('[data-support-cta="header"]')).toHaveAttribute('href', /^https:\/\/wa\.me\/50244866448\?/);
+      await expect(page.locator('.service-card[id]')).toHaveCount(0);
+    } else {
+      expect(body).not.toMatch(/Medipago|médic|consultorio/i);
+      await expect(page.locator('[data-support-cta="header"]')).toHaveAttribute('href', /^https:\/\/wa\.me\/50236532841\?/);
+    }
+    if (host === PLAIN_COMMERCE_HOST) expect(body).not.toMatch(/Meta Ads|Facebook|Instagram/);
   }
 });
