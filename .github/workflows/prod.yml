@@ -1189,6 +1189,19 @@ jobs:
         run: kill "$SERVER_PID" 2>/dev/null || true
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Post-deploy: reglas 3 y 4 sobre lo que producción sirve (issue #101). Sólo si
+# el deploy terminó bien; el scan también corre a diario por su cuenta.
+# ─────────────────────────────────────────────────────────────────────────────
+
+  served_claims:
+    name: Served claims (post-deploy)
+    needs: deploy_hetzner
+    if: needs.deploy_hetzner.result == 'success'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/served-claims.yml
+
+# ─────────────────────────────────────────────────────────────────────────────
 # JOB 6: Notify — Slack notifications for all outcomes
 # ─────────────────────────────────────────────────────────────────────────────
 

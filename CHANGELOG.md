@@ -42,6 +42,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   las composiciones existentes conservan su comportamiento.
 
 ### Fixed
+- **Las reglas 3 y 4 del guardián miran también lo que sirve producción**
+  (issue #101). Hasta ahora sólo escaneaban los inquilinos escritos en el repo;
+  un precio sembrado en el contenido que sirve el API no lo veía nadie. El
+  workflow `served-claims.yml` (diario, como último job de `prod.yml` tras un
+  deploy exitoso y a mano; nunca en un PR) enumera los sitios publicados e
+  indexables con `GET /api/v1/sites/published-hosts`, lee sus páginas del API y
+  escanea cada una en su dirección real. Una lista con menos de 2 hosts, o sin
+  `1platform.pro`, es rojo.
 - Los íconos y la tarjeta social derivados de la marca de un tenant (`/brand/*`)
   llevan en la URL una versión calculada del dibujo: un cambio de marca (fuente,
   acento, monograma o nombre) se ve de inmediato en vez de quedar hasta 24 h en

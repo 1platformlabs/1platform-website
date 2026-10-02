@@ -1,9 +1,16 @@
 import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 
-import { getWithHost } from './helpers/http-host'
-import { surface } from './helpers/site-surface'
+import { getWithHost, type HostResponse } from './helpers/http-host'
 import { expectPublishedResponse } from './helpers/published-response'
+import {
+  MIN_PRODUCTION_HOSTS,
+  productionSurface,
+  publishedHosts,
+  scanningProduction,
+  surface,
+  type SurfacePage,
+} from './helpers/site-surface'
 
 /**
  * Rules 3 and 4 of `scripts/check-tells.sh`, over the SERVED HTML of EVERY
@@ -71,6 +78,26 @@ const PORT = process.env.PLAYWRIGHT_PORT ?? '4321'
 const BASE = `http://127.0.0.1:${PORT}`
 
 /**
+ * Two modes, one set of rules. On a PR (the default) the surface is the repo
+ * manifest served by the local build. With `SERVED_CLAIMS_TARGET=prod` —
+ * only the scheduled `served-claims.yml` sets it — the surface is every
+ * published, indexable site the API lists, fetched from its real address.
+ */
+async function servedSurface(): Promise<SurfacePage[]> {
+  return scanningProduction() ? productionSurface() : surface()
+}
+
+async function fetchServed(page: SurfacePage): Promise<HostResponse> {
+  if (!scanningProduction()) return getWithHost(BASE + page.url, page.host)
+  // `manual`: a published page that redirects is a finding to report, not
+  // something to follow silently onto another page. The one sanctioned
+  // redirect (a retired address) is judged by `expectPublishedResponse`,
+  // which needs `location` — so headers travel in both modes.
+  const res = await fetch(`https://${page.host}${page.url}`, { redirect: 'manual' })
+  return { status: res.status, headers: Object.fromEntries(res.headers), body: await res.text() }
+}
+
+/**
  * Rule 4 scans `$SRC` only in the tree — never `$PROSE` — and check-tells.sh
  * says why: "An article observing that teams juggle several tools is
  * editorial context, not the site claiming it replaces them. Pointing those
@@ -102,8 +129,8 @@ test('no tenant serves a fabricated price or vanity metric, on any page, in any 
   const leaks: string[] = []
   let scanned = 0
 
-  for (const page of surface()) {
-    const res = await getWithHost(BASE + page.url, page.host)
+  for (const page of await servedSurface()) {
+    const res = await fetchServed(page)
     expectPublishedResponse(res, page)
     scanned += 1
     if (banned.test(res.body)) leaks.push(`${page.host}${page.url}`)
@@ -119,12 +146,12 @@ test('no tenant serves an unverifiable "replaces N tools" claim, in either langu
   let scanned = 0
   let excluded = 0
 
-  for (const page of surface()) {
+  for (const page of await servedSurface()) {
     if (PROSE_ROUTE.test(page.route)) {
       excluded += 1
       continue
     }
-    const res = await getWithHost(BASE + page.url, page.host)
+    const res = await fetchServed(page)
     expectPublishedResponse(res, page)
     scanned += 1
     if (en.test(res.body) || es.test(res.body)) leaks.push(`${page.host}${page.url}`)
@@ -135,4 +162,17 @@ test('no tenant serves an unverifiable "replaces N tools" claim, in either langu
   expect(scanned, 'nothing was scanned — a broken probe is not a pass').toBeGreaterThan(15)
   expect(excluded, 'the prose exclusion matched nothing — blog/changelog routes moved?').toBeGreaterThan(0)
   expect(leaks, `a numbered replace-count claim is being served on: ${leaks.join(', ')}`).toEqual([])
+})
+
+test('production mode: the API lists a non-empty estate that includes the reference site', async () => {
+  test.skip(!scanningProduction(), 'only the scheduled production scan enumerates the API')
+  const hosts = await publishedHosts()
+  // The floor: an empty or shrunken list would make both scans above pass on
+  // nothing. The reference tenant is the control that the list is the real one.
+  expect(hosts.length, `the API listed ${hosts.length} hosts: ${hosts.join(', ')}`).toBeGreaterThanOrEqual(
+    MIN_PRODUCTION_HOSTS,
+  )
+  expect(hosts).toContain('1platform.pro')
+  const pages = await productionSurface()
+  expect(new Set(pages.map((p) => p.host)).size, 'every listed host contributed pages').toBe(hosts.length)
 })
