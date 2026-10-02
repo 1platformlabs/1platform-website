@@ -1,5 +1,6 @@
 ---
 import Logo from '@components/Logo.astro';
+import SocialLinks from '@components/SocialLinks.astro';
 import { useI18n } from '@i18n';
 
 const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
@@ -129,6 +130,7 @@ const year = new Date().getFullYear();
 
     <div class="site-footer__bottom">
       <p>{t('footer.copyright', { year })}</p>
+      <SocialLinks variant="classic" />
       {legal.length > 0 && <ul>{legal.map((link) => <li><a href={link.href}>{link.label}</a></li>)}</ul>}
     </div>
   </div>

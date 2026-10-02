@@ -1,6 +1,7 @@
 ---
 import { siteChrome } from '@lib/site-chrome';
 import { docsUrl } from '@lib/site-destinations';
+import SocialLinks from '@components/SocialLinks.astro';
 import { useI18n } from '@i18n';
 const { tenant, messages, locale } = Astro.locals;
 const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
@@ -15,5 +16,5 @@ const reference = docsUrl(Astro.locals, '/api-reference/1platform-api');
     <nav class="brand-footer-column" aria-label={copy('footer.resources')}><h2>{copy('footer.resources')}</h2>{navigation.filter(({position}) => position === 3 || position === 4).reverse().map(({label,href}) => <a href={href}>{label}</a>)}{reference && <a href={reference}>{copy('footer.reference')}</a>}</nav>
     <nav class="brand-footer-column" aria-label={copy('footer.company')}><h2>{copy('footer.company')}</h2>{navigation.filter(({position}) => position === 5).map(({label,href}) => <a href={href}>{label}</a>)}</nav>
   </div>
-  <div class="brand-footer-bottom"><p>{copy('footer.copyright').replace('{year}', String(new Date().getFullYear()))}</p><ul>{legal.map(([href,key]) => <li><a href={l(href)}>{t(key)}</a></li>)}</ul></div>
+  <div class="brand-footer-bottom"><p>{copy('footer.copyright').replace('{year}', String(new Date().getFullYear()))}</p><SocialLinks variant="infrastructure" /><ul>{legal.map(([href,key]) => <li><a href={l(href)}>{t(key)}</a></li>)}</ul></div>
 </footer>

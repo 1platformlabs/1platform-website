@@ -203,6 +203,28 @@ report "fonts are self-hosted and preloaded" \
 # processor disclosure into a permanent red.
 m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b' $SRC $PROSE \
   | grep -viE '(^|/)privacy(\.(en|es))?\.(astro|ts):' | strip_comments)
+# The second exemption is by PLACE and by WORD (website-redes-sociales D-4):
+# `src/lib/social-links.ts` is the one file that may name the two social
+# networks the advertising vertical bans, because a link to the tenant's OWN
+# profile is not a capability presented as a provider's. A line there is
+# dropped only if, with those two words removed, it no longer matches — so any
+# other provider written in that file stays red. The pattern is read back from
+# the grep line above instead of copied: four tests already pin that line, and
+# a third copy here is one nobody would keep in step. With an empty pattern
+# perl would silently reuse the last one that matched, so an unreadable line
+# stops the script.
+rule10_re=$(sed -n "s/^m=\$(grep -rniE '\([^']*\)' \$SRC \$PROSE.*/\1/p" scripts/check-tells.sh)
+case "$rule10_re" in
+  ''|*$'\n'*)
+    printf '%sFAIL%s  preflight: could not read rule 10 back from its own grep line\n' "$RED" "$RESET"
+    exit 1 ;;
+esac
+m=$(printf '%s\n' "$m" | RULE10_RE="$rule10_re" perl -ne '
+  if (m{^src/lib/social-links\.ts:\d+:(.*)$}s) {
+    (my $rest = $1) =~ s/facebook|instagram//gi;
+    next unless $rest =~ /$ENV{RULE10_RE}/i;
+  }
+  print if length > 1;')
 report "no external provider names outside the privacy policy" \
        "capabilities are presented as native product features" "$m"
 

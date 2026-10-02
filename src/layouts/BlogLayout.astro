@@ -13,6 +13,7 @@ import { formatDate, useI18n, type Locale } from '@i18n';
 import { localizedOgImage } from '@i18n/og';
 import { siteOrigin } from '@lib/site-origin';
 import { resolveLogo } from '@lib/tenant-brand-assets';
+import { socialLinksOf } from '@lib/social-links';
 
 interface Props {
   frontmatter: {
@@ -39,6 +40,7 @@ const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 const categoryLabel = infrastructureChrome(Astro.locals.messages) ? t(`interiors.category.${frontmatter.category}`) : '';
 const brandName = Astro.locals.tenant.brand_name;
 const tenantLogo = await resolveLogo(Astro.locals.tenant);
+const sameAs = socialLinksOf(Astro.locals.tenant).map((link) => link.href);
 
 // Built from the page's own locale so the canonical, the share URL and the
 // Article @id all point at the language being read. These used to be pinned to
@@ -89,6 +91,8 @@ const articleJsonLd = {
           },
         }
       : {}),
+    // The same list the footer draws (D-7); absent — not `[]` — without links.
+    ...(sameAs.length > 0 ? { sameAs } : {}),
   },
   inLanguage: locale,
   mainEntityOfPage: {
