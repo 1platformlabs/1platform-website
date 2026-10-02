@@ -48,6 +48,8 @@
 export const ES_PATHS: Readonly<Record<string, string>> = {
   // — Pages ————————————————————————————————————————————————————————————
   '/about/': '/es/nosotros/',
+  '/access/': '/es/acceso/',
+  '/request-access/': '/es/solicitar-acceso/',
   '/contact/': '/es/contacto/',
   '/pricing/': '/es/precios/',
   '/privacy/': '/es/privacidad/',

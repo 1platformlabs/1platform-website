@@ -82,6 +82,8 @@ Options -Indexes +FollowSymLinks
 # `assemble.sh` guards do not apply.
 <IfModule mod_alias.c>
   RedirectMatch 301 "^/es/about/$" /es/nosotros/
+  RedirectMatch 301 "^/es/access/$" /es/acceso/
+  RedirectMatch 301 "^/es/request-access/$" /es/solicitar-acceso/
   RedirectMatch 301 "^/es/contact/$" /es/contacto/
   RedirectMatch 301 "^/es/pricing/$" /es/precios/
   RedirectMatch 301 "^/es/privacy/$" /es/privacidad/
