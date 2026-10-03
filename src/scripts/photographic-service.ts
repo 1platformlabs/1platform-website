@@ -27,14 +27,14 @@ function stringValue(config: JsonRecord, key: string): string | undefined {
 let activeRoot: HTMLElement | null = null;
 let releaseEnhancements: (() => void) | undefined;
 
-/** `MediaQueryList.addEventListener` is missing before Safari 14; `addListener` is not. */
+/**
+ * `MediaQueryList.addEventListener` is missing before Safari 14. Those reactions
+ * (reduced-motion toggled mid-visit, closing the menu at a breakpoint) are
+ * niceties: skip them there rather than throw and leave the menu and calculator
+ * unwired.
+ */
 function onMediaChange(query: MediaQueryList, listener: (event: MediaQueryListEvent) => void, signal: AbortSignal) {
-  if (typeof query.addEventListener === 'function') {
-    query.addEventListener('change', listener, { signal });
-    return;
-  }
-  query.addListener(listener);
-  signal.addEventListener('abort', () => query.removeListener(listener), { once: true });
+  if (typeof query.addEventListener === 'function') query.addEventListener('change', listener, { signal });
 }
 
 function initPhotographicService() {

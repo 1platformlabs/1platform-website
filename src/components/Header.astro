@@ -103,11 +103,8 @@ const tenantCopy = Astro.locals.messages;
 const hasCopy = (key: string) => Object.hasOwn(tenantCopy, key) && tenantCopy[key] !== '';
 const signInLabel = appUrl && hasCopy('cta.signIn') ? t('cta.signIn') : null;
 const headerCtaHref = supportUrl ?? appUrl;
-const headerCtaLabel = supportUrl
-  ? (hasCopy('cta.scheduleDemo') ? t('cta.scheduleDemo') : null)
-  : appUrl && hasCopy('cta.getStarted')
-    ? t('cta.getStarted')
-    : null;
+const headerCtaKey = supportUrl ? 'cta.scheduleDemo' : 'cta.getStarted';
+const headerCtaLabel = headerCtaHref && hasCopy(headerCtaKey) ? t(headerCtaKey) : null;
 const headerCtaAria = supportUrl && hasCopy('cta.scheduleDemoAria') ? t('cta.scheduleDemoAria') : undefined;
 const hasActions = Boolean(signInLabel || (headerCtaHref && headerCtaLabel) || hasMenuContent);
 const hasMobileFooter = Boolean(headerCtaHref || hasLanguageChoices);
