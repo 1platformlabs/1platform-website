@@ -1,0 +1,302 @@
+/* Optional commerce capabilities. Loaded only for tenants that publish them. */
+
+.photographic-service[data-solutions-mode="uniform"] .business-verticals {
+  grid-template-columns: minmax(0, 1fr);
+}
+.photographic-service[data-solutions-mode="uniform"] .business-copy h3 {
+  font-size: clamp(28px, 2.4vw, 36px);
+}
+.photographic-service[data-solutions-mode="uniform"] .delivery-order {
+  margin: 16px 16px 0;
+  padding-bottom: 14px;
+}
+.photographic-service[data-solutions-mode="uniform"] .delivery-progress {
+  padding: 16px;
+}
+.photographic-service[data-solutions-mode="uniform"] .delivery-milestone {
+  padding-bottom: 14px;
+}
+.photographic-service[data-solutions-mode="uniform"] .delivery-milestone:last-child {
+  padding-bottom: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .photographic-service .business-card[data-animated] .catalogue-product,
+  .photographic-service .business-card[data-animated] .mail-message {
+    animation: detail-arrive 0.6s 0.25s both;
+  }
+}
+
+.photographic-service[data-solutions-mode="uniform"] .campaign-card {
+  background: #f5f3ee;
+  border-color: #e2e0d9;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 48px;
+  align-items: center;
+  padding: 32px;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .campaign-card > .vertical-visual {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .campaign-card > .vertical-benefits {
+  margin-top: 24px;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .campaign-card > .button {
+  justify-self: start;
+  margin-top: auto;
+}
+
+.photographic-service .business-card.store-card {
+  background: #eef4f1;
+  border-color: #dce7e0;
+}
+
+.photographic-service .business-card.mail-card {
+  background: #f8f4ed;
+  border-color: #e9e1d5;
+}
+
+.photographic-service .catalogue-preview,
+.photographic-service .mail-preview {
+  padding: 16px;
+}
+
+.photographic-service .catalogue-address {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.photographic-service .catalogue-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.photographic-service .product-illustration {
+  display: grid;
+  place-items: center;
+  height: 80px;
+  margin-bottom: 8px;
+  border-radius: 9px;
+  background: #eaf0ec;
+  color: #577365;
+}
+
+.photographic-service .catalogue-product:nth-child(2) .product-illustration {
+  background: #f4eee2;
+  color: #8c744c;
+}
+
+.photographic-service .product-illustration .icon {
+  width: 52px;
+  height: 52px;
+  stroke-width: 1.2;
+}
+
+.photographic-service .catalogue-product strong,
+.photographic-service .catalogue-summary strong,
+.photographic-service .mail-message > strong {
+  display: block;
+  font-size: 13px;
+}
+
+.photographic-service .catalogue-product > span,
+.photographic-service .catalogue-summary span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.photographic-service .catalogue-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.photographic-service .catalogue-summary > .icon {
+  flex: none;
+  color: var(--accent);
+}
+
+.photographic-service .mail-identity {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  justify-items: start;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.photographic-service .mail-identity > .icon {
+  grid-row: 1 / span 2;
+  width: 42px;
+  height: 42px;
+  padding: 9px;
+  border-radius: 10px;
+  color: var(--accent);
+  background: var(--wash);
+}
+
+.photographic-service .mail-identity > span,
+.photographic-service .mail-signature {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.photographic-service .mail-identity > strong {
+  font-size: clamp(14px, 1.25vw, 18px);
+  overflow-wrap: anywhere;
+}
+
+.photographic-service .mail-message {
+  padding: 14px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fafbfc;
+}
+
+.photographic-service .mail-message-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 11px;
+}
+
+.photographic-service .mail-message > p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.photographic-service .mail-signature {
+  margin-top: 12px;
+}
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid {
+  grid-auto-rows: 1fr;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid > article {
+  padding: 28px;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid .business-copy .eyebrow {
+  margin-bottom: 10px;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid .business-copy h3 {
+  font-size: clamp(25px, 2.55vw, 36px);
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid .business-copy > p:last-child {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid .service-stage {
+  padding-block: 20px;
+  align-items: center;
+  background: transparent;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid .vertical-panel {
+  max-width: 320px;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid .vertical-panel-heading {
+  padding: 14px 16px;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid .vertical-benefits {
+  gap: 6px 16px;
+  margin-bottom: 16px;
+}
+
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid .business-card > .button {
+  min-height: 44px;
+  padding-block: 10px;
+}
+
+@media (max-width: 1100px) {
+  .photographic-service[data-solutions-mode="uniform"] .solutions-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .business-copy h3 {
+    font-size: 36px;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .campaign-card {
+    display: flex;
+    gap: 0;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .mail-identity > strong {
+    font-size: 18px;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .business-route {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 561px) and (max-width: 1100px) {
+  .photographic-service[data-solutions-mode="uniform"] .solutions-grid > article {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 28px;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .solutions-grid .service-stage {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    padding-block: 0;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .solutions-grid .service-copy p {
+    min-height: 0;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .solutions-grid .vertical-benefits {
+    margin-top: 20px;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .solutions-grid .business-card > .button {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 560px) {
+  .photographic-service[data-solutions-mode="uniform"] .solutions-grid > article {
+    padding: 26px 24px 20px;
+  }
+
+  .photographic-service[data-solutions-mode="uniform"] .solutions-grid .business-copy h3 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 520px) {
+  .photographic-service[data-solutions-mode="uniform"] .campaign-card {
+    padding: 24px 20px;
+  }
+  .photographic-service[data-solutions-mode="uniform"] .business-copy h3 {
+    font-size: 30px;
+  }
+}
+/* The approved cards use natural wrapping, including their illustrative copy. */
+.photographic-service[data-solutions-mode="uniform"] .solutions-grid p,
+.photographic-service[data-solutions-mode="uniform"] .campaign-card p {
+  text-wrap: wrap;
+}

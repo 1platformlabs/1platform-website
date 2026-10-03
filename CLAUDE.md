@@ -114,7 +114,8 @@ specialty label may return. `platform-commerce` and `service-lead` remain suppor
 
 The same composition carries optional commerce blocks, each enabled only by the
 tenant's content and validated by `src/lib/photographic-content.ts`: Delivery
-and advertising verticals, solution shortcuts to closed anchors, the sales
+and advertising verticals, optional store/email cards, `solutions.mode=uniform`
+(content-sized equal rows, advertising below), solution shortcuts to closed anchors, the sales
 route, configurable icons from a closed list, `calculator.mode=manual` (the
 visitor types the percentage; no tenant rate is ever rendered) and
 `theme.typeScale=compact`. A tenant without those keys renders unchanged. See

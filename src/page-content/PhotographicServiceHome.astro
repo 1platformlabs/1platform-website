@@ -6,6 +6,7 @@ import commerce from '@assets/product/showcase-store-bg.webp';
 import { photographicContent, safeJson } from '@lib/photographic-content';
 import { socialLinksOf } from '@lib/social-links';
 import SocialLinks from '@components/SocialLinks.astro';
+import PhotographicCommerceCards from '@components/PhotographicCommerceCards.astro';
 import LandingReviews from '@components/LandingReviews.astro';
 import { resolveSiteReviews } from '@lib/site-reviews';
 import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, hasTenantAccess, tenantAccess } from '@lib/tenant-access';
@@ -15,9 +16,10 @@ import { alternatesForTenantPath, defaultLocaleOf, makeLocalizePath, ogLocaleOf 
 import { iconMimeType, resolveIcon, resolveSocial, resolveAppleTouchIcon, resolveUploadedLogo, socialImageIsAvailable, appleTouchIconIsAvailable } from '@lib/tenant-brand-assets';
 import '@styles/photographic-service.css';
 import '@styles/photographic-panel.css';
+import commerceStyles from '@styles/photographic-commerce-cards.css?url';
 
 const tenant = Astro.locals.tenant;
-const { copy, contactHref, navigation, steps, audiences, faqs, calculator, manualCalculator, panel, brandStyle, clientConfig, fontKey, palette, heroFeatures, delivery, ads, solutionLinks, route, routeLabel, typeScale, footerAction, extraIcons, linkFootnote } = photographicContent(Astro.locals.messages, tenant);
+const { copy, contactHref, navigation, steps, audiences, faqs, calculator, manualCalculator, panel, brandStyle, clientConfig, fontKey, palette, heroFeatures, delivery, store, email, ads, solutionsMode, solutionLinks, route, routeLabel, typeScale, footerAction, extraIcons, linkFootnote } = photographicContent(Astro.locals.messages, tenant);
 const photographs = { consultorio, commerce };
 const photoKey = copy('hero.image');
 if (!Object.hasOwn(photographs, photoKey)) throw new Error('Unrecognised photographic asset');
@@ -94,6 +96,8 @@ const jsonLd = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
+    {(store || email || solutionsMode) && <link rel="stylesheet" href={commerceStyles} />}
+    <meta name="photographic-capabilities" content="uniform-services-v1" />
     <meta name="theme-color" content={tenant.theme.accent} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -137,7 +141,7 @@ const jsonLd = [
       }
     </script>}
   </head>
-<body class="photographic-service" data-home-template="photographic-service" data-panel-mode={panel.mode === 'collections' ? panel.mode : undefined} data-palette={palette} data-type-scale={typeScale} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
+<body class="photographic-service" data-home-template="photographic-service" data-panel-mode={panel.mode === 'collections' ? panel.mode : undefined} data-palette={palette} data-type-scale={typeScale} data-solutions-mode={solutionsMode} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
 <a class="skip-link" href="#contenido">{copy('ui.skip_link')}</a>
 <svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg">
 <symbol id="i-arrow" viewBox="0 0 24 24">
@@ -190,6 +194,9 @@ const jsonLd = [
 </symbol>
 {extraIcons.includes('truck') && <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 5h11v12H3Zm11 5h4l3 4v3h-7M5 17a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0M3 9h5"></path></symbol>}
 {extraIcons.includes('megaphone') && <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m4 9 13-5v16L4 15Zm0 0H2v6h2m3 1 2 5h3l-2-4M21 8v8"></path></symbol>}
+{extraIcons.includes('bag') && <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 7h14l1 14H4L5 7Zm3 1V6a4 4 0 0 1 8 0v2"></path></symbol>}
+{extraIcons.includes('book') && <symbol id="i-book" viewBox="0 0 24 24"><path d="M6 3h13v18H6a3 3 0 0 1 0-6h13M6 3a3 3 0 0 0-3 3v12M8 7h7"></path></symbol>}
+{extraIcons.includes('mail') && <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 6 9 7 9-7"></path></symbol>}
 </svg>
 <header class="site-header" data-tenant-access={access ? '' : undefined}>
 <a aria-label={copy('ui.brand_home').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio">
@@ -337,21 +344,12 @@ const jsonLd = [
 <svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('illustrations.automatic')}</span>
 </div>
 </article>
+{solutionsMode === 'uniform' && <PhotographicCommerceCards delivery={delivery} store={store} email={email} contactHref={contactHref} brandMark={tenant.brand_mark ?? tenant.brand_name} />}
 </div>
-{(delivery || ads) && <div class="business-verticals">
-{delivery && <article aria-labelledby="delivery-title" class="business-card delivery-card" data-sequence="" id="delivery" tabindex="-1">
-<div class="business-copy"><p class="eyebrow">{delivery.eyebrow}</p><h3 id="delivery-title">{delivery.title}</h3><p>{delivery.description}</p></div>
-<div aria-label={delivery.stageLabel} class="service-stage vertical-visual" role="img">
-<div class="vertical-panel">
-<div class="vertical-panel-heading"><span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><strong>{delivery.panelTitle}</strong><span class="vertical-tag">{delivery.tag}</span></div>
-<div class="delivery-order"><svg aria-hidden="true" class="icon"><use href="#i-truck"></use></svg><div><strong>{delivery.orderTitle}</strong><span>{delivery.orderNote}</span></div></div>
-<ol class="delivery-progress">{delivery.milestones.map((milestone) => <li class="delivery-milestone"><span aria-hidden="true" class="milestone-dot"></span><div><strong>{milestone.title}</strong><span>{milestone.text}</span></div><svg aria-hidden="true" class="icon"><use href="#i-check"></use></svg></li>)}</ol>
-</div>
-</div>
-<ul class="vertical-benefits">{delivery.benefits.map((benefit) => <li>{benefit}</li>)}</ul>
-<a class="button button-teal" data-support-cta="delivery" href={contactHref('delivery')}><span>{delivery.cta}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg></a>
-</article>}
-{ads && <article aria-labelledby="ads-title" class="business-card ads-card" data-sequence="" id="anuncios" tabindex="-1">
+{(ads || (solutionsMode !== 'uniform' && (delivery || store || email))) && <div class="business-verticals">
+{solutionsMode !== 'uniform' && <PhotographicCommerceCards delivery={delivery} store={store} email={email} contactHref={contactHref} brandMark={tenant.brand_mark ?? tenant.brand_name} />}
+
+{ads && <article aria-labelledby="ads-title" class:list={["business-card", solutionsMode === 'uniform' ? 'campaign-card' : 'ads-card']} data-sequence="" id="anuncios" tabindex="-1">
 <div class="business-copy"><p class="eyebrow">{ads.eyebrow}</p><h3 id="ads-title">{ads.title}</h3><p>{ads.description}</p></div>
 <div aria-label={ads.stageLabel} class="service-stage vertical-visual" role="img">
 <div class="vertical-panel">

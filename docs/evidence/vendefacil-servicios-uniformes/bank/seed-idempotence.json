@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "scenario": "Fresh private database after completed bank shutdown; repeated seed",
+  "preserved": {
+    "App": 3,
+    "User": 2,
+    "Websites": 1,
+    "site_tenants": 3,
+    "site_pages": 63
+  },
+  "sitePageContentPreserved": true,
+  "privateOutputMode": "0o600"
+}
