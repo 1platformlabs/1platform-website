@@ -67,6 +67,11 @@ export function assertCurrent(plan, current, direction = 'apply') {
     assert(digest(prepare(current)) === digest(plan), 'Plan changed after review; regenerate it');
   } else {
     const root = rootOf(current);
+    // Re-applying the patch masks changes to the rollback values it overwrites.
+    // These preimages were required at planning time and must still be intact.
+    for (const key of Object.keys(patch)) {
+      assert(plan.rollback.blocks[key] === originalBlocks[key], `Rollback preimage changed: ${key}`);
+    }
     assert(digest(plan.apply) === digest({ blocks: { ...plan.rollback.blocks, ...patch }, published: plan.rollback.published }), 'Plan payload changed');
     assert(digest(bodyOf(root)) === digest(plan.apply), 'Root was edited after activation; do not overwrite it');
     assert(digest(current.manifest) === plan.manifestHash, 'Manifest changed after activation');

@@ -1,0 +1,6 @@
+{
+  "case": "rollback edited at an overwritten key",
+  "expected": "refused",
+  "actual": "ACCEPTED",
+  "apiWriteSent": false
+}

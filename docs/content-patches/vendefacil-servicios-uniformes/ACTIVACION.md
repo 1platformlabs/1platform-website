@@ -1,8 +1,10 @@
 # Activación pendiente: servicios uniformes de Vende Fácil
 
-**No aplicado.** Esta continuación sólo prepara contenido. Requiere autorización
-posterior, verificación real del monorepo y publicación del renderer antes de
-cualquier escritura remota. El PR anterior #136 está mergeado y su contenido ya
+**No aplicado remotamente.** El parche y su reversión se ejercieron en la base
+privada del banco el 2026-10-03; [evidencia real](../../evidence/vendefacil-servicios-uniformes/BANCO.md).
+Requiere autorización posterior y publicación del renderer antes de cualquier
+escritura remota. La verificación del monorepo quedó aprobada para el código
+documentado en esa evidencia. El PR anterior #136 está mergeado y su contenido ya
 está activo; no reutilizar su parche ni su snapshot de 327 claves.
 
 ## Alcance y diff
@@ -101,9 +103,10 @@ Después de revertir se necesita un snapshot nuevo para volver a aplicar, porque
 
 ## Evidencia y límites
 
-Las pruebas automatizadas ejercen preparación, rechazo de drift/planes alterados,
-preservación y reversión con snapshots sintéticos. Los navegadores prueban el
-Astro SSR real contra respuestas HTTP de fixtures. El diff público es lectura
-actual; **no se ha ensayado el PUT contra API/auth/DB reales para esta continuación**.
-Ese ensayo corresponde a `/verify-epic-e2e vendefacil-servicios-uniformes` del
-monorepo, antes del merge y sin activar producción.
+Las pruebas con fixtures y el diff público siguen siendo evidencia separada del
+banco real. `/verify-epic-e2e vendefacil-servicios-uniformes` del monorepo ya ejerció
+el PUT y la reversión con auth real y Mongo privada: 413→456→413, conservando el
+manifiesto, otras páginas y un borrador. También rechazó edición concurrente y
+planes alterados, incluidos los valores previos de las claves reemplazadas.
+El control main respondió 503 con las nuevas anclas: el orden renderer→contenido
+es obligatorio. El banco no publica ni autoriza activación remota.

@@ -54,3 +54,16 @@ test('pre-write and rollback checks reject concurrent edits and modified plans w
   activated.documents[0].blocks['photographic.hero.description'] = 'An edit after activation';
   expect(() => assertCurrent(plan, activated, 'rollback')).toThrow('Root was edited');
 });
+
+test('rollback refuses tampered preimages even when applying the patch would mask them', () => {
+  const input = snapshot();
+  const plan = prepare(input);
+  const activated = structuredClone(input);
+  Object.assign(activated.documents[0], structuredClone(plan.apply));
+  for (const key of Object.keys(patch)) {
+    const changed = structuredClone(plan);
+    changed.rollback.blocks[key] = 'Changed after review';
+    expect(() => assertCurrent(changed, activated, 'rollback'), key).toThrow('Rollback preimage changed');
+  }
+  expect(() => assertCurrent(plan, activated, 'rollback')).not.toThrow();
+});
