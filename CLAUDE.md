@@ -112,6 +112,17 @@ The collections demo distinguishes gross receipts before fees from the amount
 available to withdraw; amounts are examples. No removed animation controls or
 specialty label may return. `platform-commerce` and `service-lead` remain supported.
 
+The same composition carries optional commerce blocks, each enabled only by the
+tenant's content and validated by `src/lib/photographic-content.ts`: Delivery
+and advertising verticals, solution shortcuts to closed anchors, the sales
+route, configurable icons from a closed list, `calculator.mode=manual` (the
+visitor types the percentage; no tenant rate is ever rendered) and
+`theme.typeScale=compact`. A tenant without those keys renders unchanged. See
+`docs/photographic-commerce-blocks.md`. The advertising channel's names live
+only in `src/lib/advertising-channels.ts` and appear when staff configuration
+`photographic.verticals.ads.mode` selects it; stored copy uses `{adsName}`,
+`{adsNetwork1}`, `{adsNetwork2}` markers, so the API's provider guard is kept.
+
 Blog, articles and the online-store interior opt into the approved photographic
 interior through the same infrastructure profile. Other tenant profiles keep the
 legacy renderers and require no new `interiors.*` content. Markdown bodies, dates,

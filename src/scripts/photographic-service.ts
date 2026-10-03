@@ -1,4 +1,4 @@
-import { calculateLandingAmount } from '../lib/landing-calculator';
+import { calculateLandingAmount, calculateWithPercentage } from '../lib/landing-calculator';
 
 type JsonRecord = Record<string, unknown>;
 const isRecord = (value: unknown): value is JsonRecord =>
@@ -203,6 +203,49 @@ function initPhotographicService() {
       if (!calculate()) amountField.focus();
     }, { signal });
     calculate();
+  }
+
+  // A visitor-entered percentage: nothing is computed until both fields are sent.
+  const rateField = root.querySelector<HTMLInputElement>('#calc-rate');
+  const manualCopy = calculatorCopy.mode === 'manual' ? calculatorCopy : null;
+  const manualMessages = manualCopy && (['changed', 'empty', 'incomplete', 'done', 'invalidAmount', 'invalidRate'] as const)
+    .map((key) => stringValue(manualCopy, key));
+  if (
+    calculator && amountField && rateField && calcError && calcStatus && calcNet && calcFee &&
+    manualCopy?.currency === 'GTQ' && manualMessages && manualMessages.every(Boolean)
+  ) {
+    const [changedText, emptyText, incompleteText, doneText, invalidAmountText, invalidRateText] = manualMessages as string[];
+    const money = new Intl.NumberFormat(document.documentElement.lang, { style: 'currency', currency: 'GTQ', currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 });
+    const clearEstimate = (status: string) => {
+      calcNet.textContent = '—';
+      calcFee.textContent = '—';
+      calcError.textContent = '';
+      amountField.removeAttribute('aria-invalid');
+      rateField.removeAttribute('aria-invalid');
+      calcStatus.textContent = status;
+    };
+    [amountField, rateField].forEach((field) => {
+      field.disabled = false;
+      field.addEventListener('input', () => clearEstimate(changedText), { signal });
+    });
+    calculator.querySelectorAll<HTMLButtonElement>('button[type="submit"]').forEach((button) => { button.disabled = false; });
+    calculator.addEventListener('submit', (event) => {
+      event.preventDefault();
+      clearEstimate('');
+      const result = calculateWithPercentage(amountField.value, rateField.value);
+      if (!result.ok) {
+        const invalidField = result.reason === 'invalid-amount' ? amountField : rateField;
+        calcError.textContent = result.reason === 'invalid-amount' ? invalidAmountText : invalidRateText;
+        calcStatus.textContent = incompleteText;
+        invalidField.setAttribute('aria-invalid', 'true');
+        invalidField.focus();
+        return;
+      }
+      calcNet.textContent = money.format(result.net / 100);
+      calcFee.textContent = money.format(result.fee / 100);
+      calcStatus.textContent = doneText;
+    }, { signal });
+    clearEstimate(emptyText);
   }
 
   const demo = root.querySelector<HTMLElement>('.panel-demo');

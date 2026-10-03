@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { calculateLandingAmount, decimalToCents } from '../src/lib/landing-calculator';
+import { calculateLandingAmount, calculateWithPercentage, decimalToCents, percentageToBasisPoints } from '../src/lib/landing-calculator';
 
 test('the tenant rate produces the approved quetzal examples without a fixed fee', () => {
   expect(calculateLandingAmount('100.00', 490)).toEqual({ ok: true, amount: 10_000, fee: 490, net: 9_510 });
@@ -43,4 +43,27 @@ test('tenant rates are required to be safe whole basis points within the amount'
   }
   expect(calculateLandingAmount('100', 0)).toEqual({ ok: true, amount: 10_000, fee: 0, net: 10_000 });
   expect(calculateLandingAmount('100', 10_000)).toEqual({ ok: true, amount: 10_000, fee: 10_000, net: 0 });
+});
+
+test('a visitor-entered percentage is required: there is no tenant or default rate', () => {
+  expect(calculateWithPercentage('250.00', '3.50')).toEqual({ ok: true, amount: 25_000, fee: 875, net: 24_125 });
+  expect(calculateWithPercentage('100.00', '')).toEqual({ ok: false, reason: 'invalid-rate' });
+  expect(calculateWithPercentage('', '')).toEqual({ ok: false, reason: 'invalid-amount' });
+});
+
+test('visitor percentages accept a decimal comma and round the commission once, half up', () => {
+  expect(calculateWithPercentage('1,50', '0,50')).toEqual({ ok: true, amount: 150, fee: 1, net: 149 });
+  expect(calculateWithPercentage('0.01', '50')).toEqual({ ok: true, amount: 1, fee: 1, net: 0 });
+  expect(calculateWithPercentage('100.00', '0')).toEqual({ ok: true, amount: 10_000, fee: 0, net: 10_000 });
+  expect(calculateWithPercentage('100.00', '100')).toEqual({ ok: true, amount: 10_000, fee: 10_000, net: 0 });
+  const largest = calculateWithPercentage('9999999.99', '99.99');
+  expect(largest).toEqual({ ok: true, amount: 999_999_999, fee: 999_899_999, net: 100_000 });
+});
+
+test('out-of-range or ambiguous percentages are rejected rather than partly parsed', () => {
+  for (const rate of ['', ' ', '-1', '+1', '100.01', '101', '1e2', '3.333', 'NaN', '4.9%', '.5']) {
+    expect(percentageToBasisPoints(rate), rate).toBeNull();
+    expect(calculateWithPercentage('100', rate), rate).toEqual({ ok: false, reason: 'invalid-rate' });
+  }
+  expect(percentageToBasisPoints(' 4,90 ')).toBe(490);
 });
