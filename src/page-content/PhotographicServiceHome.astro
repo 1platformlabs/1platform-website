@@ -6,6 +6,8 @@ import commerce from '@assets/product/showcase-store-bg.webp';
 import { photographicContent, safeJson } from '@lib/photographic-content';
 import { socialLinksOf } from '@lib/social-links';
 import SocialLinks from '@components/SocialLinks.astro';
+import LandingReviews from '@components/LandingReviews.astro';
+import { resolveSiteReviews } from '@lib/site-reviews';
 import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, hasTenantAccess, tenantAccess } from '@lib/tenant-access';
 import { calculateLandingAmount } from '@lib/landing-calculator';
 import { siteOrigin } from '@lib/site-origin';
@@ -72,6 +74,8 @@ const legalLinks = publishedLinks([
   { route: '/cookies/', label: () => t('footer.link.cookiePreferences') },
 ]);
 const formatLocale = tenant.region ? `${locale}-${tenant.region}` : locale;
+// landing-reviews-tenant: null = no section (switched off, API silent, repo mode).
+const reviews = await resolveSiteReviews(tenant.slug);
 const money = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: panel.currency, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
 const calculatorMoney = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: 'GTQ', currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
 const rateLabel = calculator ? new Intl.NumberFormat(formatLocale, { style: 'percent', maximumFractionDigits: 2 }).format(calculator.commissionBasisPoints / 10000) : null;
@@ -712,6 +716,7 @@ const jsonLd = [
 </div>
 <div class="faq-list" id="faq-list">{faqs.map((item) => <details><summary><span>{item.question}</span><svg class="icon" aria-hidden="true"><use href="#i-plus" /></svg></summary><p>{item.answer}</p></details>)}</div>
 </section>
+{reviews && <LandingReviews reviews={reviews} locale={locale} formatLocale={formatLocale} />}
 <section aria-labelledby="closing-title" class="closing-section">
 <div class="wrap closing-content">
 <span aria-hidden="true" class="closing-mark">{tenant.brand_mark ?? tenant.brand_name}</span>

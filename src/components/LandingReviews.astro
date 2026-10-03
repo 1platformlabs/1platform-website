@@ -1,0 +1,129 @@
+---
+/**
+ * landing-reviews-tenant — the reviews block of a tenant's landing.
+ *
+ * Server-rendered and complete without JavaScript: every public review is in
+ * the HTML, the summary is the server's (over ALL public reviews), and the
+ * controls that need a script — the rating filter and «show more» — are
+ * `hidden` until `landing-reviews.ts` enables them. With the script, the list
+ * starts at the tenant's page size and grows by it.
+ *
+ * Only reviews the API returns are drawn, and the API returns only the
+ * published AND authorised ones. Nothing here invents a rating: no public
+ * review means no score, only the empty state.
+ */
+import type { SiteReviews } from '@lib/site-reviews';
+import { reviewsCopy } from '@lib/landing-reviews-copy';
+import '@styles/landing-reviews.css';
+
+interface Props {
+  reviews: SiteReviews;
+  locale: string;
+  /** BCP-47 tag used to format numbers and dates (the page's own). */
+  formatLocale: string;
+}
+
+const { reviews, locale, formatLocale } = Astro.props;
+const copy = reviewsCopy(locale);
+const number = new Intl.NumberFormat(formatLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const dateFormat = new Intl.DateTimeFormat(formatLocale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const { summary } = reviews;
+const total = reviews.reviews.length;
+const initial = (author: string) => Array.from(author.trim())[0]?.toLocaleUpperCase(formatLocale) ?? '·';
+const bars = ([5, 4, 3, 2, 1] as const).map((rating) => {
+  const count = summary.histogram[String(rating) as '1'];
+  return { rating, count, percent: summary.count ? Math.round((count / summary.count) * 100) : 0 };
+});
+const clientCopy = {
+  of: locale === 'en' ? 'of' : 'de',
+  reviewOne: locale === 'en' ? 'review' : 'reseña',
+  reviewOther: locale === 'en' ? 'reviews' : 'reseñas',
+  starOne: locale === 'en' ? 'star' : 'estrella',
+  starOther: locale === 'en' ? 'stars' : 'estrellas',
+  moreAdded: copy.moreAdded,
+  filterUpdated: copy.filterUpdated,
+  allShown: copy.allShown,
+};
+---
+<section id="resenas" class="lr-section" aria-labelledby="lr-title" data-landing-reviews data-page-size={reviews.pageSize} data-copy={JSON.stringify(clientCopy)}>
+  <svg class="lr-sprite" aria-hidden="true" focusable="false"><symbol id="lr-star" viewBox="0 0 24 24"><path d="m12 2.6 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9Z" /></symbol></svg>
+  <div class="lr-wrap">
+    <div class="lr-head">
+      <header class="lr-heading">
+        <p class="lr-eyebrow">{copy.eyebrow}</p>
+        <h2 id="lr-title" class="lr-title">{reviews.title}</h2>
+        {reviews.subtitle && <p class="lr-subtitle">{reviews.subtitle}</p>}
+      </header>
+      {summary.count > 0 && summary.average !== null && (
+        <aside class="lr-summary" aria-label={copy.summaryLabel}>
+          <div class="lr-score">
+            <p class="lr-average">{number.format(summary.average)}<span>{copy.outOf}</span></p>
+            <p class="lr-score-label">{copy.published(summary.count)}</p>
+          </div>
+          <ul class="lr-histogram" aria-label={copy.histogramLabel}>
+            {bars.map((bar) => (
+              <li class="lr-bar-row" aria-label={copy.bar(bar.rating, bar.count)}>
+                <span aria-hidden="true">{bar.rating}<svg class="lr-bar-star"><use href="#lr-star" /></svg></span>
+                <span class="lr-bar-track" aria-hidden="true"><span class="lr-bar-fill" style={`width:${bar.percent}%`}></span></span>
+                <span aria-hidden="true">{bar.count}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+    </div>
+    {total > 0 && (
+      <div class="lr-toolbar" data-lr-toolbar hidden>
+        <p class="lr-result-count" data-lr-count>{copy.showing(total, total, 0)}</p>
+        <div class="lr-filter">
+          <label for="lr-rating-filter">{copy.filterLabel}</label>
+          <select id="lr-rating-filter" class="lr-select" data-lr-filter>
+            <option value="0">{copy.allRatings}</option>
+            {[5, 4, 3, 2, 1].map((rating) => <option value={rating}>{copy.stars(rating)}</option>)}
+          </select>
+        </div>
+      </div>
+    )}
+    {total > 0 ? (
+      <ol class="lr-grid" data-lr-grid>
+        {reviews.reviews.map((review) => (
+          <li class="lr-list-item" data-rating={review.rating}>
+            <article class="lr-card" tabindex="-1" aria-label={copy.reviewBy(review.author)}>
+              <span class="lr-stars" role="img" aria-label={copy.starsOf(review.rating)}>
+                {[1, 2, 3, 4, 5].map((index) => <svg class={index <= review.rating ? 'lr-star' : 'lr-star lr-star-off'} aria-hidden="true"><use href="#lr-star" /></svg>)}
+              </span>
+              <blockquote class="lr-quote"><p>“{review.body}”</p></blockquote>
+              <footer class="lr-signature">
+                <span class="lr-avatar" aria-hidden="true">{initial(review.author)}</span>
+                <div class="lr-author"><strong>{review.author}</strong>{review.context && <span>{review.context}</span>}</div>
+              </footer>
+              <div class="lr-provenance">
+                <span>{copy.source[review.source]}</span>
+                <time datetime={review.date}>{dateFormat.format(new Date(`${review.date}T00:00:00Z`))}</time>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <div class="lr-empty">
+        <span class="lr-empty-mark" aria-hidden="true">“</span>
+        <p>{copy.emptyTitle}</p>
+        <span>{copy.emptyBody}</span>
+      </div>
+    )}
+    {total > 0 && (
+      <div class="lr-empty" data-lr-filtered-empty hidden>
+        <span class="lr-empty-mark" aria-hidden="true">“</span>
+        <p>{copy.emptyFilteredTitle}</p>
+        <span>{copy.emptyFilteredBody}</span>
+        <button type="button" class="lr-button" data-lr-clear>{copy.clear}</button>
+      </div>
+      <div class="lr-more" data-lr-more-wrap hidden>
+        <button type="button" class="lr-button" data-lr-more>{copy.more}<svg class="lr-more-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6" /></svg></button>
+      </div>
+    )}
+    <p class="lr-status" role="status" aria-live="polite" data-lr-status></p>
+  </div>
+</section>
+<script>import '@scripts/landing-reviews';</script>

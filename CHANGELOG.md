@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Bloque de reseñas en la landing de cada inquilino (landing-reviews-tenant, LRT-08): Medipago y Vende Fácil (antes
+  del cierre) y 1Platform (antes del contacto) muestran las reseñas publicadas y autorizadas que su dueño gestiona
+  desde el panel, con promedio y distribución sobre todas las públicas, filtro por estrellas, «Ver más» y estados
+  vacíos. Lo lee de `GET /sites/{slug}/reviews` con la misma caché de 60 s que el contenido; sección apagada, API sin
+  la ruta o API caída ⇒ no hay bloque y el resto de la página no cambia (nunca un 503). Sin JavaScript se leen todas.
 - Los tres pies del sitio (infraestructura, portada fotográfica y el clásico) muestran los íconos de las redes
   sociales que el inquilino cargó, en el orden Facebook · TikTok · Instagram · LinkedIn · X, y las mismas URLs viajan
   como `sameAs` en los datos estructurados de la organización. Sin redes, el marcado no cambia.
