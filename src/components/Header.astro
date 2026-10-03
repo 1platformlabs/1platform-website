@@ -90,14 +90,26 @@ const hasNavigation = navItems.length > 0;
 // monolingual tenant must not render the control at all.
 const hasLanguageChoices = isMultilingual(Astro.locals.tenant);
 const hasMenuContent = hasNavigation || hasLanguageChoices;
+/**
+ * A destination draws its link only when the tenant also wrote its label.
+ *
+ * `t()` throws on a missing key by design, and this header renders on EVERY
+ * page, the 404 included. Translating `cta.signIn` just because `destinations.app`
+ * exists took vendefacil's whole 404 down to a 503 in PROD (2026-10-03): its
+ * copy has an app destination and no sign-in label. No label, no link — the
+ * same rule `NotFound.astro` applies to its destinations.
+ */
+const tenantCopy = Astro.locals.messages;
+const hasCopy = (key: string) => Object.hasOwn(tenantCopy, key) && tenantCopy[key] !== '';
+const signInLabel = appUrl && hasCopy('cta.signIn') ? t('cta.signIn') : null;
 const headerCtaHref = supportUrl ?? appUrl;
 const headerCtaLabel = supportUrl
-  ? t('cta.scheduleDemo')
-  : appUrl
+  ? (hasCopy('cta.scheduleDemo') ? t('cta.scheduleDemo') : null)
+  : appUrl && hasCopy('cta.getStarted')
     ? t('cta.getStarted')
     : null;
-const headerCtaAria = supportUrl ? t('cta.scheduleDemoAria') : undefined;
-const hasActions = Boolean(appUrl || headerCtaHref || hasMenuContent);
+const headerCtaAria = supportUrl && hasCopy('cta.scheduleDemoAria') ? t('cta.scheduleDemoAria') : undefined;
+const hasActions = Boolean(signInLabel || (headerCtaHref && headerCtaLabel) || hasMenuContent);
 const hasMobileFooter = Boolean(headerCtaHref || hasLanguageChoices);
 // Keep the default tenant's serialized chrome byte-for-byte stable. The
 // containment CSS only exists for a tenant that actually combines the compact
@@ -146,7 +158,7 @@ const isActive = (href: string) => href.startsWith('/') && currentPath.startsWit
     </nav>}
 
     {hasActions && <div class="site-header__actions">
-      {appUrl && <a href={appUrl} class="site-header__signin">{t('cta.signIn')}</a>}
+      {signInLabel && <a href={appUrl} class="site-header__signin">{signInLabel}</a>}
       {headerCtaHref && headerCtaLabel && (
         <a
           href={headerCtaHref}

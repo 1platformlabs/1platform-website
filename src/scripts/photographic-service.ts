@@ -27,6 +27,16 @@ function stringValue(config: JsonRecord, key: string): string | undefined {
 let activeRoot: HTMLElement | null = null;
 let releaseEnhancements: (() => void) | undefined;
 
+/** `MediaQueryList.addEventListener` is missing before Safari 14; `addListener` is not. */
+function onMediaChange(query: MediaQueryList, listener: (event: MediaQueryListEvent) => void, signal: AbortSignal) {
+  if (typeof query.addEventListener === 'function') {
+    query.addEventListener('change', listener, { signal });
+    return;
+  }
+  query.addListener(listener);
+  signal.addEventListener('abort', () => query.removeListener(listener), { once: true });
+}
+
 function initPhotographicService() {
   const root = document.querySelector<HTMLElement>('.photographic-service');
   if (!root || root === activeRoot) return;
@@ -84,7 +94,10 @@ function initPhotographicService() {
     });
   }
 
-  if (hero) {
+  // Motion is decoration: a browser without IntersectionObserver (old WebViews)
+  // keeps the static page, and must not lose the menu and calculator wired below.
+  const canObserve = 'IntersectionObserver' in window;
+  if (hero && canObserve) {
     if (!reducedMotion.matches) hero.setAttribute('data-enter', '');
     const observer = new IntersectionObserver(([entry]) => {
       if (entry) heroVisible = entry.isIntersecting;
@@ -93,20 +106,22 @@ function initPhotographicService() {
     observer.observe(hero);
     observers.push(observer);
   }
-  reducedMotion.addEventListener('change', updateMotion, { signal });
+  onMediaChange(reducedMotion, updateMotion, signal);
   document.addEventListener('visibilitychange', updateMotion, { signal });
-  const sequenceObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      const state = sequenceStates.find((item) => item.target === entry.target);
-      if (state) {
-        state.inViewport = entry.isIntersecting;
-        state.visible = entry.isIntersecting && entry.intersectionRatio >= 0.35;
-      }
-    });
-    updateMotion();
-  }, { threshold: [0, 0.35] });
-  sequenceStates.forEach(({ target }) => sequenceObserver.observe(target));
-  observers.push(sequenceObserver);
+  if (canObserve) {
+    const sequenceObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const state = sequenceStates.find((item) => item.target === entry.target);
+        if (state) {
+          state.inViewport = entry.isIntersecting;
+          state.visible = entry.isIntersecting && entry.intersectionRatio >= 0.35;
+        }
+      });
+      updateMotion();
+    }, { threshold: [0, 0.35] });
+    sequenceStates.forEach(({ target }) => sequenceObserver.observe(target));
+    observers.push(sequenceObserver);
+  }
   updateMotion();
 
   const menuToggle = root.querySelector<HTMLButtonElement>('.menu-toggle');
@@ -149,9 +164,9 @@ function initPhotographicService() {
     document.addEventListener('click', (event) => {
       if (event.target instanceof Node && !menu.hidden && !menu.contains(event.target) && !menuToggle.contains(event.target)) closeMenu();
     }, { signal });
-    window.matchMedia('(min-width: 981px)').addEventListener('change', (event) => {
+    onMediaChange(window.matchMedia('(min-width: 981px)'), (event) => {
       if (event.matches) closeMenu();
-    }, { signal });
+    }, signal);
   }
 
   const calculator = root.querySelector<HTMLFormElement>('#price-calculator');
@@ -226,7 +241,10 @@ function initPhotographicService() {
     };
     [amountField, rateField].forEach((field) => {
       field.disabled = false;
-      field.addEventListener('input', () => clearEstimate(changedText), { signal });
+      // Announce the stale estimate once per edit, not on every keystroke.
+      field.addEventListener('input', () => {
+        if (calcStatus.textContent !== changedText) clearEstimate(changedText);
+      }, { signal });
     });
     calculator.querySelectorAll<HTMLButtonElement>('button[type="submit"]').forEach((button) => { button.disabled = false; });
     calculator.addEventListener('submit', (event) => {
@@ -264,7 +282,7 @@ function initPhotographicService() {
       tablist.setAttribute('role', 'tablist');
       tablist.hidden = false;
       syncOrientation();
-      narrow.addEventListener('change', syncOrientation, { signal });
+      onMediaChange(narrow, syncOrientation, signal);
       tabs.forEach((tab, index) => {
         const screen = screens[index];
         if (!screen) return;
