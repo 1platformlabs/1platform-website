@@ -22,6 +22,12 @@ export interface FakeSite {
   tenant: Record<string, unknown> & { slug: string; domain: string };
   /** Published pages per locale. */
   pages: Map<string, PagesDocument[]>;
+  /**
+   * landing-reviews-tenant: what `GET /sites/{slug}/reviews` answers, asked on
+   * EVERY request so a spec can change it between two reads. Absent ⇒ 404, the
+   * answer of an API that does not serve the route.
+   */
+  reviews?: () => { status: number; body?: unknown };
 }
 
 export interface FakeSiteStack {
@@ -73,6 +79,13 @@ export async function startFakeSiteStack(sites: FakeSite[], readyProbe: { host: 
     if (url.pathname.endsWith('/sites/by-host')) {
       const site = byHost.get(url.searchParams.get('host') ?? '');
       if (site) return response.end(JSON.stringify({ success: true, data: site.tenant, msg: 'Site resolved' }));
+    } else if (/\/sites\/[^/]+\/reviews$/.test(url.pathname)) {
+      const slug = /\/sites\/([^/]+)\/reviews$/.exec(url.pathname)?.[1] ?? '';
+      const answer = bySlug.get(slug)?.reviews?.();
+      if (answer) {
+        response.statusCode = answer.status;
+        return response.end(JSON.stringify(answer.body ?? { success: false, data: null, msg: 'error' }));
+      }
     } else {
       const match = /\/sites\/([^/]+)\/pages$/.exec(url.pathname);
       const site = match ? bySlug.get(match[1]) : undefined;
