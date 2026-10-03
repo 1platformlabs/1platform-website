@@ -62,7 +62,7 @@ const clientCopy = {
           </div>
           <ul class="lr-histogram" aria-label={copy.histogramLabel}>
             {bars.map((bar) => (
-              <li class="lr-bar" aria-label={copy.bar(bar.rating, bar.count)}>
+              <li class="lr-bar-row" aria-label={copy.bar(bar.rating, bar.count)}>
                 <span aria-hidden="true">{bar.rating}<svg class="lr-bar-star"><use href="#lr-star" /></svg></span>
                 <span class="lr-bar-track" aria-hidden="true"><span class="lr-bar-fill" style={`width:${bar.percent}%`}></span></span>
                 <span aria-hidden="true">{bar.count}</span>

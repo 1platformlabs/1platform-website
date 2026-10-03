@@ -36,9 +36,9 @@
 .lr-section .lr-average > span { color: var(--lr-muted); font-size: 18px; font-weight: 500; letter-spacing: -.025em; white-space: nowrap; }
 .lr-section .lr-score-label { margin: 11px 0 1px; color: var(--lr-ink); font-size: 14px; font-weight: 650; }
 .lr-section .lr-histogram { display: grid; align-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.lr-section .lr-bar { display: grid; grid-template-columns: 34px minmax(0, 1fr) 24px; align-items: center; gap: 9px; font-size: 14px; line-height: 1.5; }
-.lr-section .lr-bar > span:first-child { display: inline-flex; align-items: center; gap: 3px; }
-.lr-section .lr-bar > span:last-child { text-align: right; }
+.lr-section .lr-bar-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 24px; align-items: center; gap: 9px; font-size: 14px; line-height: 1.5; }
+.lr-section .lr-bar-row > span:first-child { display: inline-flex; align-items: center; gap: 3px; }
+.lr-section .lr-bar-row > span:last-child { text-align: right; }
 .lr-section .lr-bar-star { width: 12px; height: 12px; fill: var(--lr-accent); }
 .lr-section .lr-bar-track { height: 5px; overflow: hidden; border-radius: 99px; background: color-mix(in srgb, var(--lr-accent) 10%, white); }
 .lr-section .lr-bar-fill { display: block; height: 100%; border-radius: inherit; background: var(--lr-accent); }
