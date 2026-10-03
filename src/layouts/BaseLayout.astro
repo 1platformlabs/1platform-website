@@ -24,6 +24,7 @@ import { themeColorOf, themeDeclarations } from '@lib/tenant-theme';
 import { socialLinksOf } from '@lib/social-links';
 import {
   appleTouchIconIsAvailable,
+  iconMimeType,
   resolveAppleTouchIcon,
   resolveIcon,
   resolveLogo,
@@ -233,7 +234,7 @@ const visibleAnnouncement = showAnnouncement && !modernChrome ? announcement : n
 
     </Fragment>}
 
-    <link rel="icon" type="image/svg+xml" href={icon} />
+    <link rel="icon" type={iconMimeType(icon)} href={icon} />
     {appleTouchIconAvailable && <link rel="apple-touch-icon" href={appleTouchIcon} />}
     {canonicalURL && <link rel="canonical" href={canonicalURL} />}
     {/* Not advertised by a tenant whose sitemap answers 404: every page of a

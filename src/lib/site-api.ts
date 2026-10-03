@@ -48,6 +48,36 @@ export interface SiteBrandAssets {
   apple_touch_icon?: string | null
 }
 
+/**
+ * The tenant's UPLOADED logo (api#519): the fingerprint of a PNG the API stores
+ * and serves at `/api/v1/sites/{slug}/logo/{sha256}.png`. This site re-serves it
+ * from its own origin (`/brand/logo/<sha256>.png`) and derives the favicon, the
+ * touch icon and the social card from it. Declared `brand_assets` still win.
+ */
+export interface SiteBrandLogo {
+  sha256: string
+  width: number
+  height: number
+}
+
+const SHA256_HEX = /^[0-9a-f]{64}$/
+
+/**
+ * A usable logo or null — never a reason to take the tenant offline.
+ *
+ * Unlike the fields `isTenant` checks, a malformed `brand_logo` is IGNORED: the
+ * site still renders, with its monogram. The logo is decoration; refusing the
+ * whole manifest over it would turn one bad field into an outage.
+ */
+export function normalizeBrandLogo(value: unknown): SiteBrandLogo | null {
+  if (!value || typeof value !== 'object') return null
+  const v = value as Record<string, unknown>
+  const positive = (n: unknown) => typeof n === 'number' && Number.isInteger(n) && n > 0
+  if (typeof v.sha256 !== 'string' || !SHA256_HEX.test(v.sha256)) return null
+  if (!positive(v.width) || !positive(v.height)) return null
+  return { sha256: v.sha256, width: v.width as number, height: v.height as number }
+}
+
 /** The manifest, exactly as `GET /api/v1/sites/by-host` projects it. */
 export interface SiteTenant {
   slug: string
@@ -72,6 +102,8 @@ export interface SiteTenant {
   // Optional during a rolling deploy: an API from before this additive field
   // means exactly the same as null (derive), not "take every tenant offline".
   brand_assets?: SiteBrandAssets | null
+  /** The uploaded logo, or absent/null. Optional: an older API omits it. */
+  brand_logo?: SiteBrandLogo | null
   /**
    * The site's social profiles (WRS-04). Optional and outside `isTenant()` on
    * purpose, like `brand_assets`: an API from before the field omits it, and a
@@ -193,7 +225,7 @@ export async function fetchTenantByHost(host: string, signal?: AbortSignal): Pro
     // absent tenant. Rendering half a manifest is the outcome D-22 forbids.
     throw new SiteApiUnavailable(`site API returned an unrecognised manifest for host ${host}`)
   }
-  return tenant
+  return { ...tenant, brand_logo: normalizeBrandLogo(tenant.brand_logo) }
 }
 
 /** The API wraps success payloads; accept both shapes rather than guess. */

@@ -10,7 +10,7 @@ import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, hasTenantAccess, tenantAccess } fro
 import { calculateLandingAmount } from '@lib/landing-calculator';
 import { siteOrigin } from '@lib/site-origin';
 import { alternatesForTenantPath, defaultLocaleOf, makeLocalizePath, ogLocaleOf } from '@lib/site-locale';
-import { resolveIcon, resolveSocial, resolveAppleTouchIcon, socialImageIsAvailable, appleTouchIconIsAvailable } from '@lib/tenant-brand-assets';
+import { iconMimeType, resolveIcon, resolveSocial, resolveAppleTouchIcon, resolveUploadedLogo, socialImageIsAvailable, appleTouchIconIsAvailable } from '@lib/tenant-brand-assets';
 import '@styles/photographic-service.css';
 import '@styles/photographic-panel.css';
 
@@ -29,6 +29,9 @@ const alternates = alternatesForTenantPath(tenant, Astro.originPathname);
 const icon = resolveIcon(tenant);
 const socialImage = await socialImageIsAvailable(tenant) ? new URL(resolveSocial(tenant), siteOrigin(Astro.locals)) : null;
 const touchIcon = await appleTouchIconIsAvailable(tenant) ? resolveAppleTouchIcon(tenant) : null;
+// api#519: an uploaded logo is the Organization logo; without one, the social card as before.
+const uploadedLogoPath = await resolveUploadedLogo(tenant);
+const organizationLogo = uploadedLogoPath ? new URL(uploadedLogoPath, siteOrigin(Astro.locals)) : socialImage;
 const locale = Astro.locals.locale;
 const localize = makeLocalizePath(tenant);
 const access = hasTenantAccess(tenant) ? tenantAccess(tenant, Astro.locals.messages) : null;
@@ -77,7 +80,7 @@ if (defaultCalculation && !defaultCalculation.ok) throw new Error('Invalid landi
 const sameAs = socialLinksOf(tenant).map((link) => link.href);
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: tenant.brand_name, url: canonical.toString(), description },
-  { '@context': 'https://schema.org', '@type': 'Organization', name: tenant.brand_name, url: canonical.toString(), ...(socialImage ? { logo: socialImage.toString() } : {}), ...(sameAs.length > 0 ? { sameAs } : {}) },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: tenant.brand_name, url: canonical.toString(), ...(organizationLogo ? { logo: organizationLogo.toString() } : {}), ...(sameAs.length > 0 ? { sameAs } : {}) },
   { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) },
 ];
 ---
@@ -96,7 +99,7 @@ const jsonLd = [
     {rssPath && <link rel="alternate" type="application/rss+xml" title={t('layout.rssTitle')} href={rssPath} />}
     {defaultAlternate && <link rel="alternate" hreflang="x-default" href={new URL(defaultAlternate, siteOrigin(Astro.locals))} />}
     {Object.entries(alternates).map(([language, path]) => <link rel="alternate" hreflang={language} href={new URL(path!, siteOrigin(Astro.locals))} />)}
-    <link rel="icon" href={icon} type="image/svg+xml" />
+    <link rel="icon" href={icon} type={iconMimeType(icon)} />
     {touchIcon && <link rel="apple-touch-icon" href={touchIcon} />}
     {fontKey === 'manrope' && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
     <meta property="og:type" content="website" />
