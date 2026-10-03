@@ -7,14 +7,17 @@
  * throw — and putting it in every tenant's content would mean writing
  * production data for a button label. The words that ARE the tenant's — the
  * section's title and description — come from the tenant's own settings, which
- * its owner edits in the panel. These are the controls around them, the same
- * for every tenant, in the formal register the three landings share.
+ * its owner edits in the panel; the section is on from the start, so a site whose
+ * owner never wrote a title gets `defaultTitle` in the page's language. These
+ * are the controls around them, the same for every tenant, in the formal
+ * register the three landings share.
  */
 
 import type { ReviewSource } from './site-reviews'
 
 export interface ReviewsCopy {
   eyebrow: string
+  defaultTitle: string
   summaryLabel: string
   histogramLabel: string
   outOf: string
@@ -29,8 +32,6 @@ export interface ReviewsCopy {
   moreAdded: string
   filterUpdated: string
   allShown: string
-  emptyTitle: string
-  emptyBody: string
   emptyFilteredTitle: string
   emptyFilteredBody: string
   clear: string
@@ -40,6 +41,7 @@ export interface ReviewsCopy {
 
 const ES: ReviewsCopy = {
   eyebrow: 'EN SUS PALABRAS',
+  defaultTitle: 'Lo que dicen nuestros clientes',
   summaryLabel: 'Resumen de reseñas',
   histogramLabel: 'Distribución de valoraciones',
   outOf: '/ 5',
@@ -56,8 +58,6 @@ const ES: ReviewsCopy = {
   moreAdded: 'Se han añadido más reseñas',
   filterUpdated: 'Filtro de valoración actualizado',
   allShown: 'Se muestran todas las valoraciones',
-  emptyTitle: 'Las primeras opiniones aparecerán aquí',
-  emptyBody: 'Este espacio mostrará las reseñas que el equipo publique con autorización',
   emptyFilteredTitle: 'Todavía no hay reseñas con esta valoración',
   emptyFilteredBody: 'Elija otra valoración para seguir leyendo',
   clear: 'Ver todas las reseñas',
@@ -71,6 +71,7 @@ const ES: ReviewsCopy = {
 
 const EN: ReviewsCopy = {
   eyebrow: 'IN THEIR WORDS',
+  defaultTitle: 'What our customers say',
   summaryLabel: 'Reviews summary',
   histogramLabel: 'Rating distribution',
   outOf: '/ 5',
@@ -87,8 +88,6 @@ const EN: ReviewsCopy = {
   moreAdded: 'More reviews were added',
   filterUpdated: 'Rating filter updated',
   allShown: 'All ratings are shown',
-  emptyTitle: 'The first reviews will appear here',
-  emptyBody: 'This space will show the reviews the team publishes with permission',
   emptyFilteredTitle: 'There are no reviews with this rating yet',
   emptyFilteredBody: 'Choose another rating to keep reading',
   clear: 'See all reviews',

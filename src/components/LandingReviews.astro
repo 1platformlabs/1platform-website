@@ -9,8 +9,9 @@
  * starts at the tenant's page size and grows by it.
  *
  * Only reviews the API returns are drawn, and the API returns only the
- * published AND authorised ones. Nothing here invents a rating: no public
- * review means no score, only the empty state.
+ * published AND authorised ones, and the page renders this block only when
+ * there is at least one (`resolveSiteReviews`): the section is on for every
+ * site from the start, so an empty block would promise reviews nobody writes.
  */
 import type { SiteReviews } from '@lib/site-reviews';
 import { reviewsCopy } from '@lib/landing-reviews-copy';
@@ -51,7 +52,7 @@ const clientCopy = {
     <div class="lr-head">
       <header class="lr-heading">
         <p class="lr-eyebrow">{copy.eyebrow}</p>
-        <h2 id="lr-title" class="lr-title">{reviews.title}</h2>
+        <h2 id="lr-title" class="lr-title">{reviews.title ?? copy.defaultTitle}</h2>
         {reviews.subtitle && <p class="lr-subtitle">{reviews.subtitle}</p>}
       </header>
       {summary.count > 0 && summary.average !== null && (
@@ -84,7 +85,7 @@ const clientCopy = {
         </div>
       </div>
     )}
-    {total > 0 ? (
+    {total > 0 && (
       <ol class="lr-grid" data-lr-grid>
         {reviews.reviews.map((review) => (
           <li class="lr-list-item" data-rating={review.rating}>
@@ -105,12 +106,6 @@ const clientCopy = {
           </li>
         ))}
       </ol>
-    ) : (
-      <div class="lr-empty">
-        <span class="lr-empty-mark" aria-hidden="true">“</span>
-        <p>{copy.emptyTitle}</p>
-        <span>{copy.emptyBody}</span>
-      </div>
     )}
     {total > 0 && (
       <div class="lr-empty" data-lr-filtered-empty hidden>
