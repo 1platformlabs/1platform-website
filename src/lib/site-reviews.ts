@@ -54,6 +54,7 @@ export interface ReviewSummary {
 
 export interface SiteReviews {
   enabled: boolean
+  /** The owner's heading, or `null` to use the block's own one in the page's language. */
   title: string | null
   subtitle: string | null
   sort: ReviewSort
@@ -102,7 +103,10 @@ export function parseSiteReviews(value: unknown): SiteReviews | null {
   const v = value as Record<string, unknown>
   if (typeof v.enabled !== 'boolean') return null
   if (!v.enabled) return disabled()
-  if (typeof v.title !== 'string' || !v.title.trim()) return null
+  // The section is ON from the start and its title is optional: `null` or blank
+  // means the block draws its own heading. Anything else is not a title.
+  if (v.title != null && typeof v.title !== 'string') return null
+  const title = typeof v.title === 'string' && v.title.trim() ? v.title : null
   const summary = v.summary as Record<string, unknown> | undefined
   const histogram = summary?.histogram as Record<string, unknown> | undefined
   if (!summary || !histogram || !Number.isInteger(summary.count)) return null
@@ -121,7 +125,7 @@ export function parseSiteReviews(value: unknown): SiteReviews | null {
   const pageSize = v.page_size === 6 ? 6 : 3
   return {
     enabled: true,
-    title: v.title,
+    title,
     subtitle: typeof v.subtitle === 'string' && v.subtitle.trim() ? v.subtitle : null,
     sort: v.sort === 'newest' ? 'newest' : 'featured',
     pageSize,
@@ -173,6 +177,16 @@ export async function fetchSiteReviews(slug: string, signal?: AbortSignal): Prom
 }
 
 /**
+ * Whether a parsed section is worth a block on the page. The section is on by
+ * default for EVERY site — including ones nobody manages yet — so a block with
+ * no public review would put «the first reviews will appear here» on landings
+ * where none ever will. Nothing is drawn until there is something to read.
+ */
+function drawable(section: SiteReviews): SiteReviews | null {
+  return section.enabled && section.summary.count > 0 && section.reviews.length > 0 ? section : null
+}
+
+/**
  * The section to draw, or `null` to draw none. Never throws.
  *
  * @param now injected so freshness is testable without waiting
@@ -180,10 +194,10 @@ export async function fetchSiteReviews(slug: string, signal?: AbortSignal): Prom
 export async function resolveSiteReviews(slug: string, now: number = Date.now()): Promise<SiteReviews | null> {
   if (manifestSource() === 'repo') return null
   const hit = cache.lookup(slug, now)
-  if (hit.age === 'fresh' && hit.value) return hit.value.enabled ? hit.value : null
+  if (hit.age === 'fresh' && hit.value) return drawable(hit.value)
   if (hit.age === 'stale' && hit.value) {
     cache.refreshInBackground(slug, () => fetchSiteReviews(slug), now)
-    return hit.value.enabled ? hit.value : null
+    return drawable(hit.value)
   }
   if (cache.isKnownMissing(slug, now)) return null
   try {
@@ -193,7 +207,7 @@ export async function resolveSiteReviews(slug: string, now: number = Date.now())
       return null
     }
     cache.store(slug, section, now)
-    return section.enabled ? section : null
+    return drawable(section)
   } catch {
     cache.rememberMissing(slug, now)
     return null

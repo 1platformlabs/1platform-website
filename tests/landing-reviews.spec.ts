@@ -5,6 +5,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { chromium, expect, test, type Browser, type Page } from '@playwright/test';
 
 import { repoTenantForHost } from '../src/data/site-tenants';
+import { reviewsCopy } from '../src/lib/landing-reviews-copy';
 import { __testing, parseSiteReviews, resolveSiteReviews } from '../src/lib/site-reviews';
 import { exportRepoContent, startFakeSiteStack, type FakeSite, type FakeSiteStack, type PagesDocument } from './helpers/fake-site-api';
 
@@ -87,7 +88,11 @@ test.describe('site-reviews module', () => {
     const withBad = { ...section(MEDIPAGO_REVIEWS), reviews: [...MEDIPAGO_REVIEWS, { ...MEDIPAGO_REVIEWS[0], rating: 7 }] };
     expect(parseSiteReviews(withBad)?.reviews).toHaveLength(4);
     expect(parseSiteReviews({ enabled: false })?.enabled).toBe(false);
-    expect(parseSiteReviews({ enabled: true, title: '' })).toBeNull();
+    // The section is on from the start: no title of the owner's is a valid section
+    // (the block draws its own heading); a title that is not text is not.
+    expect(parseSiteReviews(section(MEDIPAGO_REVIEWS, { title: null }))?.title).toBeNull();
+    expect(parseSiteReviews(section(MEDIPAGO_REVIEWS, { title: '   ' }))?.title).toBeNull();
+    expect(parseSiteReviews(section(MEDIPAGO_REVIEWS, { title: 7 }))).toBeNull();
   });
 
   test('a change reaches the landing after the freshness window, through ONE background refresh', async () => {
@@ -111,6 +116,15 @@ test.describe('site-reviews module', () => {
     current = { enabled: false, title: null, subtitle: null, sort: 'featured', page_size: 3, summary: { count: 0, average: null, histogram: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } }, reviews: [] };
     await resolveSiteReviews('medipago', 61_000);
     await expect.poll(async () => resolveSiteReviews('medipago', 62_000)).toBeNull();
+  });
+
+  test('on with no public review draws nothing — and appears with the first one', async () => {
+    let current: unknown = section([], { title: null });
+    answer = () => json({ success: true, data: current })();
+    expect(await resolveSiteReviews('medipago', 0)).toBeNull();
+    current = section(MEDIPAGO_REVIEWS.slice(0, 1), { title: null });
+    await resolveSiteReviews('medipago', 61_000);
+    await expect.poll(async () => (await resolveSiteReviews('medipago', 62_000))?.reviews.length).toBe(1);
   });
 
   test('the cache is keyed by tenant: one site never reads another site’s entry', async () => {
@@ -156,12 +170,13 @@ const answers: Record<string, () => { status: number; body?: unknown }> = {
   oneplatform: () => ({ status: 200, body: { success: true, data: section(MEDIPAGO_REVIEWS.slice(0, 2), { title: 'Experiencias de quienes construyen', subtitle: null, sort: 'newest' }), msg: 'ok' } }),
   apagado: () => ({ status: 200, body: { success: true, data: { enabled: false, title: null, subtitle: null, sort: 'featured', page_size: 3, summary: { count: 0, average: null, histogram: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } }, reviews: [] }, msg: 'ok' } }),
   caido: () => ({ status: 503 }),
-  vacio: () => ({ status: 200, body: { success: true, data: section([]), msg: 'ok' } }),
+  vacio: () => ({ status: 200, body: { success: true, data: section([], { title: null }), msg: 'ok' } }),
+  sintitulo: () => ({ status: 200, body: { success: true, data: section(VENDE_REVIEWS, { title: null, subtitle: null }), msg: 'ok' } }),
 };
 
 let stack: FakeSiteStack;
 let browser: Browser;
-const HOSTS = ['medipago.gt', 'vendefacil.1platform.pro', '1platform.pro', 'apagado.example', 'caido.example', 'vacio.example'];
+const HOSTS = ['medipago.gt', 'vendefacil.1platform.pro', '1platform.pro', 'apagado.example', 'caido.example', 'vacio.example', 'sintitulo.example'];
 
 test.describe('landing reviews in the browser', () => {
   test.describe.configure({ mode: 'serial' });
@@ -181,6 +196,7 @@ test.describe('landing reviews in the browser', () => {
       photographic('apagado.example', 'apagado'),
       photographic('caido.example', 'caido'),
       photographic('vacio.example', 'vacio'),
+      photographic('sintitulo.example', 'sintitulo'),
     ];
     stack = await startFakeSiteStack(sites, { host: 'medipago.gt', path: '/' });
     browser = await chromium.launch({ args: [`--host-resolver-rules=${HOSTS.map((h) => `MAP ${h} 127.0.0.1`).join(', ')}`] });
@@ -276,10 +292,17 @@ test.describe('landing reviews in the browser', () => {
     const down = await open('caido.example');
     await expect(down.locator('#resenas')).toHaveCount(0);
     await expect(down.locator('.closing-section')).toBeVisible();
+    // On by default with no public review: no block at all (not an empty promise).
     const empty = await open('vacio.example');
-    await expect(empty.getByText('Las primeras opiniones aparecerán aquí')).toBeVisible();
-    await expect(empty.locator('#resenas .lr-summary')).toHaveCount(0); // no invented rating
-    await expect(empty.locator('#resenas [data-lr-toolbar]')).toHaveCount(0);
+    await expect(empty.locator('#resenas')).toHaveCount(0);
+    await expect(empty.locator('.closing-section')).toBeVisible();
+  });
+
+  test('a site whose owner never wrote a title gets the block heading in its language', async () => {
+    const page = await open('sintitulo.example');
+    await expect(page.locator('#resenas .lr-title')).toHaveText('Lo que dicen nuestros clientes');
+    await expect(page.locator('#resenas .lr-subtitle')).toHaveCount(0);
+    expect(reviewsCopy('en').defaultTitle).toBe('What our customers say');
   });
 
   for (const [label, width, height] of [['desktop', 1440, 900], ['mobile', 390, 844], ['landscape', 844, 390]] as const) {
