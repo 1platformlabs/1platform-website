@@ -2,12 +2,18 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { useI18n } from '@i18n';
 import { docsUrl, supportUrl } from '@lib/site-destinations';
+import LandingReviews from '@components/LandingReviews.astro';
+import { resolveSiteReviews } from '@lib/site-reviews';
 import '@styles/infrastructure-home.css';
 
 const { t } = useI18n(Astro.url.pathname, Astro.locals);
 const tenant = Astro.locals.tenant;
 const contactHref = supportUrl(Astro.locals);
 const documentationHref = docsUrl(Astro.locals, '/docs/saas/1platform-api/getting-started/');
+// landing-reviews-tenant: null = no section (switched off, API silent, repo mode).
+const reviews = await resolveSiteReviews(tenant.slug);
+const locale = Astro.locals.locale;
+const formatLocale = tenant.region ? `${locale}-${tenant.region}` : locale;
 ---
 <BaseLayout title={t('infrastructure.meta.title')} description={t('infrastructure.meta.description')} showAnnouncement={false}>
 <div class="infrastructure-home" data-infrastructure-home
@@ -162,6 +168,8 @@ const documentationHref = docsUrl(Astro.locals, '/docs/saas/1platform-api/gettin
       </section>
 
       <section class="section developers" id="desarrolladores" aria-labelledby="developers-title"><div class="wrap developers-inner"><div><p class="eyebrow">{t('infrastructure.developers.eyebrow')}</p><h2 id="developers-title">{t('infrastructure.developers.title')}</h2><p>{t('infrastructure.developers.description')}</p>{documentationHref && (<a class="button button--white" href={documentationHref}>{t('infrastructure.developers.link')}<svg class="icon" aria-hidden="true"><use href="#infra-i-up" /></svg></a>)}</div><div class="developer-visual" aria-label={t('infrastructure.aria.developer')}><span>{t('infrastructure.developers.product')}</span><div class="developer-flow"><span></span><span></span><span></span></div><strong>{t('infrastructure.architecture.apiName')}</strong><small>{t('infrastructure.developers.capabilities')}</small></div></div></section>
+
+      {reviews && <LandingReviews reviews={reviews} locale={locale} formatLocale={formatLocale} />}
 
       <section class="section contact" id="contacto" aria-labelledby="contact-title"><div class="wrap contact-inner"><div><p class="eyebrow">{t('infrastructure.contact.eyebrow')}</p><h2 id="contact-title">{t('infrastructure.contact.title')}</h2><p>{t('infrastructure.contact.description')}</p></div>{contactHref && (<a class="button button--navy" href={contactHref}>{t('infrastructure.contact.whatsapp')}<svg class="icon" aria-hidden="true"><use href="#infra-i-up" /></svg></a>)}</div></section>
 
