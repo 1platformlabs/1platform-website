@@ -532,6 +532,13 @@ test('an unknown address on a tenant with a sign-in destination is its 404, not 
       expect(response.body, `${host}${path}`).not.toContain('site-header__signin');
     }
   }
+  // Medipago's copy, access pages opted in: `destinations.app` appears for the
+  // first time and its copy has no `cta.signIn` either. Its 404 must stay a 404.
+  for (const path of ['/no-existe-xyz/', '/pricing/']) {
+    const response = await getWithHost(`${appBaseUrl}${path}`, ACCESS_HOST);
+    expect(response.status, `${ACCESS_HOST}${path}`).toBe(404);
+    expect(response.body, `${ACCESS_HOST}${path}`).not.toContain('site-header__signin');
+  }
 });
 
 test('another tenant reuses the composition with its own brand, destination, font, accent and rate without cross-request leakage', async ({ landingPage: page }) => {
