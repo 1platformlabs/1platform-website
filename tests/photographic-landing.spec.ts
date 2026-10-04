@@ -520,6 +520,27 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
   });
 }
 
+test('an unknown address on a tenant with a sign-in destination is its 404, not a 503', async () => {
+  // Measured in PROD on 2026-10-03: every unknown address on vendefacil answered
+  // 503. The header draws the sign-in link whenever `destinations.app` exists and
+  // translated its label unconditionally; that tenant's copy has no `cta.signIn`,
+  // so the 404 render threw and the middleware turned it into "service down".
+  for (const host of [COMMERCE_HOST, PLAIN_COMMERCE_HOST]) {
+    for (const path of ['/no-existe-xyz/', '/pricing/', '/access/', '/request-access/']) {
+      const response = await getWithHost(`${appBaseUrl}${path}`, host);
+      expect(response.status, `${host}${path}`).toBe(404);
+      expect(response.body, `${host}${path}`).not.toContain('site-header__signin');
+    }
+  }
+  // Medipago's copy, access pages opted in: `destinations.app` appears for the
+  // first time and its copy has no `cta.signIn` either. Its 404 must stay a 404.
+  for (const path of ['/no-existe-xyz/', '/pricing/']) {
+    const response = await getWithHost(`${appBaseUrl}${path}`, ACCESS_HOST);
+    expect(response.status, `${ACCESS_HOST}${path}`).toBe(404);
+    expect(response.body, `${ACCESS_HOST}${path}`).not.toContain('site-header__signin');
+  }
+});
+
 test('another tenant reuses the composition with its own brand, destination, font, accent and rate without cross-request leakage', async ({ landingPage: page }) => {
   for (const host of [HOST, ALTERNATE_HOST, HOST, ALTERNATE_HOST]) {
     await gotoLanding(page, host);
@@ -692,6 +713,39 @@ test('a commerce tenant serves seven solutions, Delivery, the named ad channel a
   await expect(page).toHaveURL(/#anuncios$/);
   const text = await page.locator('body').innerText();
   expect(text).not.toMatch(/Medipago|médic|consultorio|4\.9|\{ads/i);
+});
+
+test('a browser without IntersectionObserver or MediaQueryList events keeps the menu and calculator', async ({ landingPage: page }) => {
+  // Old WebViews: motion may stay static, but the throw used to abort the whole
+  // enhancement, leaving the calculator disabled behind its "requires JS" text.
+  await page.addInitScript(() => {
+    delete (window as { IntersectionObserver?: unknown }).IntersectionObserver;
+    // Inherited from EventTarget, so shadow it rather than delete it.
+    Object.defineProperty(MediaQueryList.prototype, 'addEventListener', { value: undefined, configurable: true });
+  });
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await gotoLanding(page, COMMERCE_HOST);
+  await expect(page.locator('#calc-amount')).toBeEnabled();
+  await expect(page.locator('#calc-rate')).toBeEnabled();
+  await expect(page.locator('#calc-status')).toHaveText(commerceMessages['photographic.calculator.empty']);
+  expect(errors).toEqual([]);
+});
+
+test('editing the estimate announces the change once, not on every keystroke', async ({ landingPage: page }) => {
+  await gotoLanding(page, COMMERCE_HOST);
+  const status = page.locator('#calc-status');
+  const writes = await page.evaluate(() => {
+    const node = document.querySelector('#calc-status')!;
+    (window as { __statusWrites?: number }).__statusWrites = 0;
+    new MutationObserver(() => { (window as { __statusWrites?: number }).__statusWrites! += 1; })
+      .observe(node, { childList: true, characterData: true, subtree: true });
+    return 0;
+  });
+  expect(writes).toBe(0);
+  await page.locator('#calc-amount').pressSequentially('12345');
+  await expect(status).toHaveText(commerceMessages['photographic.calculator.changed']);
+  expect(await page.evaluate(() => (window as { __statusWrites?: number }).__statusWrites)).toBe(1);
 });
 
 test('the visitor types the commission: empty at first, validated per field and never a tenant rate', async ({ landingPage: page }) => {
