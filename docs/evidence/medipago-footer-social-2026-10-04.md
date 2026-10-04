@@ -95,7 +95,7 @@ de servidor deben ejecutarse de forma secuencial.
 ## Guías del repositorio
 
 `AGENTS.md` y `CLAUDE.md` del workspace permanecen sin cambios y sincronizados.
-No cambia ningún hecho transversal. La guía local y README dicen Astro 5/static
-y ausencia de CI de PR, pero el manifest y workflows actuales usan Astro 7.2.10,
-adapter Node SSR y CI de PR. Esta revisión usa los comandos/configuración reales;
-la corrección documental general queda fuera de este ajuste de pie.
+No cambia ningún hecho transversal. El `CLAUDE.md` de este worktree documenta
+Astro 7.2.10 con adapter Node SSR y CI de PR; su README también describe Astro 7
+y renderizado por tenant. Ambos coinciden con la configuración usada para esta
+revisión.
