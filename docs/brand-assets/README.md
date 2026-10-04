@@ -10,6 +10,12 @@ El marco visual se calcula sobre el PNG decodificado, después de la normalizaci
 
 `tenants.json` contiene `oneplatform`, `medipago` y `vendefacil`, con dominios, procedencia y SHA-256. Cada directorio guarda `logo-source.png` (original exacto del root), `logo.png` (canvas transparente encuadrado para upload) y `favicon.png` (original de 512 px). `node scripts/prepare-brand-assets.mjs` reproduce el encuadre; no regenera el arte ni usa la red.
 
+El preparador no acepta argumentos: opera únicamente sobre el kit del repositorio,
+independientemente del directorio actual. Preparación y preview validan que cada
+ruta sea exactamente `<site_slug>/<archivo del rol>` y rechazan enlaces simbólicos.
+El preparador valida todas las rutas antes de escribir; no admite destinos fuera
+del kit ni duplicados de tenant.
+
 La herramienta de configuración está en la rama API `feat/tenant-brand-assets`, `scripts/configure_tenant_brand_assets.py`. Valida pertenencia real antes de vincular el sitio mediante `App.config.branding.site_slug`. No debe deducirse un App de Vende Fácil por su nombre o por existir su landing. No se aplicó configuración remota en esta entrega.
 
 ## Revisión local

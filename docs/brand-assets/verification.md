@@ -91,3 +91,46 @@ del coordinador, no con nuevas referencias visuales.
 Esta verificación local precede al commit y PR de integración. No incluye
 merge, despliegue ni configuración de tenants remotos.
 `AGENTS.md`, `CLAUDE.md`, dependencias y lockfile permanecen sin cambios.
+
+## Seguimiento de CI del PR #144
+
+El HEAD `bf7210dbdb830bc43cb486ed7d43ad0c97995530` tuvo dos gates rojos
+después de la verificación anterior. La corrida
+[37212648968](https://github.com/1platformlabs/1platform-website/actions/runs/37212648968)
+registró **49 rutas idénticas y 51 diferentes** en el job de no regresión
+`111466778116`. El check independiente de Sonar `111466948842` informó niveles
+C en seguridad y fiabilidad de código nuevo; que el job del scanner terminara
+correctamente no significaba que pasara su Quality Gate.
+
+La causa del primer fallo era CSS de `TenantBrand` que Astro incluía incluso al
+renderizar sólo el fallback. Además, las reglas específicas de uploads cambiaban
+los hashes de dos hojas globales. Las reglas ahora se emiten con el arte subido;
+las hojas globales recuperan sus bytes anteriores. **No se modificaron baseline,
+snapshots ni normalizadores.** La nueva prueba de fallback comprueba también la
+ausencia de esos estilos en las homes ES/EN sin upload.
+
+Las once anotaciones de Sonar motivaron cambios acotados: manifiesto fijo sin
+argumentos CLI; validación de rutas, roles y symlinks del kit; paralelización de
+trabajos independientes; comprobación explícita de la entrada de caché
+`!== undefined`; y extracción del cálculo de límites y transparencia en funciones
+separadas. Los umbrales alpha, margen óptico y tratamiento blanco no cambian.
+Hay regresiones para traversal, rutas de otro tenant, symlinks de origen/destino
+y logos completamente transparentes.
+
+Validación del seguimiento, el 2026-10-04:
+
+| Gate | Resultado |
+| --- | --- |
+| `npm run check:baseline -- --explain` (incluye build SSR) | **100/100 idénticas**, 0 diferentes, 0 estados/destinos erróneos |
+| Cinco specs afectadas, `PLAYWRIGHT_PORT=4502`, 2 workers | **38/38**, 0 omitidas, 0 flaky; incluye los 9 casos de marca en navegador |
+| `npm run typecheck` | 0 errores, 0 advertencias, 27 hints |
+| `npm run check` | PASS y 53 self-tests |
+| Reproducir `prepare-brand-assets.mjs` y comparar kit con Git | 0 diferencias en manifiesto ni PNG |
+| `git diff --check` | PASS |
+
+El [reporte del seguimiento](evidence/ci-follow-up.json) conserva las anotaciones
+originales, los resultados intermedios, los hashes de logs y las fuentes probadas.
+La suite completa y Linux visual de la sección anterior certifican el estado
+anterior; aquí se repitieron los gates afectados. La nueva corrida de CI y el
+reanálisis de Sonar quedan pendientes del push del coordinador. No se modificó
+su configuración ni se silenciaron reglas para obtener verde.

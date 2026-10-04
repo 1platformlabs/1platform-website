@@ -50,6 +50,14 @@ test.afterAll(async () => {
   });
 });
 
+test('no-upload pages preserve the legacy HTML without brand image styles', async ({ request }) => {
+  for (const path of ['/', '/es/']) {
+    const response = await request.get(path);
+    expect(response.status()).toBe(200);
+    expect(await response.text()).not.toContain('tenant-brand-image');
+  }
+});
+
 for (const site of cases) {
   for (const width of [360, 390, 1440]) {
     test(`${site.host}: uploaded logo and independent favicon at ${width}px`, async ({ page }, testInfo) => {

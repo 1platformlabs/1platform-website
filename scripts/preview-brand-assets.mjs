@@ -6,6 +6,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { loadPreviewSites, previewResponse } from './preview-landings.mjs';
+import { BRAND_KIT_ROOT, kitAssetFile } from './brand-kit.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 function previewPort(name, fallback) {
@@ -22,18 +23,19 @@ const vende = await readJson('../tests/fixtures/vendefacil-site.json');
 sites.push({ tenant: vende.tenant, hosts: ['vendefacil.localhost'], content: new Map([['es', vende.pagesResponse]]) });
 const kit = await readJson('../docs/brand-assets/tenants.json');
 const bytes = new Map();
-for (const entry of kit.tenants) {
+await Promise.all(kit.tenants.map(async entry => {
   const site = sites.find(site => site.tenant.slug === entry.site_slug);
   if (!site) throw new Error(`Missing fixture: ${entry.site_slug}`);
-  for (const role of ['logo', 'favicon']) {
-    const original = await readFile(new URL(`../docs/brand-assets/${entry.assets[role].path}`, import.meta.url));
+  await Promise.all(['logo', 'favicon'].map(async role => {
+    const assetFile = await kitAssetFile(BRAND_KIT_ROOT, entry.site_slug, entry.assets[role].path, `${role}.png`);
+    const original = await readFile(assetFile);
     if (createHash('sha256').update(original).digest('hex') !== entry.assets[role].sha256) throw new Error(`Asset checksum: ${entry.site_slug}/${role}`);
     const { data, info } = await sharp(original).resize({ width: 1024, height: 1024, fit: 'inside', withoutEnlargement: true }).png().toBuffer({ resolveWithObject: true });
     const sha256 = createHash('sha256').update(data).digest('hex');
     site.tenant[`brand_${role}`] = { sha256, width: info.width, height: info.height };
     bytes.set(`/api/v1/sites/${entry.site_slug}/${role}/${sha256}.png`, data);
-  }
-}
+  }));
+}));
 const api = createServer((req, res) => {
   const url = new URL(req.url, 'http://127.0.0.1');
   const png = bytes.get(url.pathname);
@@ -47,7 +49,7 @@ function stop(code = 0) {
   if (stopping) return;
   stopping = true;
   process.exitCode = code;
-  if (app && app.exitCode === null) app.kill('SIGTERM');
+  if (app?.exitCode === null) app.kill('SIGTERM');
   api.close();
 }
 api.on('error', (error) => { console.error(error.message); stop(1); });

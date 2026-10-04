@@ -70,3 +70,9 @@ test('transparent artwork can use a white silhouette on dark surfaces', async ()
   __logoTesting.setFetcher(async () => image)
   expect(await tenantBrandImage({ ...tenant(), slug: 'silhouette' }, 'lockup')).toMatchObject({ canTintWhite: true })
 })
+
+test('invisible uploads preserve the fallback rather than producing an empty frame', async () => {
+  const image = await sharp({ create: { width: 10, height: 10, channels: 4, background: '#00000000' } }).png().toBuffer()
+  __logoTesting.setFetcher(async () => image)
+  expect(await tenantBrandImage({ ...tenant(), slug: 'empty-frame' }, 'lockup')).toBeNull()
+})

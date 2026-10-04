@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   regla 10 lo exime sólo en ese archivo y para esos nombres.
 
 ### Fixed
+- Los sitios sin logo subido conservan su HTML y CSS anteriores; el preparador del kit de marca rechaza rutas externas, roles cruzados y enlaces simbólicos antes de escribir.
 - La reversión del parche de servicios valida los valores anteriores incluso en las claves que la aplicación reemplaza; un plan alterado se rechaza antes de escribir.
 - El menú móvil abierto se desplaza cuando no cabe en una pantalla horizontal;
   sus últimos destinos ya no quedan fuera de alcance.

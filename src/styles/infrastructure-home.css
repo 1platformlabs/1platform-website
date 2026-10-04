@@ -336,6 +336,3 @@
 .infrastructure-home .hero-stop-1 { stop-color: #90b8ed; }
 .infrastructure-home .hero-stop-2 { stop-color: #a4d7e6; }
 .infrastructure-home .hero-stop-3 { stop-color: #c4d7ff; }
-
-/* Uploaded symbols keep their own artwork and transparent background. */
-:is(.mini-mark, .brand-mark, .closing-mark, .integration-logo):has(> .tenant-brand-image) { background: transparent; padding: 0; border-radius: 0; }
