@@ -1,0 +1,28 @@
+{
+  "command": "PLAYWRIGHT_PORT=4502 npm test -- --workers=2 --reporter=line,json",
+  "stats": {
+    "startTime": "2026-10-04T15:10:37.422Z",
+    "duration": 56644.921,
+    "expected": 516,
+    "skipped": 32,
+    "unexpected": 1,
+    "flaky": 0
+  },
+  "raw_report": {
+    "path": "/tmp/website-brand-final.LYjV9c/functional-final.json",
+    "sha256": "56696ed9c81be03474b69ffaa39ee052de8b6c2ea5252983945f68f0ff5394d6"
+  },
+  "errors": [],
+  "failures": [
+    {
+      "title": "1platform.localhost: uploaded logo and independent favicon at 360px",
+      "file": "tenant-brand-chrome.spec.ts",
+      "errors": [
+        "Error: The isolated SSR must render the uploaded brand before browser checks\n\nThe isolated SSR must render the uploaded brand before browser checks\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false\n\nCall Log:\n- Timeout 25000ms exceeded while waiting on the predicate\n\n  32 |       return response.ok && (await response.text()).includes('tenant-brand-image');\n  33 |     } catch { return false; }\n> 34 |   }, { timeout: 25_000, message: 'The isolated SSR must render the uploaded brand before browser checks' }).toBe(true);\n     |                                                                                                             ^\n  35 |   for (const { host } of cases) {\n  36 |     const response = await fetch(`http://127.0.0.1:${apiPort}/api/v1/sites/by-host?host=${host}`);\n  37 |     expect(response.ok).toBe(true);\n    at /Users/staimer/Documents/1platform-worktrees/landing-logos-digital-website/tests/tenant-brand-chrome.spec.ts:34:109"
+      ]
+    }
+  ],
+  "classification": "Test harness readiness used Node fetch with a Host header; fetch silently discarded it. Replaced with the existing getWithHost helper; favicon now fetched inside the real browser origin. No renderer change.",
+  "not_run_brand_cases": 8,
+  "follow_up": "functional-final.json: all 9 new brand cases pass"
+}

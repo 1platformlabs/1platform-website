@@ -2974,3 +2974,7 @@ body.photographic-service {
     overscroll-behavior: contain;
   }
 }
+
+/* Uploaded symbols keep their own artwork and transparent background. */
+:is(.mini-mark, .brand-mark, .closing-mark, .integration-logo):has(> .tenant-brand-image) { background: transparent; padding: 0; border-radius: 0; }
+.photographic-service .closing-mark:has(> .tenant-brand-image) { width: 1em; height: 1em; opacity: 0.09; }

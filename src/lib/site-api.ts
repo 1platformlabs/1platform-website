@@ -104,6 +104,8 @@ export interface SiteTenant {
   brand_assets?: SiteBrandAssets | null
   /** The uploaded logo, or absent/null. Optional: an older API omits it. */
   brand_logo?: SiteBrandLogo | null
+  /** Independent uploaded favicon. Older APIs omit this additive field. */
+  brand_favicon?: SiteBrandLogo | null
   /**
    * The site's social profiles (WRS-04). Optional and outside `isTenant()` on
    * purpose, like `brand_assets`: an API from before the field omits it, and a
@@ -225,7 +227,7 @@ export async function fetchTenantByHost(host: string, signal?: AbortSignal): Pro
     // absent tenant. Rendering half a manifest is the outcome D-22 forbids.
     throw new SiteApiUnavailable(`site API returned an unrecognised manifest for host ${host}`)
   }
-  return { ...tenant, brand_logo: normalizeBrandLogo(tenant.brand_logo) }
+  return { ...tenant, brand_logo: normalizeBrandLogo(tenant.brand_logo), brand_favicon: normalizeBrandLogo(tenant.brand_favicon) }
 }
 
 /** The API wraps success payloads; accept both shapes rather than guess. */

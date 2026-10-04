@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Logo subido del tenant en cabeceras, pies y acceso; favicon independiente como símbolo compacto, con fallback actual y rutas del mismo origen aisladas por tenant y hash. Kit de carga y preview local para 1Platform, Medipago y Vende Fácil.
 - Tienda en línea y Correo profesional opcionales por contenido del tenant; cuadrícula uniforme de seis tarjetas, CTA comerciales configurados y parche offline de SitePages con diff y reversión.
 - Bloque de reseñas en la landing de cada inquilino (landing-reviews-tenant, LRT-08): Medipago y Vende Fácil (antes
   del cierre) y 1Platform (antes del contacto) muestran las reseñas publicadas y autorizadas que su dueño gestiona

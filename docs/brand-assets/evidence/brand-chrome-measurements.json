@@ -1,0 +1,202 @@
+{
+  "source_tree_sha256": "464f9921303578e00790c6ea90cec4020d4e6a3208ba3fafe868cd59e5837882",
+  "count": 9,
+  "measurements": [
+    {
+      "host": "1platform.localhost",
+      "width": 360,
+      "logoPath": "/brand/logo/43821bb86aee5b9cc5764f4d7ac43fcd53103c80f92d549e2705353c67449766.png",
+      "iconPath": "/brand/favicon/a657669cc2c8cc036b773c5a84d31594e8c32a9f59eff0478b9284dd8f9c37c8.png",
+      "brandBox": {
+        "x": 31,
+        "y": 24,
+        "width": 150,
+        "height": 46
+      },
+      "logoBox": {
+        "x": 31,
+        "y": 32.28125,
+        "width": 150,
+        "height": 29.4375
+      },
+      "ctaBox": null
+    },
+    {
+      "host": "1platform.localhost",
+      "width": 390,
+      "logoPath": "/brand/logo/43821bb86aee5b9cc5764f4d7ac43fcd53103c80f92d549e2705353c67449766.png",
+      "iconPath": "/brand/favicon/a657669cc2c8cc036b773c5a84d31594e8c32a9f59eff0478b9284dd8f9c37c8.png",
+      "brandBox": {
+        "x": 31,
+        "y": 24,
+        "width": 150,
+        "height": 46
+      },
+      "logoBox": {
+        "x": 31,
+        "y": 32.28125,
+        "width": 150,
+        "height": 29.4375
+      },
+      "ctaBox": null
+    },
+    {
+      "host": "1platform.localhost",
+      "width": 1440,
+      "logoPath": "/brand/logo/43821bb86aee5b9cc5764f4d7ac43fcd53103c80f92d549e2705353c67449766.png",
+      "iconPath": "/brand/favicon/a657669cc2c8cc036b773c5a84d31594e8c32a9f59eff0478b9284dd8f9c37c8.png",
+      "brandBox": {
+        "x": 65,
+        "y": 42,
+        "width": 180,
+        "height": 46
+      },
+      "logoBox": {
+        "x": 65,
+        "y": 47.328125,
+        "width": 180,
+        "height": 35.328125
+      },
+      "ctaBox": {
+        "x": 1100.59375,
+        "y": 37,
+        "width": 282.40625,
+        "height": 56
+      }
+    },
+    {
+      "host": "medipago.localhost",
+      "width": 360,
+      "logoPath": "/brand/logo/c6771fe959622017ce046c694dcd01a25a6ef07d2e3c543e7805474ad9f6444e.png",
+      "iconPath": "/brand/favicon/9ae843ded7d98946a7cc78e363968494529b5a9873b7bac8352799a973ce429f.png",
+      "brandBox": {
+        "x": 27,
+        "y": 24.1875,
+        "width": 130.53125,
+        "height": 44
+      },
+      "logoBox": {
+        "x": 27,
+        "y": 32.234375,
+        "width": 130.53125,
+        "height": 27.90625
+      },
+      "ctaBox": {
+        "x": 163.53125,
+        "y": 24,
+        "width": 122.46875,
+        "height": 44.390625
+      }
+    },
+    {
+      "host": "medipago.localhost",
+      "width": 390,
+      "logoPath": "/brand/logo/c6771fe959622017ce046c694dcd01a25a6ef07d2e3c543e7805474ad9f6444e.png",
+      "iconPath": "/brand/favicon/9ae843ded7d98946a7cc78e363968494529b5a9873b7bac8352799a973ce429f.png",
+      "brandBox": {
+        "x": 29,
+        "y": 24.1875,
+        "width": 142.53125,
+        "height": 44
+      },
+      "logoBox": {
+        "x": 29,
+        "y": 30.953125,
+        "width": 142.53125,
+        "height": 30.46875
+      },
+      "ctaBox": {
+        "x": 181.53125,
+        "y": 24,
+        "width": 130.46875,
+        "height": 44.390625
+      }
+    },
+    {
+      "host": "medipago.localhost",
+      "width": 1440,
+      "logoPath": "/brand/logo/c6771fe959622017ce046c694dcd01a25a6ef07d2e3c543e7805474ad9f6444e.png",
+      "iconPath": "/brand/favicon/9ae843ded7d98946a7cc78e363968494529b5a9873b7bac8352799a973ce429f.png",
+      "brandBox": {
+        "x": 65,
+        "y": 41,
+        "width": 180,
+        "height": 44
+      },
+      "logoBox": {
+        "x": 65,
+        "y": 43.75,
+        "width": 180,
+        "height": 38.484375
+      },
+      "ctaBox": {
+        "x": 1220.53125,
+        "y": 37.796875,
+        "width": 162.46875,
+        "height": 50.390625
+      }
+    },
+    {
+      "host": "vendefacil.localhost",
+      "width": 360,
+      "logoPath": "/brand/logo/dcfe44f0b9479bc1bb690cf0896c464f5c8f6cea6d281c07b7986f6a627d9bc1.png",
+      "iconPath": "/brand/favicon/8832785d0609373fce198479e83d0ca27f9443727d1e5f646c659f8fcca11041.png",
+      "brandBox": {
+        "x": 27,
+        "y": 24,
+        "width": 150,
+        "height": 44
+      },
+      "logoBox": {
+        "x": 27,
+        "y": 31.640625,
+        "width": 150,
+        "height": 28.703125
+      },
+      "ctaBox": null
+    },
+    {
+      "host": "vendefacil.localhost",
+      "width": 390,
+      "logoPath": "/brand/logo/dcfe44f0b9479bc1bb690cf0896c464f5c8f6cea6d281c07b7986f6a627d9bc1.png",
+      "iconPath": "/brand/favicon/8832785d0609373fce198479e83d0ca27f9443727d1e5f646c659f8fcca11041.png",
+      "brandBox": {
+        "x": 29,
+        "y": 24,
+        "width": 150,
+        "height": 44
+      },
+      "logoBox": {
+        "x": 29,
+        "y": 31.640625,
+        "width": 150,
+        "height": 28.703125
+      },
+      "ctaBox": null
+    },
+    {
+      "host": "vendefacil.localhost",
+      "width": 1440,
+      "logoPath": "/brand/logo/dcfe44f0b9479bc1bb690cf0896c464f5c8f6cea6d281c07b7986f6a627d9bc1.png",
+      "iconPath": "/brand/favicon/8832785d0609373fce198479e83d0ca27f9443727d1e5f646c659f8fcca11041.png",
+      "brandBox": {
+        "x": 65,
+        "y": 41,
+        "width": 180,
+        "height": 44
+      },
+      "logoBox": {
+        "x": 65,
+        "y": 45.765625,
+        "width": 180,
+        "height": 34.453125
+      },
+      "ctaBox": {
+        "x": 1209.6875,
+        "y": 39,
+        "width": 173.3125,
+        "height": 48
+      }
+    }
+  ]
+}

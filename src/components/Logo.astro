@@ -1,4 +1,5 @@
 ---
+import TenantBrand from '@components/TenantBrand.astro';
 import { useI18n } from '@i18n';
 const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
 
@@ -50,7 +51,7 @@ const homeHref = tenant.pages.includes('/') ? l('/') : null;
     aria-label={accessibleLabel}
     style={wordmarkStyle}
   >
-    {mark && <span class="logo__mark" aria-hidden="true">{mark}</span>}<span class="logo__text">{wordmark}</span>
+    <TenantBrand>{mark && <span class="logo__mark" aria-hidden="true">{mark}</span>}<span class="logo__text">{wordmark}</span></TenantBrand>
   </a>
 ) : (
   <span
@@ -59,7 +60,7 @@ const homeHref = tenant.pages.includes('/') ? l('/') : null;
     aria-label={tenant.brand_name}
     style={wordmarkStyle}
   >
-    {mark && <span class="logo__mark" aria-hidden="true">{mark}</span>}<span class="logo__text" aria-hidden="true">{wordmark}</span>
+    <TenantBrand>{mark && <span class="logo__mark" aria-hidden="true">{mark}</span>}<span class="logo__text" aria-hidden="true">{wordmark}</span></TenantBrand>
   </span>
 )}
 

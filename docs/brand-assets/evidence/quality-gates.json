@@ -1,0 +1,27 @@
+{
+  "source_tree_sha256": "464f9921303578e00790c6ea90cec4020d4e6a3208ba3fafe868cd59e5837882",
+  "typecheck": {
+    "command": "npm run typecheck",
+    "exit_code": 0,
+    "errors": 0,
+    "warnings": 0,
+    "hints": 27,
+    "log_sha256": "31994ce919ddc4a342fa9398c22a113ecd8d92cb135c223e4401274cb7512afc"
+  },
+  "design_guard": {
+    "command": "npm run check",
+    "exit_code": 0,
+    "self_tests": 53,
+    "log_sha256": "bcb131e96d8116a769fc100fe5d7dcc0124a4340f9a66f4dc1a607c4f7a73c1d"
+  },
+  "diff_check": {
+    "command": "git diff --check",
+    "exit_code": 0
+  },
+  "ports_released": [
+    4502,
+    4510,
+    4511
+  ],
+  "source_changed_since_verification": []
+}
