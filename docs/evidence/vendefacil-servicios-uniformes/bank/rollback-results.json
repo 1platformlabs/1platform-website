@@ -1,0 +1,37 @@
+[
+  {
+    "name": "rollback preconditions refuse",
+    "pass": true,
+    "detail": "Rollback preimage changed: photographic.solutions.links.4.label"
+  },
+  {
+    "name": "rollback preconditions accept",
+    "pass": true,
+    "detail": "Preconditions match. No request sent."
+  },
+  {
+    "name": "staff PUT accepted",
+    "pass": true,
+    "detail": "200"
+  },
+  {
+    "name": "HTTP write persisted exactly in Mongo",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "rollback keeps manifest and all other documents exact",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "rollback removes only the new content",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "apply preconditions refuse",
+    "pass": true,
+    "detail": "Site changed after planning; export and review again"
+  }
+]

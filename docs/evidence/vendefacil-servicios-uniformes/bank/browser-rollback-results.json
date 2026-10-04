@@ -1,0 +1,50 @@
+[
+  {
+    "name": "no horizontal overflow 1440",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 1440",
+    "pass": true
+  },
+  {
+    "name": "rollback exact rendering vendefacil.1platform.pro/ 1440",
+    "pass": true,
+    "detail": [
+      "b9bdcfca6dd4a22bb7cdf22cd2d2c4b55a65347a0c235db5264b1e5194fe984c",
+      "b9bdcfca6dd4a22bb7cdf22cd2d2c4b55a65347a0c235db5264b1e5194fe984c"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 390",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 390",
+    "pass": true
+  },
+  {
+    "name": "rollback exact rendering vendefacil.1platform.pro/ 390",
+    "pass": true,
+    "detail": [
+      "49461ead8c2d393c3c3bb5d5444c89f4970114a588aeedc68837936a24bd3f43",
+      "49461ead8c2d393c3c3bb5d5444c89f4970114a588aeedc68837936a24bd3f43"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 844",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 844",
+    "pass": true
+  },
+  {
+    "name": "rollback exact rendering vendefacil.1platform.pro/ 844",
+    "pass": true,
+    "detail": [
+      "53fa0c935ab880ab279a3a34856ef119931ba9a587c038fce5b44d0eda2556fe",
+      "53fa0c935ab880ab279a3a34856ef119931ba9a587c038fce5b44d0eda2556fe"
+    ]
+  }
+]

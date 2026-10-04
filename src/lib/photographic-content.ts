@@ -4,10 +4,10 @@ import { i18nKey } from '../i18n/key'
 import { isAdvertisingChannel, nameAdvertisingChannel } from './advertising-channels'
 
 /** Symbols of the composition's sprite that content may pick by name. */
-export const ILLUSTRATION_ICONS = ['phone', 'link', 'receipt', 'chat', 'person', 'clock', 'team', 'home', 'card', 'truck', 'megaphone'] as const
+export const ILLUSTRATION_ICONS = ['phone', 'link', 'receipt', 'chat', 'person', 'clock', 'team', 'home', 'card', 'truck', 'megaphone', 'bag', 'book', 'mail'] as const
 type IllustrationIcon = typeof ILLUSTRATION_ICONS[number]
 /** Anchors a tenant's solution shortcuts may point at, each to a block the page renders. */
-const SOLUTION_ANCHORS = { '#cobros-presenciales': 'card1', '#enlaces-de-cobro': 'card2', '#facturacion': 'card3', '#delivery': 'delivery', '#anuncios': 'ads' } as const
+const SOLUTION_ANCHORS = { '#cobros-presenciales': 'card1', '#enlaces-de-cobro': 'card2', '#facturacion': 'card3', '#delivery': 'delivery', '#tienda-online': 'store', '#correo-profesional': 'email', '#anuncios': 'ads' } as const
 
 /** This composition consumes the same request-local SitePage dictionary as every home. */
 export function photographicContent(messages: Record<string, string>, tenant: SiteTenant) {
@@ -126,7 +126,30 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
     benefits: [0, 1].map((index) => copy(`verticals.ads.benefits.${index}`)),
     cta: copy('verticals.ads.cta'),
   } : null
-  const rendered = new Set<string>(['card1', 'card2', 'card3', ...(delivery ? ['delivery'] : []), ...(ads ? ['ads'] : [])])
+  const serviceCard = (kind: 'store' | 'email') => ({
+    eyebrow: copy(`verticals.${kind}.eyebrow`), title: copy(`verticals.${kind}.title`),
+    description: copy(`verticals.${kind}.description`), stageLabel: copy(`verticals.${kind}.stageLabel`),
+    panelTitle: copy(`verticals.${kind}.panelTitle`), tag: copy(`verticals.${kind}.tag`),
+    benefits: [0, 1].map((index) => copy(`verticals.${kind}.benefits.${index}`)),
+    cta: copy(`verticals.${kind}.cta`),
+    contactMessage: copy(`contact.messages.${kind}`),
+  })
+  const store = has('verticals.store.title') ? {
+    ...serviceCard('store'), address: copy('verticals.store.address'),
+    products: [0, 1].map((index) => ({
+      title: copy(`verticals.store.products.${index}.title`), category: copy(`verticals.store.products.${index}.category`),
+      icon: icon(`verticals.store.products.${index}.icon`),
+    })),
+    summaryTitle: copy('verticals.store.summaryTitle'), summaryText: copy('verticals.store.summaryText'),
+  } : null
+  const email = has('verticals.email.title') ? {
+    ...serviceCard('email'), identityLabel: copy('verticals.email.identityLabel'), address: copy('verticals.email.address'),
+    messageLabel: copy('verticals.email.messageLabel'), subject: copy('verticals.email.subject'),
+    message: copy('verticals.email.message'), signature: copy('verticals.email.signature'),
+  } : null
+  const solutionsMode = messages['photographic.solutions.mode']
+  if (solutionsMode !== undefined && solutionsMode !== 'uniform') throw new Error('Invalid photographic solutions mode')
+  const rendered = new Set<string>(['card1', 'card2', 'card3', ...(delivery ? ['delivery'] : []), ...(store ? ['store'] : []), ...(email ? ['email'] : []), ...(ads ? ['ads'] : [])])
   const solutionLinks = listIndexes(/^photographic\.solutions\.links\.(\d+)\.(label|href|footerLabel)$/, 2, 8, 'solution link').map((index) => {
     const href = copy(`solutions.links.${index}.href`)
     if (!Object.hasOwn(SOLUTION_ANCHORS, href) || !rendered.has(SOLUTION_ANCHORS[href as keyof typeof SOLUTION_ANCHORS])) {
@@ -179,15 +202,17 @@ export function photographicContent(messages: Record<string, string>, tenant: Si
   const icons = new Set<string>([...heroFeatures.map((item) => item.icon), ...route.map((item) => item.icon), ...audiences.map((item) => item.icon)])
   if (delivery) icons.add('truck')
   if (ads) icons.add('megaphone')
+  if (store) { icons.add('bag'); store.products.forEach((product) => icons.add(product.icon)) }
+  if (email) icons.add('mail')
   return {
     copy, contactHref, navigation, steps, audiences, faqs, calculator, manualCalculator, panel, fontKey,
-    heroFeatures, delivery, ads, solutionLinks, route, typeScale,
+    heroFeatures, delivery, store, email, ads, solutionsMode, solutionLinks, route, typeScale,
     routeLabel: route.length > 0 ? copy('route.label') : null,
     // The link card's footnote historically repeats the second hero capability.
     linkFootnote: filled('illustrations.linkFootnote') ? copy('illustrations.linkFootnote') : copy('hero.feature2'),
     footerAction: filled('actions.footer') ? copy('actions.footer') : copy('actions.header'),
     /** Optional symbols the sprite must carry, beyond the composition's fixed set. */
-    extraIcons: (['truck', 'megaphone'] as const).filter((name) => icons.has(name)),
+    extraIcons: (['truck', 'megaphone', 'bag', 'book', 'mail'] as const).filter((name) => icons.has(name)),
     palette: messages['photographic.theme.palette'] === 'brand' ? 'brand' : 'service',
     brandStyle: `--accent:${tenant.theme.accent};--accent-ink:${tenant.theme.accent_contrast};--tenant-font-family:${font}`,
     clientConfig: {

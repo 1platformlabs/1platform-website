@@ -1,0 +1,14 @@
+{
+  "src/lib/photographic-content.ts": "ecebf6fd646ca9335afd75fa45de0daa64ca3faef3bd81541c57b39b6cc63ea9",
+  "src/page-content/PhotographicServiceHome.astro": "22dafbc29f63169b58c501cec332132a890649073457d1ad4d964125561f1502",
+  "src/components/PhotographicCommerceCards.astro": "3ecce9a3333939b1133e26452fe97f0432b40fc42595070267232c2045cf8b89",
+  "src/styles/photographic-commerce-cards.css": "cb3febe0de0e6e7e687bde99f80ad250e68f3af51bd4a7991350576da9cfaef3",
+  "tests/fixtures/vendefacil-site.json": "884ffab738296d907cb8bc5d2afd330e1272f7ba474bb9902b08cd9a25ec74c8",
+  "docs/content-patches/vendefacil-servicios-uniformes/patch-root.es.json": "4ed49d605b7d0c17248ccce8c5669eeee9fe7ac475e8d9e041f9bd1a46d3dfb2",
+  "prototype/index.html": "cc1112e38f524e9e91ce60df200225c7ca08b7735bd28952a9b6a98c4995ac5d",
+  "prototype/tenant.css": "90ac4be819d241301a245959d1df9569523dbcdcc9a944fcd6fba0c8f132d8d5",
+  "prototype/styles.css": "97553311244b5632b2cea3dbe5f63de11151dbdf5d617029796823f00405d7a3",
+  "prototype/landing.js": "bff5743444f33e6d2269e494068cda1579dad6e7bc1168328d8f7b8eb316ce28",
+  "prototype/prototype.js": "178474f61e5f30c5652945f086adcbd7806c8dac29967d3254d1a282d4a48222",
+  "prototype/calculator.js": "42041bcc9781e07ad4bf3869a5ca7f1ec894d6ceb2f4440c878958f96ded0dd2"
+}

@@ -1,0 +1,146 @@
+[
+  {
+    "name": "no horizontal overflow 1440",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 1440",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering medipago.gt/ 1440",
+    "pass": true,
+    "detail": [
+      "80eacc9c26c994ee966ccffa071d0f17146d06ba016acf4b3304f7201f30333c",
+      "80eacc9c26c994ee966ccffa071d0f17146d06ba016acf4b3304f7201f30333c"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 390",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 390",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering medipago.gt/ 390",
+    "pass": true,
+    "detail": [
+      "f417b7d3c2ba58f8ee5739d40080015d18d955c65f6eabefecf6c2050947a339",
+      "f417b7d3c2ba58f8ee5739d40080015d18d955c65f6eabefecf6c2050947a339"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 844",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 844",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering medipago.gt/ 844",
+    "pass": true,
+    "detail": [
+      "7afb1850eea09750d1f617b6868001eec45cf6089433bbe25360b2c39495896c",
+      "7afb1850eea09750d1f617b6868001eec45cf6089433bbe25360b2c39495896c"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 1440",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 1440",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering 1platform.pro/ 1440",
+    "pass": true,
+    "detail": [
+      "1f36c4fac6db3d7ef928dd9f9c97219f084fe3b5ab43bcbc85f25650a3f4fc5f",
+      "1f36c4fac6db3d7ef928dd9f9c97219f084fe3b5ab43bcbc85f25650a3f4fc5f"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 390",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 390",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering 1platform.pro/ 390",
+    "pass": true,
+    "detail": [
+      "0699e6cb8744cf654d611ab36ccd35044215e7fc37774fa69a683b112d8c4cce",
+      "0699e6cb8744cf654d611ab36ccd35044215e7fc37774fa69a683b112d8c4cce"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 844",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 844",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering 1platform.pro/ 844",
+    "pass": true,
+    "detail": [
+      "9e0d8dc5de428436e29f49afa4da33e6eb5a09a59707b5800ad76a5b77a88aaa",
+      "9e0d8dc5de428436e29f49afa4da33e6eb5a09a59707b5800ad76a5b77a88aaa"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 1440",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 1440",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering 1platform.pro/es/ 1440",
+    "pass": true,
+    "detail": [
+      "e03748078b9dbd17607adc2e64d44dfc7f9b7b1ea9d7107927b0ecae35a217df",
+      "e03748078b9dbd17607adc2e64d44dfc7f9b7b1ea9d7107927b0ecae35a217df"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 390",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 390",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering 1platform.pro/es/ 390",
+    "pass": true,
+    "detail": [
+      "16423544849fa3d728a452cd3e0abcfb850d7ef956a1ff04ec9a377d53894d11",
+      "16423544849fa3d728a452cd3e0abcfb850d7ef956a1ff04ec9a377d53894d11"
+    ]
+  },
+  {
+    "name": "no horizontal overflow 844",
+    "pass": true
+  },
+  {
+    "name": "no horizontal overflow 844",
+    "pass": true
+  },
+  {
+    "name": "regression exact rendering 1platform.pro/es/ 844",
+    "pass": true,
+    "detail": [
+      "8536e624846864f668467720c616886a854ea41f3e98d8f0f2b39412f0557214",
+      "8536e624846864f668467720c616886a854ea41f3e98d8f0f2b39412f0557214"
+    ]
+  }
+]

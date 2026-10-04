@@ -1,0 +1,235 @@
+{
+  "source": "Public GET of published SitePages on 2026-10-03; omits drafts and administrative metadata, NOT an activation or rollback snapshot",
+  "keysBefore": 413,
+  "keysAfter": 456,
+  "added": 43,
+  "changed": 2,
+  "removed": 0,
+  "changes": [
+    {
+      "key": "photographic.solutions.mode",
+      "before": null,
+      "after": "uniform"
+    },
+    {
+      "key": "photographic.verticals.store.eyebrow",
+      "before": null,
+      "after": "Tienda en línea"
+    },
+    {
+      "key": "photographic.verticals.store.title",
+      "before": null,
+      "after": "Su catálogo\nlisto para compartir"
+    },
+    {
+      "key": "photographic.verticals.store.description",
+      "before": null,
+      "after": "Presente sus productos en una tienda con la identidad de su negocio. Reúna su catálogo y sus pedidos en un mismo lugar."
+    },
+    {
+      "key": "photographic.verticals.store.stageLabel",
+      "before": null,
+      "after": "Ejemplo ilustrativo de un catálogo con una bolsa de tela y una libreta. No permite realizar compras."
+    },
+    {
+      "key": "photographic.verticals.store.panelTitle",
+      "before": null,
+      "after": "Su catálogo"
+    },
+    {
+      "key": "photographic.verticals.store.tag",
+      "before": null,
+      "after": "Ejemplo"
+    },
+    {
+      "key": "photographic.verticals.store.address",
+      "before": null,
+      "after": "minegocio.com/tienda"
+    },
+    {
+      "key": "photographic.verticals.store.products.0.title",
+      "before": null,
+      "after": "Bolsa de tela"
+    },
+    {
+      "key": "photographic.verticals.store.products.0.category",
+      "before": null,
+      "after": "Accesorios"
+    },
+    {
+      "key": "photographic.verticals.store.products.0.icon",
+      "before": null,
+      "after": "bag"
+    },
+    {
+      "key": "photographic.verticals.store.products.1.title",
+      "before": null,
+      "after": "Libreta"
+    },
+    {
+      "key": "photographic.verticals.store.products.1.category",
+      "before": null,
+      "after": "Papelería"
+    },
+    {
+      "key": "photographic.verticals.store.products.1.icon",
+      "before": null,
+      "after": "book"
+    },
+    {
+      "key": "photographic.verticals.store.summaryTitle",
+      "before": null,
+      "after": "Un mismo catálogo"
+    },
+    {
+      "key": "photographic.verticals.store.summaryText",
+      "before": null,
+      "after": "Sus productos, a la vista"
+    },
+    {
+      "key": "photographic.verticals.store.benefits.0",
+      "before": null,
+      "after": "Catálogo de productos"
+    },
+    {
+      "key": "photographic.verticals.store.benefits.1",
+      "before": null,
+      "after": "Pedidos organizados"
+    },
+    {
+      "key": "photographic.verticals.store.cta",
+      "before": null,
+      "after": "Consultar tienda"
+    },
+    {
+      "key": "photographic.verticals.email.eyebrow",
+      "before": null,
+      "after": "Correo profesional"
+    },
+    {
+      "key": "photographic.verticals.email.title",
+      "before": null,
+      "after": "Un correo\ncon su nombre"
+    },
+    {
+      "key": "photographic.verticals.email.description",
+      "before": null,
+      "after": "Atienda las consultas de sus clientes con una dirección de su negocio. Presente su marca desde el primer mensaje."
+    },
+    {
+      "key": "photographic.verticals.email.stageLabel",
+      "before": null,
+      "after": "Ejemplo ilustrativo de un correo con dominio propio y una consulta de un pedido. No envía ni recibe mensajes."
+    },
+    {
+      "key": "photographic.verticals.email.panelTitle",
+      "before": null,
+      "after": "Su correo"
+    },
+    {
+      "key": "photographic.verticals.email.tag",
+      "before": null,
+      "after": "Ejemplo"
+    },
+    {
+      "key": "photographic.verticals.email.identityLabel",
+      "before": null,
+      "after": "Su dirección profesional"
+    },
+    {
+      "key": "photographic.verticals.email.address",
+      "before": null,
+      "after": "ventas@minegocio.com"
+    },
+    {
+      "key": "photographic.verticals.email.messageLabel",
+      "before": null,
+      "after": "Nuevo mensaje"
+    },
+    {
+      "key": "photographic.verticals.email.subject",
+      "before": null,
+      "after": "Consulta de un pedido"
+    },
+    {
+      "key": "photographic.verticals.email.message",
+      "before": null,
+      "after": "Hola, quisiera conocer las opciones disponibles para mi negocio."
+    },
+    {
+      "key": "photographic.verticals.email.signature",
+      "before": null,
+      "after": "Su negocio, en cada respuesta."
+    },
+    {
+      "key": "photographic.verticals.email.benefits.0",
+      "before": null,
+      "after": "Dominio propio"
+    },
+    {
+      "key": "photographic.verticals.email.benefits.1",
+      "before": null,
+      "after": "Identidad de su negocio"
+    },
+    {
+      "key": "photographic.verticals.email.cta",
+      "before": null,
+      "after": "Consultar correo"
+    },
+    {
+      "key": "photographic.contact.messages.store",
+      "before": null,
+      "after": "Hola, quiero conocer las opciones de tienda en línea de Vende Fácil para mostrar mi catálogo y organizar los pedidos de mi negocio."
+    },
+    {
+      "key": "photographic.contact.messages.email",
+      "before": null,
+      "after": "Hola, quiero conocer las opciones de correo profesional con dominio propio para mi negocio en Vende Fácil."
+    },
+    {
+      "key": "photographic.solutions.links.4.label",
+      "before": "{adsName}",
+      "after": "Tienda en línea"
+    },
+    {
+      "key": "photographic.solutions.links.4.href",
+      "before": "#anuncios",
+      "after": "#tienda-online"
+    },
+    {
+      "key": "photographic.solutions.links.4.footerLabel",
+      "before": null,
+      "after": "Tienda en línea"
+    },
+    {
+      "key": "photographic.solutions.links.5.label",
+      "before": null,
+      "after": "Correo profesional"
+    },
+    {
+      "key": "photographic.solutions.links.5.href",
+      "before": null,
+      "after": "#correo-profesional"
+    },
+    {
+      "key": "photographic.solutions.links.5.footerLabel",
+      "before": null,
+      "after": "Correo profesional"
+    },
+    {
+      "key": "photographic.solutions.links.6.label",
+      "before": null,
+      "after": "{adsName}"
+    },
+    {
+      "key": "photographic.solutions.links.6.href",
+      "before": null,
+      "after": "#anuncios"
+    },
+    {
+      "key": "photographic.solutions.links.6.footerLabel",
+      "before": null,
+      "after": "{adsName}"
+    }
+  ]
+}
