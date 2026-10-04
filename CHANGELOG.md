@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Tienda en línea y Correo profesional opcionales por contenido del tenant; cuadrícula uniforme de seis tarjetas, CTA comerciales configurados y parche offline de SitePages con diff y reversión.
+- Bloque de reseñas en la landing de cada inquilino (landing-reviews-tenant, LRT-08): Medipago y Vende Fácil (antes
+  del cierre) y 1Platform (antes del contacto) muestran las reseñas publicadas y autorizadas que su dueño gestiona
+  desde el panel, con promedio y distribución sobre todas las públicas, filtro por estrellas, «Ver más» y estados
+  vacíos. Lo lee de `GET /sites/{slug}/reviews` con la misma caché de 60 s que el contenido; sección apagada, API sin
+  la ruta o API caída ⇒ no hay bloque y el resto de la página no cambia (nunca un 503). Sin JavaScript se leen todas.
 - Los tres pies del sitio (infraestructura, portada fotográfica y el clásico) muestran los íconos de las redes
   sociales que el inquilino cargó, en el orden Facebook · TikTok · Instagram · LinkedIn · X, y las mismas URLs viajan
   como `sameAs` en los datos estructurados de la organización. Sin redes, el marcado no cambia.
@@ -23,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   regla 10 lo exime sólo en ese archivo y para esos nombres.
 
 ### Fixed
+- La reversión del parche de servicios valida los valores anteriores incluso en las claves que la aplicación reemplaza; un plan alterado se rechaza antes de escribir.
 - El menú móvil abierto se desplaza cuando no cabe en una pantalla horizontal;
   sus últimos destinos ya no quedan fuera de alcance.
 - 1Platform presenta la infraestructura aprobada para crear productos, conectar

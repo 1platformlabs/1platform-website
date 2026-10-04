@@ -1,0 +1,67 @@
+[
+  {
+    "name": "new renderer available before content",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "apply preconditions accept",
+    "pass": true,
+    "detail": "Preconditions match. No request sent."
+  },
+  {
+    "name": "apply preconditions refuse",
+    "pass": true,
+    "detail": "Plan changed after review; regenerate it"
+  },
+  {
+    "name": "staff PUT accepted",
+    "pass": true,
+    "detail": "200"
+  },
+  {
+    "name": "HTTP write persisted exactly in Mongo",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "apply preconditions refuse",
+    "pass": true,
+    "detail": "Site changed after planning; export and review again"
+  },
+  {
+    "name": "staff PUT accepted",
+    "pass": true,
+    "detail": "200"
+  },
+  {
+    "name": "HTTP write persisted exactly in Mongo",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "apply preconditions accept",
+    "pass": true,
+    "detail": "Preconditions match. No request sent."
+  },
+  {
+    "name": "staff PUT accepted",
+    "pass": true,
+    "detail": "200"
+  },
+  {
+    "name": "HTTP write persisted exactly in Mongo",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "rollback preconditions accept",
+    "pass": true,
+    "detail": "Preconditions match. No request sent."
+  },
+  {
+    "name": "manifest, other pages and draft unchanged",
+    "pass": true,
+    "detail": ""
+  }
+]

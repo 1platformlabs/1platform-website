@@ -120,6 +120,9 @@ test('optional verticals, shortcuts and route stay absent for a tenant that does
   const { messages, tenant } = data()
   const site = photographicContent(messages, tenant)
   expect(site.delivery).toBeNull()
+  expect(site.store).toBeNull()
+  expect(site.email).toBeNull()
+  expect(site.solutionsMode).toBeUndefined()
   expect(site.ads).toBeNull()
   expect(site.solutionLinks).toEqual([])
   expect(site.route).toEqual([])
@@ -135,16 +138,16 @@ test('optional verticals, shortcuts and route stay absent for a tenant that does
   expect(blank.linkFootnote).toBe(site.copy('hero.feature2'))
 })
 
-test('a commerce tenant publishes five solutions, two verticals, a four-step route and a visitor-rate calculator', () => {
+test('a commerce tenant publishes seven solutions, four verticals, a four-step route and a visitor-rate calculator', () => {
   const { messages, tenant } = commerceData()
   const site = photographicContent(messages, tenant)
-  expect(site.solutionLinks.map((link) => link.href)).toEqual(['#cobros-presenciales', '#enlaces-de-cobro', '#facturacion', '#delivery', '#anuncios'])
-  expect(site.solutionLinks.map((link) => link.label)).toEqual(['Cobros presenciales', 'Enlaces de cobro', 'Facturación', 'Delivery', 'Meta Ads'])
+  expect(site.solutionLinks.map((link) => link.href)).toEqual(['#cobros-presenciales', '#enlaces-de-cobro', '#facturacion', '#delivery', '#tienda-online', '#correo-profesional', '#anuncios'])
+  expect(site.solutionLinks.map((link) => link.label)).toEqual(['Cobros presenciales', 'Enlaces de cobro', 'Facturación', 'Delivery', 'Tienda en línea', 'Correo profesional', 'Meta Ads'])
   expect(site.solutionLinks[2].footerLabel).toBe('Facturación automática')
   expect(site.delivery?.milestones.map((step) => step.title)).toEqual(['Preparado', 'En camino', 'Entregado'])
   expect(site.ads?.channels).toBe('Facebook · Instagram')
   expect(site.route.map((step) => step.title)).toEqual(['Meta Ads', 'Cobros', 'Facturación', 'Delivery'])
-  expect(site.extraIcons).toEqual(['truck', 'megaphone'])
+  expect(site.extraIcons).toEqual(['truck', 'megaphone', 'bag', 'book', 'mail'])
   expect(site.typeScale).toBe('compact')
   expect(site.calculator).toBeNull()
   expect(site.manualCalculator).toMatchObject({ mode: 'manual', currency: 'GTQ' })
@@ -210,4 +213,37 @@ test('the commerce tenant keeps its own destinations and copy beside the medical
   expect(vende.copy('meta.title')).not.toMatch(/Medipago|médic/i)
   expect(medical.calculator?.commissionBasisPoints).toBe(490)
   expect(vende.calculator).toBeNull()
+})
+
+for (const kind of ['store', 'email'] as const) {
+  test(`${kind} is an independent tenant capability with complete copy and its configured destination`, () => {
+    const { messages, tenant } = commerceData()
+    const other = kind === 'store' ? 'email' : 'store'
+    for (const key of Object.keys(messages)) {
+      if (key.startsWith(`photographic.verticals.${other}.`) || key.startsWith('photographic.solutions.links.')) delete messages[key]
+    }
+    const site = photographicContent(messages, tenant)
+    expect(site[kind]).not.toBeNull()
+    expect(site[other]).toBeNull()
+    expect(new URL(site.contactHref(kind)).searchParams.get('text')).toBe(messages[`photographic.contact.messages.${kind}`])
+    tenant.destinations.support = 'https://contact.example/commercial?source=landing'
+    expect(photographicContent(messages, tenant).contactHref(kind)).toBe(tenant.destinations.support)
+    delete messages[`photographic.verticals.${kind}.stageLabel`]
+    expect(() => photographicContent(messages, tenant)).toThrow('Missing photographic content')
+  })
+}
+
+test('new services reject absent targets, incomplete messages, unknown icons and unknown layouts', () => {
+  for (const change of [
+    (m: Record<string, string>) => { m['photographic.solutions.mode'] = 'hostname' },
+    (m: Record<string, string>) => { m['photographic.verticals.store.products.0.icon'] = 'script' },
+    (m: Record<string, string>) => { delete m['photographic.contact.messages.store'] },
+    (m: Record<string, string>) => { delete m['photographic.contact.messages.email'] },
+    (m: Record<string, string>) => { delete m['photographic.verticals.email.title'] },
+    (m: Record<string, string>) => { delete m['photographic.verticals.store.title'] },
+  ]) {
+    const { messages, tenant } = commerceData()
+    change(messages)
+    expect(() => photographicContent(messages, tenant)).toThrow()
+  }
 })

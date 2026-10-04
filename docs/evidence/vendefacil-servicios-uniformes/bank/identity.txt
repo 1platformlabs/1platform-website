@@ -1,0 +1,6 @@
+SERVICIO   PUERTO PID     RAMA                             SHA       HTTP  WORKTREE
+api-rama   8710   19202   HEAD                             f020ba47  404   /Users/staimer/Documents/1platform-worktrees/vendefacil-servicios-uniformes-api
+web-rama   5021   20444   feat/vendefacil-servicios-uniformes 52d9461   404   /Users/staimer/Documents/1platform-worktrees/website-vendefacil-servicios-uniformes
+api-control 8810   20443   HEAD                             f020ba47  404   /Users/staimer/Documents/1platform-worktrees/vendefacil-servicios-control-api
+web-control 5121   20445   HEAD                             d67df79   404   /Users/staimer/Documents/1platform-worktrees/website-vendefacil-servicios-control
+BANCO OK: todos los servicios salen de worktrees aislados

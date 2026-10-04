@@ -1,0 +1,112 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "implementation": [
+    {
+      "wrapping": "wrap",
+      "id": "cobros-presenciales",
+      "width": 350,
+      "height": 686.1875,
+      "x": 20,
+      "y": 1226.125,
+      "clientHeight": 684,
+      "scrollHeight": 684,
+      "text": "Cobros en su negocio Reciba pagos con tarjeta desde su teléfono, en el mostrador o al terminar un trabajo. V Vende Fácil Pago recibido Cobro con tarjeta Comprobante del cobro Desde su celular"
+    },
+    {
+      "wrapping": "wrap",
+      "id": "enlaces-de-cobro",
+      "width": 350,
+      "height": 686.1875,
+      "x": 20,
+      "y": 1932.3125,
+      "clientHeight": 684,
+      "scrollHeight": 684,
+      "text": "Pagos a distancia Comparta un enlace con su cliente y reciba el pago de un pedido o servicio desde donde esté. V Vende Fácil Enlace de cobro Pedido de su cliente Su cliente elige dónde pagar. Compartir enlace Listo para compartir Enlaces de cobro"
+    },
+    {
+      "wrapping": "wrap",
+      "id": "facturacion",
+      "width": 350,
+      "height": 686.1875,
+      "x": 20,
+      "y": 2638.5,
+      "clientHeight": 684,
+      "scrollHeight": 684,
+      "text": "Su factura Automáticamente La factura se emite automáticamente con los datos de facturación configurados para su negocio. V Factura Emisión automática 01 Datos de facturación 02 Emisión automática Factura emitida Facturación automática"
+    },
+    {
+      "wrapping": "wrap",
+      "id": "delivery",
+      "width": 350,
+      "height": 686.1875,
+      "x": 20,
+      "y": 3344.6875,
+      "clientHeight": 684,
+      "scrollHeight": 684,
+      "text": "DELIVERY Sus pedidos hasta la puerta Organice las entregas de su negocio y dé seguimiento a cada pedido, desde que sale hasta que llega a su cliente. V Su pedido Ejemplo Pedido #1042 De su negocio a su cliente Preparado Listo para salir En camino Seguimiento de su entrega Entregado Su cliente recibe el pedido Organización de pedidos Seguimiento de entregas Consultar Delivery"
+    },
+    {
+      "wrapping": "wrap",
+      "id": "tienda-online",
+      "width": 350,
+      "height": 686.1875,
+      "x": 20,
+      "y": 4050.875,
+      "clientHeight": 684,
+      "scrollHeight": 684,
+      "text": "TIENDA EN LÍNEA Su catálogo listo para compartir Presente sus productos en una tienda con la identidad de su negocio. Reúna su catálogo y sus pedidos en un mismo lugar. V Su catálogo Ejemplo minegocio.com/tienda Bolsa de tela Accesorios Libreta Papelería Un mismo catálogo Sus productos, a la vista Catálogo de productos Pedidos organizados Consultar tienda"
+    },
+    {
+      "wrapping": "wrap",
+      "id": "correo-profesional",
+      "width": 350,
+      "height": 686.1875,
+      "x": 20,
+      "y": 4757.0625,
+      "clientHeight": 684,
+      "scrollHeight": 684,
+      "text": "CORREO PROFESIONAL Un correo con su nombre Atienda las consultas de sus clientes con una dirección de su negocio. Presente su marca desde el primer mensaje. V Su correo Ejemplo Su dirección profesional ventas@minegocio.com Nuevo mensaje Consulta de un pedido Hola, quisiera conocer las opciones disponibles para mi negocio. Su negocio, en cada respuesta. Dominio propio Identidad de su negocio Consultar correo"
+    }
+  ],
+  "reference": [
+    {
+      "wrapping": "wrap",
+      "width": 350,
+      "height": 686.1875,
+      "text": "Cobros en su negocio Reciba pagos con tarjeta desde su teléfono, en el mostrador o al terminar un trabajo. V Vende Fácil Pago recibido Cobro con tarjeta Comprobante del cobro Desde su celular"
+    },
+    {
+      "wrapping": "wrap",
+      "width": 350,
+      "height": 686.1875,
+      "text": "Pagos a distancia Comparta un enlace con su cliente y reciba el pago de un pedido o servicio desde donde esté. V Vende Fácil Enlace de cobro Pedido de su cliente Su cliente elige dónde pagar. Compartir enlace Listo para compartir Enlaces de cobro"
+    },
+    {
+      "wrapping": "wrap",
+      "width": 350,
+      "height": 686.1875,
+      "text": "Su factura Automáticamente La factura se emite automáticamente con los datos de facturación configurados para su negocio. V Factura Emisión automática 01 Datos de facturación 02 Emisión automática Factura emitida Facturación automática"
+    },
+    {
+      "wrapping": "wrap",
+      "width": 350,
+      "height": 686.1875,
+      "text": "DELIVERY Sus pedidos hasta la puerta Organice las entregas de su negocio y dé seguimiento a cada pedido, desde que sale hasta que llega a su cliente. V Su pedido Ejemplo Pedido #1042 De su negocio a su cliente Preparado Listo para salir En camino Seguimiento de su entrega Entregado Su cliente recibe el pedido Organización de pedidos Seguimiento de entregas Consultar Delivery"
+    },
+    {
+      "wrapping": "wrap",
+      "width": 350,
+      "height": 686.1875,
+      "text": "TIENDA EN LÍNEA Su catálogo listo para compartir Presente sus productos en una tienda con la identidad de su negocio. Reúna su catálogo y sus pedidos en un mismo lugar. V Su catálogo Ejemplo minegocio.com/tienda Bolsa de tela Accesorios Libreta Papelería Un mismo catálogo Sus productos, a la vista Catálogo de productos Pedidos organizados Consultar tienda"
+    },
+    {
+      "wrapping": "wrap",
+      "width": 350,
+      "height": 686.1875,
+      "text": "CORREO PROFESIONAL Un correo con su nombre Atienda las consultas de sus clientes con una dirección de su negocio. Presente su marca desde el primer mensaje. V Su correo Ejemplo Su dirección profesional ventas@minegocio.com Nuevo mensaje Consulta de un pedido Hola, quisiera conocer las opciones disponibles para mi negocio. Su negocio, en cada respuesta. Dominio propio Identidad de su negocio Consultar correo"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "rendererHead": "52d9461bdcb2f616af1bbc24e8b3e3be8d49d839",
+  "apiHead": "f020ba4753428e5824fb2f4bb008fd41a856dc1c",
+  "websiteControlHead": "d67df796a9c6e4113d71b8a6cc21170d7ee89a06",
+  "checks": {
+    "typecheck": {
+      "errors": 0,
+      "warnings": 0,
+      "hints": 27
+    },
+    "build": "pass",
+    "check": {
+      "selfTests": 53,
+      "pass": true
+    },
+    "functional": {
+      "pass": 502,
+      "skipped": 24
+    },
+    "linuxVisual": {
+      "pass": 8,
+      "baselinesModified": false
+    },
+    "realBank": {
+      "pass": 202,
+      "issues": 0
+    }
+  },
+  "fileSha256": {
+    "scripts/prepare-vendefacil-services.mjs": "b12a47c84aedf16d7c7720f4eb08eef1118a56a9aa8b685e9498a88f97fdafbd",
+    "tests/vendefacil-services-patch.spec.ts": "a0acce13c36bcc76733a94ea3444b875a9b8c2b5cd48725fe062931793f2b3f9",
+    "tests/bench/seed_vendefacil_services.py": "abf8b0448f6e530ebab13a276daad2922399eb228c9a070289be2bf0aa003a66",
+    "tests/bench/census_vendefacil_services.py": "f5820718736b3ac2f87781427d7ddacc567339ef35fae9bf4fb98f5ea5b2f771",
+    "tests/bench/browser_vendefacil_services.mjs": "d6e59f68814c8498c672b30a879fc0ca07620152c45d315deca0527ab2f03dcb",
+    "tests/bench/probe_vendefacil_services.py": "82ad222fd48a14f9ddfa0f5978cd3b427458f56b348be05e4b20672d7f352054"
+  }
+}

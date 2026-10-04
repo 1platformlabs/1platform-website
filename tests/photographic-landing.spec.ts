@@ -1,5 +1,5 @@
 import { spawn, spawnSync, type ChildProcessWithoutNullStreams } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import { join } from 'node:path';
 
@@ -65,7 +65,7 @@ Object.assign(accessFixture.pagesResponse.data.messages, accessMessages.es, requ
   'photographic.theme.palette': 'brand', 'photographic.hero.image': 'commerce',
 });
 // A commerce tenant with every optional block: Delivery, the named advertising
-// channel, five shortcuts, the sales route and a visitor-entered percentage.
+// channel, seven shortcuts, the sales route and a visitor-entered percentage.
 const COMMERCE_HOST = 'vendefacil.1platform.pro';
 const commerce = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/vendefacil-site.json'), 'utf8')) as SiteFixture;
 // The same tenant's content as PROD served it on 2026-10-02, before it opts in:
@@ -74,6 +74,10 @@ const PLAIN_COMMERCE_HOST = 'commerce-plain.example';
 const plainCommerce = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/vendefacil-live-site.json'), 'utf8')) as SiteFixture;
 plainCommerce.tenant = { ...plainCommerce.tenant, slug: 'commerce-plain', domain: PLAIN_COMMERCE_HOST };
 plainCommerce.pagesResponse.data.slug = plainCommerce.tenant.slug;
+const BEFORE_SERVICES_HOST = 'commerce-before-services.example';
+const beforeServices = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/vendefacil-before-services.json'), 'utf8')) as SiteFixture;
+beforeServices.tenant = { ...beforeServices.tenant, slug: 'commerce-before-services', domain: BEFORE_SERVICES_HOST };
+beforeServices.pagesResponse.data.slug = beforeServices.tenant.slug;
 alternate.pagesResponse.data.messages['photographic.calculator.commissionBasisPoints'] = '350';
 for (const page of alternate.pagesResponse.data.pages) {
   if ('photographic.calculator.commissionBasisPoints' in page.blocks) {
@@ -160,13 +164,13 @@ test.beforeAll(async () => {
       const host = url.searchParams.get('host') ?? '';
       resolvedHosts.add(host);
       if (host === PLATFORM_HOST) return response.end(JSON.stringify({ success: true, data: platformTenant, msg: 'Site resolved' }));
-      const selected = ({ [HOST]: fixture, [ALTERNATE_HOST]: alternate, [ACCESS_HOST]: accessFixture, [COMMERCE_HOST]: commerce, [PLAIN_COMMERCE_HOST]: plainCommerce } as Record<string, SiteFixture>)[host] ?? null;
+      const selected = ({ [HOST]: fixture, [ALTERNATE_HOST]: alternate, [ACCESS_HOST]: accessFixture, [COMMERCE_HOST]: commerce, [PLAIN_COMMERCE_HOST]: plainCommerce, [BEFORE_SERVICES_HOST]: beforeServices } as Record<string, SiteFixture>)[host] ?? null;
       if (selected) return response.end(JSON.stringify({ success: true, data: selected.tenant, msg: 'Site resolved' }));
     } else {
       const match = /\/sites\/([^/]+)\/pages$/.exec(url.pathname);
       const content = match?.[1] === platformTenant.slug ? platformContent.get(url.searchParams.get('locale') ?? '') : null;
       if (content) return response.end(JSON.stringify(content));
-      const selected = [fixture, alternate, accessFixture, commerce, plainCommerce].find((candidate) => candidate.tenant.slug === match?.[1]);
+      const selected = [fixture, alternate, accessFixture, commerce, plainCommerce, beforeServices].find((candidate) => candidate.tenant.slug === match?.[1]);
       if (selected && url.searchParams.get('locale') === selected.tenant.default_locale) {
         return response.end(JSON.stringify(selected.pagesResponse));
       }
@@ -191,7 +195,7 @@ test.beforeAll(async () => {
     try { return (await getWithHost(`${appBaseUrl}/`, HOST)).status; } catch { return 0; }
   }, { timeout: 30_000, message: 'The built tenant route must start' }).toBe(200);
   tenantBrowser = await chromium.launch({
-    args: [`--host-resolver-rules=${[HOST, ALTERNATE_HOST, PLATFORM_HOST, ACCESS_HOST, COMMERCE_HOST, PLAIN_COMMERCE_HOST].map((name) => `MAP ${name} 127.0.0.1`).join(', ')}`],
+    args: [`--host-resolver-rules=${[HOST, ALTERNATE_HOST, PLATFORM_HOST, ACCESS_HOST, COMMERCE_HOST, PLAIN_COMMERCE_HOST, BEFORE_SERVICES_HOST].map((name) => `MAP ${name} 127.0.0.1`).join(', ')}`],
   });
 });
 
@@ -664,16 +668,16 @@ test('tenant access remains readable and navigable on narrow and landscape scree
 const commerceMessages = commerce.pagesResponse.data.messages;
 const commerceSupport = commerce.tenant.destinations.support!;
 
-test('a commerce tenant serves five solutions, Delivery, the named ad channel and the sales route with its own WhatsApp messages', async ({ landingPage: page }) => {
+test('a commerce tenant serves seven solutions, Delivery, the named ad channel and the sales route with its own WhatsApp messages', async ({ landingPage: page }) => {
   const raw = await getWithHost(`${appBaseUrl}/`, COMMERCE_HOST);
   expect(raw.status).toBe(200);
   expect(raw.body).not.toMatch(/contact-dialog|copy-message|PROTOTYPE|prototipo|\{ads(Name|Network)/);
   await gotoLanding(page, COMMERCE_HOST);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
   await expect(page.locator('body')).toHaveAttribute('data-type-scale', 'compact');
-  await expect(page.locator('.solution-navigation a')).toHaveText(['Cobros presenciales', 'Enlaces de cobro', 'Facturación', 'Delivery', 'Meta Ads']);
+  await expect(page.locator('.solution-navigation a')).toHaveText(['Cobros presenciales', 'Enlaces de cobro', 'Facturación', 'Delivery', 'Tienda en línea', 'Correo profesional', 'Meta Ads']);
   await expect(page.locator('.service-card')).toHaveCount(3);
-  await expect(page.locator('.business-card')).toHaveCount(2);
+  await expect(page.locator('.business-card')).toHaveCount(4);
   await expect(page.locator('#delivery .delivery-milestone strong')).toHaveText(['Preparado', 'En camino', 'Entregado']);
   await expect(page.locator('#anuncios .campaign-channels')).toHaveText('Facebook · Instagram');
   await expect(page.locator('#anuncios .eyebrow')).toHaveText('Meta Ads');
@@ -687,7 +691,7 @@ test('a commerce tenant serves five solutions, Delivery, the named ad channel an
   const destinations = await page.locator('[data-support-cta]').evaluateAll((links) => links.map((link) => ({
     placement: link.getAttribute('data-support-cta')!, href: link.getAttribute('href')!,
   })));
-  expect(new Set(destinations.map((item) => item.placement))).toEqual(new Set(['header', 'hero', 'panel', 'onboarding', 'calculator', 'question', 'closing', 'footer', 'delivery', 'ads']));
+  expect(new Set(destinations.map((item) => item.placement))).toEqual(new Set(['header', 'hero', 'panel', 'onboarding', 'calculator', 'question', 'closing', 'footer', 'delivery', 'store', 'email', 'ads']));
   for (const { placement, href } of destinations) {
     const url = new URL(href);
     expect(`${url.origin}${url.pathname}`).toBe(commerceSupport);
@@ -790,7 +794,7 @@ test('without JavaScript the commerce landing keeps every block and explains the
     await expect(page.locator('#price-calculator button[type="submit"]')).toBeDisabled();
     await expect(page.locator('#calc-status')).toHaveText(commerceMessages['photographic.ui.calculator_nojs']);
     for (const name of ['summary', 'billing', 'withdrawals']) await expect(page.locator(`#panel-${name}`)).toBeVisible();
-    await expect(page.locator('.business-card .vertical-panel')).toHaveCount(2);
+    await expect(page.locator('.business-card .vertical-panel')).toHaveCount(4);
     for (const panel of await page.locator('.business-card .vertical-panel').all()) await expect(panel).toBeVisible();
     await expect(page.locator('#faq-list > details')).toHaveCount(6);
     await checkOverflow(page);
@@ -877,7 +881,7 @@ test('commerce verticals never leak into the medical tenant, and the same tenant
   for (const host of [COMMERCE_HOST, HOST, PLAIN_COMMERCE_HOST, COMMERCE_HOST, HOST]) {
     await gotoLanding(page, host);
     const full = host === COMMERCE_HOST;
-    await expect(page.locator('.business-card, .business-route, .solution-navigation')).toHaveCount(full ? 4 : 0);
+    await expect(page.locator('.business-card, .business-route, .solution-navigation')).toHaveCount(full ? 6 : 0);
     await expect(page.locator('symbol#i-truck, symbol#i-megaphone')).toHaveCount(full ? 2 : 0);
     await expect(page.locator('#calc-rate')).toHaveCount(full ? 1 : 0);
     await expect(page.locator('[data-commission]')).toHaveCount(host === HOST ? 1 : 0);
@@ -896,3 +900,106 @@ test('commerce verticals never leak into the medical tenant, and the same tenant
     if (host === PLAIN_COMMERCE_HOST) expect(body).not.toMatch(/Meta Ads|Facebook|Instagram/);
   }
 });
+
+
+test('the deployed commerce content retains its original presentation until the new capabilities are activated', async ({ landingPage: page }) => {
+  await gotoLanding(page, BEFORE_SERVICES_HOST);
+  await expect(page.locator('body')).not.toHaveAttribute('data-solutions-mode');
+  await expect(page.locator('.solutions-grid > article')).toHaveCount(3);
+  await expect(page.locator('.business-verticals > article')).toHaveCount(2);
+  await expect(page.locator('#tienda-online, #correo-profesional')).toHaveCount(0);
+  await expect(page.locator('#anuncios')).toHaveClass(/ads-card/);
+  await expect(page.locator('.solution-navigation a')).toHaveCount(5);
+  await expect(page.locator('#calc-rate')).toHaveValue('');
+  await expect(page.locator('.header-access')).toHaveAttribute('href', '/acceso/');
+  await checkOverflow(page);
+});
+
+for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 844, height: 390 }]) {
+  test(`six content-sized service cards, complete copy and keyboard contact at ${viewport.width}x${viewport.height}`, async ({ landingPage: page }) => {
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await gotoLanding(page, COMMERCE_HOST);
+    const cards = page.locator('.solutions-grid > article');
+    await expect(cards).toHaveCount(6);
+    const measure = () => cards.evaluateAll((elements) => elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { wrapping: getComputedStyle(element.querySelector('.business-copy > p:last-child, .service-copy p')!).textWrap, id: element.id, width: box.width, height: box.height, x: box.x, y: box.y, clientHeight: element.clientHeight, scrollHeight: element.scrollHeight, text: (element as HTMLElement).innerText.replace(/\s+/g, ' ').trim() };
+    }));
+    const sizes = await measure();
+    expect(sizes.map(({ id }) => id)).toEqual(['cobros-presenciales', 'enlaces-de-cobro', 'facturacion', 'delivery', 'tienda-online', 'correo-profesional']);
+    for (const card of sizes) {
+      expect(Math.abs(card.width - sizes[0].width)).toBeLessThan(0.05);
+      expect(Math.abs(card.height - sizes[0].height)).toBeLessThan(0.05);
+      expect(card.scrollHeight).toBe(card.clientHeight);
+    }
+    const stages = await cards.locator('.service-stage').evaluateAll((elements) => elements.map(element => {
+      const stage = element.getBoundingClientRect();
+      const copy = element.previousElementSibling!.getBoundingClientRect();
+      return { stageX: stage.x, stageY: stage.y, copyRight: copy.right, copyBottom: copy.bottom };
+    }));
+    for (const stage of stages) {
+      if (viewport.width > 560 && viewport.width <= 1100) expect(stage.stageX).toBeGreaterThan(stage.copyRight);
+      else expect(stage.stageY).toBeGreaterThanOrEqual(stage.copyBottom - 1);
+    }
+    const campaign = await page.locator('#anuncios').boundingBox();
+    expect(campaign!.width).toBeCloseTo((await page.locator('.solutions-grid').boundingBox())!.width, 1);
+    expect(campaign!.y).toBeGreaterThan(sizes[5].y + sizes[5].height);
+    await checkOverflow(page);
+    for (const [id, context] of [['tienda-online', 'store'], ['correo-profesional', 'email']]) {
+      const shortcut = page.locator(`.solution-navigation a[href="#${id}"]`);
+      await shortcut.focus();
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(new RegExp(`#${id}$`));
+      const cta = page.locator(`[data-support-cta="${context}"]`);
+      await page.keyboard.press('Tab');
+      await expect(cta).toBeFocused();
+      expect(await cta.evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
+      const target = new URL((await cta.getAttribute('href'))!);
+      expect(target.origin + target.pathname).toBe(commerceSupport);
+      expect(target.searchParams.get('text')).toBe(commerceMessages[`photographic.contact.messages.${context}`]);
+    }
+    await expect(page.locator('#correo-profesional a[href^="mailto:"], #correo-profesional .__cf_email__')).toHaveCount(0);
+    expect(await cards.evaluateAll(elements => elements.flatMap(el => el.getAnimations({ subtree: true })).length)).toBe(0);
+    // Explicit local evidence capture; never a baseline rewrite or a CI dependency.
+    if (process.env.VFS_EVIDENCE_DIR) {
+      const folder = process.env.VFS_EVIDENCE_DIR;
+      mkdirSync(folder, { recursive: true });
+      const capture = async (target: Page, prefix: string) => {
+        await target.evaluate(() => document.fonts.ready);
+        await target.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+        for (const index of viewport.width > 1100 ? [0, 3] : [0, 1, 2, 3, 4, 5]) {
+          const card = target.locator('.solutions-grid > article').nth(index);
+          await card.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 105, behavior: 'instant' }));
+          await target.screenshot({ path: join(folder, `${prefix}-${viewport.width}-${index}.png`) });
+          if (viewport.height < 500) {
+            await card.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().bottom + window.scrollY - window.innerHeight + 24, behavior: 'instant' }));
+            await target.screenshot({ path: join(folder, `${prefix}-${viewport.width}-${index}-bottom.png`) });
+          }
+        }
+        const campaign = target.locator(prefix === 'prototype' ? '#meta-ads' : '#anuncios');
+        await campaign.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 105, behavior: 'instant' }));
+        await target.screenshot({ path: join(folder, `${prefix}-${viewport.width}-campaign.png`) });
+        await campaign.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().bottom + window.scrollY - window.innerHeight + 24, behavior: 'instant' }));
+        await target.screenshot({ path: join(folder, `${prefix}-${viewport.width}-campaign-bottom.png`) });
+        await target.screenshot({ path: join(folder, `${prefix}-${viewport.width}-full.png`), fullPage: true });
+      };
+      await capture(page, 'implementation');
+      let reference;
+      if (process.env.VFS_REFERENCE_URL) {
+        const ref = await page.context().newPage();
+        await ref.setViewportSize(viewport);
+        await ref.emulateMedia({ reducedMotion: 'reduce' });
+        await ref.goto(process.env.VFS_REFERENCE_URL);
+        await expect(ref.locator('.solutions-grid > article')).toHaveCount(6);
+        await capture(ref, 'prototype');
+        reference = await ref.locator('.solutions-grid > article').evaluateAll(elements => elements.map(element => {
+          const box = element.getBoundingClientRect();
+          return { wrapping: getComputedStyle(element.querySelector('.business-copy > p:last-child, .service-copy p')!).textWrap, width: box.width, height: box.height, text: (element as HTMLElement).innerText.replace(/\s+/g, ' ').trim() };
+        }));
+        await ref.close();
+      }
+      writeFileSync(join(folder, `measurements-${viewport.width}.json`), JSON.stringify({ viewport, implementation: sizes, reference }, null, 2));
+    }
+  });
+}
