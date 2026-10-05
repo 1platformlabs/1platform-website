@@ -1191,6 +1191,7 @@ body.photographic-service {
 }
 .photographic-service .footer-bottom {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
   border-top: 1px solid #35554b;

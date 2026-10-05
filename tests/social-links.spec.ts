@@ -197,6 +197,42 @@ test('the footer passes axe; every target is at least 44×44 with a visible focu
   }
 });
 
+test('photographic copyright and social icons share a visual centre, with comfortable mobile targets', async () => {
+  const page = await open('medipago.gt', '/');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(async () => { await document.fonts.ready; });
+    const strip = page.locator('.footer-bottom');
+    await strip.scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => document.getAnimations().every((animation) => ['finished', 'idle'].includes(animation.playState)));
+    const geometry = await strip.evaluate((footer) => {
+      const range = document.createRange();
+      range.selectNodeContents(footer.querySelector(':scope > span')!);
+      const text = range.getBoundingClientRect();
+      const icons = [...footer.querySelectorAll('[data-social-links] svg')].map((icon) => icon.getBoundingClientRect());
+      const targets = [...footer.querySelectorAll('[data-social-links] a')].map((link) => link.getBoundingClientRect());
+      return {
+        textCentre: text.y + text.height / 2,
+        iconCentres: icons.map((icon) => icon.y + icon.height / 2),
+        icons: icons.map(({ width, height }) => ({ width, height })),
+        targets: targets.map(({ width, height }) => ({ width, height })),
+        overflow: document.documentElement.scrollWidth > innerWidth,
+      };
+    });
+    expect(geometry.overflow).toBe(false);
+    expect(geometry.icons).toEqual([{ width: 20, height: 20 }, { width: 20, height: 20 }]);
+    for (const target of geometry.targets) {
+      expect(target.width).toBeGreaterThanOrEqual(width === 390 ? 48 : 44);
+      expect(target.height).toBeGreaterThanOrEqual(width === 390 ? 48 : 44);
+    }
+    if (width === 1440) {
+      for (const centre of geometry.iconCentres) expect(Math.abs(centre - geometry.textCentre)).toBeLessThan(2);
+    }
+  }
+  await page.context().close();
+});
+
 test('the classic footer rings every link in its own ink, never the tenant accent', async () => {
   // Found by /verify-epic-e2e (2026-10-02): the global ring is the accent, and a
   // navy accent on this footer measured 2.5:1. The logo is the first stop.
