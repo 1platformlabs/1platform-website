@@ -1,0 +1,78 @@
+{
+  "command": "Docker mcr.microsoft.com/playwright:v1.61.1-jammy; npm ci --no-audit --no-fund; npx playwright test tests/visual --config playwright.visual.config.ts --workers=2 --reporter=line,json",
+  "stats": {
+    "startTime": "2026-10-04T15:14:29.073Z",
+    "duration": 8746.219000000001,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "raw_report": {
+    "path": "/tmp/website-brand-final.LYjV9c/visual-source-verified/visual-report.json",
+    "sha256": "136d1c50d4a3d256da249da58bdec225ae485a3b0b864fdf0b002bedefed3e39"
+  },
+  "errors": [],
+  "failures": [],
+  "skipped": [],
+  "tests": [
+    {
+      "title": "home-en-1440",
+      "file": "home.spec.ts",
+      "project": "chromium",
+      "status": "expected"
+    },
+    {
+      "title": "home-es-1440",
+      "file": "home.spec.ts",
+      "project": "chromium",
+      "status": "expected"
+    },
+    {
+      "title": "home-en-390",
+      "file": "home.spec.ts",
+      "project": "chromium",
+      "status": "expected"
+    },
+    {
+      "title": "home-es-390",
+      "file": "home.spec.ts",
+      "project": "chromium",
+      "status": "expected"
+    },
+    {
+      "title": "clinic-home-1440",
+      "file": "clinic.spec.ts",
+      "project": "clinic-chromium",
+      "status": "expected"
+    },
+    {
+      "title": "clinic-home-390",
+      "file": "clinic.spec.ts",
+      "project": "clinic-chromium",
+      "status": "expected"
+    },
+    {
+      "title": "clinic-404-1440",
+      "file": "clinic.spec.ts",
+      "project": "clinic-chromium",
+      "status": "expected"
+    },
+    {
+      "title": "clinic-404-390",
+      "file": "clinic.spec.ts",
+      "project": "clinic-chromium",
+      "status": "expected"
+    }
+  ],
+  "source_tree_sha256": "464f9921303578e00790c6ea90cec4020d4e6a3208ba3fafe868cd59e5837882",
+  "image": "mcr.microsoft.com/playwright:v1.61.1-jammy",
+  "image_id": "sha256:7b86926fff94374389e8e1f4fdc5c76d050d4a06a7886bb537bf412b20e2b71e",
+  "limits": {
+    "cpus": 2,
+    "memory": "4g",
+    "workers": 2
+  },
+  "baseline_count": 8,
+  "changed_baselines": []
+}

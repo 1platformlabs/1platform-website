@@ -1,0 +1,52 @@
+{
+  "base_head": "0637ae03a7884701fcfc23925c4129ad3198bfb2",
+  "source_tree_sha256": "c7d1231f062a9c3823be7b16ff98d881512c36ebc9a16467a658b6ae8aa9b075",
+  "file_count": 682,
+  "changed_files": {
+    "CHANGELOG.md": "d0691c9b1e14812f5747cc283ffd0eb0411cc09dea9d2c58fdcd980002b9f3fd",
+    "deploy/docker/nginx.conf": "aaca593d3b164f6c1bf6535db069be379a2aea94879f155abf85f5d05fe6ad1b",
+    "docs/brand-assets/cache.md": "e00facf0b06842e32ee16aa8e3ab6e2990a90b76e167e1411b8cfe1439d5740e",
+    "docs/brand-assets/medipago/favicon.png": "9ae843ded7d98946a7cc78e363968494529b5a9873b7bac8352799a973ce429f",
+    "docs/brand-assets/medipago/logo-source.png": "861decee9f9781a98170c0d987308dd19778601dc6eba99b4b564a4ed83df37b",
+    "docs/brand-assets/medipago/logo.png": "4db68d7be2c80588e466aa9156a1cc4d2ffb13fe4d628be3d2ead77e9bce06bc",
+    "docs/brand-assets/oneplatform/favicon.png": "a657669cc2c8cc036b773c5a84d31594e8c32a9f59eff0478b9284dd8f9c37c8",
+    "docs/brand-assets/oneplatform/logo-source.png": "cfee773b722a46f69937e83f00e5496412108d656cd3c86993ede41f2cbc1e08",
+    "docs/brand-assets/oneplatform/logo.png": "988237798074e8068dfd214f2e1ca907ff156313d2c19c51d8826b83b03fa5cc",
+    "docs/brand-assets/tenants.json": "497d29312c5b49cb0873f4def486f74642e6224078251c380cd29391c014ddd2",
+    "docs/brand-assets/vendefacil/favicon.png": "8832785d0609373fce198479e83d0ca27f9443727d1e5f646c659f8fcca11041",
+    "docs/brand-assets/vendefacil/logo-source.png": "affa920cf983967b62b8ee43f2b36d7bf8eadf5e75a4bbc6a6c2003f0beb5d2e",
+    "docs/brand-assets/vendefacil/logo.png": "7bd49296265f35b033f92a11c032884e632cd7d3426b5d1383c47144ed0051b9",
+    "scripts/prepare-brand-assets.mjs": "cb7d4a28cec26f9428542efcc510b7ae8d7e5f9f629b25d7a0373270859d3f34",
+    "scripts/preview-brand-assets.mjs": "3078bbbe7d1143ad975b27c56e1c2e9357e8eb90123e922dab7a5bb41941ed9a",
+    "src/components/InfrastructureFooter.astro": "ac0e6ab0efcc0fa4b9a7f58d8bad53e20150d8872f02359d1609587c0b615df2",
+    "src/components/InfrastructureHeader.astro": "0c5c48b9041b8033f0f501222890c6e79d9d53d324218049cd8cb02a0120bd4c",
+    "src/components/Logo.astro": "31f0c103f96324c04c17b929ef9e964543568217e143bb2bab728317de49b91a",
+    "src/components/PhotographicCommerceCards.astro": "c16369974f03af9224af8bd796148fbd0eb1c4596a807226371967161a173086",
+    "src/components/TenantBrand.astro": "c97d84f59d57ff835f0e5b1fbf59d4b20711fd8662c28721305198716a7dd902",
+    "src/lib/site-api.ts": "776dff6b8868adbce8566a0634916bb94bb6039eb2f6032120f6b34c4114c52d",
+    "src/lib/tenant-brand-assets.ts": "b6ec28164cfd0f01ee44c3de2174421451f44f350e879b41f0644d2e15f8b5ee",
+    "src/lib/tenant-brand-display.ts": "7ff76d3bf4b68b3f495d589961802f10b53a96883b3b6b1c2447893b0737cf6a",
+    "src/page-content/InfrastructureHome.astro": "b7226dc9bcb9c6881c213ac46e6be4d840363ba578b8b9dabca3093b15c7738b",
+    "src/page-content/PhotographicServiceHome.astro": "3a32ff6b58deb64116385d9bbf7d61a3bc045469905dc83c0628085684d7b82d",
+    "src/page-content/TenantAccess.astro": "d7a7a6a6b03f99d97f8a284b30fbd65ac85322810968872c7243b1cf921a28d6",
+    "src/pages/brand/favicon/[hash].png.ts": "b17f7cd165eeb25e5be04271858a3be3df5e40e14a4103f4f39275162c3a6f7a",
+    "src/styles/infrastructure-home.css": "b48d92c1f893e583137ef161e4c96e6752770517322860fe37d2e0005246a59e",
+    "src/styles/photographic-service.css": "df09c101cb1b7d6e1f9036b7d0cd0c9fe5db36f5696b9fe7f38c95dd59d1ebd2",
+    "tests/serving-contract.spec.ts": "aa8169b1a85526fb4aa1475eba352be41c30651d67c6f4f8383b9d877f0fe84a",
+    "tests/tenant-brand-chrome.spec.ts": "c15286adadda597156e93804930302fbd60d14a8932e846f0e01de5f23c1c5e0",
+    "tests/tenant-brand-display.spec.ts": "94ba3bd3de16a152c3e46453e219a2702e9c7b08b1c80940a2483809cd1ee2db",
+    "tests/tenant-favicon-cache.spec.ts": "d5a4b7c74b5dae408b8307cd1acbbc0e4fe38e9a6d96b6bb8603419cf445e460"
+  },
+  "functional_port": 4502,
+  "brand_fixture_ports": [
+    4510,
+    4511
+  ],
+  "workers": 2,
+  "visual_image": "mcr.microsoft.com/playwright:v1.61.1-jammy",
+  "visual_image_id": "sha256:7b86926fff94374389e8e1f4fdc5c76d050d4a06a7886bb537bf412b20e2b71e",
+  "excluded": [
+    "docs/brand-assets/evidence/**",
+    "docs/brand-assets/verification.md"
+  ]
+}

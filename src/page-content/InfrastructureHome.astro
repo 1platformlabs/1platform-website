@@ -1,4 +1,5 @@
 ---
+import TenantBrand from '@components/TenantBrand.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { useI18n } from '@i18n';
 import { docsUrl, supportUrl } from '@lib/site-destinations';
@@ -90,7 +91,7 @@ const formatLocale = tenant.region ? `${locale}-${tenant.region}` : locale;
             <p class="integration-kicker">{t('infrastructure.integration.eyebrow')}</p>
             <div class="integration-source"><h3 id="integration-title">{t('infrastructure.integration.title')}</h3><div class="integration-clients"><span>{t('infrastructure.integration.saas')}</span><span>{t('infrastructure.integration.applications')}</span><span>{t('infrastructure.integration.erp')}</span></div></div>
             <div class="integration-bridge"><span>{t('infrastructure.integration.bridge')}</span></div>
-            <div class="integration-core"><span class="integration-logo" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><div><strong>{tenant.brand_name}</strong><small>{t('infrastructure.integration.description')}</small></div></div>
+            <div class="integration-core"><span class="integration-logo" aria-hidden="true"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><div><strong>{tenant.brand_name}</strong><small>{t('infrastructure.integration.description')}</small></div></div>
             <div class="integration-branch" aria-hidden="true"></div>
             <p class="integration-services-label">{t('infrastructure.integration.services')}</p>
             <ul class="selected-list" data-selected-list><li>{t('infrastructure.capabilities.payments.name')}</li><li>{t('infrastructure.capabilities.invoicing.name')}</li><li>{t('infrastructure.capabilities.delivery.name')}</li></ul>

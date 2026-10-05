@@ -1,4 +1,5 @@
 ---
+import TenantBrand from '@components/TenantBrand.astro';
 import type { photographicContent } from '@lib/photographic-content';
 type Content = ReturnType<typeof photographicContent>;
 interface Props {
@@ -14,7 +15,7 @@ const { delivery, store, email, contactHref, brandMark } = Astro.props;
 <div class="business-copy"><p class="eyebrow">{delivery.eyebrow}</p><h3 id="delivery-title">{delivery.title}</h3><p>{delivery.description}</p></div>
 <div aria-label={delivery.stageLabel} class="service-stage vertical-visual" role="img">
 <div class="vertical-panel">
-<div class="vertical-panel-heading"><span class="mini-mark">{brandMark}</span><strong>{delivery.panelTitle}</strong><span class="vertical-tag">{delivery.tag}</span></div>
+<div class="vertical-panel-heading"><span class="mini-mark"><TenantBrand variant="symbol">{brandMark}</TenantBrand></span><strong>{delivery.panelTitle}</strong><span class="vertical-tag">{delivery.tag}</span></div>
 <div class="delivery-order"><svg aria-hidden="true" class="icon"><use href="#i-truck"></use></svg><div><strong>{delivery.orderTitle}</strong><span>{delivery.orderNote}</span></div></div>
 <ol class="delivery-progress">{delivery.milestones.map((milestone) => <li class="delivery-milestone"><span aria-hidden="true" class="milestone-dot"></span><div><strong>{milestone.title}</strong><span>{milestone.text}</span></div><svg aria-hidden="true" class="icon"><use href="#i-check"></use></svg></li>)}</ol>
 </div>
@@ -26,7 +27,7 @@ const { delivery, store, email, contactHref, brandMark } = Astro.props;
   <div class="business-copy"><p class="eyebrow">{store.eyebrow}</p><h3 id="store-title">{store.title}</h3><p>{store.description}</p></div>
   <div aria-label={store.stageLabel} class="service-stage vertical-visual" role="img">
     <div class="vertical-panel">
-      <div class="vertical-panel-heading"><span class="mini-mark">{brandMark}</span><strong>{store.panelTitle}</strong><span class="vertical-tag">{store.tag}</span></div>
+      <div class="vertical-panel-heading"><span class="mini-mark"><TenantBrand variant="symbol">{brandMark}</TenantBrand></span><strong>{store.panelTitle}</strong><span class="vertical-tag">{store.tag}</span></div>
       <div class="catalogue-preview">
         <p class="catalogue-address">{store.address}</p>
         <div class="catalogue-products">{store.products.map((product) => <div class="catalogue-product">
@@ -44,7 +45,7 @@ const { delivery, store, email, contactHref, brandMark } = Astro.props;
   <div class="business-copy"><p class="eyebrow">{email.eyebrow}</p><h3 id="mail-title">{email.title}</h3><p>{email.description}</p></div>
   <div aria-label={email.stageLabel} class="service-stage vertical-visual" role="img">
     <div class="vertical-panel">
-      <div class="vertical-panel-heading"><span class="mini-mark">{brandMark}</span><strong>{email.panelTitle}</strong><span class="vertical-tag">{email.tag}</span></div>
+      <div class="vertical-panel-heading"><span class="mini-mark"><TenantBrand variant="symbol">{brandMark}</TenantBrand></span><strong>{email.panelTitle}</strong><span class="vertical-tag">{email.tag}</span></div>
       <div class="mail-preview">
         <div class="mail-identity"><svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg><span>{email.identityLabel}</span><strong><Fragment set:html="<!--email_off-->" />{email.address}<Fragment set:html="<!--/email_off-->" /></strong></div>
         <div class="mail-message"><span class="mail-message-label">{email.messageLabel}</span><strong>{email.subject}</strong><p>{email.message}</p></div>

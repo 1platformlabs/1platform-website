@@ -1,4 +1,5 @@
 ---
+import TenantBrand from '@components/TenantBrand.astro';
 import { Image } from 'astro:assets';
 import { iconPaths } from '@components/icons';
 import { useI18n } from '@i18n';
@@ -6,7 +7,7 @@ import { photographicContent } from '@lib/photographic-content';
 import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, tenantAccess } from '@lib/tenant-access';
 import { siteOrigin } from '@lib/site-origin';
 import { alternatesForTenantPath, defaultLocaleOf } from '@lib/site-locale';
-import { resolveIcon } from '@lib/tenant-brand-assets';
+import { iconMimeType, resolveIcon } from '@lib/tenant-brand-assets';
 import consultorio from '@assets/photographic/consultorio-hero.webp';
 import commerce from '@assets/product/showcase-store-bg.webp';
 import '@styles/photographic-service.css';
@@ -39,7 +40,7 @@ const icon = resolveIcon(tenant);
     <link rel="canonical" href={canonical} />
     {Object.entries(alternates).map(([language, path]) => <link rel="alternate" hreflang={language} href={new URL(path, origin).toString()} />)}
     <link rel="alternate" hreflang="x-default" href={new URL(alternates[defaultLocaleOf(tenant)]!, origin).toString()} />
-    <link rel="icon" href={icon} type="image/svg+xml" />
+    <link rel="icon" href={icon} type={iconMimeType(icon)} />
     {fontKey === 'manrope' && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
   </head>
   <body class="photographic-service access-page" data-palette={palette} style={brandStyle}>
@@ -51,8 +52,8 @@ const icon = resolveIcon(tenant);
     <a class="skip-link" href="#contenido">{copy('skip')}</a>
     <header class="site-header">
       <a class="brand" href={l('/')} aria-label={copy('brandHome')}>
-        <span class="brand-mark" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span>
-        <span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span>
+        <TenantBrand tone="white"><span class="brand-mark" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span>
+        <span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>
       </a>
       <a class="access-home" href={l('/')}><svg class="icon access-back" aria-hidden="true"><use href="#access-arrow" /></svg>{copy('home')}</a>
     </header>

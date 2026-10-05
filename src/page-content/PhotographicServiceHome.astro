@@ -1,4 +1,5 @@
 ---
+import TenantBrand from '@components/TenantBrand.astro';
 import { Image } from 'astro:assets';
 import { useI18n, type Locale } from '@i18n';
 import consultorio from '@assets/photographic/consultorio-hero.webp';
@@ -200,8 +201,8 @@ const jsonLd = [
 </svg>
 <header class="site-header" data-tenant-access={access ? '' : undefined}>
 <a aria-label={copy('ui.brand_home').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio">
-<span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
-<span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span>
+<TenantBrand tone="white"><span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>
 </a>
 <nav aria-label={copy('ui.desktop_nav_aria_label')} class="desktop-nav">{navigation.map((item) => <a href={item.href}>{item.label}</a>)}</nav>
 {languageChoices.length > 1 && <nav class="landing-languages" aria-label={copy('ui.language_label')}>{languageChoices.map(([language, path]) => language === locale ? <span aria-current="true" lang={language}>{copy(`ui.language_${language}`)}</span> : <a href={path} hreflang={language} lang={language} data-lang-choice={language}>{copy(`ui.language_${language}`)}</a>)}</nav>}
@@ -256,7 +257,7 @@ const jsonLd = [
 <div aria-label={copy('ui.service_stage_aria_label')} class="service-stage" role="img">
 <div class="product-panel payment-panel">
 <div class="product-heading">
-<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
+<span class="mini-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
 <use href="#i-phone"></use>
 </svg>
 </div>
@@ -286,7 +287,7 @@ const jsonLd = [
 <div aria-label={copy('ui.service_stage_aria_label52')} class="service-stage" role="img">
 <div class="product-panel link-panel">
 <div class="product-heading">
-<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
+<span class="mini-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
 <use href="#i-link"></use>
 </svg>
 </div>
@@ -317,7 +318,7 @@ const jsonLd = [
 <div aria-label={copy('ui.service_stage_aria_label53')} class="service-stage" role="img">
 <div class="product-panel invoice-panel">
 <div class="product-heading">
-<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{copy('illustrations.invoice')}</span><svg aria-hidden="true" class="icon">
+<span class="mini-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><span>{copy('illustrations.invoice')}</span><svg aria-hidden="true" class="icon">
 <use href="#i-receipt"></use>
 </svg>
 </div>
@@ -353,7 +354,7 @@ const jsonLd = [
 <div class="business-copy"><p class="eyebrow">{ads.eyebrow}</p><h3 id="ads-title">{ads.title}</h3><p>{ads.description}</p></div>
 <div aria-label={ads.stageLabel} class="service-stage vertical-visual" role="img">
 <div class="vertical-panel">
-<div class="vertical-panel-heading"><span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><strong>{ads.panelTitle}</strong><span class="vertical-tag">{ads.tag}</span></div>
+<div class="vertical-panel-heading"><span class="mini-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><strong>{ads.panelTitle}</strong><span class="vertical-tag">{ads.tag}</span></div>
 <div class="campaign-creative"><span class="campaign-brand">{ads.brand}</span><svg aria-hidden="true" class="icon"><use href="#i-megaphone"></use></svg><strong>{ads.creative}</strong><span class="campaign-channels">{ads.channels}</span></div>
 <dl class="campaign-plan">{ads.plan.map((row) => <div><dt>{row.term}</dt><dd>{row.value}</dd></div>)}</dl>
 </div>
@@ -374,7 +375,7 @@ const jsonLd = [
 <div class="flow-panel" data-sequence="">
 <div aria-label={copy('ui.flow_visual_aria_label')} class="flow-visual" role="img">
 <div class="flow-topline">
-<span class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{copy('how.visualLabel')}</span><span class="flow-dot"></span>
+<span class="brand-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><span>{copy('how.visualLabel')}</span><span class="flow-dot"></span>
 </div>
 <div class="flow-options">
 <div>
@@ -421,7 +422,7 @@ const jsonLd = [
 <div class="panel-demo">
 <aside aria-label={copy('ui.panel_sidebar_aria_label')} class="panel-sidebar">
 <div class="panel-brand">
-<span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<span aria-hidden="true" class="brand-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span>
 <div>
 <strong>{tenant.brand_wordmark ?? tenant.brand_name}</strong><span>{copy('panel.name')}</span>
 </div>
@@ -717,7 +718,7 @@ const jsonLd = [
 {reviews && <LandingReviews reviews={reviews} locale={locale} formatLocale={formatLocale} />}
 <section aria-labelledby="closing-title" class="closing-section">
 <div class="wrap closing-content">
-<span aria-hidden="true" class="closing-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<span aria-hidden="true" class="closing-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span>
 <h2 id="closing-title">{copy('closing.title')}</h2>
 <a class="button button-white" data-support-cta="closing" href={contactHref('closing')}>
 <svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('actions.primary')}</span><svg aria-hidden="true" class="icon">
@@ -730,7 +731,7 @@ const jsonLd = [
 <footer class="site-footer">
 <div class="wrap footer-grid">
 <div class="footer-brand">
-<a aria-label={copy('ui.brand_back').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio"><span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></a>
+<a aria-label={copy('ui.brand_back').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio"><TenantBrand tone="white"><span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand></a>
 <p>{copy('footer.description')}</p>
 </div>
 <nav aria-label={copy('ui.footer_column_aria_label')} class="footer-column">

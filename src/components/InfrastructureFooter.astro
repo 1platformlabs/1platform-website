@@ -1,4 +1,5 @@
 ---
+import TenantBrand from '@components/TenantBrand.astro';
 import { siteChrome } from '@lib/site-chrome';
 import { docsUrl } from '@lib/site-destinations';
 import SocialLinks from '@components/SocialLinks.astro';
@@ -11,7 +12,7 @@ const reference = docsUrl(Astro.locals, '/api-reference/1platform-api');
 ---
 <footer class="brand-footer">
   <div class="brand-footer-main">
-    <div><a class="brand-lockup" href={home} aria-label={copy('homeLabel').replace('{brand}', tenant.brand_name)}><span class="brand-symbol" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><span class="brand-name">{tenant.brand_wordmark ?? tenant.brand_name}</span></a><p>{copy('footer.description')}</p></div>
+    <div><a class="brand-lockup" href={home} aria-label={copy('homeLabel').replace('{brand}', tenant.brand_name)}><TenantBrand tone="white"><span class="brand-symbol" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><span class="brand-name">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand></a><p>{copy('footer.description')}</p></div>
     <nav class="brand-footer-column" aria-label={copy('footer.explore')}><h2>{copy('footer.explore')}</h2>{navigation.filter(({position}) => position < 3).map(({label,href}) => <a href={href}>{label}</a>)}</nav>
     <nav class="brand-footer-column" aria-label={copy('footer.resources')}><h2>{copy('footer.resources')}</h2>{navigation.filter(({position}) => position === 3 || position === 4).reverse().map(({label,href}) => <a href={href}>{label}</a>)}{reference && <a href={reference}>{copy('footer.reference')}</a>}</nav>
     <nav class="brand-footer-column" aria-label={copy('footer.company')}><h2>{copy('footer.company')}</h2>{navigation.filter(({position}) => position === 5).map(({label,href}) => <a href={href}>{label}</a>)}</nav>

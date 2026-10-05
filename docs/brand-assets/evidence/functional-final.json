@@ -1,0 +1,23 @@
+{
+  "command": "PLAYWRIGHT_PORT=4502 npm test -- --workers=2 --reporter=line,json",
+  "stats": {
+    "startTime": "2026-10-04T15:13:02.240Z",
+    "duration": 55175.047000000006,
+    "expected": 525,
+    "skipped": 24,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "raw_report": {
+    "path": "/tmp/website-brand-final.LYjV9c/functional-final-pass.json",
+    "sha256": "d4cd963bf2c6012b1eb9106a500f781d9288ad6f8b01036f32f2ce86474d6dcc"
+  },
+  "errors": [],
+  "failures": [],
+  "source_tree_sha256": "464f9921303578e00790c6ea90cec4020d4e6a3208ba3fafe868cd59e5837882",
+  "skip_count": 24,
+  "skip_file": "tests/bench/landings.real.spec.ts",
+  "skip_reasons": [
+    "Requires the authorized private real-service bank"
+  ]
+}

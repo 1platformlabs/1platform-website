@@ -55,10 +55,12 @@ export function brandSymbol(tenant: SiteTenant): string {
 }
 
 /**
- * Always returns a path. Order: declared icon → the uploaded logo (as a PNG
- * favicon) → the derived monogram SVG.
+ * Always returns a path. Order: independent uploaded favicon → declared icon
+ * → the uploaded logo (as a PNG favicon) → the derived monogram SVG.
  */
 export function resolveIcon(tenant: SiteTenant): string {
+  const favicon = uploadedFavicon(tenant)
+  if (favicon) return uploadedFaviconPath(favicon)
   const declared = publishedPath(tenant.brand_assets?.icon)
   if (declared) return declared
   if (uploadedLogo(tenant)) return versioned('/brand/icon.png', tenant, 'icon')
@@ -481,6 +483,14 @@ export function uploadedLogo(tenant: SiteTenant): SiteBrandLogo | null {
   return normalizeBrandLogo(tenant.brand_logo)
 }
 
+export function uploadedFavicon(tenant: SiteTenant): SiteBrandLogo | null {
+  return normalizeBrandLogo(tenant.brand_favicon)
+}
+
+export function uploadedFaviconPath(favicon: SiteBrandLogo): string {
+  return `/brand/favicon/${favicon.sha256}.png`
+}
+
 /**
  * The uploaded logo's same-origin path when it is what this tenant's brand
  * resolves to — no declared asset outranks it — and its bytes can be served;
@@ -499,7 +509,8 @@ export function uploadedLogoPath(logo: SiteBrandLogo): string {
   return `/brand/logo/${logo.sha256}.png`
 }
 
-type LogoFetcher = (slug: string, sha256: string) => Promise<Buffer | null>
+type BrandRole = 'logo' | 'favicon'
+type LogoFetcher = (slug: string, sha256: string, role: BrandRole) => Promise<Buffer | null>
 
 /**
  * Ask the API for the bytes — the base URL is this server's configuration,
@@ -507,8 +518,8 @@ type LogoFetcher = (slug: string, sha256: string) => Promise<Buffer | null>
  * 200 that is really a PNG and is not absurdly large is accepted; every other
  * outcome is "not now" (null), never an exception into a page render.
  */
-const fetchLogoFromApi: LogoFetcher = async (slug, sha256) => {
-  const url = `${apiBaseUrl()}/api/v1/sites/${encodeURIComponent(slug)}/logo/${sha256}.png`
+const fetchLogoFromApi: LogoFetcher = async (slug, sha256, role) => {
+  const url = `${apiBaseUrl()}/api/v1/sites/${encodeURIComponent(slug)}/${role}/${sha256}.png`
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS), headers: { accept: 'image/png' } })
     if (response.status !== 200) return null
@@ -540,9 +551,17 @@ const LOGO_CAPACITY = 64
  * enough that recovery shows within the minute.
  */
 export function logoBytes(tenant: SiteTenant): Promise<Buffer | null> {
-  const logo = uploadedLogo(tenant)
+  return uploadedAssetBytes(tenant, 'logo')
+}
+
+export function faviconBytes(tenant: SiteTenant): Promise<Buffer | null> {
+  return uploadedAssetBytes(tenant, 'favicon')
+}
+
+function uploadedAssetBytes(tenant: SiteTenant, role: BrandRole): Promise<Buffer | null> {
+  const logo = role === 'logo' ? uploadedLogo(tenant) : uploadedFavicon(tenant)
   if (!logo) return Promise.resolve(null)
-  const key = `${tenant.slug}\u0000${logo.sha256}`
+  const key = `${tenant.slug}\u0000${role}\u0000${logo.sha256}`
   const failedAt = logoFailures.get(key)
   if (failedAt !== undefined) {
     if (logoClock() - failedAt < LOGO_FAILURE_TTL_MS) return Promise.resolve(null)
@@ -550,7 +569,7 @@ export function logoBytes(tenant: SiteTenant): Promise<Buffer | null> {
   }
   const known = logoEntries.get(key)
   if (known !== undefined) return known
-  const pending = logoFetcher(tenant.slug, logo.sha256).then((bytes) => {
+  const pending = logoFetcher(tenant.slug, logo.sha256, role).then((bytes) => {
     if (bytes === null) {
       logoEntries.delete(key)
       logoFailures.set(key, logoClock())

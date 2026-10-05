@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "tenants": [
+    {
+      "site_slug": "oneplatform",
+      "brand_name": "1Platform",
+      "domain": "1platform.pro",
+      "assets": {
+        "logo": {
+          "path": "oneplatform/logo.png",
+          "sha256": "988237798074e8068dfd214f2e1ca907ff156313d2c19c51d8826b83b03fa5cc",
+          "source_path": "oneplatform/logo-source.png",
+          "source_sha256": "cfee773b722a46f69937e83f00e5496412108d656cd3c86993ede41f2cbc1e08",
+          "frame": {
+            "left": 119,
+            "top": 193,
+            "width": 1813,
+            "height": 355
+          }
+        },
+        "favicon": {
+          "path": "oneplatform/favicon.png",
+          "sha256": "a657669cc2c8cc036b773c5a84d31594e8c32a9f59eff0478b9284dd8f9c37c8"
+        }
+      }
+    },
+    {
+      "site_slug": "medipago",
+      "brand_name": "Medipago",
+      "domain": "medipago.gt",
+      "assets": {
+        "logo": {
+          "path": "medipago/logo.png",
+          "sha256": "4db68d7be2c80588e466aa9156a1cc4d2ffb13fe4d628be3d2ead77e9bce06bc",
+          "source_path": "medipago/logo-source.png",
+          "source_sha256": "861decee9f9781a98170c0d987308dd19778601dc6eba99b4b564a4ed83df37b",
+          "frame": {
+            "left": 77,
+            "top": 166,
+            "width": 1888,
+            "height": 403
+          }
+        },
+        "favicon": {
+          "path": "medipago/favicon.png",
+          "sha256": "9ae843ded7d98946a7cc78e363968494529b5a9873b7bac8352799a973ce429f"
+        }
+      }
+    },
+    {
+      "site_slug": "vendefacil",
+      "brand_name": "Vende Fácil",
+      "domain": "vendefacil.1platform.pro",
+      "assets": {
+        "logo": {
+          "path": "vendefacil/logo.png",
+          "sha256": "7bd49296265f35b033f92a11c032884e632cd7d3426b5d1383c47144ed0051b9",
+          "source_path": "vendefacil/logo-source.png",
+          "source_sha256": "affa920cf983967b62b8ee43f2b36d7bf8eadf5e75a4bbc6a6c2003f0beb5d2e",
+          "frame": {
+            "left": 123,
+            "top": 204,
+            "width": 1843,
+            "height": 353
+          }
+        },
+        "favicon": {
+          "path": "vendefacil/favicon.png",
+          "sha256": "8832785d0609373fce198479e83d0ca27f9443727d1e5f646c659f8fcca11041"
+        }
+      }
+    }
+  ]
+}

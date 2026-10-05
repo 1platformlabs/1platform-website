@@ -1,0 +1,247 @@
+{
+  "date": "2026-10-04",
+  "previous_head": "bf7210dbdb830bc43cb486ed7d43ad0c97995530",
+  "ci_run": 37212648968,
+  "baseline_job": 111466778116,
+  "sonar_check": 111466948842,
+  "original_baseline": {
+    "identical": 49,
+    "differing": 51,
+    "wrong": 0
+  },
+  "original_sonar": {
+    "conclusion": "failure",
+    "security_rating": "C",
+    "reliability_rating": "C",
+    "annotations": [
+      {
+        "path": "src/lib/tenant-brand-display.ts",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/src/lib/tenant-brand-display.ts",
+        "start_line": 16,
+        "start_column": null,
+        "end_line": 16,
+        "end_column": null,
+        "annotation_level": "warning",
+        "title": "Expected non-Promise value in a boolean conditional.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcifJV9OdBznxsJp&open=AaEHgcifJV9OdBznxsJp&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/preview-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/preview-brand-assets.mjs",
+        "start_line": 31,
+        "start_column": null,
+        "end_line": 31,
+        "end_column": null,
+        "annotation_level": "warning",
+        "title": "Unexpected `await` inside a loop.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmlJV9OdBznxsJy&open=AaEHgcmlJV9OdBznxsJy&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/prepare-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/prepare-brand-assets.mjs",
+        "start_line": 28,
+        "start_column": null,
+        "end_line": 28,
+        "end_column": null,
+        "annotation_level": "failure",
+        "title": "Path Traversal via faulty LLM-supplied CLI arguments",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmeJV9OdBznxsJw&open=AaEHgcmeJV9OdBznxsJw&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/preview-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/preview-brand-assets.mjs",
+        "start_line": 29,
+        "start_column": null,
+        "end_line": 29,
+        "end_column": null,
+        "annotation_level": "warning",
+        "title": "Unexpected `await` inside a loop.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmlJV9OdBznxsJx&open=AaEHgcmlJV9OdBznxsJx&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/prepare-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/prepare-brand-assets.mjs",
+        "start_line": 9,
+        "start_column": null,
+        "end_line": 9,
+        "end_column": null,
+        "annotation_level": "failure",
+        "title": "Path Traversal via faulty LLM-supplied CLI arguments",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmeJV9OdBznxsJv&open=AaEHgcmeJV9OdBznxsJv&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "src/lib/tenant-brand-display.ts",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/src/lib/tenant-brand-display.ts",
+        "start_line": 17,
+        "start_column": null,
+        "end_line": 17,
+        "end_column": null,
+        "annotation_level": "failure",
+        "title": "Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcifJV9OdBznxsJq&open=AaEHgcifJV9OdBznxsJq&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/prepare-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/prepare-brand-assets.mjs",
+        "start_line": 24,
+        "start_column": null,
+        "end_line": 24,
+        "end_column": null,
+        "annotation_level": "warning",
+        "title": "Unexpected `await` inside a loop.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmeJV9OdBznxsJt&open=AaEHgcmeJV9OdBznxsJt&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/preview-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/preview-brand-assets.mjs",
+        "start_line": 50,
+        "start_column": null,
+        "end_line": 50,
+        "end_column": null,
+        "annotation_level": "warning",
+        "title": "Prefer using an optional chain expression instead, as it's more concise and easier to read.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmlJV9OdBznxsJz&open=AaEHgcmlJV9OdBznxsJz&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/prepare-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/prepare-brand-assets.mjs",
+        "start_line": 13,
+        "start_column": null,
+        "end_line": 13,
+        "end_column": null,
+        "annotation_level": "warning",
+        "title": "Unexpected `await` inside a loop.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmeJV9OdBznxsJr&open=AaEHgcmeJV9OdBznxsJr&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/prepare-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/prepare-brand-assets.mjs",
+        "start_line": 14,
+        "start_column": null,
+        "end_line": 14,
+        "end_column": null,
+        "annotation_level": "warning",
+        "title": "Unexpected `await` inside a loop.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmeJV9OdBznxsJs&open=AaEHgcmeJV9OdBznxsJs&pullRequest=144",
+        "raw_details": null
+      },
+      {
+        "path": "scripts/prepare-brand-assets.mjs",
+        "blob_href": "https://github.com/1platformlabs/1platform-website/blob/bf7210dbdb830bc43cb486ed7d43ad0c97995530/scripts/prepare-brand-assets.mjs",
+        "start_line": 25,
+        "start_column": null,
+        "end_line": 25,
+        "end_column": null,
+        "annotation_level": "warning",
+        "title": "Unexpected `await` inside a loop.",
+        "message": "\nSee more on https://sonarcloud.io/project/issues?id=1platformlabs_1platform-website&issues=AaEHgcmeJV9OdBznxsJu&open=AaEHgcmeJV9OdBznxsJu&pullRequest=144",
+        "raw_details": null
+      }
+    ]
+  },
+  "intermediate_baseline": {
+    "identical": 98,
+    "differing": 2,
+    "wrong": 0,
+    "remaining_cause": "Uploaded-only rules changed the photographic CSS bundle URLs."
+  },
+  "final_baseline": {
+    "command": "npm run check:baseline -- --explain",
+    "exit_code": 0,
+    "identical": 100,
+    "differing": 0,
+    "wrong": 0,
+    "baseline_or_normalisers_modified": false
+  },
+  "focal": {
+    "command": "PLAYWRIGHT_PORT=4502 npm test -- tests/brand-kit.spec.ts tests/tenant-brand-chrome.spec.ts tests/tenant-brand-display.spec.ts tests/tenant-favicon-cache.spec.ts tests/serving-contract.spec.ts --workers=2 --reporter=list,json",
+    "exit_code": 0,
+    "stats": {
+      "startTime": "2026-10-04T15:34:30.602Z",
+      "duration": 5729.944,
+      "expected": 38,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "errors": []
+  },
+  "typecheck": {
+    "exit_code": 0,
+    "errors": 0,
+    "warnings": 0,
+    "hints": 27
+  },
+  "design_guard": {
+    "exit_code": 0,
+    "self_tests": 53
+  },
+  "kit_reproduction": {
+    "command": "node scripts/prepare-brand-assets.mjs",
+    "exit_code": 0,
+    "manifest_and_png_diff": []
+  },
+  "source_files_sha256": {
+    "scripts/brand-kit.mjs": "9aae6badef3f01c7b4cd8d1d390ceebbab8c14ba681b31ea428379e592d01a4e",
+    "scripts/prepare-brand-assets.mjs": "0e4cdc45dc43ecf1d32f6f89893bac859964132df567a0d2d08375e105f718f6",
+    "scripts/preview-brand-assets.mjs": "44517be1866ec09aaf2221b0e5708c1f8346bf1dbedc99dfdcf9a137827a5e8b",
+    "src/components/TenantBrand.astro": "a0e014a2eec54024be800deeba4977f518aa530fc45a58c35869975e48b80fe8",
+    "src/lib/tenant-brand-display.ts": "79f87378c9fac813688b5693a7b4376dfcd6c59a40accf638d90b5463c0488db",
+    "src/styles/infrastructure-home.css": "0e70b07aef853b6ee98d01b7a93b64525469372e9389917da638a2ab218b3a6a",
+    "src/styles/photographic-service.css": "fb0527b35c464acea5b78613cfd11cc97dc1bca964661c9db6f7ad3d71a3f86d",
+    "tests/brand-kit.spec.ts": "60f7da35a719b0372096212eb07299db702cd83382084f820267cffb9467d3bf",
+    "tests/tenant-brand-chrome.spec.ts": "e73693864ad5dbcb115701c2843930119beaedad33c3a240b0650127693fa83e",
+    "tests/tenant-brand-display.spec.ts": "9baf2cbfbeb7619dd28df310eeb811f644fcf92300652c838ce5c575de89c7ba"
+  },
+  "raw_logs": [
+    {
+      "path": "/tmp/website-brand-byte-regression-ci.log",
+      "sha256": "f1646968b95c146ae2d1156de1093f07ef3f32e16f1e955911205faaca527990",
+      "bytes": 54669
+    },
+    {
+      "path": "/tmp/website-brand-sonar-annotations.json",
+      "sha256": "a2f1f10d2135838b7838c37834fc758c357a719e7fdbabc608207f73a2793a2d",
+      "bytes": 5837
+    },
+    {
+      "path": "/tmp/website-brand-baseline-follow-up.log",
+      "sha256": "ab5daaa1ff447e7cc353c65363047705aab1df5a4237f3da603047bc2d9f0f11",
+      "bytes": 2424
+    },
+    {
+      "path": "/tmp/website-brand-baseline-final.log",
+      "sha256": "8ea4e80e75a48ab3501e2b4ae323bb6d3192a0ce374ad560d32a7394880e2090",
+      "bytes": 1380
+    },
+    {
+      "path": "/tmp/website-brand-ci-follow-up-tests.log",
+      "sha256": "bb994af3ee08230b82341e3b51f198934389636a3e2f93671a8683ee51032818",
+      "bytes": 57527
+    },
+    {
+      "path": "/tmp/website-brand-ci-typecheck.log",
+      "sha256": "7de7a4487f387f44f9ffd57427fa498d0800076d76bd9a2244c317041252468b",
+      "bytes": 7357
+    },
+    {
+      "path": "/tmp/website-brand-ci-guards.log",
+      "sha256": "bcb131e96d8116a769fc100fe5d7dcc0124a4340f9a66f4dc1a607c4f7a73c1d",
+      "bytes": 3935
+    }
+  ],
+  "pending": [
+    "CI on the follow-up commit",
+    "Sonar reanalysis; no local Sonar pass is claimed"
+  ],
+  "scope": "SSR and local HTTP fixtures, not an authenticated API/DB bank; no push, merge, publication or tenant configuration."
+}
