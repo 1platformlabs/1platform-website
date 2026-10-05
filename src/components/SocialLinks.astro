@@ -49,6 +49,9 @@ const links = socialLinksOf(tenant);
   .social-links li {
     margin: 0;
   }
+  .social-links--photographic ul {
+    gap: 8px;
+  }
   .social-links a {
     display: inline-flex;
     align-items: center;
@@ -69,5 +72,11 @@ const links = socialLinksOf(tenant);
   .social-links svg {
     inline-size: 20px;
     block-size: 20px;
+  }
+  @media (max-width: 560px) {
+    .social-links--photographic a {
+      inline-size: 48px;
+      block-size: 48px;
+    }
   }
 </style>
