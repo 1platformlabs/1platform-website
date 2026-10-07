@@ -91,6 +91,11 @@
 .infrastructure-home .section-heading > p { max-width: 295px; color: var(--muted); font-size: 18px; }
 .infrastructure-home .capability-layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: stretch; gap: 22px; }
 .infrastructure-home .capability-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.infrastructure-home .capability-entry { display: flex; flex-direction: column; min-width: 0; }
+.infrastructure-home .capability-entry .capability { width: 100%; flex: 1; }
+.infrastructure-home .capability-documentation { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 22px; color: var(--blue); font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.infrastructure-home .capability-documentation .icon { width: 15px; height: 15px; }
+.infrastructure-home .capability-documentation:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
 .infrastructure-home .capability { display: flex; align-items: flex-start; gap: 15px; min-height: 126px; padding: 22px; border: 1px solid #d8e0e9; border-radius: 18px; background: white; color: var(--ink); text-align: left; transition: border-color .2s, background-color .2s, box-shadow .2s; }
 .infrastructure-home .capability:hover, .infrastructure-home .capability.is-selected { border-color: #849ecc; background: var(--site-selection); box-shadow: 0 10px 25px rgb(25 53 99 / 5%); }
 .infrastructure-home .capability-number { padding-top: 3px; color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .1em; }

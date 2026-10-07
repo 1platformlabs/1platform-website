@@ -155,7 +155,11 @@ test.beforeAll(async () => {
   const catalogue = JSON.parse(readFileSync(exportPath, 'utf8')) as { documents: { route: string; locale: string; published: boolean; blocks: Record<string, string> }[] };
   for (const locale of platformTenant.locales) {
     const pages = catalogue.documents.filter((document) => document.locale === locale && document.published);
-    platformContent.set(locale, { success: true, data: { slug: platformTenant.slug, locale, pages, messages: Object.assign({}, ...pages.map((document) => document.blocks)) }, msg: 'ok' });
+    const messages: Record<string, string> = Object.assign({}, ...pages.map((document) => document.blocks));
+    // Production serves the content PUBLISHED before SRV, which has no label for
+    // the documentation links; the page must render without it (t() would throw).
+    delete messages['infrastructure.capabilities.documentation'];
+    platformContent.set(locale, { success: true, data: { slug: platformTenant.slug, locale, pages, messages }, msg: 'ok' });
   }
   api = createServer((request, response) => {
     const url = new URL(request.url ?? '/', 'http://contract');
@@ -585,6 +589,9 @@ for (const [locale, path] of [['en', '/'], ['es', '/es/']] as const) {
     await expect(page.locator('.developers .button')).toHaveAttribute('href', new URL('/docs/saas/1platform-api/getting-started/', platformTenant.destinations.docs!).toString());
     await expect(page.locator('.brand-nav a')).toHaveText(Array.from({ length: 6 }, (_, index) => configured[`site.navigation.${index}.label`]));
     await expect(page.locator('[data-capability]')).toHaveCount(10);
+    const documentationLinks = page.locator('.capability-documentation');
+    await expect(documentationLinks).toHaveCount(10);
+    await expect(documentationLinks.first()).toHaveAccessibleName(new RegExp(locale === 'en' ? '^View documentation:' : '^Ver documentación:'));
     await expect(page.locator('[data-capability][aria-pressed="true"]')).toHaveCount(3);
     await page.setViewportSize({ width: 390, height: 844 });
     await checkOverflow(page);
