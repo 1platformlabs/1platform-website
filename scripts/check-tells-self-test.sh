@@ -153,6 +153,37 @@ assert_green "meta element is not a brand" "$PAGE" \
 assert_green "Spanish noun meta is not a brand" "$CATALOG" \
   "  'x.seeded': 'Alcanza tu meta de ventas del trimestre.',"
 
+# website-redes-sociales D-4: the tenant's OWN profiles. One file, two words.
+# Each half proved: the exemption covers exactly those two brands in exactly
+# that file, and nothing else written there — or anywhere else — slips through.
+SOCIAL="src/lib/social-links.ts"
+assert_green "social network name inside the social-links module" "$SOCIAL" \
+  "export const SEEDED = 'Instagram'"
+assert_red "social network name in any other file" "external provider names" \
+  "src/lib/site-api.ts" "export const SEEDED = 'Facebook'"
+assert_red "another provider inside the social-links module" "external provider names" \
+  "$SOCIAL" "export const SEEDED = 'stripe'"
+assert_red "ad network inside the social-links module" "external provider names" \
+  "$SOCIAL" "export const SEEDED = 'Meta Ads'"
+assert_red "exempt word does not shield a second provider on its line" \
+  "external provider names" "$SOCIAL" "export const SEEDED = 'Instagram via openai'"
+
+# vendefacil-landing D-1: the advertising channel a tenant sells as its own
+# service. One file, three names. Each half proved: the exemption covers exactly
+# those names in exactly that file, and nothing else written there -- or the
+# same names anywhere else -- slips through.
+CHANNELS="src/lib/advertising-channels.ts"
+assert_green "ad channel names inside the advertising-channels module" "$CHANNELS" \
+  "export const SEEDED = ['Meta Ads', 'Facebook', 'Instagram']"
+assert_red "ad channel name in any other file" "external provider names" \
+  "src/lib/site-api.ts" "export const SEEDED = 'Meta Ads'"
+assert_red "another provider inside the advertising-channels module" "external provider names" \
+  "$CHANNELS" "export const SEEDED = 'stripe'"
+assert_red "exempt word does not shield a second provider on its line" \
+  "external provider names" "$CHANNELS" "export const SEEDED = 'Meta Ads via openai'"
+assert_red "an unlisted brand of the same family inside the module" "external provider names" \
+  "$CHANNELS" "export const SEEDED = 'Meta Business'"
+
 printf '\n%sThe content collections%s\n' "$DIM" "$RESET"
 # ~17,500 words of client-facing prose that no rule looked at until now. A
 # provider name in a blog post reached production with this script green.

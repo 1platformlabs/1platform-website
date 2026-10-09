@@ -68,7 +68,7 @@ function pathOfPageModule(file: string): string | null {
  * `/404` is not a page anyone should be sent to, and the two `.well-known`-ish
  * files are not pages at all.
  */
-const NEVER_INDEXED = new Set(['/404/'])
+const NEVER_INDEXED = new Set(['/404/', '/access/', '/request-access/'])
 
 export interface SiteUrl {
   /** Root-relative, always with a trailing slash except the root itself. */

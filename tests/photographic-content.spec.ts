@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import fixture from './fixtures/photographic-site.json' with { type: 'json' }
+import commerce from './fixtures/vendefacil-site.json' with { type: 'json' }
 import { photographicContent, safeJson } from '../src/lib/photographic-content'
 import { isTenant, type SiteTenant } from '../src/lib/site-api'
 import messages from '../src/i18n/messages/pages/photographic-home'
@@ -110,4 +111,139 @@ test('app fallback and home font remain validated tenant configuration', () => {
   expect(() => photographicContent({ ...messages.en, 'photographic.theme.displayFont': 'x;display:none' }, tenant)).toThrow()
   expect(() => photographicContent({ ...messages.en, 'photographic.calculator.mode': 'unknown' }, tenant)).toThrow()
   expect(repoTenantForHost('clinicas.1platform.dev')?.home_template).toBe('platform-commerce')
+})
+
+const commerceData = () => ({ messages: structuredClone(commerce.pagesResponse.data.messages) as Record<string, string>, tenant: structuredClone(commerce.tenant) as SiteTenant })
+const AD_NAMES = /Meta Ads|Facebook|Instagram/
+
+test('optional verticals, shortcuts and route stay absent for a tenant that does not publish them', () => {
+  const { messages, tenant } = data()
+  const site = photographicContent(messages, tenant)
+  expect(site.delivery).toBeNull()
+  expect(site.store).toBeNull()
+  expect(site.email).toBeNull()
+  expect(site.solutionsMode).toBeUndefined()
+  expect(site.ads).toBeNull()
+  expect(site.solutionLinks).toEqual([])
+  expect(site.route).toEqual([])
+  expect(site.extraIcons).toEqual([])
+  expect(site.manualCalculator).toBeNull()
+  expect(site.typeScale).toBeUndefined()
+  expect(site.heroFeatures.map((feature) => feature.icon)).toEqual(['phone', 'link', 'receipt'])
+  expect(site.footerAction).toBe(site.copy('actions.header'))
+  expect(site.linkFootnote).toBe(site.copy('hero.feature2'))
+  // Optional texts fall back when blank instead of taking the page down.
+  const blank = photographicContent({ ...messages, 'photographic.actions.footer': ' ', 'photographic.illustrations.linkFootnote': '' }, tenant)
+  expect(blank.footerAction).toBe(site.copy('actions.header'))
+  expect(blank.linkFootnote).toBe(site.copy('hero.feature2'))
+})
+
+test('a commerce tenant publishes seven solutions, four verticals, a four-step route and a visitor-rate calculator', () => {
+  const { messages, tenant } = commerceData()
+  const site = photographicContent(messages, tenant)
+  expect(site.solutionLinks.map((link) => link.href)).toEqual(['#cobros-presenciales', '#enlaces-de-cobro', '#facturacion', '#delivery', '#tienda-online', '#correo-profesional', '#anuncios'])
+  expect(site.solutionLinks.map((link) => link.label)).toEqual(['Cobros presenciales', 'Enlaces de cobro', 'Facturación', 'Delivery', 'Tienda en línea', 'Correo profesional', 'Meta Ads'])
+  expect(site.solutionLinks[2].footerLabel).toBe('Facturación automática')
+  expect(site.delivery?.milestones.map((step) => step.title)).toEqual(['Preparado', 'En camino', 'Entregado'])
+  expect(site.ads?.channels).toBe('Facebook · Instagram')
+  expect(site.route.map((step) => step.title)).toEqual(['Meta Ads', 'Cobros', 'Facturación', 'Delivery'])
+  expect(site.extraIcons).toEqual(['truck', 'megaphone', 'bag', 'book', 'mail'])
+  expect(site.typeScale).toBe('compact')
+  expect(site.calculator).toBeNull()
+  expect(site.manualCalculator).toMatchObject({ mode: 'manual', currency: 'GTQ' })
+  expect(site.clientConfig.calculator).toEqual(site.manualCalculator)
+  expect(JSON.stringify(site.clientConfig)).not.toMatch(/BasisPoints|4\.9|490/)
+  for (const context of ['delivery', 'ads', 'calculator', 'onboarding', 'panel', 'question', 'hero', 'header', 'closing', 'footer']) {
+    const href = new URL(site.contactHref(context))
+    expect(href.origin + href.pathname).toBe(tenant.destinations.support)
+    expect(href.searchParams.get('text')).not.toMatch(/\{ads/)
+  }
+  expect(new URL(site.contactHref('ads')).searchParams.get('text')).toContain('Meta Ads de Vende Fácil')
+  expect(new URL(site.contactHref('delivery')).searchParams.get('text')).toContain('Delivery de Vende Fácil')
+})
+
+test('the stored copy never names the advertising channel; the configured channel does, and only when enabled', () => {
+  const { messages, tenant } = commerceData()
+  // What the API stores (and its provider guard refuses by hand) carries markers only.
+  expect(Object.values(messages).join('\n')).not.toMatch(AD_NAMES)
+  expect(photographicContent(messages, tenant).copy('faq.items.5.question')).toBe('¿Qué puedo planificar con Meta Ads?')
+  // Without the staff-owned switch the markers stay literal: nothing is named and nothing throws.
+  delete messages['photographic.verticals.ads.mode']
+  const unnamed = photographicContent(messages, tenant)
+  expect(unnamed.copy('faq.items.5.question')).toBe('¿Qué puedo planificar con {adsName}?')
+  expect(JSON.stringify(unnamed.ads)).not.toMatch(AD_NAMES)
+  // An owner typing a marker on a tenant without the channel cannot take the page down or name it.
+  const medical = data()
+  medical.messages['photographic.hero.description'] = 'Promocione con {adsName}.'
+  expect(photographicContent(medical.messages, medical.tenant).copy('hero.description')).toBe('Promocione con {adsName}.')
+})
+
+test('invalid commerce configuration fails closed', () => {
+  const cases: Array<(d: Record<string, string>) => void> = [
+    (m) => { m['photographic.verticals.ads.mode'] = 'tiktok' },
+    (m) => { delete m['photographic.verticals.delivery.cta'] },
+    (m) => { delete m['photographic.verticals.ads.plan.1.value'] },
+    (m) => { m['photographic.solutions.links.0.href'] = 'https://evil.example/' },
+    (m) => { m['photographic.solutions.links.0.href'] = '#como-cobras' },
+    (m) => { delete m['photographic.solutions.links.1.label']; delete m['photographic.solutions.links.1.href']; delete m['photographic.solutions.links.1.footerLabel'] },
+    (m) => { m['photographic.route.items.0.icon'] = 'rocket' },
+    (m) => { delete m['photographic.route.label'] },
+    (m) => { m['photographic.hero.feature1.icon'] = 'rocket' },
+    (m) => { m['photographic.audience.items.0.icon'] = 'rocket' },
+    (m) => { m['photographic.theme.typeScale'] = 'tiny' },
+    (m) => { delete m['photographic.calculator.invalidRate'] },
+    (m) => { delete m['photographic.contact.messages.ads'] },
+  ]
+  for (const change of cases) {
+    const d = commerceData(); change(d.messages)
+    expect(() => { const site = photographicContent(d.messages, d.tenant); site.contactHref('ads') }).toThrow()
+  }
+  // A shortcut must point at a block the page renders: without Delivery its anchor is refused.
+  const withoutDelivery = commerceData()
+  for (const key of Object.keys(withoutDelivery.messages)) if (key.startsWith('photographic.verticals.delivery.')) delete withoutDelivery.messages[key]
+  expect(() => photographicContent(withoutDelivery.messages, withoutDelivery.tenant)).toThrow('solution anchor')
+})
+
+test('the commerce tenant keeps its own destinations and copy beside the medical tenant', () => {
+  const vende = photographicContent(commerceData().messages, commerceData().tenant)
+  const medical = photographicContent(data().messages, data().tenant)
+  expect(new URL(vende.contactHref('hero')).origin + new URL(vende.contactHref('hero')).pathname).toBe('https://wa.me/50236532841')
+  expect(new URL(medical.contactHref('hero')).pathname).not.toBe('/50236532841')
+  expect(medical.copy('hero.description')).not.toMatch(AD_NAMES)
+  expect(vende.copy('meta.title')).not.toMatch(/Medipago|médic/i)
+  expect(medical.calculator?.commissionBasisPoints).toBe(490)
+  expect(vende.calculator).toBeNull()
+})
+
+for (const kind of ['store', 'email'] as const) {
+  test(`${kind} is an independent tenant capability with complete copy and its configured destination`, () => {
+    const { messages, tenant } = commerceData()
+    const other = kind === 'store' ? 'email' : 'store'
+    for (const key of Object.keys(messages)) {
+      if (key.startsWith(`photographic.verticals.${other}.`) || key.startsWith('photographic.solutions.links.')) delete messages[key]
+    }
+    const site = photographicContent(messages, tenant)
+    expect(site[kind]).not.toBeNull()
+    expect(site[other]).toBeNull()
+    expect(new URL(site.contactHref(kind)).searchParams.get('text')).toBe(messages[`photographic.contact.messages.${kind}`])
+    tenant.destinations.support = 'https://contact.example/commercial?source=landing'
+    expect(photographicContent(messages, tenant).contactHref(kind)).toBe(tenant.destinations.support)
+    delete messages[`photographic.verticals.${kind}.stageLabel`]
+    expect(() => photographicContent(messages, tenant)).toThrow('Missing photographic content')
+  })
+}
+
+test('new services reject absent targets, incomplete messages, unknown icons and unknown layouts', () => {
+  for (const change of [
+    (m: Record<string, string>) => { m['photographic.solutions.mode'] = 'hostname' },
+    (m: Record<string, string>) => { m['photographic.verticals.store.products.0.icon'] = 'script' },
+    (m: Record<string, string>) => { delete m['photographic.contact.messages.store'] },
+    (m: Record<string, string>) => { delete m['photographic.contact.messages.email'] },
+    (m: Record<string, string>) => { delete m['photographic.verticals.email.title'] },
+    (m: Record<string, string>) => { delete m['photographic.verticals.store.title'] },
+  ]) {
+    const { messages, tenant } = commerceData()
+    change(messages)
+    expect(() => photographicContent(messages, tenant)).toThrow()
+  }
 })

@@ -1,0 +1,98 @@
+---
+import TenantBrand from '@components/TenantBrand.astro';
+import { Image } from 'astro:assets';
+import { iconPaths } from '@components/icons';
+import { useI18n } from '@i18n';
+import { photographicContent } from '@lib/photographic-content';
+import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, tenantAccess } from '@lib/tenant-access';
+import { siteOrigin } from '@lib/site-origin';
+import { alternatesForTenantPath, defaultLocaleOf } from '@lib/site-locale';
+import { iconMimeType, resolveIcon } from '@lib/tenant-brand-assets';
+import consultorio from '@assets/photographic/consultorio-hero.webp';
+import commerce from '@assets/product/showcase-store-bg.webp';
+import '@styles/photographic-service.css';
+import '@styles/tenant-access.css';
+
+interface Props { request?: boolean }
+const { request = false } = Astro.props;
+const tenant = Astro.locals.tenant;
+const { locale, l } = useI18n(Astro.url.pathname, Astro.locals);
+const { copy, loginHref, supportHref } = tenantAccess(tenant, Astro.locals.messages);
+const { brandStyle, palette, fontKey } = photographicContent(Astro.locals.messages, tenant);
+const pageCopy = (key: string) => copy(request ? `requestPage.${key}` : key);
+const photo = Astro.locals.messages['photographic.hero.image'] === 'commerce' ? commerce : consultorio;
+const route = request ? REQUEST_ACCESS_ROUTE : ACCESS_ROUTE;
+const origin = siteOrigin(Astro.locals);
+const canonical = new URL(l(route), origin).toString();
+const alternates = alternatesForTenantPath(tenant, l(route));
+const icon = resolveIcon(tenant);
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageCopy('title')}</title>
+    <meta name="description" content={pageCopy('description')} />
+    <meta name="robots" content="noindex,follow" />
+    <meta name="theme-color" content={tenant.theme.accent} />
+    <link rel="canonical" href={canonical} />
+    {Object.entries(alternates).map(([language, path]) => <link rel="alternate" hreflang={language} href={new URL(path, origin).toString()} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(alternates[defaultLocaleOf(tenant)]!, origin).toString()} />
+    <link rel="icon" href={icon} type={iconMimeType(icon)} />
+    {fontKey === 'manrope' && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
+  </head>
+  <body class="photographic-service access-page" data-palette={palette} style={brandStyle}>
+    <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="access-arrow" viewBox="0 0 24 24" set:html={iconPaths['arrow-right-short']} />
+      <symbol id="access-user" viewBox="0 0 24 24" set:html={iconPaths.user} />
+      <symbol id="access-message" viewBox="0 0 24 24" set:html={iconPaths.message} />
+    </svg>
+    <a class="skip-link" href="#contenido">{copy('skip')}</a>
+    <header class="site-header">
+      <a class="brand" href={l('/')} aria-label={copy('brandHome')}>
+        <TenantBrand tone="white"><span class="brand-mark" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span>
+        <span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>
+      </a>
+      <a class="access-home" href={l('/')}><svg class="icon access-back" aria-hidden="true"><use href="#access-arrow" /></svg>{copy('home')}</a>
+    </header>
+    <main class="access-shell" id="contenido">
+      <div class="access-background" aria-hidden="true">
+        <Image src={photo} alt="" width={1920} loading="eager" format="webp" />
+      </div>
+      <div class="wrap access-layout">
+        <div class="access-copy">
+          <p class="eyebrow">{pageCopy('eyebrow')}</p>
+          <h1>{pageCopy('heading1')}<br />{pageCopy('heading2')}</h1>
+          <p>{pageCopy('intro')}</p>
+          <a class="access-text-link" href={request ? loginHref : l(REQUEST_ACCESS_ROUTE)}>
+            {copy(request ? 'requestPage.existingAccountLink' : 'noAccountLink')}<svg class="icon" aria-hidden="true"><use href="#access-arrow" /></svg>
+          </a>
+        </div>
+        <section class="access-card" aria-labelledby="access-card-title">
+          <span class="access-card-mark" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href={request ? "#access-message" : "#access-user"} /></svg></span>
+          <h2 id="access-card-title">{pageCopy('cardTitle')}</h2>
+          <p>{pageCopy('cardDescription')}</p>
+          {request && <ol class="access-steps">
+            {[0, 1, 2].map(index => <li>
+              <span class="access-step-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <div><strong>{copy(`requestPage.steps.${index}.title`)}</strong><p>{copy(`requestPage.steps.${index}.description`)}</p></div>
+            </li>)}
+          </ol>}
+          <a class="access-button" href={request ? supportHref : loginHref} data-access-action={request ? 'support' : 'login'}>
+            {copy(request ? 'requestPage.contact' : 'login')}<svg class="icon" aria-hidden="true"><use href="#access-arrow" /></svg>
+          </a>
+          <div class="access-divider">
+            <h3>{copy(request ? 'requestPage.existingAccountTitle' : 'noAccountTitle')}</h3>
+            {!request && <p>{copy('noAccountDescription')}</p>}
+            <a class="access-text-link" href={request ? loginHref : l(REQUEST_ACCESS_ROUTE)}>
+              {copy(request ? 'requestPage.backToLogin' : 'request')}<svg class="icon" aria-hidden="true"><use href="#access-arrow" /></svg>
+            </a>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer class="access-footer"><div class="wrap"><span>© {new Date().getFullYear()} {tenant.brand_name}</span><span>{tenant.domain}</span></div></footer>
+  </body>
+</html>

@@ -145,6 +145,17 @@ test('the sitemaps, robots.txt and the feeds still reach the application', () =>
   expect(xmlish!.body).toContain('include /etc/nginx/proxy-to-node.conf;')
 })
 
+test('tenant brand routes outrank image extensions and preserve the upstream cache policy', () => {
+  // Without ^~, /brand/favicon/<hash>.png reaches the static PNG regex,
+  // which caches even a temporary 503 for a day and discards immutable hashes.
+  const brand = locations().find((location) => location.header === '^~ /brand/')
+  expect(brand, 'brand routes must take precedence over the static image regex').toBeTruthy()
+  expect(brand!.body).toContain('include /etc/nginx/proxy-to-node.conf;')
+  expect(brand!.body).toMatch(/add_header\s+Cache-Control\s+\$page_cache_control\s+always\s*;/)
+  expect(brand!.body).not.toMatch(/add_header\s+Cache-Control\s+"/)
+  expect(conf(NGINX)).toMatch(/default\s+\$upstream_http_cache_control\s*;/)
+})
+
 test('gzip covers the type the sitemaps and feeds actually send', () => {
   // Measured against the running server: Astro emits `application/xml` for the
   // sitemap and the feeds. nginx used to type them from the file extension, so

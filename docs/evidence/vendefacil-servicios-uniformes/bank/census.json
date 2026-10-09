@@ -1,0 +1,764 @@
+[
+  {
+    "environment": "prod",
+    "route": "/sites/by-host?host=vendefacil.1platform.pro",
+    "status": 200,
+    "sha256": "76278bf4be98d116b52edbd4c0295eb921eae34da40b3a9a505e25ac3be07b61",
+    "shape": [
+      "brand_assets",
+      "brand_logo",
+      "brand_mark",
+      "brand_name",
+      "brand_wordmark",
+      "default_locale",
+      "destinations",
+      "domain",
+      "google_site_verification",
+      "home_template",
+      "indexable",
+      "locales",
+      "pages",
+      "redirect_to",
+      "region",
+      "slug",
+      "social_links",
+      "theme"
+    ]
+  },
+  {
+    "environment": "prod",
+    "route": "/sites/vendefacil/pages?locale=es",
+    "status": 200,
+    "sha256": "69d6581dde74b45d1abd82a36ad1172166e5d18fe7aea9e47b7e5fad440bcdd4",
+    "shape": [
+      "locale",
+      "messages",
+      "pages",
+      "slug"
+    ],
+    "pages": [
+      {
+        "route": "/",
+        "locale": "es",
+        "keys": 413
+      },
+      {
+        "route": "/access/",
+        "locale": "es",
+        "keys": 18
+      },
+      {
+        "route": "/request-access/",
+        "locale": "es",
+        "keys": 18
+      },
+      {
+        "route": "@common",
+        "locale": "es",
+        "keys": 44
+      }
+    ]
+  },
+  {
+    "environment": "prod",
+    "route": "/sites/by-host?host=medipago.gt",
+    "status": 200,
+    "sha256": "8a3191411ae8b1568c7981ffc81f5f5478b4ccc11ebc9ea6867759b089bb9c50",
+    "shape": [
+      "brand_assets",
+      "brand_logo",
+      "brand_mark",
+      "brand_name",
+      "brand_wordmark",
+      "default_locale",
+      "destinations",
+      "domain",
+      "google_site_verification",
+      "home_template",
+      "indexable",
+      "locales",
+      "pages",
+      "redirect_to",
+      "region",
+      "slug",
+      "social_links",
+      "theme"
+    ]
+  },
+  {
+    "environment": "prod",
+    "route": "/sites/medipago/pages?locale=es",
+    "status": 200,
+    "sha256": "a76f477cae494f88e13dfe23a476600d8e1f95f126284b09ea4d08557180e7fc",
+    "shape": [
+      "locale",
+      "messages",
+      "pages",
+      "slug"
+    ],
+    "pages": [
+      {
+        "route": "/",
+        "locale": "es",
+        "keys": 327
+      },
+      {
+        "route": "@common",
+        "locale": "es",
+        "keys": 44
+      }
+    ]
+  },
+  {
+    "environment": "prod",
+    "route": "/sites/by-host?host=1platform.pro",
+    "status": 200,
+    "sha256": "99a1750222ecdefcc0bb1ffeda910c72345a21ec43288adfe53407dbdee02b0d",
+    "shape": [
+      "brand_assets",
+      "brand_logo",
+      "brand_mark",
+      "brand_name",
+      "brand_wordmark",
+      "default_locale",
+      "destinations",
+      "domain",
+      "google_site_verification",
+      "home_template",
+      "indexable",
+      "locales",
+      "pages",
+      "redirect_to",
+      "region",
+      "slug",
+      "social_links",
+      "theme"
+    ]
+  },
+  {
+    "environment": "prod",
+    "route": "/sites/oneplatform/pages?locale=en",
+    "status": 200,
+    "sha256": "875ea09c68df278c04eef0b243a64f088c57da3762ea5d4f2906048edf0a7b14",
+    "shape": [
+      "locale",
+      "messages",
+      "pages",
+      "slug"
+    ],
+    "pages": [
+      {
+        "route": "/",
+        "locale": "en",
+        "keys": 59
+      },
+      {
+        "route": "/404/",
+        "locale": "en",
+        "keys": 11
+      },
+      {
+        "route": "/about/",
+        "locale": "en",
+        "keys": 55
+      },
+      {
+        "route": "/contact/",
+        "locale": "en",
+        "keys": 32
+      },
+      {
+        "route": "/cookies/",
+        "locale": "en",
+        "keys": 2
+      },
+      {
+        "route": "/for-agencies/",
+        "locale": "en",
+        "keys": 34
+      },
+      {
+        "route": "/for-developers/",
+        "locale": "en",
+        "keys": 37
+      },
+      {
+        "route": "/payments-invoicing/",
+        "locale": "en",
+        "keys": 47
+      },
+      {
+        "route": "/pricing/",
+        "locale": "en",
+        "keys": 115
+      },
+      {
+        "route": "/privacy/",
+        "locale": "en",
+        "keys": 2
+      },
+      {
+        "route": "/solutions/",
+        "locale": "en",
+        "keys": 121
+      },
+      {
+        "route": "/solutions/ads/",
+        "locale": "en",
+        "keys": 62
+      },
+      {
+        "route": "/solutions/content/",
+        "locale": "en",
+        "keys": 52
+      },
+      {
+        "route": "/solutions/deliveries/",
+        "locale": "en",
+        "keys": 66
+      },
+      {
+        "route": "/solutions/online-store/",
+        "locale": "en",
+        "keys": 59
+      },
+      {
+        "route": "/solutions/whitelabel/",
+        "locale": "en",
+        "keys": 39
+      },
+      {
+        "route": "/terms/",
+        "locale": "en",
+        "keys": 2
+      },
+      {
+        "route": "@common",
+        "locale": "en",
+        "keys": 66
+      },
+      {
+        "route": "@components/card",
+        "locale": "en",
+        "keys": 2
+      },
+      {
+        "route": "@components/comparison-table",
+        "locale": "en",
+        "keys": 16
+      },
+      {
+        "route": "@components/hero",
+        "locale": "en",
+        "keys": 1
+      },
+      {
+        "route": "@components/interconnect-diagram",
+        "locale": "en",
+        "keys": 8
+      },
+      {
+        "route": "@components/process-spine",
+        "locale": "en",
+        "keys": 7
+      },
+      {
+        "route": "@components/site-chrome",
+        "locale": "en",
+        "keys": 34
+      },
+      {
+        "route": "@content",
+        "locale": "en",
+        "keys": 42
+      },
+      {
+        "route": "@infrastructure-home",
+        "locale": "en",
+        "keys": 142
+      },
+      {
+        "route": "@photographic-home",
+        "locale": "en",
+        "keys": 216
+      },
+      {
+        "route": "@photographic-interiors",
+        "locale": "en",
+        "keys": 75
+      }
+    ]
+  },
+  {
+    "environment": "prod",
+    "route": "/sites/oneplatform/pages?locale=es",
+    "status": 200,
+    "sha256": "92e518ad68a4d09312d3276de97ba6d438929c9ecaa049afb0c9029b369ac24f",
+    "shape": [
+      "locale",
+      "messages",
+      "pages",
+      "slug"
+    ],
+    "pages": [
+      {
+        "route": "/",
+        "locale": "es",
+        "keys": 59
+      },
+      {
+        "route": "/404/",
+        "locale": "es",
+        "keys": 11
+      },
+      {
+        "route": "/about/",
+        "locale": "es",
+        "keys": 55
+      },
+      {
+        "route": "/contact/",
+        "locale": "es",
+        "keys": 32
+      },
+      {
+        "route": "/cookies/",
+        "locale": "es",
+        "keys": 2
+      },
+      {
+        "route": "/for-agencies/",
+        "locale": "es",
+        "keys": 34
+      },
+      {
+        "route": "/for-developers/",
+        "locale": "es",
+        "keys": 37
+      },
+      {
+        "route": "/payments-invoicing/",
+        "locale": "es",
+        "keys": 47
+      },
+      {
+        "route": "/pricing/",
+        "locale": "es",
+        "keys": 115
+      },
+      {
+        "route": "/privacy/",
+        "locale": "es",
+        "keys": 2
+      },
+      {
+        "route": "/solutions/",
+        "locale": "es",
+        "keys": 121
+      },
+      {
+        "route": "/solutions/ads/",
+        "locale": "es",
+        "keys": 62
+      },
+      {
+        "route": "/solutions/content/",
+        "locale": "es",
+        "keys": 52
+      },
+      {
+        "route": "/solutions/deliveries/",
+        "locale": "es",
+        "keys": 66
+      },
+      {
+        "route": "/solutions/online-store/",
+        "locale": "es",
+        "keys": 59
+      },
+      {
+        "route": "/solutions/whitelabel/",
+        "locale": "es",
+        "keys": 39
+      },
+      {
+        "route": "/terms/",
+        "locale": "es",
+        "keys": 2
+      },
+      {
+        "route": "@common",
+        "locale": "es",
+        "keys": 66
+      },
+      {
+        "route": "@components/card",
+        "locale": "es",
+        "keys": 2
+      },
+      {
+        "route": "@components/comparison-table",
+        "locale": "es",
+        "keys": 16
+      },
+      {
+        "route": "@components/hero",
+        "locale": "es",
+        "keys": 1
+      },
+      {
+        "route": "@components/interconnect-diagram",
+        "locale": "es",
+        "keys": 8
+      },
+      {
+        "route": "@components/process-spine",
+        "locale": "es",
+        "keys": 7
+      },
+      {
+        "route": "@components/site-chrome",
+        "locale": "es",
+        "keys": 34
+      },
+      {
+        "route": "@content",
+        "locale": "es",
+        "keys": 42
+      },
+      {
+        "route": "@infrastructure-home",
+        "locale": "es",
+        "keys": 142
+      },
+      {
+        "route": "@photographic-home",
+        "locale": "es",
+        "keys": 216
+      },
+      {
+        "route": "@photographic-interiors",
+        "locale": "es",
+        "keys": 75
+      }
+    ]
+  },
+  {
+    "environment": "qa",
+    "route": "/sites/by-host?host=vendefacil.1platform.pro",
+    "status": 404,
+    "sha256": "a9e9d77b39f8483f32b547335ef871d9e8b6f5527a027dc5f1790d622fc5f794"
+  },
+  {
+    "environment": "qa",
+    "route": "/sites/vendefacil/pages?locale=es",
+    "status": 404,
+    "sha256": "a9e9d77b39f8483f32b547335ef871d9e8b6f5527a027dc5f1790d622fc5f794"
+  },
+  {
+    "environment": "qa",
+    "route": "/sites/by-host?host=medipago.gt",
+    "status": 404,
+    "sha256": "a9e9d77b39f8483f32b547335ef871d9e8b6f5527a027dc5f1790d622fc5f794"
+  },
+  {
+    "environment": "qa",
+    "route": "/sites/medipago/pages?locale=es",
+    "status": 404,
+    "sha256": "a9e9d77b39f8483f32b547335ef871d9e8b6f5527a027dc5f1790d622fc5f794"
+  },
+  {
+    "environment": "qa",
+    "route": "/sites/by-host?host=1platform.pro",
+    "status": 200,
+    "sha256": "83492fc76687764410ba7d2aef17c5c46432e4b35af307da5f8d1f4a825261a1",
+    "shape": [
+      "brand_assets",
+      "brand_logo",
+      "brand_mark",
+      "brand_name",
+      "brand_wordmark",
+      "default_locale",
+      "destinations",
+      "domain",
+      "google_site_verification",
+      "home_template",
+      "indexable",
+      "locales",
+      "pages",
+      "redirect_to",
+      "region",
+      "slug",
+      "social_links",
+      "theme"
+    ]
+  },
+  {
+    "environment": "qa",
+    "route": "/sites/oneplatform/pages?locale=en",
+    "status": 200,
+    "sha256": "b0c3412af29135258e9f1dafa9d56ed7c4dbe367f6680f79d20ad78995303a4f",
+    "shape": [
+      "locale",
+      "messages",
+      "pages",
+      "slug"
+    ],
+    "pages": [
+      {
+        "route": "/",
+        "locale": "en",
+        "keys": 59
+      },
+      {
+        "route": "/404/",
+        "locale": "en",
+        "keys": 11
+      },
+      {
+        "route": "/about/",
+        "locale": "en",
+        "keys": 55
+      },
+      {
+        "route": "/contact/",
+        "locale": "en",
+        "keys": 32
+      },
+      {
+        "route": "/cookies/",
+        "locale": "en",
+        "keys": 2
+      },
+      {
+        "route": "/for-agencies/",
+        "locale": "en",
+        "keys": 34
+      },
+      {
+        "route": "/for-developers/",
+        "locale": "en",
+        "keys": 37
+      },
+      {
+        "route": "/payments-invoicing/",
+        "locale": "en",
+        "keys": 47
+      },
+      {
+        "route": "/pricing/",
+        "locale": "en",
+        "keys": 115
+      },
+      {
+        "route": "/privacy/",
+        "locale": "en",
+        "keys": 2
+      },
+      {
+        "route": "/solutions/",
+        "locale": "en",
+        "keys": 121
+      },
+      {
+        "route": "/solutions/ads/",
+        "locale": "en",
+        "keys": 62
+      },
+      {
+        "route": "/solutions/content/",
+        "locale": "en",
+        "keys": 52
+      },
+      {
+        "route": "/solutions/deliveries/",
+        "locale": "en",
+        "keys": 66
+      },
+      {
+        "route": "/solutions/online-store/",
+        "locale": "en",
+        "keys": 59
+      },
+      {
+        "route": "/solutions/whitelabel/",
+        "locale": "en",
+        "keys": 39
+      },
+      {
+        "route": "/terms/",
+        "locale": "en",
+        "keys": 2
+      },
+      {
+        "route": "@common",
+        "locale": "en",
+        "keys": 66
+      },
+      {
+        "route": "@components/card",
+        "locale": "en",
+        "keys": 2
+      },
+      {
+        "route": "@components/comparison-table",
+        "locale": "en",
+        "keys": 16
+      },
+      {
+        "route": "@components/hero",
+        "locale": "en",
+        "keys": 1
+      },
+      {
+        "route": "@components/interconnect-diagram",
+        "locale": "en",
+        "keys": 8
+      },
+      {
+        "route": "@components/process-spine",
+        "locale": "en",
+        "keys": 7
+      },
+      {
+        "route": "@content",
+        "locale": "en",
+        "keys": 42
+      }
+    ]
+  },
+  {
+    "environment": "qa",
+    "route": "/sites/oneplatform/pages?locale=es",
+    "status": 200,
+    "sha256": "428537ab4835e06647c01eb8f6230521d290a610103babe5ba9f7a5b1a46da95",
+    "shape": [
+      "locale",
+      "messages",
+      "pages",
+      "slug"
+    ],
+    "pages": [
+      {
+        "route": "/",
+        "locale": "es",
+        "keys": 59
+      },
+      {
+        "route": "/404/",
+        "locale": "es",
+        "keys": 11
+      },
+      {
+        "route": "/about/",
+        "locale": "es",
+        "keys": 55
+      },
+      {
+        "route": "/contact/",
+        "locale": "es",
+        "keys": 32
+      },
+      {
+        "route": "/cookies/",
+        "locale": "es",
+        "keys": 2
+      },
+      {
+        "route": "/for-agencies/",
+        "locale": "es",
+        "keys": 34
+      },
+      {
+        "route": "/for-developers/",
+        "locale": "es",
+        "keys": 37
+      },
+      {
+        "route": "/payments-invoicing/",
+        "locale": "es",
+        "keys": 47
+      },
+      {
+        "route": "/pricing/",
+        "locale": "es",
+        "keys": 115
+      },
+      {
+        "route": "/privacy/",
+        "locale": "es",
+        "keys": 2
+      },
+      {
+        "route": "/solutions/",
+        "locale": "es",
+        "keys": 121
+      },
+      {
+        "route": "/solutions/ads/",
+        "locale": "es",
+        "keys": 62
+      },
+      {
+        "route": "/solutions/content/",
+        "locale": "es",
+        "keys": 52
+      },
+      {
+        "route": "/solutions/deliveries/",
+        "locale": "es",
+        "keys": 66
+      },
+      {
+        "route": "/solutions/online-store/",
+        "locale": "es",
+        "keys": 59
+      },
+      {
+        "route": "/solutions/whitelabel/",
+        "locale": "es",
+        "keys": 39
+      },
+      {
+        "route": "/terms/",
+        "locale": "es",
+        "keys": 2
+      },
+      {
+        "route": "@common",
+        "locale": "es",
+        "keys": 66
+      },
+      {
+        "route": "@components/card",
+        "locale": "es",
+        "keys": 2
+      },
+      {
+        "route": "@components/comparison-table",
+        "locale": "es",
+        "keys": 16
+      },
+      {
+        "route": "@components/hero",
+        "locale": "es",
+        "keys": 1
+      },
+      {
+        "route": "@components/interconnect-diagram",
+        "locale": "es",
+        "keys": 8
+      },
+      {
+        "route": "@components/process-spine",
+        "locale": "es",
+        "keys": 7
+      },
+      {
+        "route": "@content",
+        "locale": "es",
+        "keys": 42
+      }
+    ]
+  }
+]

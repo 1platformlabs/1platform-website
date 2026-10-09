@@ -1,0 +1,62 @@
+[
+  {
+    "tenant": "medipago",
+    "width": 1440,
+    "height": 900,
+    "hashes": [
+      "80eacc9c26c994ee966ccffa071d0f17146d06ba016acf4b3304f7201f30333c",
+      "80eacc9c26c994ee966ccffa071d0f17146d06ba016acf4b3304f7201f30333c"
+    ],
+    "identical": true
+  },
+  {
+    "tenant": "medipago",
+    "width": 390,
+    "height": 844,
+    "hashes": [
+      "f417b7d3c2ba58f8ee5739d40080015d18d955c65f6eabefecf6c2050947a339",
+      "f417b7d3c2ba58f8ee5739d40080015d18d955c65f6eabefecf6c2050947a339"
+    ],
+    "identical": true
+  },
+  {
+    "tenant": "medipago",
+    "width": 844,
+    "height": 390,
+    "hashes": [
+      "7afb1850eea09750d1f617b6868001eec45cf6089433bbe25360b2c39495896c",
+      "7afb1850eea09750d1f617b6868001eec45cf6089433bbe25360b2c39495896c"
+    ],
+    "identical": true
+  },
+  {
+    "tenant": "vendefacil",
+    "width": 1440,
+    "height": 900,
+    "hashes": [
+      "b9bdcfca6dd4a22bb7cdf22cd2d2c4b55a65347a0c235db5264b1e5194fe984c",
+      "b9bdcfca6dd4a22bb7cdf22cd2d2c4b55a65347a0c235db5264b1e5194fe984c"
+    ],
+    "identical": true
+  },
+  {
+    "tenant": "vendefacil",
+    "width": 390,
+    "height": 844,
+    "hashes": [
+      "49461ead8c2d393c3c3bb5d5444c89f4970114a588aeedc68837936a24bd3f43",
+      "49461ead8c2d393c3c3bb5d5444c89f4970114a588aeedc68837936a24bd3f43"
+    ],
+    "identical": true
+  },
+  {
+    "tenant": "vendefacil",
+    "width": 844,
+    "height": 390,
+    "hashes": [
+      "53fa0c935ab880ab279a3a34856ef119931ba9a587c038fce5b44d0eda2556fe",
+      "53fa0c935ab880ab279a3a34856ef119931ba9a587c038fce5b44d0eda2556fe"
+    ],
+    "identical": true
+  }
+]

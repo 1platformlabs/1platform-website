@@ -1,0 +1,22 @@
+[
+  {
+    "name": "staff snapshot includes private draft",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "anonymous reader cannot see draft",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "prepare plan from real staff snapshot",
+    "pass": true,
+    "detail": "{\"keysBefore\":413,\"keysAfter\":456,\"added\":43,\"changed\":2,\"removed\":0,\"snapshotHash\":\"7bd90ac27c3a0e134d0698d5f2c83036e56bed6f44b2ed814a89439a2dd6b55a\"}"
+  },
+  {
+    "name": "45-key diff, 413 to 456, no deletions",
+    "pass": true,
+    "detail": ""
+  }
+]

@@ -1,0 +1,142 @@
+[
+  {
+    "name": "bank has six-service content",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner can edit photographic.verticals.store.title",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner can edit photographic.verticals.email.title",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner cannot configure photographic.solutions.mode",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner config write refused photographic.solutions.mode",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner cannot configure photographic.verticals.store.products.0.icon",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner config write refused photographic.verticals.store.products.0.icon",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner cannot configure photographic.solutions.links.4.href",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner config write refused photographic.solutions.links.4.href",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner cannot configure photographic.contact.messages.store",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner config write refused photographic.contact.messages.store",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner cannot configure photographic.contact.messages.email",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner config write refused photographic.contact.messages.email",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner cannot configure photographic.verticals.ads.mode",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner config write refused photographic.verticals.ads.mode",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "staff literal provider rejected Meta Ads",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner literal provider rejected Meta Ads",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "staff literal provider rejected Facebook",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner literal provider rejected Facebook",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "staff literal provider rejected Instagram",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner literal provider rejected Instagram",
+    "pass": true,
+    "detail": "422"
+  },
+  {
+    "name": "owner can edit advertising marker",
+    "pass": true,
+    "detail": "200"
+  },
+  {
+    "name": "rollback preconditions refuse",
+    "pass": true,
+    "detail": "Root was edited after activation; do not overwrite it"
+  },
+  {
+    "name": "owner restores original text",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "no unauthorized change in Mongo",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "owner token cannot enter staff route",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "anonymous staff write rejected",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "rollback preconditions accept",
+    "pass": true,
+    "detail": "Preconditions match. No request sent."
+  }
+]

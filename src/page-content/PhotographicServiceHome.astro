@@ -1,18 +1,26 @@
 ---
+import TenantBrand from '@components/TenantBrand.astro';
 import { Image } from 'astro:assets';
 import { useI18n, type Locale } from '@i18n';
 import consultorio from '@assets/photographic/consultorio-hero.webp';
 import commerce from '@assets/product/showcase-store-bg.webp';
 import { photographicContent, safeJson } from '@lib/photographic-content';
+import { socialLinksOf } from '@lib/social-links';
+import SocialLinks from '@components/SocialLinks.astro';
+import PhotographicCommerceCards from '@components/PhotographicCommerceCards.astro';
+import LandingReviews from '@components/LandingReviews.astro';
+import { resolveSiteReviews } from '@lib/site-reviews';
+import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, hasTenantAccess, tenantAccess } from '@lib/tenant-access';
 import { calculateLandingAmount } from '@lib/landing-calculator';
 import { siteOrigin } from '@lib/site-origin';
 import { alternatesForTenantPath, defaultLocaleOf, makeLocalizePath, ogLocaleOf } from '@lib/site-locale';
-import { resolveIcon, resolveSocial, resolveAppleTouchIcon, socialImageIsAvailable, appleTouchIconIsAvailable } from '@lib/tenant-brand-assets';
+import { iconMimeType, resolveIcon, resolveSocial, resolveAppleTouchIcon, resolveUploadedLogo, socialImageIsAvailable, appleTouchIconIsAvailable } from '@lib/tenant-brand-assets';
 import '@styles/photographic-service.css';
 import '@styles/photographic-panel.css';
+import commerceStyles from '@styles/photographic-commerce-cards.css?url';
 
 const tenant = Astro.locals.tenant;
-const { copy, contactHref, navigation, steps, audiences, faqs, calculator, panel, brandStyle, clientConfig, fontKey, palette } = photographicContent(Astro.locals.messages, tenant);
+const { copy, contactHref, navigation, steps, audiences, faqs, calculator, manualCalculator, panel, brandStyle, clientConfig, fontKey, palette, heroFeatures, delivery, store, email, ads, solutionsMode, solutionLinks, route, routeLabel, typeScale, footerAction, extraIcons, linkFootnote } = photographicContent(Astro.locals.messages, tenant);
 const photographs = { consultorio, commerce };
 const photoKey = copy('hero.image');
 if (!Object.hasOwn(photographs, photoKey)) throw new Error('Unrecognised photographic asset');
@@ -26,9 +34,17 @@ const alternates = alternatesForTenantPath(tenant, Astro.originPathname);
 const icon = resolveIcon(tenant);
 const socialImage = await socialImageIsAvailable(tenant) ? new URL(resolveSocial(tenant), siteOrigin(Astro.locals)) : null;
 const touchIcon = await appleTouchIconIsAvailable(tenant) ? resolveAppleTouchIcon(tenant) : null;
+// api#519: an uploaded logo is the Organization logo; without one, the social card as before.
+const uploadedLogoPath = await resolveUploadedLogo(tenant);
+const organizationLogo = uploadedLogoPath ? new URL(uploadedLogoPath, siteOrigin(Astro.locals)) : socialImage;
 const locale = Astro.locals.locale;
 const localize = makeLocalizePath(tenant);
+const access = hasTenantAccess(tenant) ? tenantAccess(tenant, Astro.locals.messages) : null;
+// The footer's request link predates no tenant's content: absent copy omits it rather than failing the home.
+const requestAccessLabel = access && Astro.locals.messages['access.request']?.trim() ? access.copy('request') : null;
 const pricingHref = tenant.pages.includes('/pricing/') ? localize('/pricing/', locale) : contactHref('calculator');
+// Card anchors exist only for a tenant that publishes shortcuts to them.
+const cardId = (id: string) => solutionLinks.length > 0 ? id : undefined;
 const defaultAlternate = alternates[defaultLocaleOf(tenant)];
 const rssPath = tenant.pages.includes('/blog/') ? localize('/rss.xml', locale) : null;
 const languageChoices = Object.entries(alternates).filter(([language]) => language === 'en' || language === 'es');
@@ -61,14 +77,17 @@ const legalLinks = publishedLinks([
   { route: '/cookies/', label: () => t('footer.link.cookiePreferences') },
 ]);
 const formatLocale = tenant.region ? `${locale}-${tenant.region}` : locale;
+// landing-reviews-tenant: null = no section (switched off, API silent, repo mode).
+const reviews = await resolveSiteReviews(tenant.slug);
 const money = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: panel.currency, currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
 const calculatorMoney = (cents: number) => new Intl.NumberFormat(formatLocale, { style: 'currency', currency: 'GTQ', currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2 }).format(cents / 100);
 const rateLabel = calculator ? new Intl.NumberFormat(formatLocale, { style: 'percent', maximumFractionDigits: 2 }).format(calculator.commissionBasisPoints / 10000) : null;
 const defaultCalculation = calculator ? calculateLandingAmount('100.00', calculator.commissionBasisPoints) : null;
 if (defaultCalculation && !defaultCalculation.ok) throw new Error('Invalid landing calculator configuration');
+const sameAs = socialLinksOf(tenant).map((link) => link.href);
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: tenant.brand_name, url: canonical.toString(), description },
-  { '@context': 'https://schema.org', '@type': 'Organization', name: tenant.brand_name, url: canonical.toString(), ...(socialImage ? { logo: socialImage.toString() } : {}) },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: tenant.brand_name, url: canonical.toString(), ...(organizationLogo ? { logo: organizationLogo.toString() } : {}), ...(sameAs.length > 0 ? { sameAs } : {}) },
   { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })) },
 ];
 ---
@@ -78,6 +97,8 @@ const jsonLd = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
+    {(store || email || solutionsMode) && <link rel="stylesheet" href={commerceStyles} />}
+    <meta name="photographic-capabilities" content="uniform-services-v1" />
     <meta name="theme-color" content={tenant.theme.accent} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -87,7 +108,7 @@ const jsonLd = [
     {rssPath && <link rel="alternate" type="application/rss+xml" title={t('layout.rssTitle')} href={rssPath} />}
     {defaultAlternate && <link rel="alternate" hreflang="x-default" href={new URL(defaultAlternate, siteOrigin(Astro.locals))} />}
     {Object.entries(alternates).map(([language, path]) => <link rel="alternate" hreflang={language} href={new URL(path!, siteOrigin(Astro.locals))} />)}
-    <link rel="icon" href={icon} type="image/svg+xml" />
+    <link rel="icon" href={icon} type={iconMimeType(icon)} />
     {touchIcon && <link rel="apple-touch-icon" href={touchIcon} />}
     {fontKey === 'manrope' && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
     <meta property="og:type" content="website" />
@@ -121,7 +142,7 @@ const jsonLd = [
       }
     </script>}
   </head>
-<body class="photographic-service" data-home-template="photographic-service" data-panel-mode={panel.mode === 'collections' ? panel.mode : undefined} data-palette={palette} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
+<body class="photographic-service" data-home-template="photographic-service" data-panel-mode={panel.mode === 'collections' ? panel.mode : undefined} data-palette={palette} data-type-scale={typeScale} data-solutions-mode={solutionsMode} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
 <a class="skip-link" href="#contenido">{copy('ui.skip_link')}</a>
 <svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg">
 <symbol id="i-arrow" viewBox="0 0 24 24">
@@ -172,14 +193,20 @@ const jsonLd = [
 <symbol id="i-download" viewBox="0 0 24 24">
 <path d="M12 3v12m-5-5 5 5 5-5M4 15v6h16v-6"></path>
 </symbol>
+{extraIcons.includes('truck') && <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 5h11v12H3Zm11 5h4l3 4v3h-7M5 17a2 2 0 1 0 4 0m7 0a2 2 0 1 0 4 0M3 9h5"></path></symbol>}
+{extraIcons.includes('megaphone') && <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m4 9 13-5v16L4 15Zm0 0H2v6h2m3 1 2 5h3l-2-4M21 8v8"></path></symbol>}
+{extraIcons.includes('bag') && <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 7h14l1 14H4L5 7Zm3 1V6a4 4 0 0 1 8 0v2"></path></symbol>}
+{extraIcons.includes('book') && <symbol id="i-book" viewBox="0 0 24 24"><path d="M6 3h13v18H6a3 3 0 0 1 0-6h13M6 3a3 3 0 0 0-3 3v12M8 7h7"></path></symbol>}
+{extraIcons.includes('mail') && <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 6 9 7 9-7"></path></symbol>}
 </svg>
-<header class="site-header">
+<header class="site-header" data-tenant-access={access ? '' : undefined}>
 <a aria-label={copy('ui.brand_home').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio">
-<span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
-<span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span>
+<TenantBrand tone="white"><span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>
 </a>
 <nav aria-label={copy('ui.desktop_nav_aria_label')} class="desktop-nav">{navigation.map((item) => <a href={item.href}>{item.label}</a>)}</nav>
 {languageChoices.length > 1 && <nav class="landing-languages" aria-label={copy('ui.language_label')}>{languageChoices.map(([language, path]) => language === locale ? <span aria-current="true" lang={language}>{copy(`ui.language_${language}`)}</span> : <a href={path} hreflang={language} lang={language} data-lang-choice={language}>{copy(`ui.language_${language}`)}</a>)}</nav>}
+{access && <a class="header-access" data-access-entry href={localize(ACCESS_ROUTE, locale)}>{access.copy('entry')}</a>}
 <a class="button button-header" data-support-cta="header" href={contactHref('header')}>
 <span>{copy('actions.header')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg>
 </a>
@@ -210,12 +237,7 @@ const jsonLd = [
 <div class="hero-caption">
 <p>{copy('hero.location')}</p>
 </div>
-<div class="hero-capabilities">
-<span><svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg><span>{copy('hero.feature1')}</span></span>
-<span><svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg><span>{copy('hero.feature2')}</span></span>
-<span><svg aria-hidden="true" class="icon">
-<use href="#i-receipt"></use></svg><span>{copy('hero.feature3')}</span></span>
-</div>
+<div class="hero-capabilities">{heroFeatures.map((feature) => <span><svg aria-hidden="true" class="icon"><use href={`#i-${feature.icon}`}></use></svg><span>{feature.label}</span></span>)}</div>
 </div>
 </section>
 <section aria-labelledby="solutions-title" class="solutions section-pad wrap" id="como-cobras">
@@ -225,8 +247,9 @@ const jsonLd = [
 <h2 id="solutions-title">{copy('solutions.title')}</h2>
 </div>
 </div>
+{solutionLinks.length > 0 && <nav aria-label={copy('solutions.linksLabel').replace('{brand}', tenant.brand_name)} class="solution-navigation"><ul class="landing-product-links">{solutionLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}</ul></nav>}
 <div class="solutions-grid">
-<article class="service-card service-presencial" data-sequence="">
+<article class="service-card service-presencial" data-sequence="" id={cardId('cobros-presenciales')}>
 <div class="service-copy">
 <h3>{copy('solutions.card1.title')}</h3>
 <p>{copy('solutions.card1.description')}</p>
@@ -234,7 +257,7 @@ const jsonLd = [
 <div aria-label={copy('ui.service_stage_aria_label')} class="service-stage" role="img">
 <div class="product-panel payment-panel">
 <div class="product-heading">
-<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
+<span class="mini-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
 <use href="#i-phone"></use>
 </svg>
 </div>
@@ -256,7 +279,7 @@ const jsonLd = [
 <svg aria-hidden="true" class="icon"><use href="#i-phone"></use></svg><span>{copy('illustrations.device')}</span>
 </div>
 </article>
-<article class="service-card service-link" data-sequence="">
+<article class="service-card service-link" data-sequence="" id={cardId('enlaces-de-cobro')}>
 <div class="service-copy">
 <h3>{copy('solutions.card2.title')}</h3>
 <p>{copy('solutions.card2.description')}</p>
@@ -264,7 +287,7 @@ const jsonLd = [
 <div aria-label={copy('ui.service_stage_aria_label52')} class="service-stage" role="img">
 <div class="product-panel link-panel">
 <div class="product-heading">
-<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
+<span class="mini-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><span>{tenant.brand_wordmark ?? tenant.brand_name}</span><svg aria-hidden="true" class="icon">
 <use href="#i-link"></use>
 </svg>
 </div>
@@ -284,10 +307,10 @@ const jsonLd = [
 </div>
 </div>
 <div class="service-footnote">
-<svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg><span>{copy('hero.feature2')}</span>
+<svg aria-hidden="true" class="icon"><use href="#i-link"></use></svg><span>{linkFootnote}</span>
 </div>
 </article>
-<article class="service-card service-invoice" data-sequence="">
+<article class="service-card service-invoice" data-sequence="" id={cardId('facturacion')}>
 <div class="service-copy">
 <h3>{copy('solutions.card3.title')}</h3>
 <p>{copy('solutions.card3.description')}</p>
@@ -295,7 +318,7 @@ const jsonLd = [
 <div aria-label={copy('ui.service_stage_aria_label53')} class="service-stage" role="img">
 <div class="product-panel invoice-panel">
 <div class="product-heading">
-<span class="mini-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{copy('illustrations.invoice')}</span><svg aria-hidden="true" class="icon">
+<span class="mini-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><span>{copy('illustrations.invoice')}</span><svg aria-hidden="true" class="icon">
 <use href="#i-receipt"></use>
 </svg>
 </div>
@@ -322,7 +345,25 @@ const jsonLd = [
 <svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('illustrations.automatic')}</span>
 </div>
 </article>
+{solutionsMode === 'uniform' && <PhotographicCommerceCards delivery={delivery} store={store} email={email} contactHref={contactHref} brandMark={tenant.brand_mark ?? tenant.brand_name} />}
 </div>
+{(ads || (solutionsMode !== 'uniform' && (delivery || store || email))) && <div class="business-verticals">
+{solutionsMode !== 'uniform' && <PhotographicCommerceCards delivery={delivery} store={store} email={email} contactHref={contactHref} brandMark={tenant.brand_mark ?? tenant.brand_name} />}
+
+{ads && <article aria-labelledby="ads-title" class:list={["business-card", solutionsMode === 'uniform' ? 'campaign-card' : 'ads-card']} data-sequence="" id="anuncios" tabindex="-1">
+<div class="business-copy"><p class="eyebrow">{ads.eyebrow}</p><h3 id="ads-title">{ads.title}</h3><p>{ads.description}</p></div>
+<div aria-label={ads.stageLabel} class="service-stage vertical-visual" role="img">
+<div class="vertical-panel">
+<div class="vertical-panel-heading"><span class="mini-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><strong>{ads.panelTitle}</strong><span class="vertical-tag">{ads.tag}</span></div>
+<div class="campaign-creative"><span class="campaign-brand">{ads.brand}</span><svg aria-hidden="true" class="icon"><use href="#i-megaphone"></use></svg><strong>{ads.creative}</strong><span class="campaign-channels">{ads.channels}</span></div>
+<dl class="campaign-plan">{ads.plan.map((row) => <div><dt>{row.term}</dt><dd>{row.value}</dd></div>)}</dl>
+</div>
+</div>
+<ul class="vertical-benefits">{ads.benefits.map((benefit) => <li>{benefit}</li>)}</ul>
+<a class="button button-teal" data-support-cta="ads" href={contactHref('ads')}><span>{ads.cta}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg></a>
+</article>}
+</div>}
+{route.length > 0 && <ol aria-label={routeLabel!} class="business-route">{route.map((step) => <li><svg aria-hidden="true" class="icon"><use href={`#i-${step.icon}`}></use></svg><div><strong>{step.title}</strong><span>{step.text}</span></div></li>)}</ol>}
 </section>
 <section aria-labelledby="how-title" class="how-section" id="como-funciona">
 <div class="wrap how-grid">
@@ -334,7 +375,7 @@ const jsonLd = [
 <div class="flow-panel" data-sequence="">
 <div aria-label={copy('ui.flow_visual_aria_label')} class="flow-visual" role="img">
 <div class="flow-topline">
-<span class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span>{copy('how.visualLabel')}</span><span class="flow-dot"></span>
+<span class="brand-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><span>{copy('how.visualLabel')}</span><span class="flow-dot"></span>
 </div>
 <div class="flow-options">
 <div>
@@ -381,7 +422,7 @@ const jsonLd = [
 <div class="panel-demo">
 <aside aria-label={copy('ui.panel_sidebar_aria_label')} class="panel-sidebar">
 <div class="panel-brand">
-<span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<span aria-hidden="true" class="brand-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span>
 <div>
 <strong>{tenant.brand_wordmark ?? tenant.brand_name}</strong><span>{copy('panel.name')}</span>
 </div>
@@ -566,7 +607,47 @@ const jsonLd = [
 </div>
 </section>
 <section aria-labelledby="calculator-title" class="calculator-section section-pad wrap" id="calculadora">
-{defaultCalculation?.ok ? <>
+{manualCalculator ? <>
+<form class="calculator-form" id="price-calculator" novalidate="">
+<h3>{copy('calculator.formTitle')}</h3>
+<div class="calc-field amount-field">
+<label for="calc-amount">{copy('calculator.amount')}</label>
+<div class="amount-input">
+<span aria-hidden="true">Q</span><input aria-describedby="calc-error" autocomplete="off" disabled="" id="calc-amount" inputmode="decimal" maxlength="10" name="amount" required="" type="text" value="100.00"/>
+</div>
+</div>
+<div class="calc-field rate-field">
+<label for="calc-rate">{copy('calculator.rate')}</label>
+<div class="amount-input">
+<span aria-hidden="true">%</span><input aria-describedby="calc-rate-help calc-error" autocomplete="off" disabled="" id="calc-rate" inputmode="decimal" maxlength="6" name="rate" placeholder={copy('calculator.ratePlaceholder')} required="" type="text"/>
+</div>
+<p id="calc-rate-help">{copy('calculator.rateHelp')}</p>
+</div>
+<button class="button button-teal calc-submit" disabled="" type="submit">
+<span>{copy('calculator.submit')}</span><svg aria-hidden="true" class="icon"><use href="#i-arrow"></use></svg>
+</button>
+<p class="calc-error" id="calc-error" role="alert"></p>
+<div aria-atomic="true" aria-live="polite" class="calc-result" role="status">
+<span>{copy('calculator.result')}</span><output for="calc-amount calc-rate" id="calc-net">—</output>
+<dl>
+<div>
+<dt>{copy('calculator.fee')}</dt>
+<dd id="calc-fee">—</dd>
+</div>
+</dl>
+<p id="calc-status">{copy('ui.calculator_nojs')}</p>
+</div>
+</form>
+<div class="calculator-copy">
+<p class="eyebrow">{copy('calculator.eyebrow')}</p>
+<h2 id="calculator-title">{copy('calculator.title')}</h2>
+<p class="calculator-intro">{copy('calculator.description')}</p>
+<a class="button button-teal" data-support-cta="calculator" href={contactHref('calculator')}>
+<span>{copy('calculator.contact')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg>
+</a>
+<p class="calculator-note">{copy('calculator.note')}</p>
+</div>
+</> : defaultCalculation?.ok ? <>
 <form class="calculator-form" id="price-calculator" novalidate="">
 <h3>{copy('calculator.formTitle')}</h3>
 <div class="calc-field amount-field">
@@ -634,9 +715,10 @@ const jsonLd = [
 </div>
 <div class="faq-list" id="faq-list">{faqs.map((item) => <details><summary><span>{item.question}</span><svg class="icon" aria-hidden="true"><use href="#i-plus" /></svg></summary><p>{item.answer}</p></details>)}</div>
 </section>
+{reviews && <LandingReviews reviews={reviews} locale={locale} formatLocale={formatLocale} />}
 <section aria-labelledby="closing-title" class="closing-section">
 <div class="wrap closing-content">
-<span aria-hidden="true" class="closing-mark">{tenant.brand_mark ?? tenant.brand_name}</span>
+<span aria-hidden="true" class="closing-mark"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span>
 <h2 id="closing-title">{copy('closing.title')}</h2>
 <a class="button button-white" data-support-cta="closing" href={contactHref('closing')}>
 <svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('actions.primary')}</span><svg aria-hidden="true" class="icon">
@@ -649,12 +731,12 @@ const jsonLd = [
 <footer class="site-footer">
 <div class="wrap footer-grid">
 <div class="footer-brand">
-<a aria-label={copy('ui.brand_back').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio"><span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></a>
+<a aria-label={copy('ui.brand_back').replace('{brand}', tenant.brand_name)} class="brand" href="#inicio"><TenantBrand tone="white"><span aria-hidden="true" class="brand-mark">{tenant.brand_mark ?? tenant.brand_name}</span><span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand></a>
 <p>{copy('footer.description')}</p>
 </div>
 <nav aria-label={copy('ui.footer_column_aria_label')} class="footer-column">
 <h2>{copy('footer.solutions')}</h2>
-{productLinks.length > 0 ? productLinks.map(({ href, label }) => <a href={href}>{label}</a>) : <>
+{productLinks.length > 0 ? productLinks.map(({ href, label }) => <a href={href}>{label}</a>) : solutionLinks.length > 0 ? solutionLinks.map(({ href, footerLabel }) => <a href={href}>{footerLabel}</a>) : <>
 <a href="#como-cobras">{copy('hero.feature1')}</a>
 <a href="#como-cobras">{copy('hero.feature2')}</a>
 <a href="#como-funciona">{copy('hero.feature3')}</a>
@@ -669,12 +751,14 @@ const jsonLd = [
 <a href="#calculadora">{copy('ui.label45')}</a>
 <a href="#preguntas">{copy('ui.label46')}</a>
 </>}
+{access && <a data-access-entry href={localize(ACCESS_ROUTE, locale)}>{access.copy('entry')}</a>}
+{requestAccessLabel && <a href={localize(REQUEST_ACCESS_ROUTE, locale)}>{requestAccessLabel}</a>}
 </nav>
 <div class="footer-column">
 <h2>{copy('footer.contact')}</h2>
 <p>{copy('footer.coverage')}</p>
 <a class="footer-contact" data-support-cta="footer" href={contactHref('footer')}>
-<svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{copy('actions.header')}</span><svg aria-hidden="true" class="icon">
+<svg aria-hidden="true" class="icon"><use href="#i-chat"></use></svg><span>{footerAction}</span><svg aria-hidden="true" class="icon">
 <use href="#i-up-right"></use>
 </svg>
 </a>
@@ -684,6 +768,7 @@ const jsonLd = [
 </div>
 <div class="wrap footer-bottom">
 <span>{copy('footer.copyright')}</span>
+<SocialLinks variant="photographic" />
 <a class="back-to-top" href="#inicio"><span>{copy('footer.back')}</span><svg aria-hidden="true" class="icon"><use href="#i-up-right"></use></svg></a>
 </div>
 </footer>

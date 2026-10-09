@@ -67,6 +67,9 @@ const ROUTE_OF = {
   'pages/infrastructure-home.ts': '@infrastructure-home',
   'pages/photographic-interiors.ts': '@photographic-interiors',
   'pages/about.ts': '/about/',
+  // Copy is available to seed, but routes require an explicit tenant opt-in.
+  'pages/access.ts': '@tenant-access',
+  'pages/request-access.ts': '@tenant-request-access',
   'pages/contact.ts': '/contact/',
   'pages/cookies.ts': '/cookies/',
   'pages/for-agencies.ts': '/for-agencies/',

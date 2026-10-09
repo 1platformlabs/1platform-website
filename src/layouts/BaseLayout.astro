@@ -21,8 +21,10 @@ import {
   ogLocaleOf,
 } from '@lib/site-locale';
 import { themeColorOf, themeDeclarations } from '@lib/tenant-theme';
+import { socialLinksOf } from '@lib/social-links';
 import {
   appleTouchIconIsAvailable,
+  iconMimeType,
   resolveAppleTouchIcon,
   resolveIcon,
   resolveLogo,
@@ -78,6 +80,7 @@ const brandSocial = resolveSocial(tenant);
 const appleTouchIcon = resolveAppleTouchIcon(tenant);
 const appleTouchIconAvailable = await appleTouchIconIsAvailable(tenant);
 const logo = await resolveLogo(tenant);
+const sameAs = socialLinksOf(tenant).map((link) => link.href);
 // A page's own card (notably an article) remains authoritative. The tenant
 // card supplies only the old layout default; if its derived raster is not
 // deterministic, the absence is honest and no platform card is substituted.
@@ -231,7 +234,7 @@ const visibleAnnouncement = showAnnouncement && !modernChrome ? announcement : n
 
     </Fragment>}
 
-    <link rel="icon" type="image/svg+xml" href={icon} />
+    <link rel="icon" type={iconMimeType(icon)} href={icon} />
     {appleTouchIconAvailable && <link rel="apple-touch-icon" href={appleTouchIcon} />}
     {canonicalURL && <link rel="canonical" href={canonicalURL} />}
     {/* Not advertised by a tenant whose sitemap answers 404: every page of a
@@ -383,6 +386,9 @@ const visibleAnnouncement = showAnnouncement && !modernChrome ? announcement : n
       // social raster succeeds. Absence is more honest than a broken image or
       // a platform fallback under a customer domain.
       ...(logo ? { logo: `https://${tenant.domain}${logo}` } : {}),
+      // The same list the footer draws (D-7); absent — not `[]` — without links,
+      // so a site without links keeps this block byte-identical.
+      ...(sameAs.length > 0 ? { sameAs } : {}),
     })} />
 
     {/*

@@ -1,13 +1,24 @@
 ---
+import TenantBrand from '@components/TenantBrand.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { useI18n } from '@i18n';
 import { docsUrl, supportUrl } from '@lib/site-destinations';
+import LandingReviews from '@components/LandingReviews.astro';
+import { resolveSiteReviews } from '@lib/site-reviews';
 import '@styles/infrastructure-home.css';
 
 const { t } = useI18n(Astro.url.pathname, Astro.locals);
 const tenant = Astro.locals.tenant;
 const contactHref = supportUrl(Astro.locals);
 const documentationHref = docsUrl(Astro.locals, '/docs/saas/1platform-api/getting-started/');
+// landing-reviews-tenant: null = no section (switched off, API silent, repo mode).
+const reviews = await resolveSiteReviews(tenant.slug);
+const locale = Astro.locals.locale;
+const formatLocale = tenant.region ? `${locale}-${tenant.region}` : locale;
+// Not t(): in production the dictionary is only the tenant's PUBLISHED content,
+// and t() throws on a key it lacks — a new label would take the page down for
+// every tenant whose content predates it (CI renders from the repo catalogue).
+const documentationLabel = locale === 'en' ? 'View documentation' : 'Ver documentación';
 ---
 <BaseLayout title={t('infrastructure.meta.title')} description={t('infrastructure.meta.description')} showAnnouncement={false}>
 <div class="infrastructure-home" data-infrastructure-home
@@ -69,22 +80,52 @@ const documentationHref = docsUrl(Astro.locals, '/docs/saas/1platform-api/gettin
         <div class="wrap section-heading"><div><p class="eyebrow">{t('infrastructure.capabilities.eyebrow')}</p><h2 id="capabilities-title">{t('infrastructure.capabilities.title')}</h2></div><p>{t('infrastructure.capabilities.description')}</p></div>
         <div class="wrap capability-layout">
           <div class="capability-grid" aria-label={t('infrastructure.aria.capabilities')}>
+            <div class="capability-entry">
             <button class="capability is-selected" type="button" data-capability={t('infrastructure.capabilities.payments.name')} aria-pressed="true"><span class="capability-number">01</span><span class="capability-text"><strong>{t('infrastructure.capabilities.payments.name')}</strong><small>{t('infrastructure.capabilities.payments.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/pagos-en-linea/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/pagos-en-linea/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.payments.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability is-selected" type="button" data-capability={t('infrastructure.capabilities.invoicing.name')} aria-pressed="true"><span class="capability-number">02</span><span class="capability-text"><strong>{t('infrastructure.capabilities.invoicing.name')}</strong><small>{t('infrastructure.capabilities.invoicing.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/facturacion-electronica/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/facturacion-electronica/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.invoicing.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability is-selected" type="button" data-capability={t('infrastructure.capabilities.delivery.name')} aria-pressed="true"><span class="capability-number">03</span><span class="capability-text"><strong>{t('infrastructure.capabilities.delivery.name')}</strong><small>{t('infrastructure.capabilities.delivery.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/envios/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/envios/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.delivery.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability" type="button" data-capability={t('infrastructure.capabilities.subscriptions.name')} aria-pressed="false"><span class="capability-number">04</span><span class="capability-text"><strong>{t('infrastructure.capabilities.subscriptions.name')}</strong><small>{t('infrastructure.capabilities.subscriptions.description')}</small><em>{t('infrastructure.capabilities.subscriptions.status')}</em></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/suscripciones/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/suscripciones/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.subscriptions.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability" type="button" data-capability={t('infrastructure.capabilities.ads.name')} aria-pressed="false"><span class="capability-number">05</span><span class="capability-text"><strong>{t('infrastructure.capabilities.ads.name')}</strong><small>{t('infrastructure.capabilities.ads.description')}</small><em>{t('infrastructure.capabilities.ads.status')}</em></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/publicidad/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/publicidad/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.ads.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability" type="button" data-capability={t('infrastructure.capabilities.sites.name')} aria-pressed="false"><span class="capability-number">06</span><span class="capability-text"><strong>{t('infrastructure.capabilities.sites.name')}</strong><small>{t('infrastructure.capabilities.sites.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/sitios-web-y-contenido/publicar-con-dominio/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/sitios-web-y-contenido/publicar-con-dominio/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.sites.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability" type="button" data-capability={t('infrastructure.capabilities.email.name')} aria-pressed="false"><span class="capability-number">07</span><span class="capability-text"><strong>{t('infrastructure.capabilities.email.name')}</strong><small>{t('infrastructure.capabilities.email.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/dominios-y-correo/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/dominios-y-correo/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.email.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability" type="button" data-capability={t('infrastructure.capabilities.agents.name')} aria-pressed="false"><span class="capability-number">08</span><span class="capability-text"><strong>{t('infrastructure.capabilities.agents.name')}</strong><small>{t('infrastructure.capabilities.agents.description')}</small><em>{t('infrastructure.capabilities.agents.status')}</em></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/agentes-de-ia/integrar-en-su-aplicacion/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/agentes-de-ia/integrar-en-su-aplicacion/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.agents.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability" type="button" data-capability={t('infrastructure.capabilities.telemetry.name')} aria-pressed="false"><span class="capability-number">09</span><span class="capability-text"><strong>{t('infrastructure.capabilities.telemetry.name')}</strong><small>{t('infrastructure.capabilities.telemetry.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/telemetria/integrar-telemetria/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/telemetria/integrar-telemetria/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.telemetry.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
+            <div class="capability-entry">
             <button class="capability" type="button" data-capability={t('infrastructure.capabilities.whitelabel.name')} aria-pressed="false"><span class="capability-number">10</span><span class="capability-text"><strong>{t('infrastructure.capabilities.whitelabel.name')}</strong><small>{t('infrastructure.capabilities.whitelabel.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/plataforma/marca-blanca/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/plataforma/marca-blanca/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.whitelabel.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+            </div>
           </div>
           <div class="integration-preview" aria-labelledby="integration-title">
             <p class="integration-kicker">{t('infrastructure.integration.eyebrow')}</p>
             <div class="integration-source"><h3 id="integration-title">{t('infrastructure.integration.title')}</h3><div class="integration-clients"><span>{t('infrastructure.integration.saas')}</span><span>{t('infrastructure.integration.applications')}</span><span>{t('infrastructure.integration.erp')}</span></div></div>
             <div class="integration-bridge"><span>{t('infrastructure.integration.bridge')}</span></div>
-            <div class="integration-core"><span class="integration-logo" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><div><strong>{tenant.brand_name}</strong><small>{t('infrastructure.integration.description')}</small></div></div>
+            <div class="integration-core"><span class="integration-logo" aria-hidden="true"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><div><strong>{tenant.brand_name}</strong><small>{t('infrastructure.integration.description')}</small></div></div>
             <div class="integration-branch" aria-hidden="true"></div>
             <p class="integration-services-label">{t('infrastructure.integration.services')}</p>
             <ul class="selected-list" data-selected-list><li>{t('infrastructure.capabilities.payments.name')}</li><li>{t('infrastructure.capabilities.invoicing.name')}</li><li>{t('infrastructure.capabilities.delivery.name')}</li></ul>
@@ -162,6 +203,8 @@ const documentationHref = docsUrl(Astro.locals, '/docs/saas/1platform-api/gettin
       </section>
 
       <section class="section developers" id="desarrolladores" aria-labelledby="developers-title"><div class="wrap developers-inner"><div><p class="eyebrow">{t('infrastructure.developers.eyebrow')}</p><h2 id="developers-title">{t('infrastructure.developers.title')}</h2><p>{t('infrastructure.developers.description')}</p>{documentationHref && (<a class="button button--white" href={documentationHref}>{t('infrastructure.developers.link')}<svg class="icon" aria-hidden="true"><use href="#infra-i-up" /></svg></a>)}</div><div class="developer-visual" aria-label={t('infrastructure.aria.developer')}><span>{t('infrastructure.developers.product')}</span><div class="developer-flow"><span></span><span></span><span></span></div><strong>{t('infrastructure.architecture.apiName')}</strong><small>{t('infrastructure.developers.capabilities')}</small></div></div></section>
+
+      {reviews && <LandingReviews reviews={reviews} locale={locale} formatLocale={formatLocale} />}
 
       <section class="section contact" id="contacto" aria-labelledby="contact-title"><div class="wrap contact-inner"><div><p class="eyebrow">{t('infrastructure.contact.eyebrow')}</p><h2 id="contact-title">{t('infrastructure.contact.title')}</h2><p>{t('infrastructure.contact.description')}</p></div>{contactHref && (<a class="button button--navy" href={contactHref}>{t('infrastructure.contact.whatsapp')}<svg class="icon" aria-hidden="true"><use href="#infra-i-up" /></svg></a>)}</div></section>
 

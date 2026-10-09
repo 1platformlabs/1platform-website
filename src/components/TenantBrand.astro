@@ -1,0 +1,22 @@
+---
+import { tenantBrandImage, type BrandVariant } from '@lib/tenant-brand-display';
+interface Props { variant?: BrandVariant; tone?: 'original' | 'white' }
+const { variant = 'lockup', tone = 'original' } = Astro.props;
+const image = await tenantBrandImage(Astro.locals.tenant, variant);
+const whiteTreatment = tone === 'white' && image ? (image.canTintWhite ? 'silhouette' : 'plate') : undefined;
+const frameStyle = image ? `--brand-ratio:${image.cropWidth}/${image.cropHeight};--brand-frame-width:${Math.min(100, 100 * image.cropWidth / image.cropHeight)}%;--brand-frame-height:${Math.min(100, 100 * image.cropHeight / image.cropWidth)}%;--brand-image-width:${100 * image.width / image.cropWidth}%;--brand-image-left:${-100 * image.left / image.cropWidth}%;--brand-image-top:${-100 * image.top / image.cropHeight}%` : undefined;
+---
+{image ? <><span class="tenant-brand-image" data-variant={variant} data-tone={tone} data-white-treatment={whiteTreatment} style={frameStyle} aria-hidden="true"><span class="tenant-brand-frame"><img src={image.src} alt="" width={image.width} height={image.height} decoding="async" /></span></span>
+{/* Emit styles only with uploaded artwork. Astro hoists a scoped style even when this component renders only its legacy slot. */}
+<style is:inline>
+  .tenant-brand-image { display: inline-block; position: relative; overflow: hidden; flex: none; width: var(--tenant-logo-width, 180px); max-width: 100%; aspect-ratio: var(--brand-ratio); vertical-align: middle; }
+  .tenant-brand-image[data-variant="symbol"] { width: 100%; height: 100%; }
+  .tenant-brand-frame { display: block; position: absolute; width: 100%; height: 100%; overflow: hidden; }
+  .tenant-brand-image[data-variant="symbol"] .tenant-brand-frame { width: var(--brand-frame-width); height: var(--brand-frame-height); left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  .tenant-brand-image img { position: absolute; display: block; width: var(--brand-image-width); max-width: none; height: auto; left: var(--brand-image-left); top: var(--brand-image-top); }
+  .tenant-brand-image[data-white-treatment="silhouette"] img { filter: brightness(0) invert(1); }
+  .tenant-brand-image[data-white-treatment="plate"] { background: white; border-radius: 3px; box-shadow: 0 0 0 3px white; }
+  :is(.mini-mark, .brand-mark, .closing-mark, .integration-logo):has(> .tenant-brand-image) { background: transparent; padding: 0; border-radius: 0; }
+  .photographic-service .closing-mark:has(> .tenant-brand-image) { width: 1em; height: 1em; opacity: 0.09; }
+  @media (max-width: 600px) { .tenant-brand-image[data-variant="lockup"] { width: var(--tenant-logo-width-mobile, 150px); } }
+</style></> : <slot />}

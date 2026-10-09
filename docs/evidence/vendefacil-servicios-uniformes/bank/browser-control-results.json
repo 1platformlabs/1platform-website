@@ -1,0 +1,10 @@
+[
+  {
+    "name": "main rejects new configured anchors with 503",
+    "pass": true
+  },
+  {
+    "name": "same six-card assertion fails on main",
+    "pass": true
+  }
+]
