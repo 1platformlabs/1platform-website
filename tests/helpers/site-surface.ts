@@ -36,3 +36,30 @@ export function surface(): SurfacePage[] {
   }
   return out
 }
+
+/**
+ * PRODUCTION mode (issue #101): the surface the API actually serves.
+ *
+ * `surface()` above walks the repo manifest, which is all a PR check can know —
+ * CI has no API and a PR must not go red over live data. The tenants that live
+ * ONLY in the API (the case #101 is about) are reached here instead, by the
+ * scheduled workflow `served-claims.yml`, never by a pull request:
+ *
+ *   GET /api/v1/sites/published-hosts   -> the published, indexable hosts
+ *   GET /api/v1/sites/by-host?host=…    -> each one's pages and locales
+ *
+ * and each page is then fetched from its real address, so what is scanned is
+ * what a visitor receives. Provisional (`indexable: false`) sites are not
+ * listed by the API and are therefore not scanned — a stated gap, not a pass.
+ */
+
+export function scanningProduction(): boolean {
+  return process.env.SERVED_CLAIMS_TARGET === 'prod'
+}
+
+/**
+ * Below this many listed hosts the run FAILS: an empty or truncated list is
+ * indistinguishable, from the scan's own output, from an estate with no
+ * defects. Two is what production lists today (1platform.pro, medipago.gt).
+ */
+export const MIN_PRODUCTION_HOSTS = Number(process.env.SERVED_CLAIMS_MIN_HOSTS || 2)
