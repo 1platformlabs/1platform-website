@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   regla 10 lo exime sólo en ese archivo y para esos nombres.
 
 ### Fixed
+- El escaneo de afirmaciones publicadas valida el padrón completo de la API, mantiene los errores visibles y continúa con los demás sitios y rutas. Controles con un tenant exclusivo de la API prueban que precios inventados y conteos se detectan, y que un padrón vacío o incompleto nunca pasa (#101).
 - Los sitios sin logo subido conservan su HTML y CSS anteriores; el preparador del kit de marca rechaza rutas externas, roles cruzados y enlaces simbólicos antes de escribir.
 - Los íconos sociales del pie fotográfico se alinean con el copyright en escritorio y conservan áreas táctiles de 48 px en móvil, sin cambiar los destinos del tenant.
 - La reversión del parche de servicios valida los valores anteriores incluso en las claves que la aplicación reemplaza; un plan alterado se rechaza antes de escribir.

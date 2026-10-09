@@ -1,5 +1,4 @@
 import { repoTenants } from '../../src/data/site-tenants'
-import { apiBaseUrl, type SiteTenant } from '../../src/lib/site-api'
 import { localesOf, makeLocalizePath } from '../../src/lib/site-locale'
 
 /**
@@ -64,34 +63,3 @@ export function scanningProduction(): boolean {
  * defects. Two is what production lists today (1platform.pro, medipago.gt).
  */
 export const MIN_PRODUCTION_HOSTS = Number(process.env.SERVED_CLAIMS_MIN_HOSTS || 2)
-
-async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${apiBaseUrl()}${path}`, { headers: { accept: 'application/json' } })
-  if (res.status !== 200) throw new Error(`GET ${path} answered ${res.status}`)
-  const body = (await res.json()) as { data: T }
-  return body.data
-}
-
-export async function publishedHosts(): Promise<string[]> {
-  const { hosts } = await getJson<{ hosts: string[] }>('/api/v1/sites/published-hosts')
-  return hosts
-}
-
-let productionCache: Promise<SurfacePage[]> | null = null
-
-export function productionSurface(): Promise<SurfacePage[]> {
-  productionCache ??= (async () => {
-    const out: SurfacePage[] = []
-    for (const host of await publishedHosts()) {
-      const tenant = await getJson<SiteTenant>(`/api/v1/sites/by-host?host=${encodeURIComponent(host)}`)
-      const localise = makeLocalizePath(tenant)
-      for (const locale of localesOf(tenant)) {
-        for (const route of tenant.pages) {
-          out.push({ slug: tenant.slug, host: tenant.domain, locale, route, url: localise(route, locale) })
-        }
-      }
-    }
-    return out
-  })()
-  return productionCache
-}

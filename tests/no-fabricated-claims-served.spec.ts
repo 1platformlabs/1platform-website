@@ -1,12 +1,12 @@
-import { readFileSync } from 'node:fs'
+import { fabricatedPricingPattern, replaceCountPatterns } from './helpers/claim-patterns'
 import { expect, test } from '@playwright/test'
 
 import { getWithHost, type HostResponse } from './helpers/http-host'
 import { expectPublishedResponse } from './helpers/published-response'
+import { apiBaseUrl } from '../src/lib/site-api'
+import { scanProductionClaims } from './helpers/production-claims'
 import {
   MIN_PRODUCTION_HOSTS,
-  productionSurface,
-  publishedHosts,
   scanningProduction,
   surface,
   type SurfacePage,
@@ -54,26 +54,6 @@ import {
  * silently stop being enforced on served content while `npm run check` still
  * reports it green.
  */
-function fabricatedPricingPattern(): RegExp {
-  const guard = readFileSync('scripts/check-tells.sh', 'utf8')
-  // The only `-rnE` (no `i`) grep against BOTH `$SRC` and `$PROSE` in the
-  // file — rule 10 is the only other rule scanning both directories, and it
-  // uses `-rniE`, so this cannot match rule 10's line by accident.
-  const m = guard.match(/grep -rnE '([^']+)' \$SRC \$PROSE/)
-  expect(m, 'could not read rule 3 (fabricated pricing) out of check-tells.sh').not.toBeNull()
-  return new RegExp(m![1])
-}
-
-function replaceCountPatterns(): { en: RegExp; es: RegExp } {
-  const guard = readFileSync('scripts/check-tells.sh', 'utf8')
-  const candidates = [...guard.matchAll(/grep -rniE '([^']+)' \$SRC\b/g)].map((m) => m[1])
-  const en = candidates.find((p) => p.includes('vendors'))
-  const es = candidates.find((p) => p.includes('herramientas'))
-  expect(en, 'could not read rule 4 (English replace-count) out of check-tells.sh').toBeDefined()
-  expect(es, 'could not read rule 4 (Spanish replace-count) out of check-tells.sh').toBeDefined()
-  return { en: new RegExp(en!, 'i'), es: new RegExp(es!, 'i') }
-}
-
 const PORT = process.env.PLAYWRIGHT_PORT ?? '4321'
 const BASE = `http://127.0.0.1:${PORT}`
 
@@ -83,18 +63,8 @@ const BASE = `http://127.0.0.1:${PORT}`
  * only the scheduled `served-claims.yml` sets it — the surface is every
  * published, indexable site the API lists, fetched from its real address.
  */
-async function servedSurface(): Promise<SurfacePage[]> {
-  return scanningProduction() ? productionSurface() : surface()
-}
-
 async function fetchServed(page: SurfacePage): Promise<HostResponse> {
-  if (!scanningProduction()) return getWithHost(BASE + page.url, page.host)
-  // `manual`: a published page that redirects is a finding to report, not
-  // something to follow silently onto another page. The one sanctioned
-  // redirect (a retired address) is judged by `expectPublishedResponse`,
-  // which needs `location` — so headers travel in both modes.
-  const res = await fetch(`https://${page.host}${page.url}`, { redirect: 'manual' })
-  return { status: res.status, headers: Object.fromEntries(res.headers), body: await res.text() }
+  return getWithHost(BASE + page.url, page.host)
 }
 
 /**
@@ -125,11 +95,12 @@ test('the two patterns still catch what they are named for', () => {
 })
 
 test('no tenant serves a fabricated price or vanity metric, on any page, in any language', async () => {
+  test.skip(scanningProduction(), 'production audits both rules in one pass below')
   const banned = fabricatedPricingPattern()
   const leaks: string[] = []
   let scanned = 0
 
-  for (const page of await servedSurface()) {
+  for (const page of surface()) {
     const res = await fetchServed(page)
     expectPublishedResponse(res, page)
     scanned += 1
@@ -141,12 +112,13 @@ test('no tenant serves a fabricated price or vanity metric, on any page, in any 
 })
 
 test('no tenant serves an unverifiable "replaces N tools" claim, in either language', async () => {
+  test.skip(scanningProduction(), 'production audits both rules in one pass below')
   const { en, es } = replaceCountPatterns()
   const leaks: string[] = []
   let scanned = 0
   let excluded = 0
 
-  for (const page of await servedSurface()) {
+  for (const page of surface()) {
     if (PROSE_ROUTE.test(page.route)) {
       excluded += 1
       continue
@@ -164,15 +136,18 @@ test('no tenant serves an unverifiable "replaces N tools" claim, in either langu
   expect(leaks, `a numbered replace-count claim is being served on: ${leaks.join(', ')}`).toEqual([])
 })
 
-test('production mode: the API lists a non-empty estate that includes the reference site', async () => {
+test('production mode: complete API corpus satisfies both content rules', async () => {
   test.skip(!scanningProduction(), 'only the scheduled production scan enumerates the API')
-  const hosts = await publishedHosts()
-  // The floor: an empty or shrunken list would make both scans above pass on
-  // nothing. The reference tenant is the control that the list is the real one.
-  expect(hosts.length, `the API listed ${hosts.length} hosts: ${hosts.join(', ')}`).toBeGreaterThanOrEqual(
-    MIN_PRODUCTION_HOSTS,
-  )
-  expect(hosts).toContain('1platform.pro')
-  const pages = await productionSurface()
-  expect(new Set(pages.map((p) => p.host)).size, 'every listed host contributed pages').toBe(hosts.length)
+  const { en, es } = replaceCountPatterns()
+  const report = await scanProductionClaims({
+    apiBase: apiBaseUrl(), minHosts: MIN_PRODUCTION_HOSTS, referenceHost: '1platform.pro',
+    patterns: { price: fabricatedPricingPattern(), countEn: en, countEs: es },
+  })
+  // Report everything together: an early bad route must not hide another host.
+  console.log(JSON.stringify(report, null, 2))
+  expect.soft(report.errors).toEqual([])
+  expect.soft(report.findings).toEqual([])
+  expect.soft(report.scanned, 'nothing was scanned').toBeGreaterThan(40)
+  expect.soft(report.countScanned, 'count surface is empty').toBeGreaterThan(15)
+  expect.soft(report.excluded, 'prose exclusion matched nothing').toBeGreaterThan(0)
 })
