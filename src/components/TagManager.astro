@@ -18,5 +18,5 @@ const id = tagManagerIdOf(Astro.locals.tenant)
 ---
 {id && part === 'head' && <script is:inline set:html={tagManagerHeadScript(id)} />}
 {id && part === 'body' && (
-  <noscript><iframe src={tagManagerNoscriptSrc(id)} height="0" width="0" style="display:none;visibility:hidden" title="Tag Manager" /></noscript>
+  <noscript><iframe src={tagManagerNoscriptSrc(id)} height="0" width="0" style="display:none;visibility:hidden" /></noscript>
 )}
