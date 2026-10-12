@@ -7,6 +7,7 @@ import commerce from '@assets/product/showcase-store-bg.webp';
 import { photographicContent, safeJson } from '@lib/photographic-content';
 import { socialLinksOf } from '@lib/social-links';
 import SocialLinks from '@components/SocialLinks.astro';
+import TagManager from '@components/TagManager.astro';
 import PhotographicCommerceCards from '@components/PhotographicCommerceCards.astro';
 import LandingReviews from '@components/LandingReviews.astro';
 import { resolveSiteReviews } from '@lib/site-reviews';
@@ -95,6 +96,7 @@ const jsonLd = [
 <html lang={formatLocale}>
   <head>
     <meta charset="utf-8" />
+    <TagManager part="head" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
     {(store || email || solutionsMode) && <link rel="stylesheet" href={commerceStyles} />}
@@ -143,6 +145,7 @@ const jsonLd = [
     </script>}
   </head>
 <body class="photographic-service" data-home-template="photographic-service" data-panel-mode={panel.mode === 'collections' ? panel.mode : undefined} data-palette={palette} data-type-scale={typeScale} data-solutions-mode={solutionsMode} data-language-choices={languageChoices.length > 1 ? '' : undefined} style={brandStyle}>
+<TagManager part="body" />
 <a class="skip-link" href="#contenido">{copy('ui.skip_link')}</a>
 <svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg">
 <symbol id="i-arrow" viewBox="0 0 24 24">

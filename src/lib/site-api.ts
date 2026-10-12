@@ -128,6 +128,13 @@ export interface SiteTenant {
    */
   region?: string | null
   /**
+   * The Tag Manager web container this site loads (`GTM-XXXXXXX`), or
+   * absent/null for none. Optional and outside `isTenant()` like `region`: an
+   * older API omits it, and a malformed value switches the container off,
+   * never the tenant. Read it only through `tagManagerIdOf()`.
+   */
+  tag_manager_id?: string | null
+  /**
    * The host this request should be redirected to, or absent/null when it
    * should be served here.
    *

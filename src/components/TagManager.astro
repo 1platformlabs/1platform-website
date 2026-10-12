@@ -1,0 +1,22 @@
+---
+/**
+ * The tenant's Tag Manager container, or nothing at all.
+ *
+ * Mounted twice per document: `part="head"` as high in `<head>` as possible,
+ * `part="body"` right after `<body>`. Renders NOTHING for a tenant without a
+ * valid id, so every tenant that has not declared one serves byte-identical
+ * HTML to before. See `@lib/tag-manager` for why only the id is data.
+ */
+import { tagManagerHeadScript, tagManagerIdOf, tagManagerNoscriptSrc } from '@lib/tag-manager'
+
+interface Props {
+  part: 'head' | 'body'
+}
+
+const { part } = Astro.props
+const id = tagManagerIdOf(Astro.locals.tenant)
+---
+{id && part === 'head' && <script is:inline set:html={tagManagerHeadScript(id)} />}
+{id && part === 'body' && (
+  <noscript><iframe src={tagManagerNoscriptSrc(id)} height="0" width="0" style="display:none;visibility:hidden" title="Tag Manager" /></noscript>
+)}

@@ -8,6 +8,7 @@ import { ACCESS_ROUTE, REQUEST_ACCESS_ROUTE, tenantAccess } from '@lib/tenant-ac
 import { siteOrigin } from '@lib/site-origin';
 import { alternatesForTenantPath, defaultLocaleOf } from '@lib/site-locale';
 import { iconMimeType, resolveIcon } from '@lib/tenant-brand-assets';
+import TagManager from '@components/TagManager.astro';
 import consultorio from '@assets/photographic/consultorio-hero.webp';
 import commerce from '@assets/product/showcase-store-bg.webp';
 import '@styles/photographic-service.css';
@@ -32,6 +33,7 @@ const icon = resolveIcon(tenant);
 <html lang={locale}>
   <head>
     <meta charset="utf-8" />
+    <TagManager part="head" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageCopy('title')}</title>
     <meta name="description" content={pageCopy('description')} />
@@ -44,6 +46,7 @@ const icon = resolveIcon(tenant);
     {fontKey === 'manrope' && <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />}
   </head>
   <body class="photographic-service access-page" data-palette={palette} style={brandStyle}>
+    <TagManager part="body" />
     <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
       <symbol id="access-arrow" viewBox="0 0 24 24" set:html={iconPaths['arrow-right-short']} />
       <symbol id="access-user" viewBox="0 0 24 24" set:html={iconPaths.user} />
