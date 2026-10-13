@@ -4,6 +4,7 @@ import { manifestSource, repoContentOverrides } from './data/site-tenants'
 import { dictionaryFor } from './i18n'
 import type { Locale } from './i18n/ui'
 import { resolveTenant } from './lib/resolve-tenant'
+import { HEALTH_PATHS } from './lib/served-health'
 import type { SiteTenant } from './lib/site-api'
 import { REDIRECT_MAX_AGE_SECONDS, decideRedirect } from './lib/site-redirect'
 import { resolveContent } from './lib/site-content'
@@ -389,6 +390,13 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 
   const unacceptableImage = refuseUnacceptableImage(url)
   if (unacceptableImage) return unacceptableImage
+
+  // The served-version probe answers BEFORE the tenant is resolved: it is a
+  // property of the container, not of a site, and the platform reads it with
+  // the Host of every claimed domain — including hosts that resolve to no
+  // tenant, whose honest answer is still "this build served you". The route
+  // itself (`pages/api/health.ts`) needs nothing from `locals`.
+  if (HEALTH_PATHS.has(url.pathname)) return next()
 
   // The tenant for THIS request. `context.locals` is per request by
   // construction, which is the entire reason the answer is put there.
