@@ -5,6 +5,7 @@ import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import InfrastructureHeader from '@components/InfrastructureHeader.astro';
 import InfrastructureFooter from '@components/InfrastructureFooter.astro';
+import TagManager from '@components/TagManager.astro';
 import { infrastructureChrome, siteChrome } from '@lib/site-chrome';
 import '@styles/site-chrome.css';
 import { pickAnnouncement } from '@components/announcement';
@@ -202,6 +203,7 @@ const visibleAnnouncement = showAnnouncement && !modernChrome ? announcement : n
   <head>
     {usesManrope && <style is:inline>@font-face{font-family:Manrope;src:url('/fonts/manrope-variable.woff2') format('woff2');font-style:normal;font-weight:200 800;font-display:swap}</style>}
     <meta charset="UTF-8" />
+    <TagManager part="head" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content={themeColorOf(tenant)} />
@@ -405,6 +407,7 @@ const visibleAnnouncement = showAnnouncement && !modernChrome ? announcement : n
     {themeCss && <style set:html={themeCss} />}
   </head>
   <body style={chrome?.style}>
+    <TagManager part="body" />
     <a href="#main-content" class="skip-link">{t('layout.skipToContent')}</a>
     {visibleAnnouncement && <AnnouncementBar entry={visibleAnnouncement} />}
     {modernChrome ? <InfrastructureHeader alternates={alternates} /> : <Header alternates={alternates} />}

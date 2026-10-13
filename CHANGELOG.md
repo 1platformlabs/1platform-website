@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Contenedor de Tag Manager por inquilino: si el manifiesto trae `tag_manager_id`, el cargador va al principio del
+  `<head>` y el `noscript` justo después de `<body>` en los tres documentos (layout común, portada fotográfica y
+  acceso). El id se revalida antes de interpolarlo; sin id válido el HTML no cambia, así que ningún otro inquilino
+  carga el contenedor de otro.
 - Enlaces de documentación contextual para las diez capacidades de la portada de infraestructura, con destinos e idioma del tenant y controles separados del selector del diagrama.
 - Logo subido del tenant en cabeceras, pies y acceso; favicon independiente como símbolo compacto, con fallback actual y rutas del mismo origen aisladas por tenant y hash. Kit de carga y preview local para 1Platform, Medipago y Vende Fácil.
 - Tienda en línea y Correo profesional opcionales por contenido del tenant; cuadrícula uniforme de seis tarjetas, CTA comerciales configurados y parche offline de SitePages con diff y reversión.
