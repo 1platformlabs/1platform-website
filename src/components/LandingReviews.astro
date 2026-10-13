@@ -13,7 +13,7 @@
  * there is at least one (`resolveSiteReviews`): the section is on for every
  * site from the start, so an empty block would promise reviews nobody writes.
  */
-import type { SiteReviews } from '@lib/site-reviews';
+import { sectionHeading, type SiteReviews } from '@lib/site-reviews';
 import { reviewsCopy } from '@lib/landing-reviews-copy';
 import '@styles/landing-reviews.css';
 
@@ -26,6 +26,9 @@ interface Props {
 
 const { reviews, locale, formatLocale } = Astro.props;
 const copy = reviewsCopy(locale);
+// The owner's heading in THIS page's language (api#846); the cache is per site,
+// so the choice is made here, per render, and not in `resolveSiteReviews`.
+const heading = sectionHeading(reviews, locale, copy.defaultTitle);
 const number = new Intl.NumberFormat(formatLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const dateFormat = new Intl.DateTimeFormat(formatLocale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 const { summary } = reviews;
@@ -52,8 +55,8 @@ const clientCopy = {
     <div class="lr-head">
       <header class="lr-heading">
         <p class="lr-eyebrow">{copy.eyebrow}</p>
-        <h2 id="lr-title" class="lr-title">{reviews.title ?? copy.defaultTitle}</h2>
-        {reviews.subtitle && <p class="lr-subtitle">{reviews.subtitle}</p>}
+        <h2 id="lr-title" class="lr-title">{heading.title}</h2>
+        {heading.subtitle && <p class="lr-subtitle">{heading.subtitle}</p>}
       </header>
       {summary.count > 0 && summary.average !== null && (
         <aside class="lr-summary" aria-label={copy.summaryLabel}>

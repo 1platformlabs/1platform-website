@@ -57,6 +57,14 @@ export interface SiteReviews {
   /** The owner's heading, or `null` to use the block's own one in the page's language. */
   title: string | null
   subtitle: string | null
+  /**
+   * The owner's heading per language (api#846). `null` = the API predates it,
+   * so `title` is the only copy there is. A language absent from the map has
+   * no heading of its own: the block uses its built-in one in that language,
+   * never another language's title.
+   */
+  titles: Record<string, string> | null
+  subtitles: Record<string, string> | null
   sort: ReviewSort
   pageSize: number
   summary: ReviewSummary
@@ -90,6 +98,38 @@ function toReview(value: unknown): PublicReview | null {
   const context = typeof r.context === 'string' && r.context.trim() ? r.context : null
   const source = typeof r.source === 'string' && SOURCES.includes(r.source) ? (r.source as ReviewSource) : 'manual'
   return { author: r.author, context, body: r.body, rating: r.rating, source, date: r.date }
+}
+
+/**
+ * A per-language map of text, or `null` when there is none to read. Lenient on
+ * purpose: unlike `title`, a malformed map does NOT take the section down — it
+ * is ignored and the block falls back to `title`/`subtitle`, exactly what an
+ * API that predates the map gives. Entries that are not text, or are blank, are
+ * dropped one by one.
+ */
+function textsByLocale(value: unknown): Record<string, string> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  const texts: Record<string, string> = {}
+  for (const [locale, text] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof text === 'string' && text.trim()) texts[locale] = text
+  }
+  return texts
+}
+
+/**
+ * The heading the block draws on a page in `locale`. With a per-language map
+ * (current API) only that language's copy is used — otherwise the block's own
+ * heading in that language, so `/es/` never shows the English title under
+ * «EN SUS PALABRAS». Without one (older API) it is `title`, as before.
+ */
+export function sectionHeading(
+  reviews: Pick<SiteReviews, 'title' | 'subtitle' | 'titles' | 'subtitles'>,
+  locale: string,
+  defaultTitle: string,
+): { title: string; subtitle: string | null } {
+  const title = reviews.titles === null ? reviews.title : (reviews.titles[locale] ?? null)
+  const subtitle = reviews.subtitles === null ? reviews.subtitle : (reviews.subtitles[locale] ?? null)
+  return { title: title ?? defaultTitle, subtitle }
 }
 
 /**
@@ -127,6 +167,8 @@ export function parseSiteReviews(value: unknown): SiteReviews | null {
     enabled: true,
     title,
     subtitle: typeof v.subtitle === 'string' && v.subtitle.trim() ? v.subtitle : null,
+    titles: textsByLocale(v.titles),
+    subtitles: textsByLocale(v.subtitles),
     sort: v.sort === 'newest' ? 'newest' : 'featured',
     pageSize,
     summary: { count, average, histogram: bars },
@@ -139,6 +181,8 @@ function disabled(): SiteReviews {
     enabled: false,
     title: null,
     subtitle: null,
+    titles: null,
+    subtitles: null,
     sort: 'featured',
     pageSize: 3,
     summary: { count: 0, average: null, histogram: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } },

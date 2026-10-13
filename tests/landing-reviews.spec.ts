@@ -6,7 +6,7 @@ import { chromium, expect, test, type Browser, type Page } from '@playwright/tes
 
 import { repoTenantForHost } from '../src/data/site-tenants';
 import { reviewsCopy } from '../src/lib/landing-reviews-copy';
-import { __testing, parseSiteReviews, resolveSiteReviews } from '../src/lib/site-reviews';
+import { __testing, parseSiteReviews, resolveSiteReviews, sectionHeading } from '../src/lib/site-reviews';
 import { exportRepoContent, startFakeSiteStack, type FakeSite, type FakeSiteStack, type PagesDocument } from './helpers/fake-site-api';
 
 /**
@@ -95,6 +95,30 @@ test.describe('site-reviews module', () => {
     expect(parseSiteReviews(section(MEDIPAGO_REVIEWS, { title: 7 }))).toBeNull();
   });
 
+  test('api#846: the heading per language — parsed leniently, never borrowed from another language', () => {
+    // An API that predates the map: same result as before.
+    const legacy = parseSiteReviews(section(MEDIPAGO_REVIEWS));
+    expect(legacy?.titles).toBeNull();
+    expect(legacy?.subtitles).toBeNull();
+    expect(sectionHeading(legacy!, 'es', reviewsCopy('es').defaultTitle)).toEqual({
+      title: 'Experiencias que nos acercan',
+      subtitle: 'La experiencia de cobrar, desde el consultorio',
+    });
+    // A map that is not an object is ignored and the section does NOT fall (unlike `title: 7`).
+    for (const bad of ['es', 7, ['What teams say']]) {
+      const parsed = parseSiteReviews(section(MEDIPAGO_REVIEWS, { titles: bad, subtitles: bad }));
+      expect(parsed, String(bad)).not.toBeNull();
+      expect(parsed?.titles).toBeNull();
+    }
+    // Entries that are not text, or are blank, are dropped one by one.
+    const mixed = parseSiteReviews(section(MEDIPAGO_REVIEWS, { titles: { en: 'What teams say', es: '  ', pt: 7 }, subtitles: {} }));
+    expect(mixed?.titles).toEqual({ en: 'What teams say' });
+    // The defect: an English-only title must not appear on /es/.
+    const englishOnly = parseSiteReviews(section(MEDIPAGO_REVIEWS, { title: 'What teams say', titles: { en: 'What teams say' }, subtitles: { en: 'Real ones' } }))!;
+    expect(sectionHeading(englishOnly, 'es', reviewsCopy('es').defaultTitle)).toEqual({ title: reviewsCopy('es').defaultTitle, subtitle: null });
+    expect(sectionHeading(englishOnly, 'en', reviewsCopy('en').defaultTitle)).toEqual({ title: 'What teams say', subtitle: 'Real ones' });
+  });
+
   test('a change reaches the landing after the freshness window, through ONE background refresh', async () => {
     let current = section(MEDIPAGO_REVIEWS);
     answer = () => json({ success: true, data: current })();
@@ -167,7 +191,7 @@ const platform = repoTenantForHost('1platform.pro')!;
 const answers: Record<string, () => { status: number; body?: unknown }> = {
   medipago: () => ({ status: 200, body: { success: true, data: section(MEDIPAGO_REVIEWS), msg: 'ok' } }),
   vendefacil: () => ({ status: 200, body: { success: true, data: section(VENDE_REVIEWS, { title: 'Cada negocio tiene una historia', subtitle: null }), msg: 'ok' } }),
-  oneplatform: () => ({ status: 200, body: { success: true, data: section(MEDIPAGO_REVIEWS.slice(0, 2), { title: 'Experiencias de quienes construyen', subtitle: null, sort: 'newest' }), msg: 'ok' } }),
+  oneplatform: () => ({ status: 200, body: { success: true, data: section(MEDIPAGO_REVIEWS.slice(0, 2), { title: 'What teams say', subtitle: null, titles: { en: 'What teams say', es: 'Lo que dicen los equipos' }, subtitles: {}, sort: 'newest' }), msg: 'ok' } }),
   apagado: () => ({ status: 200, body: { success: true, data: { enabled: false, title: null, subtitle: null, sort: 'featured', page_size: 3, summary: { count: 0, average: null, histogram: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 } }, reviews: [] }, msg: 'ok' } }),
   caido: () => ({ status: 503 }),
   vacio: () => ({ status: 200, body: { success: true, data: section([], { title: null }), msg: 'ok' } }),
@@ -283,6 +307,15 @@ test.describe('landing reviews in the browser', () => {
     const ids = await page.evaluate(() => [...document.querySelectorAll('section[id]')].map((s) => s.id));
     expect(ids.indexOf('resenas')).toBe(ids.indexOf('contacto') - 1);
     await expect(page.locator('#resenas .lr-author strong')).toHaveText(['Daniela C.', 'Jorge A.']);
+  });
+
+  test('api#846: a bilingual site shows the owner’s heading in each page’s language', async () => {
+    const es = await open('1platform.pro', { path: '/es/' });
+    await expect(es.locator('#resenas .lr-eyebrow')).toHaveText(reviewsCopy('es').eyebrow);
+    await expect(es.locator('#lr-title')).toHaveText('Lo que dicen los equipos');
+    await expect(es.locator('#resenas')).not.toContainText('What teams say');
+    const en = await open('1platform.pro');
+    await expect(en.locator('#lr-title')).toHaveText('What teams say');
   });
 
   test('a section switched off, an API that fails, and no public reviews', async () => {
