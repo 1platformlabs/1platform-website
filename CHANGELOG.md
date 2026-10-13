@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   desde el panel, con promedio y distribución sobre todas las públicas, filtro por estrellas, «Ver más» y estados
   vacíos. Lo lee de `GET /sites/{slug}/reviews` con la misma caché de 60 s que el contenido; sección apagada, API sin
   la ruta o API caída ⇒ no hay bloque y el resto de la página no cambia (nunca un 503). Sin JavaScript se leen todas.
+- El bloque de reseñas toma su título y su descripción del idioma de la página (lote-backlog-2026-10-12,
+  1platform-api#846): si el API publica `titles`/`subtitles` por idioma, `/es/` usa el texto en español y `/` el
+  inglés; un idioma sin texto propio usa el encabezado incorporado en ese idioma y nunca el de otro. Con un API que
+  todavía no publica el mapa, se comporta como antes; un mapa malformado se ignora sin tumbar la sección.
 - Los tres pies del sitio (infraestructura, portada fotográfica y el clásico) muestran los íconos de las redes
   sociales que el inquilino cargó, en el orden Facebook · TikTok · Instagram · LinkedIn · X, y las mismas URLs viajan
   como `sameAs` en los datos estructurados de la organización. Sin redes, el marcado no cambia.
