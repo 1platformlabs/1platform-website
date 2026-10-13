@@ -742,6 +742,9 @@ jobs:
               [ -n "${SITE_API_BASE_URL:-}" ] && echo "SITE_API_BASE_URL=${SITE_API_BASE_URL}"
               [ -n "${SITE_MANIFEST_SOURCE:-}" ] && echo "SITE_MANIFEST_SOURCE=${SITE_MANIFEST_SOURCE}"
               [ -n "${SITE_MISS_BUDGET_PER_MINUTE:-}" ] && echo "SITE_MISS_BUDGET_PER_MINUTE=${SITE_MISS_BUDGET_PER_MINUTE}"
+              # La versión servida en `GET /api/health` (TSD-01): el mismo commit
+              # al que se acaba de resetear el árbol. `VERSION` ya viaja en `envs:`.
+              echo "GIT_SHA=${VERSION}"
               true
             } > .env.prod
             chmod 600 .env.prod

@@ -42,6 +42,11 @@ services:
       # el techo que acota el ataque que el límite por IP de la API no puede
       # ver, porque todo el tráfico legítimo llega desde esta única dirección.
       SITE_MISS_BUDGET_PER_MINUTE: "${SITE_MISS_BUDGET_PER_MINUTE:-}"
+      # La versión que este contenedor sirve en `GET /api/health` (épica
+      # `telemetria-silencio-por-despliegue`, TSD-01). La escribe `prod.yml` en
+      # `.env.prod` con el commit al que reseteó el host (`VERSION`). Vacía o
+      # fuera de forma ⇒ `version: null`, nunca un error de arranque.
+      GIT_SHA: "${GIT_SHA:-}"
 
     ports:
       # ⚠️ ENTRECOMILLADO a propósito: el verificador del pipeline deriva el
