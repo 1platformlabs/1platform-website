@@ -1,0 +1,66 @@
+# Configuración de gitleaks para 1platform-website.
+# Documenta los ÚNICOS falsos-positivos permitidos. Regla de la casa: cada excepción es un valor
+# LITERAL y ANCLADO (^…$) — nunca `paths` sobre código o tests (apagaría el archivo entero) y nunca
+# «la forma» de un secreto (cualquier hash, cualquier UUID): así una credencial real que alguien
+# pegue en esos mismos archivos sigue bloqueando.
+#
+# Medido 2026-10-12 con gitleaks 8.30.1 sobre `origin/main` (bfd8c03) con la config anterior:
+# 7 hallazgos `generic-api-key` en JSON de evidencia (hashes SHA-256 y un SHA de commit). Además,
+# 12 hallazgos que la config anterior ya tapaba: 10 `curl-auth-header` del blog y 2 slugs del
+# changelog — sus excepciones se reemplazaron por los valores literales. Las excepciones heredadas
+# del molde (JWT truncado con `...`, placeholders cortos `ak-`/`sk-` de <=28, UUID `A1B2C3D4…`)
+# casaban con 0 hallazgos ese día y se quitaron.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Placeholders y hashes literales de documentación + artefactos de build"
+
+paths = [
+  '''node_modules/.*''',
+  '''dist/.*''',
+  '''\.astro/.*''',
+  '''\.gitleaks\.toml''',
+]
+
+regexes = [
+  # Placeholder de los ejemplos `curl` del blog: `curl-auth-header` extrae como «secreto» el
+  # literal del ejemplo `Authorization: Bearer …` (10 hallazgos en
+  # src/content/blog/{en,es}/{automate-seo-pipeline,automatizar-el-pipeline-de-seo,
+  # getting-started-5-minutes,primeros-pasos-en-5-minutos}.md). Sólo esos dos literales.
+  '''^YOUR_(?:APP_)?TOKEN$''',
+  # `translationKey` del changelog: el slug del propio archivo, que `generic-api-key` confunde con
+  # una clave por estar al lado de la palabra «key»
+  # (src/content/changelog/{en,es}/2026-05-20-refocus-positioning.md:5). Literal, no la forma
+  # «fecha-slug»: un slug nuevo que marque se agrega aquí a mano.
+  '''^2026-05-20-refocus-positioning$''',
+  # Evidencia de verificación (JSON generados por las corridas de verificación, no código):
+  # `generic-api-key` marca valores hex por estar en líneas cuyo nombre de archivo contiene
+  # `api`/`Access`. Son hashes de contenido de archivos del propio repo y un SHA de commit, públicos.
+  # - SHA-256 de src/lib/site-api.ts y de src/page-content/TenantAccess.astro en
+  #   docs/brand-assets/evidence/source-snapshot{,-final,-host-probe-attempt}.json.
+  '''^776dff6b8868adbce8566a0634916bb94bb6039eb2f6032120f6b34c4114c52d$''',
+  '''^d7a7a6a6b03f99d97f8a284b30fbd65ac85322810968872c7243b1cf921a28d6$''',
+  # - SHA de commit del API (`apiHead`) en docs/evidence/vendefacil-servicios-uniformes/bank/gates.json:3.
+  '''^f020ba4753428e5824fb2f4bb008fd41a856dc1c$''',
+]
+
+# Reglas propias: el ruleset por defecto de gitleaks NO tiene una regla dedicada para las API keys
+# de Anthropic ni para las de proyecto/servicio de OpenAI (sólo las caza por casualidad la heurística
+# genérica `generic-api-key`, y sólo si el nombre de variable "suena" a credencial). El piso de
+# longitud (80/40 chars) es lo que las separa de los placeholders cortos `ak-`/`sk-` del modelo
+# two-token. Medido 2026-09-07 con gitleaks 8.30.1.
+# Refs 1platformlabs/1platform-wiki#7
+
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API key (sk-ant-…)"
+regex = 'sk-ant-(?:api|admin|sid)[0-9]{2}-[A-Za-z0-9_-]{80,120}'
+keywords = ["sk-ant-"]
+
+[[rules]]
+id = "openai-project-key"
+description = "OpenAI project/user key (sk-proj-, sk-svcacct-, sk-admin-)"
+regex = 'sk-(?:proj|svcacct|admin)-[A-Za-z0-9_-]{40,}'
+keywords = ["sk-proj-", "sk-svcacct-", "sk-admin-"]
