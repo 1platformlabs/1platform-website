@@ -123,6 +123,24 @@ ErrorDocument 404 /404.html
   # Astro emits content-hashed assets under /_astro/ — safe to pin for a year.
   <FilesMatch "^.*$">
     Header set X-Content-Type-Options "nosniff"
+    # HSTS, Referrer-Policy and a base CSP (1platform-atlas-dashboard#453). Same
+    # values as `deploy/docker/nginx.conf`, where the reasoning is written out in
+    # full; the short version:
+    #  - HSTS without includeSubDomains/preload: the host is a customer's domain
+    #    and its subdomains (e.g. the panel at app.<domain>) are not ours to pin
+    #    to https. HSTS is applied by the BROWSER, not a redirect by this origin,
+    #    so it cannot loop under `flexible` (hard rule above); browsers ignore it
+    #    when it arrives over plain http.
+    #  - The CSP restricts nothing about WHERE things load from: tenants paste
+    #    Tag Manager and their own snippets. No form-action: forms post to the
+    #    API, another origin. frame-ancestors 'self' replaces X-Frame-Options.
+    #    No upgrade-insecure-requests: unlike HSTS, browsers apply it to a page
+    #    served over plain http too, and it rewrites the site's own relative
+    #    assets to https — measured breaking an http bench (nginx.conf).
+    # `always` so error responses (the 404) carry them too, as nginx does.
+    Header always set Strict-Transport-Security "max-age=31536000"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Content-Security-Policy "frame-ancestors 'self'; base-uri 'self'; object-src 'none'"
   </FilesMatch>
 
   # Everything the build fingerprints. The name changes when the bytes change,

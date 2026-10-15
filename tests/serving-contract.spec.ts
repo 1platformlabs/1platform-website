@@ -29,6 +29,7 @@ import { expect, test } from '@playwright/test'
 
 const NGINX = 'deploy/docker/nginx.conf'
 const PROXY = 'deploy/docker/proxy-to-node.conf'
+const HTACCESS = 'deploy/cpanel/htaccess/landing.htaccess'
 
 function conf(path: string): string {
   return readFileSync(path, 'utf8')
@@ -90,6 +91,90 @@ test('every location repeats nosniff, because add_header does NOT accumulate', (
       `location ${header} does not repeat X-Content-Type-Options; the server-level ` +
         `add_header is DISCARDED inside a block that declares any add_header of its own`,
     ).toMatch(/add_header\s+X-Content-Type-Options\s+"nosniff"\s+always\s*;/)
+  }
+})
+
+/**
+ * The three security headers of 1platform-atlas-dashboard#453, with the exact
+ * value every block must carry. Exact on purpose: a block that drifted to
+ * `includeSubDomains` would pin a customer's panel subdomain to https for a
+ * year, and a CSP that grew a `script-src` would break a tenant's pasted Tag
+ * Manager in silence — neither is a "still has the header" pass.
+ */
+const SECURITY_HEADERS = [
+  ['Strict-Transport-Security', 'max-age=31536000'],
+  ['Referrer-Policy', 'strict-origin-when-cross-origin'],
+  [
+    'Content-Security-Policy',
+    "frame-ancestors 'self'; base-uri 'self'; object-src 'none'",
+  ],
+] as const
+
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+function securityHeaderLine(name: string, value: string): RegExp {
+  return new RegExp(`add_header\\s+${escapeRegExp(name)}\\s+"${escapeRegExp(value)}"\\s+always\\s*;`)
+}
+
+test('every location repeats the security headers, for the same reason it repeats nosniff', () => {
+  const blocks = locations()
+  expect(blocks.length).toBeGreaterThanOrEqual(4)
+  for (const { header, body } of blocks) {
+    for (const [name, value] of SECURITY_HEADERS) {
+      expect(
+        body,
+        `location ${header} does not carry ${name}: "${value}" — the server-level ` +
+          `add_header is DISCARDED inside a block that declares any add_header of its own`,
+      ).toMatch(securityHeaderLine(name, value))
+    }
+  }
+})
+
+test('the server level carries the security headers too — the www redirect answers from there', () => {
+  // `return 301` in the server's rewrite phase never enters a location, so the
+  // only add_header that applies to it is the server's.
+  const text = conf(NGINX)
+    .split('\n')
+    .filter((l) => !l.trim().startsWith('#'))
+    .join('\n')
+  const serverLevel = text.slice(text.indexOf('server {'), text.search(/^\s*location\s/m))
+  for (const [name, value] of SECURITY_HEADERS) {
+    expect(serverLevel, `server level is missing ${name}`).toMatch(securityHeaderLine(name, value))
+  }
+})
+
+test('HSTS never commits subdomains, and the CSP never restricts where content loads from', () => {
+  const text = conf(NGINX) + '\n' + conf(HTACCESS)
+  const directives = text
+    .split('\n')
+    .filter((l) => !l.trim().startsWith('#'))
+    .join('\n')
+  // A customer's subdomains (their panel at app.<domain>, whatever else their
+  // DNS holds) are not served by this container and are not ours to pin.
+  expect(directives).not.toMatch(/includeSubDomains/i)
+  expect(directives).not.toMatch(/preload/i)
+  // Tenants paste Tag Manager and their own HTML; forms post to the API.
+  for (const directive of ['default-src', 'script-src', 'style-src', 'img-src', 'connect-src', 'form-action']) {
+    expect(directives, `${directive} would break tenant snippets or cross-origin forms`).not.toContain(directive)
+  }
+  // Unlike HSTS, browsers honour it on a page served over plain http, and it
+  // rewrites the site's OWN relative assets to https. Measured against this
+  // container over http with Chromium mapping 1platform.pro to it: 6 of 7
+  // requests went to https://1platform.pro/… and 3 failed (net::ERR_FAILED).
+  expect(directives, 'upgrade-insecure-requests breaks any host still served over http').not.toContain(
+    'upgrade-insecure-requests',
+  )
+})
+
+test('the cPanel mirror carries the same security headers as nginx', () => {
+  const directives = conf(HTACCESS)
+    .split('\n')
+    .filter((l) => !l.trim().startsWith('#'))
+    .join('\n')
+  for (const [name, value] of SECURITY_HEADERS) {
+    expect(directives, `landing.htaccess is missing ${name}: "${value}"`).toMatch(
+      new RegExp(`Header\\s+always\\s+set\\s+${escapeRegExp(name)}\\s+"${escapeRegExp(value)}"`),
+    )
   }
 })
 
