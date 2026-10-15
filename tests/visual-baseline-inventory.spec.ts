@@ -33,7 +33,7 @@ test('every visual snapshot directory has an executable spec', () => {
   const pngs = snapshotDirs.flatMap((dir) =>
     readdirSync(join(VISUAL_DIR, dir)).filter((name) => name.endsWith('-linux.png')),
   )
-  expect(pngs, 'the visual contract is four platform + four clinic renders').toHaveLength(8)
+  expect(pngs, 'the visual contract is four platform + four clinic + three commerce renders').toHaveLength(11)
 })
 
 test('CONTROL: the inventory detects the historical showcase failure shape', () => {

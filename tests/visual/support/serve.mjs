@@ -4,6 +4,8 @@ import { createServer, request } from 'node:http'
 
 const host = '127.0.0.1'
 const clinicHost = 'clinicas.1platform.dev'
+// The photographic commerce landing, served by the same API-mode adapter.
+const commerceHost = 'vendefacil.1platform.pro'
 const platformPort = numberFromEnv('PLAYWRIGHT_PLATFORM_PORT', 4321)
 const clinicPort = numberFromEnv('PLAYWRIGHT_CLINIC_PORT', 4322)
 const apiPort = numberFromEnv('PLAYWRIGHT_STUB_API_PORT', 4397)
@@ -13,6 +15,13 @@ const fixture = JSON.parse(
   readFileSync(new URL('../../fixtures/service-lead-site.json', import.meta.url), 'utf8'),
 )
 assertFixture(fixture)
+const commerce = JSON.parse(
+  readFileSync(new URL('../../fixtures/vendefacil-site.json', import.meta.url), 'utf8'),
+)
+if (commerce?.tenant?.domain !== commerceHost || commerce.tenant.home_template !== 'photographic-service') {
+  throw new Error('commerce fixture must exercise the photographic-service contract')
+}
+const sites = new Map([[clinicHost, fixture], [commerceHost, commerce]])
 
 const api = createServer((req, res) => {
   const url = new URL(req.url ?? '/', `http://${host}`)
@@ -20,19 +29,21 @@ const api = createServer((req, res) => {
   res.setHeader('cache-control', 'no-store')
 
   if (url.pathname === '/api/v1/sites/by-host') {
-    if (url.searchParams.get('host') !== clinicHost) return json(res, 404, absent())
+    const site = sites.get(url.searchParams.get('host'))
+    if (!site) return json(res, 404, absent())
     return json(res, 200, {
       success: true,
-      data: fixture.tenant,
+      data: site.tenant,
       msg: 'Site resolved',
     })
   }
 
-  if (url.pathname === `/api/v1/sites/${fixture.tenant.slug}/pages`) {
-    if (url.searchParams.get('locale') !== fixture.tenant.default_locale) {
+  for (const site of sites.values()) {
+    if (url.pathname !== `/api/v1/sites/${site.tenant.slug}/pages`) continue
+    if (url.searchParams.get('locale') !== site.tenant.default_locale) {
       return json(res, 404, absent())
     }
-    return json(res, 200, fixture.pagesResponse)
+    return json(res, 200, site.pagesResponse)
   }
 
   return json(res, 404, absent())
@@ -63,6 +74,7 @@ for (const child of children) {
 await Promise.all([
   waitForHttp(platformPort, 'localhost'),
   waitForHttp(clinicPort, clinicHost),
+  waitForHttp(clinicPort, commerceHost),
 ])
 
 readiness = createServer((req, res) => {
