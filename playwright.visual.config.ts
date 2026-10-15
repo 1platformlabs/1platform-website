@@ -72,5 +72,20 @@ export default defineConfig({
         },
       },
     },
+    {
+      // The photographic commerce landing with every optional block, from the
+      // same API-mode adapter as the clinic.
+      name: 'commerce-chromium',
+      testMatch: 'commerce.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://vendefacil.1platform.pro/',
+        launchOptions: {
+          args: [
+            `--host-resolver-rules=MAP vendefacil.1platform.pro:80 127.0.0.1:${clinicPort}`,
+          ],
+        },
+      },
+    },
   ],
 });
