@@ -1,0 +1,26 @@
+{
+  "checked_at": "2026-10-16T01:33:55.951Z",
+  "mode": "public-read-only",
+  "tenant": "oneplatform",
+  "renderer": "infrastructure",
+  "local_source": "SITE_MANIFEST_SOURCE=repo",
+  "production_source": "SitePages API; no catalogue fallback",
+  "documents": [
+    {
+      "locale": "es",
+      "url": "https://api.1platform.pro/api/v1/sites/oneplatform/pages?locale=es",
+      "route": "@infrastructure-home",
+      "existing_keys": 142,
+      "cloud_keys": [],
+      "snapshot_sha256": "950f5f7292ebde89d4dbc013c4c4b98e9da53ed1b4447e70cf8aa21a28c05979"
+    },
+    {
+      "locale": "en",
+      "url": "https://api.1platform.pro/api/v1/sites/oneplatform/pages?locale=en",
+      "route": "@infrastructure-home",
+      "existing_keys": 142,
+      "cloud_keys": [],
+      "snapshot_sha256": "38fdaf9f904adbe2f3fbf4f905939370691b3fabc5e7f02e2f5cf865dbac2eef"
+    }
+  ]
+}

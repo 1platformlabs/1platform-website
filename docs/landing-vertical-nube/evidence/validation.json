@@ -1,0 +1,26 @@
+{
+  "base": "1ba29ce",
+  "branch": "feat/landing-vertical-nube",
+  "node": "24.18.0",
+  "browser_tests": {
+    "passed": 573,
+    "skipped": 25,
+    "failed": 0
+  },
+  "linux_visual": {
+    "passed": 11,
+    "changed_snapshots": 4,
+    "unchanged_other_tenant_snapshots": 7
+  },
+  "html_baseline": {
+    "routes": 100,
+    "identical": 100,
+    "differing": 0,
+    "wrong": 0
+  },
+  "source_sha256": {
+    "src/page-content/InfrastructureHome.astro": "81ed3d359e0244ba013491a546e0f9bcd8a891e31f3e7fbb3571a26a893c3288",
+    "src/i18n/messages/pages/infrastructure-home.ts": "6108b8ed3a03ceabb4281066ded50028af4040b1167d25ce9cdc909e8bef1137",
+    "src/scripts/infrastructure-home.ts": "45123b1636253b052392c4744b9f8ee8125553df3225c92af50e055c0241c415"
+  }
+}

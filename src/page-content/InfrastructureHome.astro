@@ -19,6 +19,11 @@ const formatLocale = tenant.region ? `${locale}-${tenant.region}` : locale;
 // and t() throws on a key it lacks — a new label would take the page down for
 // every tenant whose content predates it (CI renders from the repo catalogue).
 const documentationLabel = locale === 'en' ? 'View documentation' : 'Ver documentación';
+// SitePages are activated separately from code. Older or incomplete tenant
+// content keeps its existing home until all three Cloud labels are published.
+const showCloud = ['name', 'description', 'status'].every((field) =>
+  Astro.locals.messages[`infrastructure.capabilities.cloud.${field}`]?.trim(),
+);
 ---
 <BaseLayout title={t('infrastructure.meta.title')} description={t('infrastructure.meta.description')} showAnnouncement={false}>
 <div class="infrastructure-home" data-infrastructure-home
@@ -120,6 +125,9 @@ const documentationLabel = locale === 'en' ? 'View documentation' : 'Ver documen
             <button class="capability" type="button" data-capability={t('infrastructure.capabilities.whitelabel.name')} aria-pressed="false"><span class="capability-number">10</span><span class="capability-text"><strong>{t('infrastructure.capabilities.whitelabel.name')}</strong><small>{t('infrastructure.capabilities.whitelabel.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
               {docsUrl(Astro.locals, '/docs/saas/1platform-api/plataforma/marca-blanca/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/plataforma/marca-blanca/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.whitelabel.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
             </div>
+            {showCloud && (<div class="capability-entry">
+              <button class="capability" type="button" data-capability={t('infrastructure.capabilities.cloud.name')} data-capability-status={t('infrastructure.capabilities.cloud.status')} aria-pressed="false"><span class="capability-number">11</span><span class="capability-text"><strong>{t('infrastructure.capabilities.cloud.name')}</strong><small>{t('infrastructure.capabilities.cloud.description')}</small><em>{t('infrastructure.capabilities.cloud.status')}</em></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+            </div>)}
           </div>
           <div class="integration-preview" aria-labelledby="integration-title">
             <p class="integration-kicker">{t('infrastructure.integration.eyebrow')}</p>

@@ -1,0 +1,170 @@
+[
+  {
+    "locale": "es",
+    "width": 390,
+    "colorScheme": "light",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "es",
+    "width": 390,
+    "colorScheme": "dark",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "es",
+    "width": 768,
+    "colorScheme": "light",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "es",
+    "width": 768,
+    "colorScheme": "dark",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "es",
+    "width": 1440,
+    "colorScheme": "light",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "es",
+    "width": 1440,
+    "colorScheme": "dark",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "en",
+    "width": 390,
+    "colorScheme": "light",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "en",
+    "width": 390,
+    "colorScheme": "dark",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "en",
+    "width": 768,
+    "colorScheme": "light",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "en",
+    "width": 768,
+    "colorScheme": "dark",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "en",
+    "width": 1440,
+    "colorScheme": "light",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  },
+  {
+    "locale": "en",
+    "width": 1440,
+    "colorScheme": "dark",
+    "total": 11,
+    "focus": {
+      "visible": true,
+      "outline": "solid",
+      "width": "3px"
+    },
+    "overflow": false,
+    "scheme": "light",
+    "errors": []
+  }
+]

@@ -25,6 +25,6 @@ for (const [locale, home, interior] of [['en', '/', '/about/'], ['es', '/es/', '
       await section.scrollIntoViewIfNeeded();
       await expect(section).toBeVisible();
     }
-    await expect(page.locator('main [data-capability]')).toHaveCount(10);
+    await expect(page.locator('main [data-capability]')).toHaveCount(11);
   });
 }

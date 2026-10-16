@@ -10,7 +10,8 @@ for (const locale of ['es', 'en']) {
   test(`ten contextual documentation links preserve illustrative controls (${locale})`, async ({ page }) => {
     await page.goto(locale === 'es' ? '/es/' : '/');
     const cards = page.locator('.capability-entry');
-    await expect(cards).toHaveCount(10);
+    await expect(cards).toHaveCount(11);
+    await expect(cards.last().getByRole('link')).toHaveCount(0);
     await expect(page.locator('.capability a')).toHaveCount(0);
     for (let index = 0; index < destinations.length; index++) {
       const button = cards.nth(index).getByRole('button');
@@ -26,6 +27,6 @@ for (const locale of ['es', 'en']) {
       const box = await link.boundingBox();
       expect(box?.height).toBeGreaterThanOrEqual(44);
     }
-    await expect(page.locator('.capability-text em')).toHaveCount(3);
+    await expect(page.locator('.capability-text em')).toHaveCount(4);
   });
 }
