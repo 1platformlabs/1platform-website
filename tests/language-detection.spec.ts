@@ -272,7 +272,7 @@ test.describe('infrastructure home language detection', () => {
       await expect(page).toHaveURL(/^https?:\/\/[^/]+\/$/);
       await expect(page.locator('.hero h1')).toBeVisible();
       await expect(page.locator('.outcome-grid article')).toHaveCount(3);
-      await expect(page.locator('.capability')).toHaveCount(10);
+      await expect(page.locator('.capability')).toHaveCount(11);
       await expect(page.locator('.brand-languages a[data-lang-choice="es"]')).toHaveAttribute('href', '/es/');
     });
   });

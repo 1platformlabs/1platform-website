@@ -18,7 +18,7 @@ function initInfrastructureHome() {
     const selected = capabilities.filter((button) => button.getAttribute('aria-pressed') === 'true');
     const items = selected.map((button) => {
       const item = document.createElement('li');
-      item.textContent = button.dataset.capability ?? '';
+      item.textContent = [button.dataset.capability, button.dataset.capabilityStatus].filter(Boolean).join(' · ');
       return item;
     });
     if (items.length === 0) {

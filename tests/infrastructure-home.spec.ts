@@ -3,10 +3,44 @@ import AxeBuilder from '@axe-core/playwright';
 
 const route = '/es/';
 
+for (const [path, name, description, status, count] of [
+  ['/es/', 'Nube', 'Servidores y bases de datos para sus ambientes', 'EN PREPARACIÓN', 'capacidades seleccionadas'],
+  ['/', 'Cloud', 'Servers and databases for your environments', 'IN DEVELOPMENT', 'capabilities selected'],
+]) {
+  test(`${path}: Cloud is an illustrative, keyboard-selectable service in development`, async ({ page }) => {
+    await page.goto(path);
+    const cloud = page.locator(`[data-capability="${name}"]`);
+    await expect(cloud.locator('.capability-number')).toHaveText('11');
+    await expect(cloud.locator('small')).toHaveText(description);
+    await expect(cloud.locator('em')).toHaveText(status);
+    await expect(cloud).toHaveAttribute('aria-pressed', 'false');
+    await expect(cloud.locator('..').locator('a')).toHaveCount(0);
+    await expect(page.locator('[data-selection-count]')).toHaveText(`3 ${count}`);
+    const mutations: string[] = [];
+    page.on('request', (request) => {
+      if (!['GET', 'HEAD'].includes(request.method())) mutations.push(request.url());
+    });
+    await page.locator('.capability-documentation').last().focus();
+    await page.keyboard.press('Tab');
+    await expect(cloud).toBeFocused();
+    expect(await cloud.evaluate((button) => button.matches(':focus-visible'))).toBe(true);
+    expect(await cloud.evaluate((button) => getComputedStyle(button).outlineStyle)).not.toBe('none');
+    await page.keyboard.press('Space');
+    await expect(cloud).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-selected-list] li').last()).toHaveText(`${name} · ${status}`);
+    await expect(page.locator('[data-selection-count]')).toHaveText(`4 ${count}`);
+    await page.keyboard.press('Enter');
+    await expect(cloud).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('[data-selection-count]')).toHaveText(`3 ${count}`);
+    expect(mutations).toEqual([]);
+  });
+}
+
 for (const viewport of [
   { width: 1440, height: 900 },
   { width: 360, height: 800 },
   { width: 390, height: 844 },
+  { width: 768, height: 900 },
   { width: 430, height: 932 },
   { width: 844, height: 390 },
 ]) {
@@ -17,7 +51,7 @@ for (const viewport of [
     await expect(home).toBeVisible();
     await expect(home.locator('h1')).toHaveText('Infraestructura parasu próxima solución');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await expect(home.locator('[data-capability]')).toHaveCount(10);
+    await expect(home.locator('[data-capability]')).toHaveCount(11);
     const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(accessibility.violations).toEqual([]);
     const selected = home.locator('[data-capability][aria-pressed="true"]');
@@ -26,8 +60,8 @@ for (const viewport of [
     await expect(home.locator('[data-selection-count]')).toHaveText('0 capacidades seleccionadas');
     await expect(home.locator('[data-selected-list]')).toHaveText('Seleccione servicios para su integración');
     for (const button of await home.locator('[data-capability]').all()) await button.click();
-    await expect(home.locator('[data-selected-list] li')).toHaveCount(10);
-    await expect(home.locator('[data-selection-count]')).toHaveText('10 capacidades seleccionadas');
+    await expect(home.locator('[data-selected-list] li')).toHaveCount(11);
+    await expect(home.locator('[data-selection-count]')).toHaveText('11 capacidades seleccionadas');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }

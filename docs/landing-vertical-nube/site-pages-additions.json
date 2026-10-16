@@ -1,0 +1,24 @@
+{
+  "tenant_slug": "oneplatform",
+  "mode": "additions-only-not-a-put-body",
+  "documents": [
+    {
+      "route": "@infrastructure-home",
+      "locale": "en",
+      "additions": {
+        "infrastructure.capabilities.cloud.name": "Cloud",
+        "infrastructure.capabilities.cloud.description": "Servers and databases for your environments",
+        "infrastructure.capabilities.cloud.status": "IN DEVELOPMENT"
+      }
+    },
+    {
+      "route": "@infrastructure-home",
+      "locale": "es",
+      "additions": {
+        "infrastructure.capabilities.cloud.name": "Nube",
+        "infrastructure.capabilities.cloud.description": "Servidores y bases de datos para sus ambientes",
+        "infrastructure.capabilities.cloud.status": "EN PREPARACIÓN"
+      }
+    }
+  ]
+}

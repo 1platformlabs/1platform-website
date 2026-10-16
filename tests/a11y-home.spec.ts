@@ -39,6 +39,18 @@ function expectNoViolations(results: ScanResults) {
 }
 
 for (const path of ['/', '/es/']) {
+  test(`${path}: selected Cloud and its development status remain accessible at 390px`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    const cloud = page.locator('[data-capability-status]');
+    await cloud.click();
+    await expect(cloud).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-selected-list] li')).toHaveCount(4);
+    const results = await scan(page);
+    expect(results.passes.length).toBeGreaterThan(10);
+    expectNoViolations(results);
+  });
+
   test(`${path}: zero violations with the page at rest`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(path);

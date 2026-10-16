@@ -588,7 +588,7 @@ for (const [locale, path] of [['en', '/'], ['es', '/es/']] as const) {
     await expect(page.locator('.brand-cta')).toHaveAttribute('href', platformTenant.destinations.support!);
     await expect(page.locator('.developers .button')).toHaveAttribute('href', new URL('/docs/saas/1platform-api/getting-started/', platformTenant.destinations.docs!).toString());
     await expect(page.locator('.brand-nav a')).toHaveText(Array.from({ length: 6 }, (_, index) => configured[`site.navigation.${index}.label`]));
-    await expect(page.locator('[data-capability]')).toHaveCount(10);
+    await expect(page.locator('[data-capability]')).toHaveCount(11);
     const documentationLinks = page.locator('.capability-documentation');
     await expect(documentationLinks).toHaveCount(10);
     await expect(documentationLinks.first()).toHaveAccessibleName(new RegExp(locale === 'en' ? '^View documentation:' : '^Ver documentación:'));

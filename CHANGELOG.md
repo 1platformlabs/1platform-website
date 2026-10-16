@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Vertical Nube / Cloud en la portada de infraestructura, en preparación, sin alta ni documentación. Selección ilustrativa con estado visible en el mapa; activación por los tres textos del tenant en cada idioma.
 - Contenedor de Tag Manager por inquilino: si el manifiesto trae `tag_manager_id`, el cargador va al principio del
   `<head>` y el `noscript` justo después de `<body>` en los tres documentos (layout común, portada fotográfica y
   acceso). El id se revalida antes de interpolarlo; sin id válido el HTML no cambia, así que ningún otro inquilino

@@ -72,8 +72,8 @@ test('reduced motion keeps the infrastructure illustration static and WebGL-free
 
 test('the infrastructure home names the approved capabilities and honest availability in both languages', async ({ page }) => {
   for (const [path, names, preparation] of [
-    ['/', ['Payments', 'Invoicing', 'Delivery', 'Subscriptions', 'Digital advertising', 'Sites and domains', 'Email', 'Agents', 'Telemetry', 'White label'], ['PAYMENTS IN DEVELOPMENT', 'INTEGRATION IN DEVELOPMENT', 'WHATSAPP IN DEVELOPMENT']],
-    ['/es/', ['Cobros', 'Facturación', 'Delivery', 'Suscripciones', 'Publicidad digital', 'Sitios y dominios', 'Correo', 'Agentes', 'Telemetría', 'Marca blanca'], ['COBROS EN PREPARACIÓN', 'INTEGRACIÓN EN PREPARACIÓN', 'WHATSAPP EN PREPARACIÓN']],
+    ['/', ['Payments', 'Invoicing', 'Delivery', 'Subscriptions', 'Digital advertising', 'Sites and domains', 'Email', 'Agents', 'Telemetry', 'White label', 'Cloud'], ['PAYMENTS IN DEVELOPMENT', 'INTEGRATION IN DEVELOPMENT', 'WHATSAPP IN DEVELOPMENT', 'IN DEVELOPMENT']],
+    ['/es/', ['Cobros', 'Facturación', 'Delivery', 'Suscripciones', 'Publicidad digital', 'Sitios y dominios', 'Correo', 'Agentes', 'Telemetría', 'Marca blanca', 'Nube'], ['COBROS EN PREPARACIÓN', 'INTEGRACIÓN EN PREPARACIÓN', 'WHATSAPP EN PREPARACIÓN', 'EN PREPARACIÓN']],
   ] as const) {
     await page.goto(path);
     await expect(page.locator('.capability-text strong')).toHaveText([...names]);
