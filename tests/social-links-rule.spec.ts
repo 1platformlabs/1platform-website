@@ -37,10 +37,11 @@ test('socialLinksOf is total and keeps render order', () => {
   }
   expect(socialLinksOf(null)).toEqual([]);
   const links = socialLinksOf({
-    social_links: { x: 'https://x.com/a', instagram: 'HTTPS://WWW.Instagram.com/a', facebook: 'https://l.facebook.com/l.php', other: 'https://x.com/b' },
+    social_links: { youtube: 'https://WWW.YouTube.com/@a', x: 'https://x.com/a', instagram: 'HTTPS://WWW.Instagram.com/a', facebook: 'https://l.facebook.com/l.php', other: 'https://x.com/b' },
   });
   expect(links.map((l) => [l.code, l.href])).toEqual([
     [SOCIAL_NETWORKS.indexOf('instagram'), 'https://www.instagram.com/a'],
     [SOCIAL_NETWORKS.indexOf('x'), 'https://x.com/a'],
+    [SOCIAL_NETWORKS.indexOf('youtube'), 'https://www.youtube.com/@a'],
   ]);
 });

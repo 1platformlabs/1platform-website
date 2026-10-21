@@ -66,6 +66,36 @@
     "normalized": "https://twitter.com/medipago"
   },
   {
+    "network": "youtube",
+    "href": "https://www.youtube.com/@medipago",
+    "problem": null,
+    "normalized": "https://www.youtube.com/@medipago"
+  },
+  {
+    "network": "youtube",
+    "href": "https://youtube.com/channel/UC1234567890abcdefghijkl",
+    "problem": null,
+    "normalized": "https://youtube.com/channel/UC1234567890abcdefghijkl"
+  },
+  {
+    "network": "youtube",
+    "href": "https://m.youtube.com/c/medipago",
+    "problem": null,
+    "normalized": "https://m.youtube.com/c/medipago"
+  },
+  {
+    "network": "youtube",
+    "href": "https://www.youtube.com/redirects-explained",
+    "problem": null,
+    "normalized": "https://www.youtube.com/redirects-explained"
+  },
+  {
+    "network": "facebook",
+    "href": "https://www.facebook.com/redirect.agency",
+    "problem": null,
+    "normalized": "https://www.facebook.com/redirect.agency"
+  },
+  {
     "network": "instagram",
     "href": "https://www.instagram.com",
     "problem": null,
@@ -254,6 +284,60 @@
   {
     "network": "linkedin",
     "href": "https://lnkd.in/x",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://www.youtube.com/redirect?q=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://www.youtube.com/REDIRECT?q=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://www.youtube.com/redirect/?q=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://www.youtube.com/attribution_link?u=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://www.youtube.com/%72edirect?q=https://evil.io",
+    "problem": "redirect",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://youtu.be/abc",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://music.youtube.com/@medipago",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://www.youtube.com.evil.io/@medipago",
+    "problem": "host",
+    "normalized": null
+  },
+  {
+    "network": "youtube",
+    "href": "https://www.instagram.com/medipago",
     "problem": "host",
     "normalized": null
   },
