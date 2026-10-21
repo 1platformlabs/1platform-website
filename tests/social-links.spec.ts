@@ -27,7 +27,8 @@ import { getWithHost } from './helpers/http-host';
 const ROOT = process.cwd();
 const IG = 'https://www.instagram.com/marca';
 const X = 'https://x.com/marca';
-const WITH_LINKS = { facebook: null, tiktok: null, instagram: IG, linkedin: null, x: X };
+const YT = 'https://www.youtube.com/@marca';
+const WITH_LINKS = { facebook: null, tiktok: null, instagram: IG, linkedin: null, x: X, youtube: YT };
 
 type Fixture = { tenant: FakeSite['tenant']; pagesResponse: { data: { pages: PagesDocument[] } } };
 const medipago = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/photographic-site.json'), 'utf8')) as Fixture;
@@ -112,7 +113,7 @@ test('the harness reaches Footer.astro: medipago 404 is the classic footer', asy
   await page.context().close();
 });
 
-test('each of the three footers draws exactly the two icons, in order', async () => {
+test('each of the three footers draws exactly the three icons, in order', async () => {
   const cases: [string, string, number, RegExp][] = [
     ['1platform.pro', '/', 200, /social-links--infrastructure/],
     ['medipago.gt', '/', 200, /social-links--photographic/],
@@ -123,7 +124,7 @@ test('each of the three footers draws exactly the two icons, in order', async ()
     const nav = page.locator('footer [data-social-links]');
     await expect(nav, `${host}${path}`).toHaveCount(1);
     await expect(nav).toHaveClass(variant);
-    expect(await hrefs(page), `${host}${path}`).toEqual([IG, X]);
+    expect(await hrefs(page), `${host}${path}`).toEqual([IG, X, YT]);
     for (const link of await page.locator('[data-social-links] a').all()) {
       await expect(link).toHaveAttribute('target', '_blank');
       await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -139,13 +140,13 @@ test('labels come from the local map, in the page language (no t(), es-only tena
   const es = await open('medipago.gt', '/');
   await expect(es.locator('[data-social-links]')).toHaveAttribute('aria-label', 'Redes sociales');
   expect(await es.locator('[data-social-links] a').evaluateAll((a) => a.map((x) => x.getAttribute('aria-label'))))
-    .toEqual(['Medipago en Instagram', 'Medipago en X']);
+    .toEqual(['Medipago en Instagram', 'Medipago en X', 'Medipago en YouTube']);
   await es.context().close();
 
   const en = await open('1platform.pro', '/');
   await expect(en.locator('[data-social-links]')).toHaveAttribute('aria-label', 'Social media');
   expect(await en.locator('[data-social-links] a').evaluateAll((a) => a.map((x) => x.getAttribute('aria-label'))))
-    .toEqual([`${platform.brand_name} on Instagram`, `${platform.brand_name} on X`]);
+    .toEqual([`${platform.brand_name} on Instagram`, `${platform.brand_name} on X`, `${platform.brand_name} on YouTube`]);
   await en.context().close();
 
   const esPlatform = await open('1platform.pro', '/es/');
@@ -156,7 +157,7 @@ test('labels come from the local map, in the page language (no t(), es-only tena
 test('a brand with replacement markers is rendered literally', async () => {
   const page = await open('marcadores.example', '/');
   expect(await page.locator('[data-social-links] a').evaluateAll((a) => a.map((x) => x.getAttribute('aria-label'))))
-    .toEqual(['Tienda $& {network} en Instagram', 'Tienda $& {network} en X']);
+    .toEqual(['Tienda $& {network} en Instagram', 'Tienda $& {network} en X', 'Tienda $& {network} en YouTube']);
   await page.context().close();
 });
 
@@ -221,7 +222,7 @@ test('photographic copyright and social icons share a visual centre, with comfor
       };
     });
     expect(geometry.overflow).toBe(false);
-    expect(geometry.icons).toEqual([{ width: 20, height: 20 }, { width: 20, height: 20 }]);
+    expect(geometry.icons).toEqual([{ width: 20, height: 20 }, { width: 20, height: 20 }, { width: 20, height: 20 }]);
     for (const target of geometry.targets) {
       expect(target.width).toBeGreaterThanOrEqual(width === 390 ? 48 : 44);
       expect(target.height).toBeGreaterThanOrEqual(width === 390 ? 48 : 44);
@@ -258,7 +259,7 @@ test('sameAs equals the footer in BaseLayout and the photographic home', async (
     const page = await open(host, path, status);
     const sameAs = await sameAsOf(page);
     expect(sameAs.length, `${host}${path}`).toBeGreaterThan(0);
-    for (const value of sameAs) expect(value).toEqual([IG, X]);
+    for (const value of sameAs) expect(value).toEqual([IG, X, YT]);
     await page.context().close();
   }
 });
@@ -268,6 +269,6 @@ test('sameAs rides on the publisher of a legacy blog post', async () => {
   const publishers = await page.locator('script[type="application/ld+json"]').evaluateAll((nodes) =>
     nodes.map((n) => JSON.parse(n.textContent ?? '{}')).filter((b) => b.publisher).map((b) => b.publisher.sameAs));
   expect(publishers.length).toBeGreaterThan(0);
-  for (const value of publishers) expect(value).toEqual([IG, X]);
+  for (const value of publishers) expect(value).toEqual([IG, X, YT]);
   await page.context().close();
 });

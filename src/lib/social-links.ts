@@ -19,11 +19,11 @@
  */
 
 /** Render order (the request's) and the closed list of keys. */
-export const SOCIAL_NETWORKS = ['facebook', 'tiktok', 'instagram', 'linkedin', 'x'] as const
+export const SOCIAL_NETWORKS = ['facebook', 'tiktok', 'instagram', 'linkedin', 'x', 'youtube'] as const
 
 export type SocialNetwork = (typeof SOCIAL_NETWORKS)[number]
 
-/** What `GET /sites/by-host` publishes: all five, each a URL or `null`. */
+/** What `GET /sites/by-host` publishes: all six, each a URL or `null`. */
 export type SiteSocialLinks = Record<SocialNetwork, string | null>
 
 export interface SocialLink {
@@ -47,12 +47,16 @@ const HOSTS: Record<SocialNetwork, readonly string[]> = {
   instagram: 'instagram.com instagr.am'.split(' '),
   linkedin: 'linkedin.com'.split(' '),
   x: 'x.com twitter.com'.split(' '),
+  youtube: 'youtube.com'.split(' '),
 }
 
 /** The only subdomains accepted in front of those domains ('' = bare). */
 const SUBDOMAINS = ['', 'www', 'm'] as const
 
 const REDIRECT_PATH_PREFIXES = ['/l.php', '/redir/'] as const
+
+/** Redirectors matched as the WHOLE first path segment (a prefix would refuse real names). */
+const REDIRECT_FIRST_SEGMENTS = new Set(['redirect', 'attribution_link'])
 
 export const SOCIAL_LINK_MAX_CHARS = 500
 
@@ -68,6 +72,7 @@ const NAMES: Record<SocialNetwork, string> = {
   instagram: 'Instagram',
   linkedin: 'LinkedIn',
   x: 'X',
+  youtube: 'YouTube',
 }
 
 /** Stroke glyphs on a 24 box, drawn with `currentColor` (copied from Bower). */
@@ -79,6 +84,7 @@ const PATHS: Record<SocialNetwork, string> = {
   linkedin:
     'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z M6 9H2v12h4z M4 6a2 2 0 100-4 2 2 0 000 4z',
   x: 'M4 4l16 16M20 4L4 20',
+  youtube: 'M5 5h14a3 3 0 013 3v8a3 3 0 01-3 3H5a3 3 0 01-3-3V8a3 3 0 013-3z M10 9v6l5-3z',
 }
 
 /**
@@ -172,6 +178,7 @@ function pathProblem(path: string): string | null {
   if (decoded.split('/').some((segment) => segment === '.' || segment === '..')) return 'path'
   const lowered = decoded.toLowerCase()
   if (REDIRECT_PATH_PREFIXES.some((prefix) => lowered.startsWith(prefix))) return 'redirect'
+  if (REDIRECT_FIRST_SEGMENTS.has(lowered.replace(/^\/+/, '').split('/')[0] ?? '')) return 'redirect'
   return null
 }
 
