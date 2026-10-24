@@ -11,7 +11,7 @@ Marketing website + documentation site for **1Platform** — a unified platform 
 
 ## Tech Stack
 
-- **[Astro](https://astro.build/) 7.2.10** — SSR with the Node standalone adapter; one long-lived process resolves the tenant from `Host` on every request
+- **[Astro](https://astro.build/) 7.4.2** — SSR with the Node standalone adapter; one long-lived process resolves the tenant from `Host` on every request
 - **Islands architecture** — JS only ships for interactive components (`client:visible`, `client:load`)
 - **Content Collections** — type-safe Markdown/MDX for blog and changelog (Zod-validated schemas)
 - **Lenis** smooth scroll (npm package, initialized in `src/scripts/lenis-init.ts`)
