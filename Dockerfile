@@ -7,6 +7,11 @@
 # La versión sale de `.nvmrc` (24), la misma que usa el job `build` del
 # pipeline: si el CI y la imagen construyeran con runtimes distintos, el
 # artefacto verificado en CI no sería el que se sirve.
+#
+# El tag flota a propósito dentro de la línea 24: el parche de seguridad de Node
+# del 2026-10-21 (24.22.1 en esta línea) entra solo al reconstruir. Esta etapa
+# NO llega a producción —sólo construye—, así que no lleva la compuerta de
+# versión mínima que sí lleva el runtime de abajo.
 FROM node:24-alpine AS build
 
 WORKDIR /app
@@ -27,7 +32,7 @@ RUN npm run build
 # demanda — en tiempo de PETICIÓN, con `sharp`. Si quedara fuera de la imagen
 # final, el sitio arrancaría perfecto y toda imagen respondería 500. Por eso se
 # lo instala explícitamente aunque `package.json` lo declare en devDependencies.
-RUN npm ci --omit=dev && npm i --no-save sharp@^0.35.4
+RUN npm ci --omit=dev && npm i --no-save sharp@^0.35.5
 
 # ── Etapa 2: servir — nginx DELANTE de Node ──────────────────────────────────
 # ⚠️ VERSIÓN FIJADA, y no es cosmético: `nginx:alpine` y `nginx:stable-alpine`
@@ -46,17 +51,37 @@ RUN npm ci --omit=dev && npm i --no-save sharp@^0.35.4
 # agrega lo que falta.
 #
 # Node llega por `apk`, y la versión alcanza: medido, `nginx:1.27-alpine` es
-# Alpine 3.21.3 y su paquete `nodejs` es **22.23.2**, contra el `>=22.12.0` que
-# Astro 7 declara en `engines`. El bundle se construye con Node 24 y se ejecuta
-# con Node 22; son artefactos ESM planos, no binarios.
+# Alpine 3.21.3 y su paquete `nodejs` es de la línea **22**, contra el
+# `>=22.12.0` que Astro 7 declara en `engines`. El bundle se construye con
+# Node 24 y se ejecuta con Node 22; son artefactos ESM planos, no binarios.
+#
+# ⚠️ PISO DE SEGURIDAD: Node >= 22.23.4. El 2026-10-23 el contenedor de PROD
+# (arrancado el 2026-10-21) corría **22.23.2**, afectado por el release de
+# seguridad de Node del 2026-10-21 (10 CVE: RCE en el decodificador Brotli
+# CVE-2026-111497, bypass de verificación de hostname en TLS, truncamiento por
+# NUL en `dns`), corregido en 22.23.4 — que Alpine 3.21 ya publica como
+# `nodejs-22.23.4-r0`. Antes la imagen pedía `nodejs` a secas: tomaba lo que
+# hubiera en el índice, y una capa cacheada en el host podía reusar un paquete
+# viejo sin que nadie se enterara. Ahora:
+#   1. `apk` exige la versión mínima (`nodejs>=…`) y falla si el índice no la
+#      tiene, en vez de instalar una más vieja;
+#   2. el build verifica `node -v` y FALLA si queda por debajo del piso;
+#   3. el piso es un ARG usado en el `RUN`: subirlo cambia la clave de caché de
+#      esa capa, así que el host no puede reusar la instalación anterior.
+# Para el próximo release de seguridad: subir NODE_RUNTIME_MIN y nada más.
+# Verificar tras el deploy: `docker exec 1platform-website-prod node -v`.
 FROM nginx:1.27-alpine AS runtime
+
+ARG NODE_RUNTIME_MIN=22.23.4
 
 # `sharp` rasterises the tenant social card from SVG at request time. Alpine's
 # nginx image carries neither a font nor fontconfig, which would let the PNG
 # encoder succeed while silently omitting the brand text. Keep a small,
 # deterministic sans face in the runtime image rather than relying on a build
 # dependency that `npm ci --omit=dev` removes.
-RUN apk add --no-cache nodejs fontconfig font-dejavu
+RUN apk add --no-cache --upgrade "nodejs>=${NODE_RUNTIME_MIN}" fontconfig font-dejavu \
+ && node -e 'const [m,c]=[process.argv[1],process.versions.node].map(v=>v.split(".").map(Number));if((c.map((x,i)=>x-m[i]).find(x=>x!==0)??0)<0){console.error(`Node ${process.version} está por debajo del piso de seguridad v${process.argv[1]}`);process.exit(1)}' "${NODE_RUNTIME_MIN}" \
+ && echo "runtime: node $(node -v) (piso v${NODE_RUNTIME_MIN})"
 
 # El contrato de servido (www→apex, caché por familia, nosniff, 404 real) vive
 # versionado en el repo, no editado a mano en el host.

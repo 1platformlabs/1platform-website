@@ -301,7 +301,18 @@ test('the container carries a runtime for the application it now proxies to', ()
   // node:24-alpine instead would bring an nginx from the 1.28/1.29 family,
   // which is the family that does not start there.
   expect(dockerfile).toMatch(/FROM nginx:1\.27-alpine AS runtime/)
-  expect(dockerfile, 'the runtime stage must install Node').toMatch(/apk add --no-cache nodejs/)
+  expect(dockerfile, 'the runtime stage must install Node').toMatch(/apk add --no-cache[^\n]*"nodejs>=\$\{NODE_RUNTIME_MIN\}"/)
+  // A bare `nodejs` takes whatever the index (or a cached layer) has: on
+  // 2026-10-23 PROD ran 22.23.2, below the 2026-10-21 security release. The
+  // floor is an ARG used in the RUN (bumping it busts that layer's cache) and
+  // the build fails if `node` ends up below it.
+  const floor = dockerfile.match(/^ARG NODE_RUNTIME_MIN=(\d+)\.(\d+)\.(\d+)$/m)
+  expect(floor, 'the runtime stage must declare a Node security floor').not.toBeNull()
+  const [maj, min, pat] = floor!.slice(1).map(Number)
+  expect(maj * 1e6 + min * 1e3 + pat, 'the floor cannot drop below 22.23.4').toBeGreaterThanOrEqual(22023004)
+  expect(dockerfile, 'the build must fail when node is below the floor').toMatch(
+    /process\.versions\.node[\s\S]*process\.exit\(1\)[\s\S]*"\$\{NODE_RUNTIME_MIN\}"/,
+  )
   expect(dockerfile, 'the server bundle must be copied').toMatch(/COPY --from=build \/app\/dist/)
   expect(dockerfile, 'node_modules is needed at runtime, not only at build').toMatch(
     /COPY --from=build \/app\/node_modules/,
