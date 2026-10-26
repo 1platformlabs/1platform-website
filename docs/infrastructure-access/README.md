@@ -41,10 +41,49 @@ correspondiente. Esta integración no los ejecuta.
    navegación apunta a `/es/acceso/` del `WEBSITE_URL` configurado; un build
    del portal no activa rutas en el website.
 
-Para revertir la activación, retirar del manifiesto sólo las rutas añadidas
-por esta operación y restaurar `destinations.app` desde el snapshot. Restaurar
-los documentos previos o despublicar únicamente los creados. Revisar cambios
-concurrentes antes de restaurar; no reemplazar el manifiesto completo.
+## Script de activación y reversión
+
+`activate_access.py` aplica este paquete por los servicios del Core
+(`SitePageService.put_page` y `SiteTenantService.patch_tenant`), con las mismas
+validaciones que la API administrativa y sin abrir sesiones de staff. Corre
+dentro de un runtime del Core (`PYTHONPATH` en la raíz del API). Sin `--apply`
+toda fase es de sólo lectura.
+
+```bash
+python activate_access.py plan      --package activation.json --snapshot-out snapshot.json
+python activate_access.py documents --package activation.json --apply
+#   esperar ≥2 min con tráfico EN y ES (cachés de 60 s del website)
+python activate_access.py manifest  --package activation.json --apply
+python activate_access.py verify    --package activation.json
+```
+
+`manifest` se niega si faltan los documentos; escribe sólo `pages` (lista viva
+más las dos rutas) y `destinations.app`. Reversión, también en dos fases:
+
+```bash
+python activate_access.py rollback --package activation.json --snapshot snapshot.json --phase manifest --apply
+#   esperar ≥2 min con tráfico EN y ES
+python activate_access.py rollback --package activation.json --snapshot snapshot.json --phase documents --apply
+```
+
+La fase `documents` se niega mientras las rutas sigan publicadas. Borra sólo
+los documentos que no existían en el snapshot y que nadie editó después, y
+restaura `destinations.app` sólo si sigue en el valor de este paquete.
+
+Efecto colateral conocido: `destinations.app` también alimenta los CTA de
+`/about/`, `/contact/`, `/pricing/`, `/payments-invoicing/` y `/solutions/*`
+(con `?intent=`), que pasan de `/app/` a `/app/auth/login`. El panel no lee
+`intent` hoy, así que el parámetro ya se ignoraba.
+
+El orden importa en las dos direcciones. Manifiesto y contenido se cachean por
+separado; en el banco local, borrar los documentos en el mismo paso que el
+manifiesto dejó todas las páginas en inglés en 503 hasta que el manifiesto
+caducó. Desde este PR la cabecera y el pie omiten la entrada si falta su copia
+(`tenantAccessChrome`), pero las páginas de acceso siguen exigiéndola.
+
+Banco local: `bench/seed_bench.py` carga un snapshot real y un sitio sin
+activar; `bench/probe_access.mjs <web> <dev> <capturas> [--expect-control]`
+recorre website y Developer en 320/390/844/1440 px.
 
 ## Evidencia y continuación
 

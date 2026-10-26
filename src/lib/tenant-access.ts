@@ -10,6 +10,28 @@ export function hasTenantAccess(tenant: SiteTenant): boolean {
   return tenant.pages.includes(ACCESS_ROUTE) && tenant.pages.includes(REQUEST_ACCESS_ROUTE)
 }
 
+/**
+ * The site-wide entry («Acceder» / «Solicitar acceso») for chrome that renders
+ * on EVERY page, resolved up front.
+ *
+ * The manifest and the copy are cached independently (60 s each), so during an
+ * activation or a rollback one can be fresh while the other is stale: routes
+ * published with the copy not yet there, or the copy gone with the routes still
+ * listed. Measured on the local bench: a rollback left every English page
+ * answering 503 until the manifest refreshed. The access pages themselves still
+ * fail loudly; the chrome omits the entry instead of taking the site down.
+ */
+export function tenantAccessChrome(tenant: SiteTenant, messages: Record<string, string>): { entry: string; request: string } | null {
+  if (!hasTenantAccess(tenant)) return null
+  try {
+    const access = tenantAccess(tenant, messages)
+    return { entry: access.copy('entry'), request: access.copy('request') }
+  } catch (error) {
+    console.warn('[access] chrome entry omitted slug=%s reason=%s', tenant.slug, error instanceof Error ? error.message : String(error))
+    return null
+  }
+}
+
 export function tenantAccess(tenant: SiteTenant, messages: Record<string, string>) {
   if (!hasTenantAccess(tenant)) throw new Error('Tenant access pages are not published')
   const prefix = i18nKey('access.')
