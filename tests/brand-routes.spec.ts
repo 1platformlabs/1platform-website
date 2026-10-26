@@ -67,3 +67,18 @@ test('the served head gives each tenant its own touch icon and never leaks the p
     "a tenant's pages must not name the platform's compiled touch icon anywhere",
   ).not.toContain('logo-oauth-120x120.png')
 })
+
+test('the Domain Connect logo is a stable platform-only SVG, closed to other tenants and unknown hosts', async () => {
+  const [platform, clinic, unknown] = await Promise.all([
+    getWithHost(`${BASE}/brand/domain-connect-logo.svg`, '1platform.pro'),
+    getWithHost(`${BASE}/brand/domain-connect-logo.svg`, 'clinicas.1platform.dev'),
+    getWithHost(`${BASE}/brand/domain-connect-logo.svg`, 'unknown-brand-route.example'),
+  ])
+
+  expect(platform.status).toBe(200)
+  expect(platform.headers['content-type']).toContain('image/svg+xml')
+  expect(platform.body).toMatch(/^<svg [^>]*viewBox="/)
+  expect(platform.body, 'a logo a DNS provider renders must be self-contained').not.toMatch(/<script|href=|url\(|@import/i)
+  expect(clinic.status, 'a client domain must not serve the platform lockup').toBe(404)
+  expect(unknown.status, 'middleware must reject unknown hosts before the route').toBe(404)
+})
