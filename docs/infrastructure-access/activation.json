@@ -1,0 +1,116 @@
+{
+  "tenant_slug": "oneplatform",
+  "locales": [
+    "en",
+    "es"
+  ],
+  "add_routes": [
+    "/access/",
+    "/request-access/"
+  ],
+  "destinations_patch": {
+    "app": "https://app.1platform.pro/app/auth/login"
+  },
+  "documents": [
+    {
+      "route": "/access/",
+      "locale": "en",
+      "published": true,
+      "blocks": {
+        "access.entry": "Access",
+        "access.home": "Back to home",
+        "access.brandHome": "{brand}, back to home",
+        "access.skip": "Skip to content",
+        "access.login": "Sign in",
+        "access.request": "Request access",
+        "access.supportMessage": "Hello, I do not have a {brand} account yet and would like to request access to my platform dashboard. Could you help me get started?",
+        "access.title": "Access | {brand}",
+        "access.description": "Sign in to your {brand} dashboard or contact support to request access.",
+        "access.eyebrow": "WELCOME TO {brand}",
+        "access.heading1": "Your dashboard,",
+        "access.heading2": "one step away",
+        "access.intro": "Sign in with your {brand} account to continue managing your platform.",
+        "access.noAccountLink": "I do not have an account yet",
+        "access.cardTitle": "Enter your dashboard",
+        "access.cardDescription": "Use the account you received when activating {brand}.",
+        "access.noAccountTitle": "Do not have an account yet?",
+        "access.noAccountDescription": "Contact support on WhatsApp to request access for your platform."
+      }
+    },
+    {
+      "route": "/access/",
+      "locale": "es",
+      "published": true,
+      "blocks": {
+        "access.entry": "Acceder",
+        "access.home": "Volver al inicio",
+        "access.brandHome": "{brand}, volver al inicio",
+        "access.skip": "Ir al contenido",
+        "access.login": "Iniciar sesión",
+        "access.request": "Solicitar acceso",
+        "access.supportMessage": "Hola, todavía no tengo usuario de {brand} y quiero solicitar acceso al panel de mi plataforma. ¿Podrían ayudarme con los pasos para el alta?",
+        "access.title": "Acceso | {brand}",
+        "access.description": "Ingrese a su panel de {brand} o contacte a soporte para solicitar su acceso.",
+        "access.eyebrow": "BIENVENIDO A {brand}",
+        "access.heading1": "Su panel,",
+        "access.heading2": "a un paso",
+        "access.intro": "Ingrese con su usuario de {brand} para continuar con la gestión de su plataforma.",
+        "access.noAccountLink": "Todavía no tengo usuario",
+        "access.cardTitle": "Ingrese a su panel",
+        "access.cardDescription": "Use el usuario que recibió al activar su cuenta de {brand}.",
+        "access.noAccountTitle": "¿Todavía no tiene usuario?",
+        "access.noAccountDescription": "Contacte a soporte por WhatsApp para solicitar el acceso de su plataforma."
+      }
+    },
+    {
+      "route": "/request-access/",
+      "locale": "en",
+      "published": true,
+      "blocks": {
+        "access.requestPage.title": "Request access | {brand}",
+        "access.requestPage.description": "Contact {brand} support on WhatsApp to request access for your platform.",
+        "access.requestPage.eyebrow": "GET STARTED WITH {brand}",
+        "access.requestPage.heading1": "Do not have",
+        "access.requestPage.heading2": "an account yet?",
+        "access.requestPage.intro": "Message {brand} support on WhatsApp to request access. We will help you get your platform set up.",
+        "access.requestPage.existingAccountLink": "I already have an account",
+        "access.requestPage.cardTitle": "We will help you get started",
+        "access.requestPage.cardDescription": "Request access through our support team on WhatsApp.",
+        "access.requestPage.steps.0.title": "Message us on WhatsApp",
+        "access.requestPage.steps.0.description": "Tell us your name and about your platform.",
+        "access.requestPage.steps.1.title": "Set up your account",
+        "access.requestPage.steps.1.description": "We will explain the information and steps needed.",
+        "access.requestPage.steps.2.title": "Receive your access",
+        "access.requestPage.steps.2.description": "We will share instructions for signing in.",
+        "access.requestPage.contact": "Contact on WhatsApp",
+        "access.requestPage.existingAccountTitle": "Already have an account?",
+        "access.requestPage.backToLogin": "Back to sign in"
+      }
+    },
+    {
+      "route": "/request-access/",
+      "locale": "es",
+      "published": true,
+      "blocks": {
+        "access.requestPage.title": "Solicitar acceso | {brand}",
+        "access.requestPage.description": "Contacte a soporte de {brand} por WhatsApp para solicitar el acceso de su plataforma.",
+        "access.requestPage.eyebrow": "EMPIECE CON {brand}",
+        "access.requestPage.heading1": "¿Todavía no",
+        "access.requestPage.heading2": "tiene usuario?",
+        "access.requestPage.intro": "Escriba por WhatsApp a soporte de {brand} para solicitar su acceso. Le acompañamos en el alta de su plataforma.",
+        "access.requestPage.existingAccountLink": "Ya tengo usuario",
+        "access.requestPage.cardTitle": "Le ayudamos a comenzar",
+        "access.requestPage.cardDescription": "Solicite su acceso por WhatsApp con nuestro equipo de soporte.",
+        "access.requestPage.steps.0.title": "Escríbanos por WhatsApp",
+        "access.requestPage.steps.0.description": "Cuéntenos su nombre y sobre su plataforma.",
+        "access.requestPage.steps.1.title": "Coordinemos el alta",
+        "access.requestPage.steps.1.description": "Le indicaremos los datos y pasos necesarios.",
+        "access.requestPage.steps.2.title": "Reciba su acceso",
+        "access.requestPage.steps.2.description": "Le compartiremos las instrucciones para ingresar.",
+        "access.requestPage.contact": "Contactar por WhatsApp",
+        "access.requestPage.existingAccountTitle": "¿Ya tiene usuario?",
+        "access.requestPage.backToLogin": "Volver a iniciar sesión"
+      }
+    }
+  ]
+}

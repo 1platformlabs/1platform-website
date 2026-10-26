@@ -11,6 +11,10 @@ html.infrastructure-site { scroll-padding-top: 130px; }
 .brand-nav { display: flex; align-items: center; gap: clamp(12px, 1.8vw, 28px); margin-left: auto; }
 .brand-nav a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; white-space: nowrap; font-size: 15px; font-weight: 600; text-decoration: none; transition: opacity .2s; }
 .brand-nav a:hover { opacity: .72; }
+.brand-access { display: inline-flex; flex: none; align-items: center; justify-content: center; min-height: 48px; padding: 10px 18px; border: 1px solid rgb(255 255 255 / 50%); border-radius: 999px; color: white; font-size: 14px; font-weight: 650; line-height: 1.4; white-space: nowrap; text-decoration: none; }
+.brand-access:hover { background: rgb(255 255 255 / 12%); }
+.brand-header:has(.brand-access) { gap: 18px; }
+.brand-header:has(.brand-access) .brand-nav { gap: clamp(10px, 1.25vw, 20px); }
 .brand-cta { display: inline-flex; align-items: center; justify-content: center; gap: 20px; min-height: 56px; padding: 14px 24px; margin-left: 2px; border: 1px solid transparent; border-radius: 999px; background: white; color: var(--site-navy); font-size: 16px; font-weight: 700; line-height: 1.35; text-align: center; text-decoration: none; white-space: nowrap; transition: background-color .2s, transform .2s; }
 .brand-cta:hover { background: var(--site-selection); transform: translateY(-2px); }
 .brand-cta svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
@@ -37,6 +41,8 @@ html.infrastructure-site { scroll-padding-top: 130px; }
 .brand-footer-bottom a { display: inline-flex; align-items: center; min-height: 32px; color: inherit; }
 body.brand-menu-open { overflow: hidden; }
 @media (max-width: 1290px) {
+  .brand-access { margin-left: auto; }
+  .brand-header:has(.brand-access) .brand-menu-toggle { margin-left: 0; }
   .brand-nav, .brand-cta { display: none; }
   .brand-menu-toggle { display: block; }
   .brand-noscript-nav { display: flex; flex-wrap: wrap; gap: 10px 24px; padding: 118px 40px 24px; background: var(--site-navy); color: white; }
@@ -47,6 +53,8 @@ body.brand-menu-open { overflow: hidden; }
 }
 @media (max-width: 900px) { .brand-footer-main { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 680px) {
+  .brand-header:has(.brand-access) { gap: 8px; }
+  .brand-access { padding-inline: 12px; font-size: 12px; }
   html.infrastructure-site { scroll-padding-top: 101px; }
   .infrastructure-site body { font-size: 16px; }
   .brand-header { top: 14px; left: 15px; right: 15px; width: calc(100% - 30px); min-height: 64px; padding: 8px 9px 8px 15px; }
@@ -60,6 +68,9 @@ body.brand-menu-open { overflow: hidden; }
   .brand-footer-main > div:first-child { grid-column: 1 / -1; }
   .brand-footer-bottom { flex-direction: column; align-items: flex-start; gap: 5px; }
   .brand-footer-bottom ul { flex-wrap: wrap; gap: 6px 18px; }
+}
+@media (max-width: 380px) {
+  .brand-header:has(.brand-access) .brand-lockup { --tenant-logo-width-mobile: 120px; font-size: 19px; gap: 6px; }
 }
 @media (prefers-reduced-motion: reduce) { .brand-header, .brand-nav a, .brand-cta, .brand-menu-toggle span { transition: none; } }
 
