@@ -89,7 +89,8 @@ jobs:
 
   browser:
     name: Suite de navegador
-    runs-on: ubuntu-latest
+    # Fijado a 24.04: desde 2026-10-25 ubuntu-latest puede caer en 26.04 y Playwright 1.59 no lo soporta («does not support chromium on ubuntu26.04-x64»). Las líneas base visuales son de 24.04.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -132,7 +133,8 @@ jobs:
 
   visual:
     name: Multitenant SSR visual regression
-    runs-on: ubuntu-latest
+    # Fijado a 24.04: desde 2026-10-25 ubuntu-latest puede caer en 26.04 y Playwright 1.59 no lo soporta («does not support chromium on ubuntu26.04-x64»). Las líneas base visuales son de 24.04.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
