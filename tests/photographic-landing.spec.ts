@@ -35,6 +35,17 @@ const HOST = 'medipago.gt';
 const PLATFORM_HOST = '1platform.pro';
 const platformTenant = repoTenantForHost(PLATFORM_HOST)!;
 const platformContent = new Map<string, SiteFixture['pagesResponse']>();
+const INFRA_ACCESS_HOST = 'infrastructure-access.example';
+const infrastructureAccess = JSON.parse(readFileSync(join(ROOT, 'docs/infrastructure-access/activation.json'), 'utf8'));
+const infrastructureAccessTenant = {
+  ...platformTenant, slug: 'infrastructure-access', domain: INFRA_ACCESS_HOST,
+  pages: [...platformTenant.pages, ...infrastructureAccess.add_routes],
+  destinations: { ...platformTenant.destinations, ...infrastructureAccess.destinations_patch },
+};
+const infrastructureAccessContent = new Map<string, SiteFixture['pagesResponse']>();
+// The bench rollback state: routes still published, access copy already gone.
+const INFRA_STALE_HOST = 'infrastructure-stale.example';
+const infrastructureStaleTenant = { ...infrastructureAccessTenant, slug: 'infrastructure-stale', domain: INFRA_STALE_HOST };
 const ALTERNATE_HOST = 'aurora-photographic.example';
 const ALTERNATE_NAME = 'Salud Aurora';
 const alternate: SiteFixture = JSON.parse(JSON.stringify(fixture).replaceAll('Medipago', ALTERNATE_NAME));
@@ -160,6 +171,11 @@ test.beforeAll(async () => {
     // the documentation links; the page must render without it (t() would throw).
     delete messages['infrastructure.capabilities.documentation'];
     platformContent.set(locale, { success: true, data: { slug: platformTenant.slug, locale, pages, messages }, msg: 'ok' });
+    const accessPages = infrastructureAccess.documents.filter((document: { locale: string }) => document.locale === locale);
+    // Infrastructure access must not depend on the clinic's commercial catalogue.
+    const infrastructureMessages = Object.fromEntries(Object.entries(messages).filter(([key]) => !key.startsWith('photographic.') || key === 'photographic.theme.layout'));
+    Object.assign(infrastructureMessages, ...accessPages.map((document: { blocks: Record<string, string> }) => document.blocks));
+    infrastructureAccessContent.set(locale, { success: true, data: { slug: infrastructureAccessTenant.slug, locale, pages: [...pages, ...accessPages], messages: infrastructureMessages }, msg: 'ok' });
   }
   api = createServer((request, response) => {
     const url = new URL(request.url ?? '/', 'http://contract');
@@ -168,10 +184,19 @@ test.beforeAll(async () => {
       const host = url.searchParams.get('host') ?? '';
       resolvedHosts.add(host);
       if (host === PLATFORM_HOST) return response.end(JSON.stringify({ success: true, data: platformTenant, msg: 'Site resolved' }));
+      if (host === INFRA_ACCESS_HOST) return response.end(JSON.stringify({ success: true, data: infrastructureAccessTenant, msg: 'Site resolved' }));
+      if (host === INFRA_STALE_HOST) return response.end(JSON.stringify({ success: true, data: infrastructureStaleTenant, msg: 'Site resolved' }));
       const selected = ({ [HOST]: fixture, [ALTERNATE_HOST]: alternate, [ACCESS_HOST]: accessFixture, [COMMERCE_HOST]: commerce, [PLAIN_COMMERCE_HOST]: plainCommerce, [BEFORE_SERVICES_HOST]: beforeServices } as Record<string, SiteFixture>)[host] ?? null;
       if (selected) return response.end(JSON.stringify({ success: true, data: selected.tenant, msg: 'Site resolved' }));
     } else {
       const match = /\/sites\/([^/]+)\/pages$/.exec(url.pathname);
+      const accessContent = match?.[1] === infrastructureAccessTenant.slug ? infrastructureAccessContent.get(url.searchParams.get('locale') ?? '') : null;
+      if (accessContent) return response.end(JSON.stringify(accessContent));
+      const stale = match?.[1] === infrastructureStaleTenant.slug ? platformContent.get(url.searchParams.get('locale') ?? '') : null;
+      if (stale) {
+        const messages = Object.fromEntries(Object.entries(stale.data.messages).filter(([key]) => !key.startsWith('access.')));
+        return response.end(JSON.stringify({ ...stale, data: { ...stale.data, slug: infrastructureStaleTenant.slug, messages } }));
+      }
       const content = match?.[1] === platformTenant.slug ? platformContent.get(url.searchParams.get('locale') ?? '') : null;
       if (content) return response.end(JSON.stringify(content));
       const selected = [fixture, alternate, accessFixture, commerce, plainCommerce, beforeServices].find((candidate) => candidate.tenant.slug === match?.[1]);
@@ -199,7 +224,7 @@ test.beforeAll(async () => {
     try { return (await getWithHost(`${appBaseUrl}/`, HOST)).status; } catch { return 0; }
   }, { timeout: 30_000, message: 'The built tenant route must start' }).toBe(200);
   tenantBrowser = await chromium.launch({
-    args: [`--host-resolver-rules=${[HOST, ALTERNATE_HOST, PLATFORM_HOST, ACCESS_HOST, COMMERCE_HOST, PLAIN_COMMERCE_HOST, BEFORE_SERVICES_HOST].map((name) => `MAP ${name} 127.0.0.1`).join(', ')}`],
+    args: [`--host-resolver-rules=${[HOST, ALTERNATE_HOST, PLATFORM_HOST, INFRA_ACCESS_HOST, INFRA_STALE_HOST, ACCESS_HOST, COMMERCE_HOST, PLAIN_COMMERCE_HOST, BEFORE_SERVICES_HOST].map((name) => `MAP ${name} 127.0.0.1`).join(', ')}`],
   });
 });
 
@@ -639,6 +664,74 @@ for (const [locale, path] of [['en', '/'], ['es', '/es/']] as const) {
     });
   }
 }
+
+for (const [locale, home, accessPath, requestPath, entry] of [
+  ['es', '/es/', '/es/acceso/', '/es/solicitar-acceso/', 'Acceder'],
+  ['en', '/', '/access/', '/request-access/', 'Access'],
+] as const) {
+  test(`infrastructure access ${locale} keeps header, footer and onboarding reachable`, async ({ landingPage: page }) => {
+    for (const [width, height] of [[320, 740], [390, 844], [844, 390], [1440, 900]]) {
+      await page.setViewportSize({ width, height });
+      await page.goto(`http://${INFRA_ACCESS_HOST}:${appPort}${home}`);
+      await expect(page.locator('.brand-access')).toHaveText(entry);
+      await expect(page.locator('.brand-access')).toBeVisible();
+      await checkOverflow(page);
+      await expect(page.locator('.brand-footer [data-access-entry]')).toHaveAttribute('href', accessPath);
+      if (width < 1291) {
+        await page.locator('.brand-menu-toggle').click();
+        await expect(page.locator('.brand-mobile-nav [data-access-entry]')).toBeVisible();
+        await expect(page.locator('.brand-mobile-nav [data-access-entry]')).toHaveAttribute('href', accessPath);
+        await page.keyboard.press('Escape');
+        await expect(page.locator('.brand-menu-toggle')).toBeFocused();
+      }
+      await page.locator('.brand-access').click();
+      await expect(page).toHaveURL(new RegExp(`${accessPath}$`));
+      await expect(page.locator('body')).toHaveAttribute('data-access-layout', 'infrastructure');
+      await expect(page.locator('.access-background img')).toHaveCount(0);
+      await expect(page.locator('[data-access-action="login"]')).toHaveAttribute('href', 'https://app.1platform.pro/app/auth/login');
+      await expect(page.locator('.access-button')).toHaveCSS('color', 'rgb(255, 255, 255)');
+      if (width === 390) expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+      await checkOverflow(page);
+      await page.locator(`.access-divider a[href="${requestPath}"]`).click();
+      await expect(page).toHaveURL(new RegExp(`${requestPath}$`));
+      await checkOverflow(page);
+      const support = new URL((await page.locator('[data-access-action="support"]').getAttribute('href'))!);
+      expect(support.origin + support.pathname).toBe(platformTenant.destinations.support);
+      expect(support.searchParams.get('text')).toContain('1Platform');
+      if (width === 390) expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    }
+    await page.goto(`http://${INFRA_ACCESS_HOST}:${appPort}${home}blog/`);
+    await expect(page.locator('.brand-access')).toHaveAttribute('href', accessPath);
+    await page.goto(`http://${PLATFORM_HOST}:${appPort}${home}`);
+    await expect(page.locator('[data-access-entry]')).toHaveCount(0);
+    expect((await getWithHost(`${appBaseUrl}${accessPath}`, PLATFORM_HOST)).status).toBe(404);
+  });
+}
+
+test('routes published before the access copy keep every infrastructure page up without the entry', async ({ landingPage: page }) => {
+  // Manifest and copy are cached apart; a rollback measured on the bench left every
+  // English page answering 503 while the manifest still listed the access routes.
+  for (const path of ['/', '/es/', '/blog/', '/es/blog/']) {
+    const response = await page.goto(`http://${INFRA_STALE_HOST}:${appPort}${path}`);
+    expect(response?.status(), path).toBe(200);
+    await expect(page.locator('.brand-header')).toBeVisible();
+    await expect(page.locator('[data-access-entry]')).toHaveCount(0);
+    await expect(page.locator('.brand-footer')).toBeVisible();
+  }
+});
+
+test('infrastructure access works without JavaScript', async () => {
+  const context = await tenantBrowser!.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  try {
+    const page = await context.newPage();
+    await page.goto(`http://${INFRA_ACCESS_HOST}:${appPort}/es/`);
+    await page.locator('.brand-access').click();
+    await expect(page.locator('[data-access-action="login"]')).toHaveAttribute('href', 'https://app.1platform.pro/app/auth/login');
+    await page.locator('.access-divider a').click();
+    await expect(page).toHaveURL(/\/es\/solicitar-acceso\/$/);
+    await expect(page.locator('[data-access-action="support"]')).toBeVisible();
+  } finally { await context.close(); }
+});
 
 test('tenant access keeps login and WhatsApp onboarding reachable with tenant-owned destinations', async ({ landingPage: page }) => {
   await gotoLanding(page, ACCESS_HOST);

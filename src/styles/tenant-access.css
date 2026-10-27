@@ -16,6 +16,20 @@
   background: #ffffff0a;
   box-shadow: none;
 }
+.photographic-service.access-page[data-access-layout="infrastructure"] {
+  --accent: var(--site-blue);
+  --accent-ink: #fff;
+  --access-accent: var(--site-blue);
+  --access-deep: var(--site-navy);
+  --access-ink: var(--site-text);
+  --access-muted: var(--site-muted);
+  --access-wash: var(--site-surface);
+  --access-line: color-mix(in srgb, var(--site-muted) 20%, white);
+}
+.photographic-service .access-background--grid {
+  background-image: linear-gradient(rgb(143 172 220 / 9%) 1px, transparent 1px), linear-gradient(90deg, rgb(143 172 220 / 9%) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
 .photographic-service.access-page .brand {
   color: #fff;
 }

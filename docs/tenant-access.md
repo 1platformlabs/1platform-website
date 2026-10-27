@@ -22,6 +22,18 @@ un destino de aplicación o soporte por defecto. El mensaje de WhatsApp procede
 del contenido del tenant; `{brand}` se sustituye al renderizar, sin HTML crudo.
 Las páginas funcionan sin JavaScript y se excluyen del sitemap y del índice.
 
+## 1Platform: perfil de infraestructura
+
+El perfil `site.theme.profile=infrastructure` comparte el recorrido de acceso,
+con Manrope, fondo de cuadrícula y los tokens `site.theme.*`. No necesita textos
+ni imágenes de la composición de clínicas. La cabecera mantiene «Acceder»
+visible en móvil; el menú y el pie conservan los enlaces correspondientes.
+
+El paquete y orden de activación están en
+[`infrastructure-access/README.md`](infrastructure-access/README.md).
+La prueba HTTP del perfil usa sólo su contenido de infraestructura y acceso,
+en EN/ES, con comprobaciones de rutas, destinos, contraste y ausencia de overflow.
+
 ## Vende Fácil
 
 Destino de sesión aprobado: `https://app.1platform.pro/app/auth/login`.

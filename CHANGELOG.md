@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Acceso en cabecera, menú móvil y pie del perfil de infraestructura, con páginas de acceso y solicitud en su identidad visual. Activación por tenant, contenido EN/ES y destinos existentes; paquete de activación de 1Platform documentado sin modificar datos publicados. La cabecera y el pie omiten la entrada si el contenido de acceso todavía no llegó (o ya se retiró) en vez de responder 503; script de activación y reversión en dos fases con banco local.
 - Logo de 1Platform en una URL estable para la plantilla de Domain Connect: `/brand/domain-connect-logo.svg` (SVG vectorial, sin referencias externas). Sólo lo sirve el inquilino de la plataforma; cualquier otro dominio recibe 404.
 - Vertical Nube / Cloud en la portada de infraestructura, en preparación, sin alta ni documentación. Selección ilustrativa con estado visible en el mapa; activación por los tres textos del tenant en cada idioma.
 - Contenedor de Tag Manager por inquilino: si el manifiesto trae `tag_manager_id`, el cargador va al principio del
