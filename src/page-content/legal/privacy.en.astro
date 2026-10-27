@@ -15,6 +15,16 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
   <li><strong>Communication data:</strong> Messages you send to our support team or through feedback channels</li>
 </ul>
 
+<h3>Information from social networks you connect</h3>
+<p>If you connect a Facebook Page or an Instagram professional account to 1Platform, Meta shares with us, for the Pages and accounts you select and only with the permissions you approve:</p>
+<ul>
+  <li><strong>Account identifiers:</strong> the ID, name, username and profile picture link of each Facebook Page and linked Instagram professional account you connect</li>
+  <li><strong>Access credentials:</strong> the access tokens Meta issues for that connection, stored encrypted</li>
+  <li><strong>Posts:</strong> the posts you publish through 1Platform and their identifiers, links and publishing status</li>
+  <li><strong>Comments:</strong> comments people leave on those Pages and accounts, including the commenter's public name, their identifier on the network and the comment text, so you can read, reply to and hide them from your dashboard</li>
+  <li><strong>Insights:</strong> aggregated metrics Meta reports for your Pages, accounts and posts, such as followers, reach, views, reactions, comments and shares</li>
+</ul>
+
 <h3>Information collected automatically</h3>
 <ul>
   <li><strong>Usage data:</strong> API calls, feature usage, timestamps, and session duration</li>
@@ -34,6 +44,7 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
   <li>Detect, investigate, and prevent fraudulent or unauthorized activity</li>
   <li>Comply with legal obligations</li>
 </ul>
+<p>Data from social networks you connect is used only to publish the content you schedule, show you the comments on your Pages and accounts so you can reply to or hide them, and report your performance. We do not use it for advertising, we do not sell it, and we do not combine it across different businesses.</p>
 
 <h2>3. Data Sharing and Third-Party Providers</h2>
 <p>To deliver our unified platform capabilities, we share specific categories of data with the following third-party service providers:</p>
@@ -61,6 +72,9 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
 
 <h3>Delivery and courier providers</h3>
 <p>When you dispatch an order through a contracted courier service rather than your own staff, the delivery details you supply are transmitted to that courier so it can collect and deliver the parcel: your buyer's name, phone number, delivery address and, where you provide them, its coordinates. Deliveries you fulfil with your own staff are not shared with anyone. The public tracking link your buyer opens identifies the shipment and does not disclose the courier.</p>
+
+<h3>Social networks</h3>
+<p>When you connect a Facebook Page or an Instagram professional account, we exchange data with <strong>Meta Platforms</strong> on your behalf: we send the posts you publish and the replies you write, and we receive the data described in section 1. Meta's terms and data policy apply to that content on its platforms.</p>
 
 <h3>Advertising networks</h3>
 <p>If you connect an advertising account to run paid campaigns, you grant us management scopes over the pages and campaigns you select on that network so we can publish and control them on your behalf. The campaign material you create, the budget you assign and the performance figures the network reports back are exchanged with that network. This happens only for accounts you connect yourself, and we never sell your data to advertisers.</p>
@@ -94,6 +108,9 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
   <li><strong>Generated content:</strong> Retained for up to 90 days after account deletion</li>
   <li><strong>API logs:</strong> Retained for 90 days for debugging and analytics</li>
   <li><strong>Billing records:</strong> Retained as required by applicable tax and accounting laws</li>
+  <li><strong>Social network credentials:</strong> Deleted automatically after you disconnect a Page or account, within 24 hours once no other Page or account connected with the same authorization remains. If the authorization expires or is revoked in Meta, the credentials stop working and the Page or account is marked for reconnection; they are deleted when you disconnect it or ask us to delete your data</li>
+  <li><strong>Social network comments:</strong> Kept while the Page or account is connected, and deleted 90 days after you disconnect it, or earlier on request</li>
+  <li><strong>Social network insights:</strong> Retained for up to 16 months to show period comparisons, and deleted earlier when you ask us to delete your account</li>
   <li><strong>Anonymized analytics:</strong> May be retained indefinitely in aggregate form</li>
 </ul>
 
@@ -110,21 +127,22 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
 <p>To exercise any of these rights, contact us at <strong>privacy@1platform.pro</strong>. We will respond to your request within 30 days.</p>
 
 <h2 id="data-deletion">7. Data Deletion Instructions</h2>
-<p>You can ask us to delete your personal data at any time. This includes the data we receive from Meta when a business connects its WhatsApp Business account to 1Platform: the identifiers of the business account and its phone numbers, the access credentials issued for that connection, and the conversations and contact details exchanged with the business's customers.</p>
+<p>You can ask us to delete your personal data at any time. This includes the data we receive from Meta when a business connects its WhatsApp Business account, a Facebook Page or an Instagram professional account to 1Platform: the identifiers of those accounts and phone numbers, the access credentials issued for each connection, the conversations and contact details exchanged with the business's customers, and the posts, comments and insights of the connected Pages and accounts.</p>
 
 <h3>If you are a business using 1Platform</h3>
 <ol>
   <li>To stop us from receiving and sending WhatsApp messages for your number, switch the channel off in your dashboard under <strong>Sales &rsaquo; Channels</strong>, or remove 1Platform from the apps connected to your business portfolio in Meta Business Suite.</li>
+  <li>To stop us from publishing to or reading a Facebook Page or Instagram account, open <strong>Social media &rsaquo; Accounts</strong> in your dashboard and choose <strong>Disconnect</strong>; its access credentials are then deleted automatically. To also withdraw the permission in Meta, remove 1Platform under <strong>Settings &rsaquo; Business integrations</strong> in Facebook.</li>
   <li>To have your account and its data deleted, email <strong>privacy@1platform.pro</strong> from the email address of your account, with the subject <strong>&ldquo;Data deletion request&rdquo;</strong>.</li>
 </ol>
 
 <h3>If you wrote to a business that uses 1Platform</h3>
-<p>Email <strong>privacy@1platform.pro</strong> with the subject <strong>&ldquo;Data deletion request&rdquo;</strong>, the name of the business you wrote to and the phone number you used. We process those conversations on behalf of that business, so we coordinate the deletion with it.</p>
+<p>Email <strong>privacy@1platform.pro</strong> with the subject <strong>&ldquo;Data deletion request&rdquo;</strong>, the name of the business you wrote to and the phone number you used, or the Facebook or Instagram profile you commented from. We process those conversations and comments on behalf of that business, so we coordinate the deletion with it.</p>
 
 <h3>What happens after your request</h3>
 <ul>
   <li>We reply within 30 days and confirm when the deletion is complete.</li>
-  <li>We delete your account data, the credentials of any connected channel, and the stored conversations and contact details.</li>
+  <li>We delete your account data, the credentials of any connected channel or social account, the stored conversations and contact details, and the stored comments and insights.</li>
   <li>Records we are required by law to keep, such as invoices and tax records, are retained only for the period the law requires and then deleted.</li>
 </ul>
 

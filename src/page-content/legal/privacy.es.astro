@@ -15,6 +15,16 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
   <li><strong>Datos de comunicación:</strong> Mensajes que envías a nuestro equipo de soporte o a través de los canales de comentarios</li>
 </ul>
 
+<h3>Información de las redes sociales que conectas</h3>
+<p>Si conectas una página de Facebook o una cuenta profesional de Instagram a 1Platform, Meta nos comparte, sólo de las páginas y cuentas que eliges y con los permisos que apruebas:</p>
+<ul>
+  <li><strong>Identificadores de la cuenta:</strong> el ID, el nombre, el nombre de usuario y el enlace a la foto de perfil de cada página de Facebook y cuenta profesional de Instagram vinculada que conectas</li>
+  <li><strong>Credenciales de acceso:</strong> los tokens de acceso que Meta emite para esa conexión, guardados cifrados</li>
+  <li><strong>Publicaciones:</strong> las publicaciones que haces a través de 1Platform y sus identificadores, enlaces y estado de publicación</li>
+  <li><strong>Comentarios:</strong> los comentarios que otras personas dejan en esas páginas y cuentas, con el nombre público de quien comenta, su identificador en la red y el texto, para que puedas leerlos, responderlos y ocultarlos desde tu panel</li>
+  <li><strong>Métricas:</strong> las métricas agregadas que Meta reporta de tus páginas, cuentas y publicaciones, como seguidores, alcance, visualizaciones, reacciones, comentarios y veces compartido</li>
+</ul>
+
 <h3>Información recopilada automáticamente</h3>
 <ul>
   <li><strong>Datos de uso:</strong> Llamadas a la API, uso de funciones, marcas de tiempo y duración de la sesión</li>
@@ -34,6 +44,7 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
   <li>Detectar, investigar y prevenir actividad fraudulenta o no autorizada</li>
   <li>Cumplir con obligaciones legales</li>
 </ul>
+<p>Los datos de las redes sociales que conectas se usan sólo para publicar el contenido que programas, mostrarte los comentarios de tus páginas y cuentas para que los respondas u ocultes, e informarte de su rendimiento. No los usamos para publicidad, no los vendemos y no los cruzamos entre negocios distintos.</p>
 
 <h2>3. Uso compartido de datos y proveedores externos</h2>
 <p>Para ofrecer las funciones de nuestra plataforma unificada, compartimos categorías específicas de datos con los siguientes proveedores externos de servicios:</p>
@@ -61,6 +72,9 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
 
 <h3>Proveedores de mensajería y reparto</h3>
 <p>Cuando despachas un pedido con un servicio de mensajería contratado en lugar de con tu propio personal, los datos de entrega que indicas se transmiten a esa mensajería para que pueda recoger y entregar el paquete: el nombre de tu comprador, su teléfono, la dirección de entrega y, si las proporcionas, sus coordenadas. Los envíos que despachas con tu propio personal no se comparten con nadie. El enlace público de seguimiento que abre tu comprador identifica el envío y no revela la mensajería.</p>
+
+<h3>Redes sociales</h3>
+<p>Cuando conectas una página de Facebook o una cuenta profesional de Instagram, intercambiamos datos con <strong>Meta Platforms</strong> en tu nombre: le enviamos las publicaciones que haces y las respuestas que escribes, y recibimos los datos descritos en la sección 1. Los términos y la política de datos de Meta se aplican a ese contenido dentro de sus plataformas.</p>
 
 <h3>Redes publicitarias</h3>
 <p>Si conectas una cuenta publicitaria para lanzar campañas pagadas, nos otorgas permisos de gestión sobre las páginas y campañas que elijas en esa red para que podamos publicarlas y controlarlas en tu nombre. El material de campaña que creas, el presupuesto que le asignas y las métricas de rendimiento que la red informa se intercambian con esa red. Esto ocurre únicamente con las cuentas que tú mismo conectas, y nunca vendemos tus datos a anunciantes.</p>
@@ -94,6 +108,9 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
   <li><strong>Contenido generado:</strong> Se conserva hasta por 90 días después de eliminar la cuenta</li>
   <li><strong>Registros de la API:</strong> Se conservan durante 90 días para depuración y análisis</li>
   <li><strong>Registros de facturación:</strong> Se conservan según lo exijan las leyes tributarias y contables aplicables</li>
+  <li><strong>Credenciales de redes sociales:</strong> Se eliminan automáticamente después de que desconectas una página o cuenta, dentro de las 24 horas siguientes a que no quede conectada ninguna otra página o cuenta con la misma autorización. Si la autorización vence o se revoca en Meta, las credenciales dejan de funcionar y la página o cuenta queda marcada para reconectar; se eliminan cuando la desconectas o nos pides eliminar tus datos</li>
+  <li><strong>Comentarios de redes sociales:</strong> Se conservan mientras la página o cuenta esté conectada, y se eliminan 90 días después de que la desconectas, o antes si lo pides</li>
+  <li><strong>Métricas de redes sociales:</strong> Se conservan hasta 16 meses para mostrar comparaciones entre períodos, y se eliminan antes si nos pides eliminar tu cuenta</li>
   <li><strong>Análisis anonimizados:</strong> Pueden conservarse indefinidamente de forma agregada</li>
 </ul>
 
@@ -110,21 +127,22 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
 <p>Para ejercer cualquiera de estos derechos, contáctanos en <strong>privacy@1platform.pro</strong>. Responderemos a tu solicitud en un plazo de 30 días.</p>
 
 <h2 id="data-deletion">7. Instrucciones para eliminar tus datos</h2>
-<p>Puedes pedirnos en cualquier momento que eliminemos tus datos personales. Esto incluye los datos que recibimos de Meta cuando un negocio conecta su cuenta de WhatsApp Business a 1Platform: los identificadores de la cuenta del negocio y de sus números de teléfono, las credenciales de acceso emitidas para esa conexión, y las conversaciones y datos de contacto intercambiados con los clientes del negocio.</p>
+<p>Puedes pedirnos en cualquier momento que eliminemos tus datos personales. Esto incluye los datos que recibimos de Meta cuando un negocio conecta a 1Platform su cuenta de WhatsApp Business, una página de Facebook o una cuenta profesional de Instagram: los identificadores de esas cuentas y números de teléfono, las credenciales de acceso emitidas para cada conexión, las conversaciones y datos de contacto intercambiados con los clientes del negocio, y las publicaciones, comentarios y métricas de las páginas y cuentas conectadas.</p>
 
 <h3>Si eres un negocio que usa 1Platform</h3>
 <ol>
   <li>Para que dejemos de recibir y enviar mensajes de WhatsApp de tu número, desactiva el canal en tu panel, en <strong>Ventas &rsaquo; Canales</strong>, o quita 1Platform de las apps conectadas a tu portfolio comercial en Meta Business Suite.</li>
+  <li>Para que dejemos de publicar en una página de Facebook o una cuenta de Instagram, o de leerla, abre <strong>Redes sociales &rsaquo; Cuentas</strong> en tu panel y elige <strong>Desconectar</strong>; sus credenciales de acceso se eliminan automáticamente. Para retirar también el permiso en Meta, quita 1Platform en <strong>Configuración &rsaquo; Integraciones comerciales</strong> de Facebook.</li>
   <li>Para que eliminemos tu cuenta y sus datos, escribe a <strong>privacy@1platform.pro</strong> desde el correo de tu cuenta, con el asunto <strong>&laquo;Solicitud de eliminación de datos&raquo;</strong>.</li>
 </ol>
 
 <h3>Si escribiste a un negocio que usa 1Platform</h3>
-<p>Escribe a <strong>privacy@1platform.pro</strong> con el asunto <strong>&laquo;Solicitud de eliminación de datos&raquo;</strong>, el nombre del negocio al que escribiste y el número de teléfono que usaste. Tratamos esas conversaciones en nombre de ese negocio, así que coordinamos la eliminación con él.</p>
+<p>Escribe a <strong>privacy@1platform.pro</strong> con el asunto <strong>&laquo;Solicitud de eliminación de datos&raquo;</strong>, el nombre del negocio al que escribiste y el número de teléfono que usaste, o el perfil de Facebook o Instagram desde el que comentaste. Tratamos esas conversaciones y comentarios en nombre de ese negocio, así que coordinamos la eliminación con él.</p>
 
 <h3>Qué pasa después de tu solicitud</h3>
 <ul>
   <li>Te respondemos en un plazo de 30 días y te confirmamos cuando la eliminación esté completa.</li>
-  <li>Eliminamos los datos de tu cuenta, las credenciales de los canales conectados, y las conversaciones y datos de contacto guardados.</li>
+  <li>Eliminamos los datos de tu cuenta, las credenciales de los canales y cuentas de redes sociales conectados, las conversaciones y datos de contacto guardados, y los comentarios y métricas guardados.</li>
   <li>Los registros que la ley nos obliga a conservar, como facturas y registros tributarios, se guardan sólo durante el plazo legal y después se eliminan.</li>
 </ul>
 
