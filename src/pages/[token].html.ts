@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { declaredVerificationTokens } from '../lib/site-api'
 
 /**
  * Search Console ownership verification — served ONLY to the tenant that
@@ -44,12 +45,16 @@ import type { APIRoute } from 'astro'
 export const prerender = false
 
 export const GET: APIRoute = ({ params, locals }) => {
-  const declared = locals.tenant.google_site_verification
+  // The main token and any served beside it (the owner's connection adds one
+  // when the main slot already holds somebody else's proof): every one is THIS
+  // tenant's own declaration, so the cross-host guarantee above is unchanged.
+  const token = params.token ?? ''
+  const declared = declaredVerificationTokens(locals.tenant).includes(token) ? token : null
 
   // A tenant with no token has nothing to prove and serves nothing. Absent is
   // NOT "fall back to the platform's token": that fallback is precisely the
   // defect this route replaces.
-  if (!declared || params.token !== declared) {
+  if (!declared) {
     return new Response('Not Found\n', {
       status: 404,
       headers: { 'content-type': 'text/plain; charset=utf-8', 'x-content-type-options': 'nosniff' },

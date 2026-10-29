@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 
 import { repoTenants } from '../src/data/site-tenants'
+import { declaredVerificationTokens } from '../src/lib/site-api'
 import { localesOf, makeLocalizePath } from '../src/lib/site-locale'
 import { getWithHost } from './helpers/http-host'
 import { surface } from './helpers/site-surface'
@@ -169,15 +170,19 @@ test('a tenant page never carries the ownership token of another', async () => {
   // served under somebody else's hostname grants ownership of THEIR domain to
   // whoever holds the property. It used to be a file in `public/`, answered 200
   // to every Host including hosts that resolve to no tenant at all.
-  const tokens = repoTenants()
-    .map((t) => t.google_site_verification)
-    .filter((v): v is string => Boolean(v))
+  // Main tokens AND the ones served beside them (`google_site_verifications`):
+  // an extra is as much a grant of ownership as the main one.
+  const tokens = [...new Set(repoTenants().flatMap((t) => declaredVerificationTokens(t)))]
   expect(tokens.length, 'at least one tenant should declare a token, or this asserts nothing').toBeGreaterThan(0)
+  expect(
+    repoTenants().some((t) => (t.google_site_verifications ?? []).length > 0),
+    'at least one tenant should declare an EXTRA token, or the extras go untested',
+  ).toBe(true)
 
   for (const tenant of repoTenants()) {
     for (const token of tokens) {
       const res = await getWithHost(`${BASE}/${token}.html`, tenant.domain)
-      const mine = tenant.google_site_verification === token
+      const mine = declaredVerificationTokens(tenant).includes(token)
       expect(
         res.status,
         `${tenant.domain} ${mine ? 'should' : 'must NOT'} be served ${token}.html`,
