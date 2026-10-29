@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Un inquilino puede servir más de un archivo de verificación de Search Console: además de
+  `google_site_verification`, la ruta `/<token>.html` sirve los tokens de `google_site_verifications` (los agrega
+  la conexión del dueño cuando el lugar principal ya tiene una prueba de otra cuenta, como en `1platform.pro`).
+  Cada token se revalida y se sirve sólo bajo el host de su inquilino; un manifiesto sin el campo sigue igual.
+
 ### Added
 - Acceso en cabecera, menú móvil y pie del perfil de infraestructura, con páginas de acceso y solicitud en su identidad visual. Activación por tenant, contenido EN/ES y destinos existentes; paquete de activación de 1Platform documentado sin modificar datos publicados. La cabecera y el pie omiten la entrada si el contenido de acceso todavía no llegó (o ya se retiró) en vez de responder 503; script de activación y reversión en dos fases con banco local.
 - Logo de 1Platform en una URL estable para la plantilla de Domain Connect: `/brand/domain-connect-logo.svg` (SVG vectorial, sin referencias externas). Sólo lo sirve el inquilino de la plataforma; cualquier otro dominio recibe 404.

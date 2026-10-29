@@ -120,6 +120,13 @@ export interface SiteTenant {
    * `src/pages/[token].html.ts` for why it stopped being a file in `public/`.
    */
   google_site_verification: string | null
+  /**
+   * Further tokens served BESIDE `google_site_verification`, each at
+   * `/<token>.html` — added by the owner's Search Console connection when the
+   * main one already holds somebody else's proof (1platform.pro, 2026-10-29).
+   * Optional: an API that predates the field omits it.
+   */
+  google_site_verifications?: string[] | null
   indexable: boolean
   /**
    * ISO 3166-1 alpha-2 country the site addresses (`GT`), or absent/null when
@@ -261,6 +268,10 @@ export function isTenant(value: unknown): value is SiteTenant {
   if (!str(t.slug) || !str(t.brand_name) || !str(t.domain)) return false
   if (!strOrNull(t.brand_mark) || !strOrNull(t.brand_wordmark)) return false
   if (!strOrNull(t.google_site_verification)) return false
+  const extras = t.google_site_verifications
+  if (extras !== undefined && extras !== null) {
+    if (!Array.isArray(extras) || !extras.every((v) => typeof v === 'string')) return false
+  }
   const assets = t.brand_assets
   if (assets !== undefined && assets !== null) {
     if (!assets || typeof assets !== 'object') return false
@@ -285,4 +296,20 @@ export function isTenant(value: unknown): value is SiteTenant {
     if (!strOrNull(dest[key])) return false
   }
   return true
+}
+
+/** The shape the API enforces on a verification token. Checked again here
+ *  because the token becomes a URL segment and a `text/html` body. */
+const VERIFICATION_TOKEN = /^[A-Za-z0-9_-]{1,120}$/
+
+/**
+ * Every Search Console token THIS tenant declares: the main one and the ones
+ * served beside it. The one answer for the route that serves them and for the
+ * gate that lets their addresses through — two lists would drift.
+ */
+export function declaredVerificationTokens(
+  tenant: Pick<SiteTenant, 'google_site_verification' | 'google_site_verifications'>,
+): string[] {
+  const all = [tenant.google_site_verification, ...(tenant.google_site_verifications ?? [])]
+  return [...new Set(all.filter((t): t is string => typeof t === 'string' && VERIFICATION_TOKEN.test(t)))]
 }

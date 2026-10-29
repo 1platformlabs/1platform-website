@@ -86,6 +86,11 @@ const ONEPLATFORM: SiteTenant = {
   // give one page two entries and make "did this tenant publish it?"
   // ambiguous.
   google_site_verification: 'google1dd96c2b1cc5f482',
+  // A token served BESIDE the main one — the shape production takes when the
+  // owner's Search Console connection is added next to an existing property.
+  // A synthetic value (it verifies nothing): it exists so the isolation suite
+  // proves extras are served to THIS tenant and to no other.
+  google_site_verifications: ['google0e2e0extra0proof'],
   pages: [
     '/',
     '/about/',

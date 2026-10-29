@@ -1,5 +1,5 @@
 import { LOCALES, localizePath, type Locale } from '@i18n/ui'
-import type { HomeTemplate, SiteTenant } from './site-api'
+import { declaredVerificationTokens, type HomeTemplate, type SiteTenant } from './site-api'
 import {
   canonicalPathForTenant,
   defaultLocaleOf,
@@ -318,10 +318,7 @@ export function isPublishedRequest(pathname: string, tenant: SiteTenant): boolea
   // every `*.html` address, which shadowed `/404.html` — the browser suite
   // caught it, because two language-switcher tests navigate there and got a
   // bare text body instead of the rendered 404 page.
-  if (
-    tenant.google_site_verification &&
-    pathname === `/${tenant.google_site_verification}.html`
-  ) {
+  if (declaredVerificationTokens(tenant).some((token) => pathname === `/${token}.html`)) {
     return true
   }
 
