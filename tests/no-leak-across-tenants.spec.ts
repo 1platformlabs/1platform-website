@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 
 import { repoTenants } from '../src/data/site-tenants'
-import { declaredVerificationTokens } from '../src/lib/site-api'
 import { localesOf, makeLocalizePath } from '../src/lib/site-locale'
 import { getWithHost } from './helpers/http-host'
 import { surface } from './helpers/site-surface'
@@ -171,8 +170,13 @@ test('a tenant page never carries the ownership token of another', async () => {
   // whoever holds the property. It used to be a file in `public/`, answered 200
   // to every Host including hosts that resolve to no tenant at all.
   // Main tokens AND the ones served beside them (`google_site_verifications`):
-  // an extra is as much a grant of ownership as the main one.
-  const tokens = [...new Set(repoTenants().flatMap((t) => declaredVerificationTokens(t)))]
+  // an extra is as much a grant of ownership as the main one. Read from the
+  // RAW fields, never through `declaredVerificationTokens`: the oracle cannot be
+  // the function under test, or a helper that drops the extras would take the
+  // assertion down with it (measured: that mutant survived this test).
+  const declared = (t: ReturnType<typeof repoTenants>[number]) =>
+    [t.google_site_verification, ...(t.google_site_verifications ?? [])].filter((v): v is string => Boolean(v))
+  const tokens = [...new Set(repoTenants().flatMap(declared))]
   expect(tokens.length, 'at least one tenant should declare a token, or this asserts nothing').toBeGreaterThan(0)
   expect(
     repoTenants().some((t) => (t.google_site_verifications ?? []).length > 0),
@@ -182,7 +186,7 @@ test('a tenant page never carries the ownership token of another', async () => {
   for (const tenant of repoTenants()) {
     for (const token of tokens) {
       const res = await getWithHost(`${BASE}/${token}.html`, tenant.domain)
-      const mine = declaredVerificationTokens(tenant).includes(token)
+      const mine = declared(tenant).includes(token)
       expect(
         res.status,
         `${tenant.domain} ${mine ? 'should' : 'must NOT'} be served ${token}.html`,
