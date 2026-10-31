@@ -34,6 +34,11 @@ npm run preview      # Preview built output locally
 
 Node 24 required (see `.nvmrc`).
 
+The photographic landing accepts staged tenant access configuration: incomplete
+or invalid access links are omitted without failing the landing. Access pages
+retain their strict validation. `tests/photographic-landing.spec.ts` covers both
+languages and isolates complete, missing and invalid configurations by host.
+
 ## Structure
 
 ```

@@ -75,6 +75,29 @@ accessFixture.pagesResponse.data.slug = accessFixture.tenant.slug;
 Object.assign(accessFixture.pagesResponse.data.messages, accessMessages.es, requestAccessMessages.es, {
   'photographic.theme.palette': 'brand', 'photographic.hero.image': 'commerce',
 });
+// Each cache state owns a host/slug: switching hosts must not reuse another
+// tenant's healthy access copy. These are photographic, not infrastructure.
+const accessTransitions: SiteFixture[] = [];
+for (const locale of ['es', 'en'] as const) {
+  for (const state of ['complete', 'missing-entry', 'missing-request', 'missing-destination', 'invalid-destination', 'routes-absent']) {
+    const candidate: SiteFixture = structuredClone(accessFixture);
+    candidate.tenant.slug = `access-${locale}-${state}`;
+    candidate.tenant.domain = `${candidate.tenant.slug}.example`;
+    candidate.tenant.default_locale = locale;
+    candidate.tenant.locales = [locale];
+    candidate.pagesResponse.data.slug = candidate.tenant.slug;
+    candidate.pagesResponse.data.locale = locale;
+    for (const item of candidate.pagesResponse.data.pages) item.locale = locale;
+    const messages = candidate.pagesResponse.data.messages;
+    Object.assign(messages, accessMessages[locale], requestAccessMessages[locale]);
+    if (state === 'missing-entry') delete messages['access.entry'];
+    if (state === 'missing-request') delete messages['access.request'];
+    if (state === 'missing-destination') candidate.tenant.destinations.app = null;
+    if (state === 'invalid-destination') candidate.tenant.destinations.app = 'javascript:alert(1)';
+    if (state === 'routes-absent') candidate.tenant.pages = ['/'];
+    accessTransitions.push(candidate);
+  }
+}
 // A commerce tenant with every optional block: Delivery, the named advertising
 // channel, seven shortcuts, the sales route and a visitor-entered percentage.
 const COMMERCE_HOST = 'vendefacil.1platform.pro';
@@ -186,6 +209,8 @@ test.beforeAll(async () => {
       if (host === PLATFORM_HOST) return response.end(JSON.stringify({ success: true, data: platformTenant, msg: 'Site resolved' }));
       if (host === INFRA_ACCESS_HOST) return response.end(JSON.stringify({ success: true, data: infrastructureAccessTenant, msg: 'Site resolved' }));
       if (host === INFRA_STALE_HOST) return response.end(JSON.stringify({ success: true, data: infrastructureStaleTenant, msg: 'Site resolved' }));
+      const transition = accessTransitions.find(candidate => candidate.tenant.domain === host);
+      if (transition) return response.end(JSON.stringify({ success: true, data: transition.tenant, msg: 'Site resolved' }));
       const selected = ({ [HOST]: fixture, [ALTERNATE_HOST]: alternate, [ACCESS_HOST]: accessFixture, [COMMERCE_HOST]: commerce, [PLAIN_COMMERCE_HOST]: plainCommerce, [BEFORE_SERVICES_HOST]: beforeServices } as Record<string, SiteFixture>)[host] ?? null;
       if (selected) return response.end(JSON.stringify({ success: true, data: selected.tenant, msg: 'Site resolved' }));
     } else {
@@ -199,7 +224,7 @@ test.beforeAll(async () => {
       }
       const content = match?.[1] === platformTenant.slug ? platformContent.get(url.searchParams.get('locale') ?? '') : null;
       if (content) return response.end(JSON.stringify(content));
-      const selected = [fixture, alternate, accessFixture, commerce, plainCommerce, beforeServices].find((candidate) => candidate.tenant.slug === match?.[1]);
+      const selected = [fixture, alternate, accessFixture, commerce, plainCommerce, beforeServices, ...accessTransitions].find((candidate) => candidate.tenant.slug === match?.[1]);
       if (selected && url.searchParams.get('locale') === selected.tenant.default_locale) {
         return response.end(JSON.stringify(selected.pagesResponse));
       }
@@ -224,7 +249,7 @@ test.beforeAll(async () => {
     try { return (await getWithHost(`${appBaseUrl}/`, HOST)).status; } catch { return 0; }
   }, { timeout: 30_000, message: 'The built tenant route must start' }).toBe(200);
   tenantBrowser = await chromium.launch({
-    args: [`--host-resolver-rules=${[HOST, ALTERNATE_HOST, PLATFORM_HOST, INFRA_ACCESS_HOST, INFRA_STALE_HOST, ACCESS_HOST, COMMERCE_HOST, PLAIN_COMMERCE_HOST, BEFORE_SERVICES_HOST].map((name) => `MAP ${name} 127.0.0.1`).join(', ')}`],
+    args: [`--host-resolver-rules=${[HOST, ALTERNATE_HOST, PLATFORM_HOST, INFRA_ACCESS_HOST, INFRA_STALE_HOST, ACCESS_HOST, COMMERCE_HOST, PLAIN_COMMERCE_HOST, BEFORE_SERVICES_HOST, ...accessTransitions.map(candidate => candidate.tenant.domain)].map((name) => `MAP ${name} 127.0.0.1`).join(', ')}`],
   });
 });
 
@@ -717,6 +742,26 @@ test('routes published before the access copy keep every infrastructure page up 
     await expect(page.locator('.brand-header')).toBeVisible();
     await expect(page.locator('[data-access-entry]')).toHaveCount(0);
     await expect(page.locator('.brand-footer')).toBeVisible();
+  }
+});
+
+test('photographic access cache transitions keep complete header and footer in both locales', async ({ landingPage: page }) => {
+  for (const candidate of accessTransitions) {
+    const { domain, slug, default_locale: locale } = candidate.tenant;
+    const response = await page.goto(`http://${domain}:${appPort}/`);
+    expect(response?.status(), slug).toBe(200);
+    await expect(page.locator('.site-header')).toBeVisible();
+    await expect(page.locator('.site-footer')).toBeVisible();
+    await expect(page.locator('main h1')).not.toBeEmpty();
+    if (slug.endsWith('-complete')) {
+      await expect(page.locator('[data-access-entry]')).toHaveCount(2);
+      await expect(page.locator('.header-access')).toHaveText(accessMessages[locale as 'es' | 'en']['access.entry']);
+    } else {
+      await expect(page.locator('[data-access-entry]')).toHaveCount(0);
+    }
+    // A stale host must not poison the healthy tenant's manifest/content cache.
+    await gotoLanding(page, ACCESS_HOST);
+    await expect(page.locator('[data-access-entry]')).toHaveCount(2);
   }
 });
 

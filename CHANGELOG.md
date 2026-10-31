@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- La portada fotográfica sigue respondiendo 200 cuando se activa o retira el
+  acceso del tenant: omite juntos los enlaces incompletos o inválidos y conserva
+  la validación estricta de las páginas de acceso (Refs #161).
 - Un inquilino puede servir más de un archivo de verificación de Search Console: además de
   `google_site_verification`, la ruta `/<token>.html` sirve los tokens de `google_site_verifications` (los agrega
   la conexión del dueño cuando el lugar principal ya tiene una prueba de otra cuenta, como en `1platform.pro`).
