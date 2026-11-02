@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Floating WhatsApp access on infrastructure and photographic landings, using each tenant’s configured contact and existing sales message, with keyboard focus and responsive safe-area spacing.
+
 ### Fixed
 - La portada fotográfica sigue respondiendo 200 cuando se activa o retira el
   acceso del tenant: omite juntos los enlaces incompletos o inválidos y conserva

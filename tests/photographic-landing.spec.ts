@@ -1155,3 +1155,42 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 
     }
   });
 }
+
+// The floating entry uses the existing sales conversation, never the access flow.
+for (const host of [HOST, COMMERCE_HOST, PLATFORM_HOST]) {
+  test(`floating WhatsApp keeps the tenant destination and sales message: ${host}`, async ({ landingPage: page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`http://${host}:${appPort}/`);
+    const entry = page.locator('[data-whatsapp-contact]');
+    await expect(entry).toBeVisible();
+    const existing = host === PLATFORM_HOST ? page.locator('.contact .button') : page.locator('[data-support-cta="hero"]');
+    await expect(entry).toHaveAttribute('href', (await existing.getAttribute('href'))!);
+    await expect(entry).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(entry).toHaveAttribute('target', '_blank');
+    await entry.focus();
+    await expect(entry).toBeFocused();
+    expect(await entry.evaluate(el => getComputedStyle(el).outlineStyle)).toBe('solid');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect(entry).toHaveCSS('transition-duration', '0s');
+    const menu = page.locator(host === PLATFORM_HOST ? '.brand-menu-toggle' : '.menu-toggle');
+    await menu.click();
+    await expect(entry).toBeHidden();
+    await page.keyboard.press('Escape');
+    await expect(entry).toBeVisible();
+    await expect(menu).toBeFocused();
+    for (const size of [{width:1440,height:900},{width:390,height:844},{width:844,height:390}]) {
+      await page.setViewportSize(size);
+      const box = await entry.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.width).toBe(size.width > 600 && size.height > 500 ? 60 : 56);
+      expect(box!.x + box!.width).toBeLessThan(size.width);
+      expect(box!.y + box!.height).toBeLessThan(size.height);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+  });
+}
+test('a non-WhatsApp support destination does not acquire a WhatsApp control', async ({ landingPage: page }) => {
+  await page.goto(`http://${ALTERNATE_HOST}:${appPort}/`);
+  await expect(page.locator('h1')).toBeVisible();
+  await expect(page.locator('[data-whatsapp-contact]')).toHaveCount(0);
+});

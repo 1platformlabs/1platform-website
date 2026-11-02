@@ -1,0 +1,21 @@
+---
+import Icon from '@components/Icon.astro';
+import '@styles/whatsapp-contact.css';
+
+interface Props { href: string | null; locale: 'en' | 'es'; }
+const { href, locale } = Astro.props;
+// Only a configured WhatsApp destination earns a WhatsApp control. Missing,
+// malformed or other support destinations never fall back to another tenant.
+let available = false;
+try {
+  const url = new URL(href ?? '');
+  available = url.protocol === 'https:' && !url.username && !url.password &&
+    !url.port && ['wa.me', 'api.whatsapp.com'].includes(url.hostname);
+} catch { /* An absent destination renders nothing. */ }
+// UI copy ships with the renderer so existing published SitePages need no migration.
+const label = locale === 'en' ? 'Contact us on WhatsApp (opens a new tab)' : 'Contactar por WhatsApp (abre una pestaña nueva)';
+---
+{available && <a class="whatsapp-contact" data-whatsapp-contact href={href}
+  aria-label={label} title={label} target="_blank" rel="noopener noreferrer">
+  <Icon name="whatsapp" size={32} />
+</a>}
