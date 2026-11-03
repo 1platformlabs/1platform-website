@@ -37,9 +37,13 @@ const ctaHrefs = (html: string, label: string) =>
 
 test('the CTA helper builds the exact encoded login href, and nothing without a panel', () => {
   const platform = repoTenantForHost(PLATFORM_HOST)!;
-  expect(plateOrderUrl({ tenant: platform })).toBe(`https://app.1platform.pro/auth/login?${EXPECTED_QUERY}`);
+  expect(plateOrderUrl({ tenant: platform })).toBe(`https://app.1platform.pro/app/auth/login?${EXPECTED_QUERY}`);
   const noPanel = { ...platform, destinations: { ...platform.destinations, app: null } };
   expect(plateOrderUrl({ tenant: noPanel })).toBeNull();
+  // The login lives UNDER the panel's basename; a base without its trailing
+  // slash must not lose its last segment.
+  const bare = { ...platform, destinations: { ...platform.destinations, app: 'https://panel.example/app' } };
+  expect(plateOrderUrl({ tenant: bare })).toBe(`https://panel.example/app/auth/login?${EXPECTED_QUERY}`);
 });
 
 for (const [locale, path, headline, cta] of [
@@ -52,7 +56,7 @@ for (const [locale, path, headline, cta] of [
     expect(res.body).toContain(headline);
     const hrefs = ctaHrefs(res.body, cta);
     expect(hrefs.length, 'the CTA is missing — a broken probe would pass the checks below').toBeGreaterThanOrEqual(2);
-    for (const href of hrefs) expect(href).toBe(`https://app.1platform.pro/auth/login?${EXPECTED_QUERY}`);
+    for (const href of hrefs) expect(href).toBe(`https://app.1platform.pro/app/auth/login?${EXPECTED_QUERY}`);
     expect(visibleText(res.body)).not.toMatch(PROVIDERS);
     expect(res.body).toMatch(/<main[\s\S]*<h1/);
   });
@@ -98,7 +102,7 @@ test.describe('tenant mode (API manifest)', () => {
       expect(res.status, stack.log()).toBe(200);
       const hrefs = ctaHrefs(res.body, cta);
       expect(hrefs.length).toBeGreaterThanOrEqual(2);
-      for (const href of hrefs) expect(href).toBe(`https://panel.delta.example/auth/login?${EXPECTED_QUERY}`);
+      for (const href of hrefs) expect(href).toBe(`https://panel.delta.example/app/auth/login?${EXPECTED_QUERY}`);
       expect(res.body).not.toContain('app.1platform.pro');
     }
   });
@@ -114,6 +118,6 @@ test.describe('tenant mode (API manifest)', () => {
   test('the platform itself, in API mode, still renders it with its own panel', async () => {
     const res = await getWithHost(`${stack.baseUrl}${ROUTE}`, PLATFORM_HOST);
     expect(res.status, stack.log()).toBe(200);
-    expect(ctaHrefs(res.body, 'Order my plates')[0]).toBe(`https://app.1platform.pro/auth/login?${EXPECTED_QUERY}`);
+    expect(ctaHrefs(res.body, 'Order my plates')[0]).toBe(`https://app.1platform.pro/app/auth/login?${EXPECTED_QUERY}`);
   });
 });

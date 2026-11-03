@@ -105,7 +105,15 @@ export function ctaTo(
 export function plateOrderUrl(locals: DestinationLocals): string | null {
   const base = locals.tenant.destinations.app
   if (!base) return null
-  const url = new URL('/auth/login', base)
+  // RELATIVE to the app base, never root-absolute: the base carries the
+  // panel's basename (`https://app.1platform.pro/app/`) and the login lives
+  // under it. `new URL('/auth/login', base)` would drop `/app/` and land the
+  // merchant on a page the panel does not serve. A base without its trailing
+  // slash would lose its last segment the same way, so one is added first.
+  const root = new URL(base)
+  if (!root.pathname.endsWith('/')) root.pathname = `${root.pathname}/`
+  const url = new URL('auth/login', root)
+  url.search = ''
   url.searchParams.set('next', '/main/plates/orders?new=1')
   return environmentDestination(url.toString())
 }
