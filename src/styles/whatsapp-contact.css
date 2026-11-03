@@ -22,7 +22,7 @@
 }
 .whatsapp-contact:hover { background: var(--whatsapp-hover); }
 .whatsapp-contact:focus-visible { outline: 3px solid var(--whatsapp-focus); outline-offset: 4px; }
-.whatsapp-contact .icon { width: 32px; height: 32px; }
+.whatsapp-contact .icon { width: 32px; height: 32px; color: white; }
 body:has(.brand-menu-toggle[aria-expanded="true"]) .whatsapp-contact,
 body:has(.menu-toggle[aria-expanded="true"]) .whatsapp-contact { visibility: hidden; }
 body:has(.whatsapp-contact) .hero-bottom { padding-right: 64px; }
