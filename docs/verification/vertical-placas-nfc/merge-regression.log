@@ -1,0 +1,130 @@
+
+Running 56 tests using 4 workers
+
+(node:48287) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:48286) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:48289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:48288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [chromium] › tests/review-plates.spec.ts:55:3 › the four steps use the full desktop row at /solutions/review-plates/ (1.3s)
+  ✓   3 [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /es/soluciones/placas/ (1.3s)
+  ✓   1 [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /solutions/review-plates/ (1.3s)
+  ✓   6 [chromium] › tests/review-plates.spec.ts:72:1 › the CTA helper builds the exact encoded login href, and nothing without a panel (2ms)
+  ✓   7 [chromium] › tests/review-plates.spec.ts:87:3 › the en page renders, its CTA is the encoded login href and it names no provider (27ms)
+  ✓   8 [chromium] › tests/review-plates.spec.ts:87:3 › the es page renders, its CTA is the encoded login href and it names no provider (24ms)
+  ✓   5 [chromium] › tests/review-plates.spec.ts:55:3 › the four steps use the full desktop row at /es/soluciones/placas/ (599ms)
+  ✓   4 [chromium] › tests/photographic-landing.spec.ts:265:1 › actual tenant Host renders the approved SSR page, metadata and configured support destinations (1.1s)
+  ✓   9 [chromium] › tests/review-plates.spec.ts:133:3 › tenant mode (API manifest) › a tenant with a panel points the CTA at ITS panel, in both languages (110ms)
+  ✓  11 [chromium] › tests/review-plates.spec.ts:144:3 › tenant mode (API manifest) › a tenant without a panel renders the page and no CTA (22ms)
+  ✓  12 [chromium] › tests/review-plates.spec.ts:152:3 › tenant mode (API manifest) › the platform itself, in API mode, still renders it with its own panel (5ms)
+  ✓  10 [chromium] › tests/photographic-landing.spec.ts:311:1 › without JavaScript copy, all demonstration views, FAQ and default calculation remain available (2.2s)
+  ✓  13 [chromium] › tests/photographic-landing.spec.ts:351:1 › mobile navigation stays fixed and supports native anchors, focus and Escape (681ms)
+  ✓  14 [chromium] › tests/photographic-landing.spec.ts:380:1 › the demonstration has keyboard tabs, payment-channel filters and separate gross collections and withdrawals (3.8s)
+  ✓  15 [chromium] › tests/photographic-landing.spec.ts:433:1 › one editable amount uses the configured rate, clears stale results and recovers from invalid input (3.5s)
+  ✓  16 [chromium] › tests/photographic-landing.spec.ts:464:1 › photograph and flow play automatically, restart on re-entry and respect reduced motion (1.4s)
+  ✓  17 [chromium] › tests/photographic-landing.spec.ts:506:5 › illustrations autoplay when visible and on return: medipago.gt/ 1440px (2.5s)
+  ✓  18 [chromium] › tests/photographic-landing.spec.ts:506:5 › illustrations autoplay when visible and on return: medipago.gt/ 390px (2.3s)
+  ✓  19 [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 1440px (4.6s)
+  ✓  20 [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 390px (5.5s)
+  ✘  21 [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 360px (17.2m)
+(node:49640) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  22 [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 430px (10.4m)
+(node:49916) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  23 [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 844px (3.7s)
+  ✓  24 [chromium] › tests/photographic-landing.spec.ts:577:1 › an unknown address on a tenant with a sign-in destination is its 404, not a 503 (109ms)
+  ✓  25 [chromium] › tests/photographic-landing.spec.ts:598:1 › another tenant reuses the composition with its own brand, destination, font, accent and rate without cross-request leakage (1.2s)
+  ✓  26 [chromium] › tests/photographic-landing.spec.ts:620:3 › 1Platform en resolves infrastructure from API content with independent brand and destinations (1.6s)
+  ✓  27 [chromium] › tests/photographic-landing.spec.ts:668:5 › infrastructure autoplay is continuous, visibility-aware and reduced-motion safe: en 1440px (611ms)
+  ✓  28 [chromium] › tests/photographic-landing.spec.ts:668:5 › infrastructure autoplay is continuous, visibility-aware and reduced-motion safe: en 390px (626ms)
+  ✓  29 [chromium] › tests/photographic-landing.spec.ts:620:3 › 1Platform es resolves infrastructure from API content with independent brand and destinations (1.3s)
+  ✓  30 [chromium] › tests/photographic-landing.spec.ts:668:5 › infrastructure autoplay is continuous, visibility-aware and reduced-motion safe: es 1440px (685ms)
+  ✓  31 [chromium] › tests/photographic-landing.spec.ts:668:5 › infrastructure autoplay is continuous, visibility-aware and reduced-motion safe: es 390px (587ms)
+  ✓  32 [chromium] › tests/photographic-landing.spec.ts:697:3 › infrastructure access es keeps header, footer and onboarding reachable (2.3s)
+  ✓  33 [chromium] › tests/photographic-landing.spec.ts:697:3 › infrastructure access en keeps header, footer and onboarding reachable (2.5s)
+  ✓  34 [chromium] › tests/photographic-landing.spec.ts:736:1 › routes published before the access copy keep every infrastructure page up without the entry (545ms)
+  ✓  35 [chromium] › tests/photographic-landing.spec.ts:748:1 › photographic access cache transitions keep complete header and footer in both locales (5.0s)
+  ✓  36 [chromium] › tests/photographic-landing.spec.ts:768:1 › infrastructure access works without JavaScript (342ms)
+  ✓  37 [chromium] › tests/photographic-landing.spec.ts:781:1 › tenant access keeps login and WhatsApp onboarding reachable with tenant-owned destinations (942ms)
+  ✓  38 [chromium] › tests/photographic-landing.spec.ts:805:1 › tenant access remains readable and navigable on narrow and landscape screens (889ms)
+  ✓  39 [chromium] › tests/photographic-landing.spec.ts:823:1 › a commerce tenant serves seven solutions, Delivery, the named ad channel and the sales route with its own WhatsApp messages (587ms)
+  ✓  40 [chromium] › tests/photographic-landing.spec.ts:863:1 › a browser without IntersectionObserver or MediaQueryList events keeps the menu and calculator (334ms)
+  ✓  41 [chromium] › tests/photographic-landing.spec.ts:880:1 › editing the estimate announces the change once, not on every keystroke (279ms)
+  ✓  42 [chromium] › tests/photographic-landing.spec.ts:896:1 › the visitor types the commission: empty at first, validated per field and never a tenant rate (917ms)
+  ✓  43 [chromium] › tests/photographic-landing.spec.ts:938:1 › without JavaScript the commerce landing keeps every block and explains the disabled simulation (378ms)
+  ✓  44 [chromium] › tests/photographic-landing.spec.ts:956:1 › the verticals animate on entry and re-entry, pause with the tab hidden and stay still with reduced motion (1.5s)
+  ✓  45 [chromium] › tests/photographic-landing.spec.ts:992:3 › the commerce landing reflows, keeps its menu, panel and FAQ usable and passes Axe at 1440×900 (1.5s)
+  ✓  46 [chromium] › tests/photographic-landing.spec.ts:992:3 › the commerce landing reflows, keeps its menu, panel and FAQ usable and passes Axe at 390×844 (1.6s)
+  ✓  47 [chromium] › tests/photographic-landing.spec.ts:992:3 › the commerce landing reflows, keeps its menu, panel and FAQ usable and passes Axe at 844×390 (1.5s)
+  ✓  48 [chromium] › tests/photographic-landing.spec.ts:1032:1 › commerce verticals never leak into the medical tenant, and the same tenant without them still serves (1.2s)
+  ✓  49 [chromium] › tests/photographic-landing.spec.ts:1057:1 › the deployed commerce content retains its original presentation until the new capabilities are activated (306ms)
+  ✓  50 [chromium] › tests/photographic-landing.spec.ts:1071:3 › six content-sized service cards, complete copy and keyboard contact at 1440x900 (505ms)
+  ✓  51 [chromium] › tests/photographic-landing.spec.ts:1071:3 › six content-sized service cards, complete copy and keyboard contact at 390x844 (417ms)
+  ✓  52 [chromium] › tests/photographic-landing.spec.ts:1071:3 › six content-sized service cards, complete copy and keyboard contact at 844x390 (417ms)
+  ✓  53 [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: medipago.gt (463ms)
+  ✓  54 [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: vendefacil.1platform.pro (596ms)
+  ✓  55 [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: 1platform.pro (421ms)
+  ✓  56 [chromium] › tests/photographic-landing.spec.ts:1193:1 › a non-WhatsApp support destination does not acquire a WhatsApp control (224ms)
+
+
+  1) [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 360px
+
+    Test timeout of 90000ms exceeded.
+
+    Error Context: test-results/photographic-landing-all-p-70763-eflow-and-pass-Axe-at-360px-chromium/error-context.md
+
+    Error Context: test-results/photographic-landing-all-p-70763-eflow-and-pass-Axe-at-360px-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/photographic-landing-all-p-70763-eflow-and-pass-Axe-at-360px-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/photographic-landing-all-p-70763-eflow-and-pass-Axe-at-360px-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 430px
+
+    Test timeout of 90000ms exceeded.
+
+    Error: frame.evaluate: Target page, context or browser has been closed
+
+      557 |       await page.locator(`[data-panel-tab="${name}"]`).click();
+      558 |       await checkOverflow(page);
+    > 559 |       const results = await new AxeBuilder({ page }).analyze();
+          |                       ^
+      560 |       expect(results.violations, `${viewport.width}px ${name}: ${JSON.stringify(results.violations)}`).toEqual([]);
+      561 |       const file = join(evidence, `${viewport.width}-panel-${name}.png`);
+      562 |       await page.locator('#su-panel').screenshot({ path: file, animations: 'disabled' });
+        at AxeBuilder.runPartialRecursive (/Users/staimer/Documents/1platform-worktrees/vertical-placas-nfc-website/node_modules/@axe-core/playwright/dist/index.mjs:283:34)
+        at AxeBuilder.analyze (/Users/staimer/Documents/1platform-worktrees/vertical-placas-nfc-website/node_modules/@axe-core/playwright/dist/index.mjs:210:28)
+        at /Users/staimer/Documents/1platform-worktrees/vertical-placas-nfc-website/tests/photographic-landing.spec.ts:559:23
+
+    attachment #1: 430-panel-summary (image/png) ───────────────────────────────────────────────────
+    test-results/photographic-landing-all-p-bc74f-eflow-and-pass-Axe-at-430px-chromium/attachments/430-panel-summary-fc464294e1e4b8d5117d24225f5e8b098cba6ec2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: 430-panel-billing (image/png) ───────────────────────────────────────────────────
+    test-results/photographic-landing-all-p-bc74f-eflow-and-pass-Axe-at-430px-chromium/attachments/430-panel-billing-7ec909d7ab65e46132b131f7e0858c8df4fabcfb.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/photographic-landing-all-p-bc74f-eflow-and-pass-Axe-at-430px-chromium/error-context.md
+
+    Error Context: test-results/photographic-landing-all-p-bc74f-eflow-and-pass-Axe-at-430px-chromium/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/photographic-landing-all-p-bc74f-eflow-and-pass-Axe-at-430px-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/photographic-landing-all-p-bc74f-eflow-and-pass-Axe-at-430px-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 360px
+    [chromium] › tests/photographic-landing.spec.ts:544:3 › all page sections and panel views reflow and pass Axe at 430px
+  54 passed (28.8m)

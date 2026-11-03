@@ -1,0 +1,100 @@
+
+> 1platform-website@3.5.17 test
+> playwright test --grep floating WhatsApp keeps --workers=1 --reporter=list
+
+[WebServer] (node:81816) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:81866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:81912) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: medipago.gt (5.3s)
+(node:82049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: vendefacil.1platform.pro (5.3s)
+(node:82213) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: 1platform.pro (282ms)
+
+
+  1) [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: medipago.gt 
+
+    Error: expect(locator).toHaveCSS(expected) failed
+
+    Locator:  locator('[data-whatsapp-contact]').locator('.icon')
+    Expected: "rgb(255, 255, 255)"
+    Received: "rgb(21, 45, 41)"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCSS" with timeout 5000ms
+      - waiting for locator('[data-whatsapp-contact]').locator('.icon')
+        14 × locator resolved to <svg width="32" height="32" fill="none" class="icon" focusable="false" stroke-width="1.5" aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-ccg5yoga="">…</svg>
+           - unexpected value "rgb(21, 45, 41)"
+
+
+      1164 |     const entry = page.locator('[data-whatsapp-contact]');
+      1165 |     await expect(entry).toBeVisible();
+    > 1166 |     await expect(entry.locator('.icon')).toHaveCSS('color', 'rgb(255, 255, 255)');
+           |                                          ^
+      1167 |     const existing = host === PLATFORM_HOST ? page.locator('.contact .button') : page.locator('[data-support-cta="hero"]');
+      1168 |     await expect(entry).toHaveAttribute('href', (await existing.getAttribute('href'))!);
+      1169 |     await expect(entry).toHaveAttribute('rel', 'noopener noreferrer');
+        at /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website/tests/photographic-landing.spec.ts:1166:42
+
+    Error Context: test-results/photographic-landing-float-3970b-d-sales-message-medipago-gt-chromium/error-context.md
+
+    Error Context: test-results/photographic-landing-float-3970b-d-sales-message-medipago-gt-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/photographic-landing-float-3970b-d-sales-message-medipago-gt-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/photographic-landing-float-3970b-d-sales-message-medipago-gt-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: vendefacil.1platform.pro 
+
+    Error: expect(locator).toHaveCSS(expected) failed
+
+    Locator:  locator('[data-whatsapp-contact]').locator('.icon')
+    Expected: "rgb(255, 255, 255)"
+    Received: "color(srgb 0.0180392 0.0564706 0.13098)"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCSS" with timeout 5000ms
+      - waiting for locator('[data-whatsapp-contact]').locator('.icon')
+        14 × locator resolved to <svg width="32" height="32" fill="none" class="icon" focusable="false" stroke-width="1.5" aria-hidden="true" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-ccg5yoga="">…</svg>
+           - unexpected value "color(srgb 0.0180392 0.0564706 0.13098)"
+
+
+      1164 |     const entry = page.locator('[data-whatsapp-contact]');
+      1165 |     await expect(entry).toBeVisible();
+    > 1166 |     await expect(entry.locator('.icon')).toHaveCSS('color', 'rgb(255, 255, 255)');
+           |                                          ^
+      1167 |     const existing = host === PLATFORM_HOST ? page.locator('.contact .button') : page.locator('[data-support-cta="hero"]');
+      1168 |     await expect(entry).toHaveAttribute('href', (await existing.getAttribute('href'))!);
+      1169 |     await expect(entry).toHaveAttribute('rel', 'noopener noreferrer');
+        at /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website/tests/photographic-landing.spec.ts:1166:42
+
+    Error Context: test-results/photographic-landing-float-1cd7e-ge-vendefacil-1platform-pro-chromium/error-context.md
+
+    Error Context: test-results/photographic-landing-float-1cd7e-ge-vendefacil-1platform-pro-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/photographic-landing-float-1cd7e-ge-vendefacil-1platform-pro-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/photographic-landing-float-1cd7e-ge-vendefacil-1platform-pro-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: medipago.gt 
+    [chromium] › tests/photographic-landing.spec.ts:1161:3 › floating WhatsApp keeps the tenant destination and sales message: vendefacil.1platform.pro 
+  1 passed (15.7s)

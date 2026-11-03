@@ -1,4 +1,5 @@
 ---
+import WhatsAppContact from '@components/WhatsAppContact.astro';
 import TenantBrand from '@components/TenantBrand.astro';
 import { Image } from 'astro:assets';
 import { useI18n, type Locale } from '@i18n';
@@ -776,6 +777,7 @@ const jsonLd = [
 </footer>
 
 
+<WhatsAppContact href={tenant.destinations.support ? contactHref('hero') : null} locale={locale} />
 <script is:inline type="application/json" id="landing-config" set:html={safeJson(clientConfig)} />
 <script>import '@scripts/photographic-service';</script></body>
 </html>

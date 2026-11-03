@@ -1,0 +1,62 @@
+[
+  {
+    "sample": 1,
+    "host": "1platform.pro",
+    "time": "2026-11-03T03:30:07.477443+00:00",
+    "health": {
+      "status": "ok",
+      "service": "site",
+      "version": "153d63bf0fc8883fba1cc728611dc93c60004ba3"
+    }
+  },
+  {
+    "sample": 1,
+    "host": "medipago.gt",
+    "time": "2026-11-03T03:30:07.975593+00:00",
+    "health": {
+      "status": "ok",
+      "service": "site",
+      "version": "153d63bf0fc8883fba1cc728611dc93c60004ba3"
+    }
+  },
+  {
+    "sample": 1,
+    "host": "vendefacil.gt",
+    "time": "2026-11-03T03:30:08.485841+00:00",
+    "health": {
+      "status": "ok",
+      "service": "site",
+      "version": "153d63bf0fc8883fba1cc728611dc93c60004ba3"
+    }
+  },
+  {
+    "sample": 2,
+    "host": "1platform.pro",
+    "time": "2026-11-03T03:30:09.029070+00:00",
+    "health": {
+      "status": "ok",
+      "service": "site",
+      "version": "153d63bf0fc8883fba1cc728611dc93c60004ba3"
+    }
+  },
+  {
+    "sample": 2,
+    "host": "medipago.gt",
+    "time": "2026-11-03T03:30:09.576341+00:00",
+    "health": {
+      "status": "ok",
+      "service": "site",
+      "version": "153d63bf0fc8883fba1cc728611dc93c60004ba3"
+    }
+  },
+  {
+    "sample": 2,
+    "host": "vendefacil.gt",
+    "time": "2026-11-03T03:30:10.078477+00:00",
+    "health": {
+      "status": "ok",
+      "service": "site",
+      "version": "153d63bf0fc8883fba1cc728611dc93c60004ba3"
+    }
+  }
+]
