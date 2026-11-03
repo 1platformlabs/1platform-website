@@ -5,6 +5,7 @@ import { repoTenantForHost } from '../src/data/site-tenants';
 import { plateOrderUrl } from '../src/lib/site-destinations';
 import { exportRepoContent, startFakeSiteStack, type FakeSiteStack, type PagesDocument } from './helpers/fake-site-api';
 import { getWithHost } from './helpers/http-host';
+import { openTenantPage } from './helpers/tenant-browser';
 
 /**
  * PNF-07 — the review plates landing (epic vertical-placas-nfc, D-11).
@@ -34,6 +35,39 @@ const visibleText = (html: string) =>
 
 const ctaHrefs = (html: string, label: string) =>
   [...html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>\s*([^<]*?)\s*<\/a>/g)].filter((m) => m[2] === label).map((m) => m[1]);
+
+for (const path of [ROUTE, '/es/soluciones/placas/']) {
+  test(`reduced motion keeps keyboard anchor navigation at ${path}`, async () => {
+    const { browser, page } = await openTenantPage(PLATFORM_HOST, path);
+    try {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.reload();
+      const link = page.locator('.hero a[href="#how-it-works"]');
+      await link.focus();
+      await page.keyboard.press('Enter');
+      await expect(page).toHaveURL(/#how-it-works$/);
+      await expect(page.locator('#how-it-works')).toBeInViewport();
+    } finally {
+      await browser.close();
+    }
+  });
+
+  test(`the four steps use the full desktop row at ${path}`, async () => {
+    const { browser, page } = await openTenantPage(PLATFORM_HOST, path);
+    try {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      const steps = page.locator('#how-it-works .spine');
+      await expect(steps.locator('li')).toHaveCount(4);
+      const columns = await steps.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
+      expect(columns, 'four steps must not leave two empty desktop columns').toBe(4);
+      await page.setViewportSize({ width: 390, height: 844 });
+      expect(await steps.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(1);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+    } finally {
+      await browser.close();
+    }
+  });
+}
 
 test('the CTA helper builds the exact encoded login href, and nothing without a panel', () => {
   const platform = repoTenantForHost(PLATFORM_HOST)!;

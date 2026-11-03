@@ -334,6 +334,12 @@ const steps = [
     flex-wrap: wrap;
   }
 
+  @media (min-width: 900px) {
+    #how-it-works :global(.spine) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
   @media (max-width: 900px) {
     .split {
       grid-template-columns: 1fr;

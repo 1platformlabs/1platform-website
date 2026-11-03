@@ -444,8 +444,8 @@
       "route": "/es/soluciones/placas/",
       "status": 200,
       "file": "es/soluciones/placas/index.html",
-      "sha256": "87e505037538cb6b167ea4efc31334e3fcfe0d3f517084138f43c3bd9bad8d32",
-      "bytes": 36394
+      "sha256": "c5b15e28d5f8230c8cfb91bc9eb5bb8567fab2272df0ff8db6d4db3d5358d4f8",
+      "bytes": 36509
     },
     {
       "route": "/es/soluciones/publicidad/",
@@ -599,8 +599,8 @@
       "route": "/solutions/review-plates/",
       "status": 200,
       "file": "solutions/review-plates/index.html",
-      "sha256": "10efbf26df40066d7c4831116f877b141c1d77fb61f612d0e045b99de17d88ba",
-      "bytes": 36136
+      "sha256": "722a252add0690bf7f17f22d6514001444daa0511081d3abfe2cd19b1564ca33",
+      "bytes": 36251
     },
     {
       "route": "/solutions/website/",

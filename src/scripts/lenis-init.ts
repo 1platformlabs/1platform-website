@@ -24,6 +24,8 @@ if (!prefersReducedMotion) {
 
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   anchor.addEventListener('click', (e) => {
+    // With no animation frame loop, leave scrolling and focus to the browser.
+    if (prefersReducedMotion) return;
     const href = (anchor as HTMLAnchorElement).getAttribute('href');
     if (href && href !== '#') {
       e.preventDefault();
