@@ -143,13 +143,22 @@ const sellAndGetPaid: Solution[] = [
     replaces: t('solutions.group.intelligence.item.deliveries.replaces'),
     href: l('/solutions/deliveries/'),
   },
-  {
-    icon: 'tag',
-    title: t('solutions.group.intelligence.item.reviewPlates.title'),
-    description: t('solutions.group.intelligence.item.reviewPlates.desc'),
-    replaces: t('solutions.group.intelligence.item.reviewPlates.replaces'),
-    href: l('/solutions/review-plates/'),
-  },
+  // Only where the tenant publishes the page (vertical-placas-nfc, plan §18).
+  // The code ships before any tenant's copy for it exists, and `t()` throws on
+  // a missing key: asked unconditionally, this card took the whole hub down
+  // (503) for every tenant that publishes `/solutions/` without the landing.
+  // The keys are asked only inside the branch, never before the check.
+  ...(Astro.locals.tenant.pages.includes('/solutions/review-plates/')
+    ? [
+        {
+          icon: 'tag' as const,
+          title: t('solutions.group.intelligence.item.reviewPlates.title'),
+          description: t('solutions.group.intelligence.item.reviewPlates.desc'),
+          replaces: t('solutions.group.intelligence.item.reviewPlates.replaces'),
+          href: l('/solutions/review-plates/'),
+        },
+      ]
+    : []),
 ];
 
 /* Build your site — everything a storefront or site is made of. */
