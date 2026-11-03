@@ -23,6 +23,7 @@ try {
    const button=page.locator('[data-whatsapp-contact]');
    assert.equal(await button.count(),1,`Missing floating WhatsApp: ${host}${path}`);
    assert(await button.isVisible());
+   assert.equal(await button.locator('.icon').evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)');
    const original=page.locator(host==='1platform.pro'?'.contact .button':'[data-support-cta="hero"]');
    assert.equal(await button.getAttribute('href'),await original.getAttribute('href'));
    assert.match(await button.getAttribute('aria-label'),locale==='en'?/opens a new tab/:/abre una pestaña nueva/);

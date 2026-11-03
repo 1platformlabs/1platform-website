@@ -32,3 +32,9 @@ PR workflow: verification only. Merge to main triggers prod.yml: build, tag/rele
 Wait for all PR checks before merge; follow the deploy and verify `/api/health` twice against the merge SHA plus rendered contact and tenant destinations on all three live domains. Rollback is a revert PR through the same protected main and normal deployment pipeline; no schema/data rollback is required.
 
 Root AGENTS.md and CLAUDE.md were not changed; no workspace-wide fact changed.
+
+## Post-release contrast correction
+
+PR #166 deployed as v3.19.0 / d0ca276e5148633589a219ed6ee3119d85c119bd; its production pipeline passed. The 17 functional production checks passed, but visual inspection found `.photographic-service a { color: inherit }` overriding the anchor colour and making the WhatsApp glyph dark. The original checks did not assert the computed glyph colour.
+
+A new assertion fails against that code for both medical and commerce tenants (2 failures, platform still passes), and the same failure was observed publicly. The icon now explicitly keeps white. The full functional suite, real bank and Linux visual gate were repeated, and the browser evidence refreshed. The production probe now checks computed icon colour too. No link, behavior, tenant data or unrelated theme colour changes.

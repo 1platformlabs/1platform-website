@@ -1163,6 +1163,7 @@ for (const host of [HOST, COMMERCE_HOST, PLATFORM_HOST]) {
     await page.goto(`http://${host}:${appPort}/`);
     const entry = page.locator('[data-whatsapp-contact]');
     await expect(entry).toBeVisible();
+    await expect(entry.locator('.icon')).toHaveCSS('color', 'rgb(255, 255, 255)');
     const existing = host === PLATFORM_HOST ? page.locator('.contact .button') : page.locator('[data-support-cta="hero"]');
     await expect(entry).toHaveAttribute('href', (await existing.getAttribute('href'))!);
     await expect(entry).toHaveAttribute('rel', 'noopener noreferrer');
