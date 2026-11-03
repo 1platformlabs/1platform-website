@@ -152,3 +152,11 @@ líneas con espacios finales del log rojo ya versionado en `main`
 (`docs/evidence/landing-whatsapp-float/contrast-red.txt`), sin reescribir esa
 evidencia histórica. El servidor de pruebas repo en 14421 quedó detenido; el
 banco API de 4421 permanece activo con PID 49032.
+
+## Gate `/verify-epic-e2e` (2026-11-03, HEAD `397aae5`)
+
+`gate-397aae5/`: 12 superficies de la landing (ES/EN × 390/768/1440 × preferencia clara/oscura,
+0 Axe) servidas por el SSR de la rama con manifiesto y copia de la API local `f0e383d3`;
+`extra/`: horizontal 844×390 y 1024×768, hub con la tarjeta y control `origin/main` (landing
+404, hub sin tarjeta). El arreglo del hub (503 con la copia actual de PROD) tiene su regresión
+en `tests/review-plates-rollout.spec.ts`. Publicar la landing en PROD: website#169.
