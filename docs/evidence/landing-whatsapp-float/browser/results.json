@@ -1,0 +1,173 @@
+{
+  "checks": 14,
+  "results": [
+    {
+      "host": "1platform.pro",
+      "path": "/",
+      "locale": "en",
+      "width": 1440,
+      "height": 900,
+      "href": "https://wa.me/50253946564",
+      "box": {
+        "x": 1356,
+        "y": 816,
+        "width": 60,
+        "height": 60
+      }
+    },
+    {
+      "host": "1platform.pro",
+      "path": "/",
+      "locale": "en",
+      "width": 390,
+      "height": 844,
+      "href": "https://wa.me/50253946564",
+      "box": {
+        "x": 318,
+        "y": 772,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "host": "1platform.pro",
+      "path": "/",
+      "locale": "en",
+      "width": 844,
+      "height": 390,
+      "href": "https://wa.me/50253946564",
+      "box": {
+        "x": 772,
+        "y": 318,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "host": "1platform.pro",
+      "path": "/es/",
+      "locale": "es",
+      "width": 1440,
+      "height": 900,
+      "href": "https://wa.me/50253946564",
+      "box": {
+        "x": 1356,
+        "y": 816,
+        "width": 60,
+        "height": 60
+      }
+    },
+    {
+      "host": "1platform.pro",
+      "path": "/es/",
+      "locale": "es",
+      "width": 390,
+      "height": 844,
+      "href": "https://wa.me/50253946564",
+      "box": {
+        "x": 318,
+        "y": 772,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "host": "1platform.pro",
+      "path": "/es/",
+      "locale": "es",
+      "width": 844,
+      "height": 390,
+      "href": "https://wa.me/50253946564",
+      "box": {
+        "x": 772,
+        "y": 318,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "host": "medipago.gt",
+      "path": "/",
+      "locale": "es",
+      "width": 1440,
+      "height": 900,
+      "href": "https://wa.me/50236532841?text=Hola%2C+quisiera+empezar+a+cobrar+con+tarjeta+en+mi+consultorio+y+conocer+la+facturaci%C3%B3n+autom%C3%A1tica.",
+      "box": {
+        "x": 1356,
+        "y": 816,
+        "width": 60,
+        "height": 60
+      }
+    },
+    {
+      "host": "medipago.gt",
+      "path": "/",
+      "locale": "es",
+      "width": 390,
+      "height": 844,
+      "href": "https://wa.me/50236532841?text=Hola%2C+quisiera+empezar+a+cobrar+con+tarjeta+en+mi+consultorio+y+conocer+la+facturaci%C3%B3n+autom%C3%A1tica.",
+      "box": {
+        "x": 318,
+        "y": 772,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "host": "medipago.gt",
+      "path": "/",
+      "locale": "es",
+      "width": 844,
+      "height": 390,
+      "href": "https://wa.me/50236532841?text=Hola%2C+quisiera+empezar+a+cobrar+con+tarjeta+en+mi+consultorio+y+conocer+la+facturaci%C3%B3n+autom%C3%A1tica.",
+      "box": {
+        "x": 772,
+        "y": 318,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "host": "vendefacil.gt",
+      "path": "/",
+      "locale": "es",
+      "width": 1440,
+      "height": 900,
+      "href": "https://wa.me/50252370065?text=Hola%2C+quiero+conocer+Vende+F%C3%A1cil+para+mi+negocio%3A+cobros%2C+facturaci%C3%B3n%2C+delivery+y+Meta+Ads.",
+      "box": {
+        "x": 1356,
+        "y": 816,
+        "width": 60,
+        "height": 60
+      }
+    },
+    {
+      "host": "vendefacil.gt",
+      "path": "/",
+      "locale": "es",
+      "width": 390,
+      "height": 844,
+      "href": "https://wa.me/50252370065?text=Hola%2C+quiero+conocer+Vende+F%C3%A1cil+para+mi+negocio%3A+cobros%2C+facturaci%C3%B3n%2C+delivery+y+Meta+Ads.",
+      "box": {
+        "x": 318,
+        "y": 772,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "host": "vendefacil.gt",
+      "path": "/",
+      "locale": "es",
+      "width": 844,
+      "height": 390,
+      "href": "https://wa.me/50252370065?text=Hola%2C+quiero+conocer+Vende+F%C3%A1cil+para+mi+negocio%3A+cobros%2C+facturaci%C3%B3n%2C+delivery+y+Meta+Ads.",
+      "box": {
+        "x": 772,
+        "y": 318,
+        "width": 56,
+        "height": 56
+      }
+    }
+  ]
+}

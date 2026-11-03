@@ -1,4 +1,5 @@
 ---
+import WhatsAppContact from '@components/WhatsAppContact.astro';
 import TenantBrand from '@components/TenantBrand.astro';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { useI18n } from '@i18n';
@@ -217,6 +218,7 @@ const showCloud = ['name', 'description', 'status'].every((field) =>
       <section class="section contact" id="contacto" aria-labelledby="contact-title"><div class="wrap contact-inner"><div><p class="eyebrow">{t('infrastructure.contact.eyebrow')}</p><h2 id="contact-title">{t('infrastructure.contact.title')}</h2><p>{t('infrastructure.contact.description')}</p></div>{contactHref && (<a class="button button--navy" href={contactHref}>{t('infrastructure.contact.whatsapp')}<svg class="icon" aria-hidden="true"><use href="#infra-i-up" /></svg></a>)}</div></section>
 
 </div>
+<WhatsAppContact href={contactHref} locale={locale} />
 </BaseLayout>
 <script>
   import '@scripts/infrastructure-home';
