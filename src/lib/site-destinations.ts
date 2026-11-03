@@ -94,3 +94,18 @@ export function ctaTo(
 ): { label: string; href: string } | undefined {
   return href ? { label, href } : undefined
 }
+
+/**
+ * Where "order my plates" leads: the tenant's panel sign-in, carrying the
+ * in-panel order form as `next` so a visitor lands on it after signing in
+ * (epic vertical-placas-nfc, D-11). `/auth/sign-up` does not exist, so it is
+ * the login route. `null` when the tenant has no panel; the caller renders no
+ * CTA, never a default.
+ */
+export function plateOrderUrl(locals: DestinationLocals): string | null {
+  const base = locals.tenant.destinations.app
+  if (!base) return null
+  const url = new URL('/auth/login', base)
+  url.searchParams.set('next', '/main/plates/orders?new=1')
+  return environmentDestination(url.toString())
+}
