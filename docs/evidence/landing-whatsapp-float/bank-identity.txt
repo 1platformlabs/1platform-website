@@ -1,0 +1,6 @@
+SERVICIO   PUERTO PID     RAMA                             SHA       HTTP  WORKTREE
+api        8410   32496   test/landing-whatsapp-float      0ee54244  404   /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-api
+website    4721   37324   feat/landing-whatsapp-float      9616069   404   /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website
+api-control 8710   35332   HEAD                             0ee54244  404   /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-api-control
+website-control 5021   37432   HEAD                             153d63b   404   /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website-control
+BANCO OK: todos los servicios salen de worktrees aislados

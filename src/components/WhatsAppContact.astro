@@ -15,7 +15,7 @@ try {
 // UI copy ships with the renderer so existing published SitePages need no migration.
 const label = locale === 'en' ? 'Contact us on WhatsApp (opens a new tab)' : 'Contactar por WhatsApp (abre una pestaña nueva)';
 ---
-{available && <a class="whatsapp-contact" data-whatsapp-contact href={href}
+{available && <aside aria-label={locale === 'en' ? 'Quick contact' : 'Contacto rápido'}><a class="whatsapp-contact" data-whatsapp-contact href={href}
   aria-label={label} title={label} target="_blank" rel="noopener noreferrer">
   <Icon name="whatsapp" size={32} />
-</a>}
+</a></aside>}

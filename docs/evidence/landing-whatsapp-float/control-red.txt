@@ -1,0 +1,18 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Missing floating WhatsApp: 1platform.pro/
+
+0 !== 1
+
+    at file:///Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website/tests/bench/whatsapp-contacts.real.mjs:24:11 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 0,
+  expected: 1,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.18.0
