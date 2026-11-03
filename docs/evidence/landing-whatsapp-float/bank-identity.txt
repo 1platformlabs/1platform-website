@@ -1,6 +1,7 @@
-SERVICIO   PUERTO PID     RAMA                             SHA       HTTP  WORKTREE
-api        8410   32496   test/landing-whatsapp-float      0ee54244  404   /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-api
-website    4721   37324   feat/landing-whatsapp-float      9616069   404   /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website
-api-control 8710   35332   HEAD                             0ee54244  404   /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-api-control
-website-control 5021   37432   HEAD                             153d63b   404   /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website-control
-BANCO OK: todos los servicios salen de worktrees aislados
+Service | Port | PID | Source SHA | Worktree
+api | 8410 | 32496 | 0ee54244bddb400282f62ccffe0b698508a8315a | /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-api
+website | 4721 | 68699 | 2b08ff9e55b190baa35709a6a5934d941bf0985f | /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website
+api-control | 8710 | 35332 | 0ee54244bddb400282f62ccffe0b698508a8315a | /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-api-control
+website-control | 5021 | 37432 | 153d63bf0fc8883fba1cc728611dc93c60004ba3 | /Users/staimer/Documents/1platform-worktrees/landing-whatsapp-float-website-control
+
+BANCO OK: full runtimes in isolated worktrees; public route verification in browser/results.json.
