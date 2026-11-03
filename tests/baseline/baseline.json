@@ -3,8 +3,8 @@
   "subject": "the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo",
   "host": "1platform.pro",
   "bodies": "tests/baseline/html",
-  "total_routes": 100,
-  "ok_routes": 51,
+  "total_routes": 102,
+  "ok_routes": 53,
   "redirect_routes": 48,
   "other_routes": 1,
   "entries": [
@@ -423,8 +423,8 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "3a530b1224615fe3a93e9838137274c8612ce122d369598d2efd1ce313826987",
-      "bytes": 75089
+      "sha256": "d4c54d29b89e10e8febaae6016a69a9aefc4d7feba2449faf6655a2774ed81aa",
+      "bytes": 76105
     },
     {
       "route": "/es/soluciones/envios/",
@@ -439,6 +439,13 @@
       "file": "es/soluciones/marca-blanca/index.html",
       "sha256": "c8eacd558180099daecf7e1d2e6fe959ad14b6cca68975a3e3db8a659b666dc6",
       "bytes": 36470
+    },
+    {
+      "route": "/es/soluciones/placas/",
+      "status": 200,
+      "file": "es/soluciones/placas/index.html",
+      "sha256": "9643ec09b8f667f8cb693653dbe252f6b2da72e4af626c005cd5fda783c530de",
+      "bytes": 36386
     },
     {
       "route": "/es/soluciones/publicidad/",
@@ -557,8 +564,8 @@
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "46ef2d7e89f8d9c4bd12ba2b40bd6f81e1a871212d9b1a83a54998e1e263baeb",
-      "bytes": 73050
+      "sha256": "233c0bcb73b4f63defe966fdf14f74ac4d339ca0d0351479147da0498fddabb0",
+      "bytes": 74064
     },
     {
       "route": "/solutions/ads/",
@@ -587,6 +594,13 @@
       "file": "solutions/online-store/index.html",
       "sha256": "d742fb3255844c57161975818bbc1f906fc77186064127a0d54409f2cf3bbe56",
       "bytes": 38449
+    },
+    {
+      "route": "/solutions/review-plates/",
+      "status": 200,
+      "file": "solutions/review-plates/index.html",
+      "sha256": "b1531a2f0828eb59644021fb2693487633e0ab873fbed2878d1ec5f72604145d",
+      "bytes": 36128
     },
     {
       "route": "/solutions/website/",
