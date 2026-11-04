@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Nube / Cloud se presenta como disponible en el catálogo ES/EN y enlaza a su guía de servidores y bases de datos desde el destino de documentación del tenant. El contenido publicado se actualiza por separado en SitePages.
+
 ### Added
 - Floating WhatsApp access on infrastructure and photographic landings, using each tenant’s configured contact and existing sales message, with keyboard focus and responsive safe-area spacing.
 
