@@ -1,0 +1,22 @@
+
+> 1platform-website@3.5.17 build
+> astro build
+
+06:36:06 [@astrojs/node] Enabling sessions with filesystem storage
+06:36:06 [content] Syncing content
+06:36:06 [content] Synced content
+06:36:06 [types] Generated 547ms
+06:36:06 [build] output: "server"
+06:36:06 [build] mode: "server"
+06:36:06 [build] directory: /Users/staimer/Documents/1platform-worktrees/vertical-placas-nfc-website/dist/
+06:36:06 [build] adapter: @astrojs/node
+06:36:06 [build] Collecting build info...
+06:36:06 [build] ✓ Completed in 593ms.
+06:36:06 [build] Building server entrypoints...
+06:36:07 [vite] ✓ built in 256ms
+06:36:08 [vite] ✓ built in 793ms
+06:36:08 [vite] ✓ built in 65ms
+06:36:08 [build] Rearranging server assets...
+06:36:08 [build] ✓ Completed in 1.16s.
+06:36:08 [build] Server built in 1.75s
+06:36:08 [build] Complete!

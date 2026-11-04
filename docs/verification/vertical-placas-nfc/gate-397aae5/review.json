@@ -1,0 +1,326 @@
+[
+  {
+    "id": "en-390-light",
+    "url": "http://1platform.pro:4421/solutions/review-plates/#how-it-works",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "preferredColorScheme": "light",
+    "metrics": {
+      "width": 390,
+      "scrollWidth": 390,
+      "colorScheme": "light",
+      "columns": "342px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "en-390-dark",
+    "url": "http://1platform.pro:4421/solutions/review-plates/#how-it-works",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "preferredColorScheme": "dark",
+    "metrics": {
+      "width": 390,
+      "scrollWidth": 390,
+      "colorScheme": "light",
+      "columns": "342px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "en-768-light",
+    "url": "http://1platform.pro:4421/solutions/review-plates/#how-it-works",
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "preferredColorScheme": "light",
+    "metrics": {
+      "width": 768,
+      "scrollWidth": 768,
+      "colorScheme": "light",
+      "columns": "720px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "en-768-dark",
+    "url": "http://1platform.pro:4421/solutions/review-plates/#how-it-works",
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "preferredColorScheme": "dark",
+    "metrics": {
+      "width": 768,
+      "scrollWidth": 768,
+      "colorScheme": "light",
+      "columns": "720px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "en-1440-light",
+    "url": "http://1platform.pro:4421/solutions/review-plates/#how-it-works",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "preferredColorScheme": "light",
+    "metrics": {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "colorScheme": "light",
+      "columns": "276px 276px 276px 276px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "en-1440-dark",
+    "url": "http://1platform.pro:4421/solutions/review-plates/#how-it-works",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "preferredColorScheme": "dark",
+    "metrics": {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "colorScheme": "light",
+      "columns": "276px 276px 276px 276px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "es-390-light",
+    "url": "http://1platform.pro:4421/es/soluciones/placas/#how-it-works",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "preferredColorScheme": "light",
+    "metrics": {
+      "width": 390,
+      "scrollWidth": 390,
+      "colorScheme": "light",
+      "columns": "342px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "es-390-dark",
+    "url": "http://1platform.pro:4421/es/soluciones/placas/#how-it-works",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "preferredColorScheme": "dark",
+    "metrics": {
+      "width": 390,
+      "scrollWidth": 390,
+      "colorScheme": "light",
+      "columns": "342px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "es-768-light",
+    "url": "http://1platform.pro:4421/es/soluciones/placas/#how-it-works",
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "preferredColorScheme": "light",
+    "metrics": {
+      "width": 768,
+      "scrollWidth": 768,
+      "colorScheme": "light",
+      "columns": "720px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "es-768-dark",
+    "url": "http://1platform.pro:4421/es/soluciones/placas/#how-it-works",
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "preferredColorScheme": "dark",
+    "metrics": {
+      "width": 768,
+      "scrollWidth": 768,
+      "colorScheme": "light",
+      "columns": "720px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "es-1440-light",
+    "url": "http://1platform.pro:4421/es/soluciones/placas/#how-it-works",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "preferredColorScheme": "light",
+    "metrics": {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "colorScheme": "light",
+      "columns": "276px 276px 276px 276px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  },
+  {
+    "id": "es-1440-dark",
+    "url": "http://1platform.pro:4421/es/soluciones/placas/#how-it-works",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "preferredColorScheme": "dark",
+    "metrics": {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "colorScheme": "light",
+      "columns": "276px 276px 276px 276px",
+      "unusedRight": 0,
+      "steps": 4
+    },
+    "keyboard": {
+      "focus": {
+        "visible": true,
+        "outline": "none",
+        "width": "3px",
+        "shadow": "rgb(255, 255, 255) 0px 0px 0px 2px, rgb(19, 21, 26) 0px 0px 0px 5px"
+      },
+      "anchor": true
+    },
+    "violations": []
+  }
+]

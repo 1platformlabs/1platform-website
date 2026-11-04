@@ -1,0 +1,17 @@
+[WebServer] (node:63086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:63183) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:63231) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/review-plates.spec.ts:38:1 › the CTA helper builds the exact encoded login href, and nothing without a panel (3ms)
+  ✓  2 [chromium] › tests/review-plates.spec.ts:53:3 › the en page renders, its CTA is the encoded login href and it names no provider (23ms)
+  ✓  3 [chromium] › tests/review-plates.spec.ts:53:3 › the es page renders, its CTA is the encoded login href and it names no provider (10ms)
+  ✓  4 [chromium] › tests/review-plates.spec.ts:99:3 › tenant mode (API manifest) › a tenant with a panel points the CTA at ITS panel, in both languages (50ms)
+  ✓  5 [chromium] › tests/review-plates.spec.ts:110:3 › tenant mode (API manifest) › a tenant without a panel renders the page and no CTA (16ms)
+  ✓  6 [chromium] › tests/review-plates.spec.ts:118:3 › tenant mode (API manifest) › the platform itself, in API mode, still renders it with its own panel (6ms)
+
+  6 passed (5.7s)

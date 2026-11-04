@@ -1,0 +1,21 @@
+[WebServer] (node:79725) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:79826) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 10 tests using 1 worker
+
+(node:79882) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /solutions/review-plates/ (483ms)
+  ✓   2 [chromium] › tests/review-plates.spec.ts:55:3 › the four steps use the full desktop row at /solutions/review-plates/ (251ms)
+  ✓   3 [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /es/soluciones/placas/ (251ms)
+  ✓   4 [chromium] › tests/review-plates.spec.ts:55:3 › the four steps use the full desktop row at /es/soluciones/placas/ (332ms)
+  ✓   5 [chromium] › tests/review-plates.spec.ts:72:1 › the CTA helper builds the exact encoded login href, and nothing without a panel (1ms)
+  ✓   6 [chromium] › tests/review-plates.spec.ts:87:3 › the en page renders, its CTA is the encoded login href and it names no provider (19ms)
+  ✓   7 [chromium] › tests/review-plates.spec.ts:87:3 › the es page renders, its CTA is the encoded login href and it names no provider (6ms)
+  ✓   8 [chromium] › tests/review-plates.spec.ts:133:3 › tenant mode (API manifest) › a tenant with a panel points the CTA at ITS panel, in both languages (32ms)
+  ✓   9 [chromium] › tests/review-plates.spec.ts:144:3 › tenant mode (API manifest) › a tenant without a panel renders the page and no CTA (12ms)
+  ✓  10 [chromium] › tests/review-plates.spec.ts:152:3 › tenant mode (API manifest) › the platform itself, in API mode, still renders it with its own panel (4ms)
+
+  10 passed (6.1s)

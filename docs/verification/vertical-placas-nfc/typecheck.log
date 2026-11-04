@@ -1,0 +1,140 @@
+
+> 1platform-website@3.5.17 typecheck
+> astro check
+
+06:46:37 [@astrojs/node] Enabling sessions with filesystem storage
+06:46:38 [content] Syncing content
+06:46:38 [content] Synced content
+06:46:38 [types] Generated 287ms
+06:46:38 [check] Getting diagnostics for Astro files in /Users/staimer/Documents/1platform-worktrees/vertical-placas-nfc-website...
+[96msrc/content.config.ts[0m:[93m55[0m:[93m21[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m55[0m     translationKey: z.string(),
+[7m  [0m [93m                    ~[0m
+[96msrc/content.config.ts[0m:[93m54[0m:[93m15[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m54[0m     category: z.enum(['new-feature', 'improvement', 'bug-fix', 'api-change']),
+[7m  [0m [93m              ~[0m
+[96msrc/content.config.ts[0m:[93m53[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m53[0m     version: z.string().optional(),
+[7m  [0m [93m             ~[0m
+[96msrc/content.config.ts[0m:[93m52[0m:[93m11[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m52[0m     date: z.coerce.date(),
+[7m  [0m [93m          ~[0m
+[96msrc/content.config.ts[0m:[93m51[0m:[93m12[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m51[0m     title: z.string(),
+[7m  [0m [93m           ~[0m
+[96msrc/content.config.ts[0m:[93m50[0m:[93m11[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m50[0m   schema: z.object({
+[7m  [0m [93m          ~[0m
+[96msrc/content.config.ts[0m:[93m44[0m:[93m21[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m44[0m     translationKey: z.string(),
+[7m  [0m [93m                    ~[0m
+[96msrc/content.config.ts[0m:[93m43[0m:[93m19[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m43[0m     tags: z.array(z.string()).optional(),
+[7m  [0m [93m                  ~[0m
+[96msrc/content.config.ts[0m:[93m43[0m:[93m11[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m43[0m     tags: z.array(z.string()).optional(),
+[7m  [0m [93m          ~[0m
+[96msrc/content.config.ts[0m:[93m42[0m:[93m18[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m42[0m     readingTime: z.number().int().positive().optional(),
+[7m  [0m [93m                 ~[0m
+[96msrc/content.config.ts[0m:[93m38[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m38[0m     ogImage: z.string().optional(),
+[7m  [0m [93m             ~[0m
+[96msrc/content.config.ts[0m:[93m37[0m:[93m12[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m37[0m     image: z.string().optional(),
+[7m  [0m [93m           ~[0m
+[96msrc/content.config.ts[0m:[93m29[0m:[93m15[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m29[0m     category: z.enum([
+[7m  [0m [93m              ~[0m
+[96msrc/content.config.ts[0m:[93m28[0m:[93m13[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m28[0m     author: z.string(),
+[7m  [0m [93m            ~[0m
+[96msrc/content.config.ts[0m:[93m27[0m:[93m18[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m27[0m     updatedDate: z.coerce.date().optional(),
+[7m  [0m [93m                 ~[0m
+[96msrc/content.config.ts[0m:[93m26[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m26[0m     pubDate: z.coerce.date(),
+[7m  [0m [93m             ~[0m
+[96msrc/content.config.ts[0m:[93m25[0m:[93m18[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m25[0m     description: z.string(),
+[7m  [0m [93m                 ~[0m
+[96msrc/content.config.ts[0m:[93m24[0m:[93m12[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m24[0m     title: z.string(),
+[7m  [0m [93m           ~[0m
+[96msrc/content.config.ts[0m:[93m23[0m:[93m11[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m23[0m   schema: z.object({
+[7m  [0m [93m          ~[0m
+[96msrc/content.config.ts[0m:[93m1[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'z' is deprecated.
+
+[7m1[0m import { defineCollection, z } from 'astro:content';
+[7m [0m [93m                           ~[0m
+
+[96msrc/components/Breadcrumb.astro[0m:[93m47[0m:[93m9[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m47[0m <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+[7m  [0m [93m        ~~~~[0m
+
+[96msrc/components/ShareButtons.astro[0m:[93m96[0m:[93m20[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(commandId: string, showUI?: boolean | undefined, value?: string | undefined): boolean' of 'document.execCommand' is deprecated.
+
+[7m96[0m           document.execCommand('copy');
+[7m  [0m [93m                   ~~~~~~~~~~~[0m
+
+[96msrc/layouts/BaseLayout.astro[0m:[93m378[0m:[93m13[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m378[0m     <script type="application/ld+json" set:html={jsonLdScript({
+[7m   [0m [93m            ~~~~[0m
+[96msrc/layouts/BaseLayout.astro[0m:[93m369[0m:[93m15[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m369[0m       <script type="application/ld+json" set:html={jsonLdScript(jsonLd)} />
+[7m   [0m [93m              ~~~~[0m
+
+[96mtests/site-without-copy-is-not-a-200.spec.ts[0m:[93m148[0m:[93m10[0m - [93mwarning[0m[90m ts(80006): [0mThis may be converted to an async function.
+
+[7m148[0m function startStubApi(): Promise<{ server: Server; baseUrl: string }> {
+[7m   [0m [93m         ~~~~~~~~~~~~[0m
+
+[96mtests/tenant-composition-contract.spec.ts[0m:[93m269[0m:[93m10[0m - [93mwarning[0m[90m ts(80006): [0mThis may be converted to an async function.
+
+[7m269[0m function startStubApi(): Promise<{ server: Server; baseUrl: string }> {
+[7m   [0m [93m         ~~~~~~~~~~~~[0m
+
+[96mtests/tenant-isolation.spec.ts[0m:[93m4[0m:[93m10[0m - [93mwarning[0m[90m ts(6133): [0m'MissBudget' is declared but its value is never read.
+
+[7m4[0m import { MissBudget, TenantCache } from '../src/lib/tenant-cache'
+[7m [0m [93m         ~~~~~~~~~~[0m
+
+Result (317 files):
+- 0 errors
+- 0 warnings
+- 27 hints

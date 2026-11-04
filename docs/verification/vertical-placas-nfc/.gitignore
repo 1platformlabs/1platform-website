@@ -1,0 +1,6 @@
+# Public seed exports are generated from the catalogues for the private bank.
+site-pages.json
+site-tenant.json
+
+# Interrupted broad run is retained locally; it is not acceptance evidence.
+full-suite-interrupted.log

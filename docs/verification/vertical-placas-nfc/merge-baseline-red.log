@@ -1,0 +1,8 @@
+compare-served: 102 baseline routes against http://127.0.0.1:14421
+  identical : 100
+  differing : 2
+  wrong     : 0   (status, destination, or unreachable)
+  normalisers applied: trailing-newline, json-ld-whitespace, scoped-style-order
+  (run with --explain for the first divergence of each)
+  DIFFERS    /
+  DIFFERS    /es/

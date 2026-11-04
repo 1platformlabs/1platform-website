@@ -94,3 +94,26 @@ export function ctaTo(
 ): { label: string; href: string } | undefined {
   return href ? { label, href } : undefined
 }
+
+/**
+ * Where "order my plates" leads: the tenant's panel sign-in, carrying the
+ * in-panel order form as `next` so a visitor lands on it after signing in
+ * (epic vertical-placas-nfc, D-11). `/auth/sign-up` does not exist, so it is
+ * the login route. `null` when the tenant has no panel; the caller renders no
+ * CTA, never a default.
+ */
+export function plateOrderUrl(locals: DestinationLocals): string | null {
+  const base = locals.tenant.destinations.app
+  if (!base) return null
+  // RELATIVE to the app base, never root-absolute: the base carries the
+  // panel's basename (`https://app.1platform.pro/app/`) and the login lives
+  // under it. `new URL('/auth/login', base)` would drop `/app/` and land the
+  // merchant on a page the panel does not serve. A base without its trailing
+  // slash would lose its last segment the same way, so one is added first.
+  const root = new URL(base)
+  if (!root.pathname.endsWith('/')) root.pathname = `${root.pathname}/`
+  const url = new URL('auth/login', root)
+  url.search = ''
+  url.searchParams.set('next', '/main/plates/orders?new=1')
+  return environmentDestination(url.toString())
+}

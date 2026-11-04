@@ -1,0 +1,152 @@
+[
+  {
+    "label": "rama-en-landing-landscape-844x390",
+    "port": 4421,
+    "path": "/solutions/review-plates/",
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "status": 200,
+    "plates_links_in_main": 0,
+    "overflow": false,
+    "axe": 0,
+    "errors": 0,
+    "file": "rama-en-landing-landscape-844x390.png"
+  },
+  {
+    "label": "rama-en-landing-landscape-1024x768",
+    "port": 4421,
+    "path": "/solutions/review-plates/",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "status": 200,
+    "plates_links_in_main": 0,
+    "overflow": false,
+    "axe": 0,
+    "errors": 0,
+    "file": "rama-en-landing-landscape-1024x768.png"
+  },
+  {
+    "label": "rama-en-hub-1440",
+    "port": 4421,
+    "path": "/solutions/#solutions",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "status": 200,
+    "plates_links_in_main": 1,
+    "overflow": false,
+    "axe": 0,
+    "errors": 0,
+    "file": "rama-en-hub-1440.png"
+  },
+  {
+    "label": "control-en-landing-1440",
+    "port": 4521,
+    "path": "/solutions/review-plates/",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "status": 404,
+    "plates_links_in_main": 0,
+    "overflow": false,
+    "axe": null,
+    "errors": 0,
+    "file": "control-en-landing-1440.png"
+  },
+  {
+    "label": "control-en-hub-1440",
+    "port": 4521,
+    "path": "/solutions/",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "status": 200,
+    "plates_links_in_main": 0,
+    "overflow": false,
+    "axe": 0,
+    "errors": 0,
+    "file": "control-en-hub-1440.png"
+  },
+  {
+    "label": "rama-es-landing-landscape-844x390",
+    "port": 4421,
+    "path": "/es/soluciones/placas/",
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "status": 200,
+    "plates_links_in_main": 0,
+    "overflow": false,
+    "axe": 0,
+    "errors": 0,
+    "file": "rama-es-landing-landscape-844x390.png"
+  },
+  {
+    "label": "rama-es-landing-landscape-1024x768",
+    "port": 4421,
+    "path": "/es/soluciones/placas/",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "status": 200,
+    "plates_links_in_main": 0,
+    "overflow": false,
+    "axe": 0,
+    "errors": 0,
+    "file": "rama-es-landing-landscape-1024x768.png"
+  },
+  {
+    "label": "rama-es-hub-1440",
+    "port": 4421,
+    "path": "/es/soluciones/#solutions",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "status": 200,
+    "plates_links_in_main": 1,
+    "overflow": false,
+    "axe": 0,
+    "errors": 0,
+    "file": "rama-es-hub-1440.png"
+  },
+  {
+    "label": "control-es-landing-1440",
+    "port": 4521,
+    "path": "/es/soluciones/placas/",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "status": 404,
+    "plates_links_in_main": 0,
+    "overflow": false,
+    "axe": null,
+    "errors": 0,
+    "file": "control-es-landing-1440.png"
+  },
+  {
+    "label": "control-es-hub-1440",
+    "port": 4521,
+    "path": "/es/soluciones/",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "status": 200,
+    "plates_links_in_main": 0,
+    "overflow": false,
+    "axe": 0,
+    "errors": 0,
+    "file": "control-es-hub-1440.png"
+  }
+]

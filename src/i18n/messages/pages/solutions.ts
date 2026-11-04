@@ -76,6 +76,11 @@ export default defineMessages({
       'Register a shipment, dispatch it with your own staff or a courier service, and give your buyer a link to follow it.',
     'solutions.group.intelligence.item.deliveries.replaces': 'A spreadsheet beside the orders',
 
+    'solutions.group.intelligence.item.reviewPlates.title': 'Review Plates',
+    'solutions.group.intelligence.item.reviewPlates.desc':
+      'A counter plate with NFC and QR that takes your customer to your reviews, your profile or your chat, and that you can re-point at any time.',
+    'solutions.group.intelligence.item.reviewPlates.replaces': 'A printed code that goes stale',
+
     // — Group: build your site ———————————————————————————————————
     'solutions.group.content.eyebrow': 'Build your site',
     'solutions.group.content.title': 'Everything the storefront is made of',
@@ -263,6 +268,11 @@ export default defineMessages({
     'solutions.group.intelligence.item.deliveries.desc':
       'Registra un envío, despáchalo con tu propio personal o con una mensajería, y dale a tu comprador un enlace para seguirlo.',
     'solutions.group.intelligence.item.deliveries.replaces': 'Una hoja de cálculo al lado de los pedidos',
+
+    'solutions.group.intelligence.item.reviewPlates.title': 'Placas de reseñas',
+    'solutions.group.intelligence.item.reviewPlates.desc':
+      'Una placa de mostrador con NFC y QR que lleva a tu cliente a tus reseñas, tu perfil o tu chat, y que puedes redirigir cuando quieras.',
+    'solutions.group.intelligence.item.reviewPlates.replaces': 'Un código impreso que queda viejo',
 
     // — Grupo: crea tu sitio —————————————————————————————————————
     'solutions.group.content.eyebrow': 'Crea tu sitio',
