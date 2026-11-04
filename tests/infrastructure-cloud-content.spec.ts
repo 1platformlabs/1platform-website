@@ -26,7 +26,7 @@ test('Cloud requires complete tenant copy in each locale, with no catalogue fall
   const stack = await startFakeSiteStack(sites, { host: sites[0].tenant.domain, path: '/' });
   try {
     for (const [index, site] of sites.entries()) {
-      for (const [path, name, status] of [['/es/', 'Nube', 'EN PREPARACIÓN'], ['/', 'Cloud', 'IN DEVELOPMENT']]) {
+      for (const [path, name, status] of [['/es/', 'Nube', 'DISPONIBLE'], ['/', 'Cloud', 'AVAILABLE']]) {
         const response = await getWithHost(`${stack.baseUrl}${path}`, site.tenant.domain);
         expect(response.status, `${scenarios[index]} ${path}: ${stack.log()}`).toBe(200);
         const complete = scenarios[index] === 'complete';

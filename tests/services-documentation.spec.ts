@@ -3,15 +3,15 @@ import { expect, test } from '@playwright/test';
 const destinations = [
   'pagos-en-linea', 'facturacion-electronica', 'envios', 'suscripciones', 'publicidad',
   'sitios-web-y-contenido/publicar-con-dominio', 'dominios-y-correo',
-  'agentes-de-ia/integrar-en-su-aplicacion', 'telemetria/integrar-telemetria', 'plataforma/marca-blanca',
+  'agentes-de-ia/integrar-en-su-aplicacion', 'telemetria/integrar-telemetria', 'plataforma/marca-blanca', 'nube',
 ];
 
 for (const locale of ['es', 'en']) {
-  test(`ten contextual documentation links preserve illustrative controls (${locale})`, async ({ page }) => {
+  test(`eleven contextual documentation links preserve illustrative controls (${locale})`, async ({ page }) => {
     await page.goto(locale === 'es' ? '/es/' : '/');
     const cards = page.locator('.capability-entry');
     await expect(cards).toHaveCount(11);
-    await expect(cards.last().getByRole('link')).toHaveCount(0);
+    await expect(cards.last().getByRole('link')).toHaveCount(1);
     await expect(page.locator('.capability a')).toHaveCount(0);
     for (let index = 0; index < destinations.length; index++) {
       const button = cards.nth(index).getByRole('button');

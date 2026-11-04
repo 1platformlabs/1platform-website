@@ -4,23 +4,25 @@ import AxeBuilder from '@axe-core/playwright';
 const route = '/es/';
 
 for (const [path, name, description, status, count] of [
-  ['/es/', 'Nube', 'Servidores y bases de datos para sus ambientes', 'EN PREPARACIÓN', 'capacidades seleccionadas'],
-  ['/', 'Cloud', 'Servers and databases for your environments', 'IN DEVELOPMENT', 'capabilities selected'],
+  ['/es/', 'Nube', 'Servidores y bases de datos para sus ambientes', 'DISPONIBLE', 'capacidades seleccionadas'],
+  ['/', 'Cloud', 'Servers and databases for your environments', 'AVAILABLE', 'capabilities selected'],
 ]) {
-  test(`${path}: Cloud is an illustrative, keyboard-selectable service in development`, async ({ page }) => {
+  test(`${path}: Cloud is an illustrative, keyboard-selectable available service with documentation`, async ({ page }) => {
     await page.goto(path);
     const cloud = page.locator(`[data-capability="${name}"]`);
     await expect(cloud.locator('.capability-number')).toHaveText('11');
     await expect(cloud.locator('small')).toHaveText(description);
     await expect(cloud.locator('em')).toHaveText(status);
     await expect(cloud).toHaveAttribute('aria-pressed', 'false');
-    await expect(cloud.locator('..').locator('a')).toHaveCount(0);
+    const documentation = cloud.locator('..').getByRole('link');
+    await expect(documentation).toHaveAttribute('href', 'https://developer.1platform.pro/docs/saas/1platform-api/nube/');
+    await expect(documentation).toHaveAccessibleName(`${path === '/' ? 'View documentation' : 'Ver documentación'}: ${name}`);
     await expect(page.locator('[data-selection-count]')).toHaveText(`3 ${count}`);
     const mutations: string[] = [];
     page.on('request', (request) => {
       if (!['GET', 'HEAD'].includes(request.method())) mutations.push(request.url());
     });
-    await page.locator('.capability-documentation').last().focus();
+    await page.locator('.capability-documentation').nth(9).focus();
     await page.keyboard.press('Tab');
     await expect(cloud).toBeFocused();
     expect(await cloud.evaluate((button) => button.matches(':focus-visible'))).toBe(true);
@@ -32,6 +34,8 @@ for (const [path, name, description, status, count] of [
     await page.keyboard.press('Enter');
     await expect(cloud).toHaveAttribute('aria-pressed', 'false');
     await expect(page.locator('[data-selection-count]')).toHaveText(`3 ${count}`);
+    await page.keyboard.press('Tab');
+    await expect(documentation).toBeFocused();
     expect(mutations).toEqual([]);
   });
 }

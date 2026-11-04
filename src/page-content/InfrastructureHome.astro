@@ -128,6 +128,7 @@ const showCloud = ['name', 'description', 'status'].every((field) =>
             </div>
             {showCloud && (<div class="capability-entry">
               <button class="capability" type="button" data-capability={t('infrastructure.capabilities.cloud.name')} data-capability-status={t('infrastructure.capabilities.cloud.status')} aria-pressed="false"><span class="capability-number">11</span><span class="capability-text"><strong>{t('infrastructure.capabilities.cloud.name')}</strong><small>{t('infrastructure.capabilities.cloud.description')}</small><em>{t('infrastructure.capabilities.cloud.status')}</em></span><span class="capability-indicator" aria-hidden="true">+</span></button>
+              {docsUrl(Astro.locals, '/docs/saas/1platform-api/nube/') && (<a class="capability-documentation" href={docsUrl(Astro.locals, '/docs/saas/1platform-api/nube/')} aria-label={documentationLabel + ": " + t('infrastructure.capabilities.cloud.name')}>{documentationLabel}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
             </div>)}
           </div>
           <div class="integration-preview" aria-labelledby="integration-title">
