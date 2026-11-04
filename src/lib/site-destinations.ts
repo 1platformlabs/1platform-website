@@ -111,9 +111,15 @@ export function plateOrderUrl(locals: DestinationLocals): string | null {
   // merchant on a page the panel does not serve. A base without its trailing
   // slash would lose its last segment the same way, so one is added first.
   const root = new URL(base)
+  // The base may ALREADY be the sign-in (PROD's `oneplatform` publishes
+  // `https://app.1platform.pro/app/auth/login`, the same URL every «Sign in»
+  // link uses): then it is the login as is. Appending `auth/login` to it gave
+  // `/app/auth/login/auth/login`, a page the panel does not serve.
+  const alreadyLogin = /\/auth\/login\/?$/.test(root.pathname)
   if (!root.pathname.endsWith('/')) root.pathname = `${root.pathname}/`
-  const url = new URL('auth/login', root)
+  const url = alreadyLogin ? new URL(root.pathname.replace(/\/$/, ''), root) : new URL('auth/login', root)
   url.search = ''
+  url.hash = ''
   url.searchParams.set('next', '/main/plates/orders?new=1')
   return environmentDestination(url.toString())
 }

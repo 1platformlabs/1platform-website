@@ -78,6 +78,12 @@ test('the CTA helper builds the exact encoded login href, and nothing without a 
   // slash must not lose its last segment.
   const bare = { ...platform, destinations: { ...platform.destinations, app: 'https://panel.example/app' } };
   expect(plateOrderUrl({ tenant: bare })).toBe(`https://panel.example/app/auth/login?${EXPECTED_QUERY}`);
+  // PROD's `oneplatform` publishes the sign-in itself as `destinations.app`:
+  // it is used as is, never as `/auth/login/auth/login` (website#169).
+  for (const app of ['https://app.1platform.pro/app/auth/login', 'https://app.1platform.pro/app/auth/login/', 'https://app.1platform.pro/app/auth/login?x=1']) {
+    const login = { ...platform, destinations: { ...platform.destinations, app } };
+    expect(plateOrderUrl({ tenant: login })).toBe(`https://app.1platform.pro/app/auth/login?${EXPECTED_QUERY}`);
+  }
 });
 
 for (const [locale, path, headline, cta] of [
