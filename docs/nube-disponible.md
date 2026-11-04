@@ -15,7 +15,7 @@ Decisión del usuario: presentar Nube como disponible y agregar documentación d
 | Website | `/Users/staimer/Documents/1platform-worktrees/nube-disponible-website` | `feat/nube-disponible` | `f2e9d4d8721c26cdba40adfed52ec32e5f4be528` |
 | Developer | `/Users/staimer/Documents/1platform-worktrees/nube-disponible-developer` | `docs/nube-disponible` | `214118bce5890313f7eeb2d61ded5192b67505de` |
 
-Código local sin commit, push, PR, merge, publicación ni escrituras en producción. Los checkouts compartidos y los prototipos permanecen intactos durante esta implementación. `AGENTS.md` y `CLAUDE.md` no se editaron.
+Estado de implementación inicial: código local sin commit, push, PR, merge, publicación ni escrituras en producción. La continuación de release y la evidencia vigente se registran en `docs/nube-release.md`. Los checkouts compartidos y los prototipos permanecen intactos durante esta implementación. `AGENTS.md` y `CLAUDE.md` no se editaron.
 
 ## Publicación futura: contenido separado del código
 

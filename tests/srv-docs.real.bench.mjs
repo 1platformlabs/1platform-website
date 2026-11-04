@@ -24,7 +24,7 @@ for (const width of [1440, 390])
           { name: "1p_lang", value: lang, url: "https://127.0.0.1:4822" },
         ]);
         await page.goto(home);
-        await expect(page.locator(".capability-documentation")).toHaveCount(10);
+        await expect(page.locator(".capability-documentation")).toHaveCount(11);
         await page
           .locator(".capability-documentation")
           .first()
