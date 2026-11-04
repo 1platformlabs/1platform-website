@@ -1,0 +1,82 @@
+[WebServer] (node:78875) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:78983) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:78992) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /solutions/review-plates/ (5.4s)
+(node:79184) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /es/soluciones/placas/ (5.4s)
+
+
+  1) [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /solutions/review-plates/
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /#how-it-works$/
+    Received string:  "http://1platform.pro:14421/solutions/review-plates/"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        14 × unexpected value "http://1platform.pro:14421/solutions/review-plates/"
+
+
+      46 |       await link.focus();
+      47 |       await page.keyboard.press('Enter');
+    > 48 |       await expect(page).toHaveURL(/#how-it-works$/);
+         |                          ^
+      49 |       await expect(page.locator('#how-it-works')).toBeInViewport();
+      50 |     } finally {
+      51 |       await browser.close();
+        at /Users/staimer/Documents/1platform-worktrees/vertical-placas-nfc-website/tests/review-plates.spec.ts:48:26
+
+    Error Context: test-results/review-plates-reduced-moti-cc5ab-at-solutions-review-plates--chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/review-plates-reduced-moti-cc5ab-at-solutions-review-plates--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/review-plates-reduced-moti-cc5ab-at-solutions-review-plates--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /es/soluciones/placas/
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /#how-it-works$/
+    Received string:  "http://1platform.pro:14421/es/soluciones/placas/"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        14 × unexpected value "http://1platform.pro:14421/es/soluciones/placas/"
+
+
+      46 |       await link.focus();
+      47 |       await page.keyboard.press('Enter');
+    > 48 |       await expect(page).toHaveURL(/#how-it-works$/);
+         |                          ^
+      49 |       await expect(page.locator('#how-it-works')).toBeInViewport();
+      50 |     } finally {
+      51 |       await browser.close();
+        at /Users/staimer/Documents/1platform-worktrees/vertical-placas-nfc-website/tests/review-plates.spec.ts:48:26
+
+    Error Context: test-results/review-plates-reduced-moti-cbcec-on-at-es-soluciones-placas--chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/review-plates-reduced-moti-cbcec-on-at-es-soluciones-placas--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/review-plates-reduced-moti-cbcec-on-at-es-soluciones-placas--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /solutions/review-plates/
+    [chromium] › tests/review-plates.spec.ts:40:3 › reduced motion keeps keyboard anchor navigation at /es/soluciones/placas/

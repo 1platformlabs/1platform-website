@@ -1,0 +1,363 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumb from '@components/Breadcrumb.astro';
+import Hero from '@components/Hero.astro';
+import Card from '@components/Card.astro';
+import Check from '@components/Check.astro';
+import Icon from '@components/Icon.astro';
+import ProcessSpine from '@components/ProcessSpine.astro';
+import type { IconName } from '@components/icons';
+import { useI18n } from '@i18n';
+import { siteOrigin } from '@lib/site-origin';
+import { plateOrderUrl, ctaTo } from '@lib/site-destinations';
+
+/**
+ * Every string on this page is read by key (D-11): a tenant renders it with its
+ * own copy, and `t()` throws on a missing key. Do not add a literal here.
+ */
+const { t, l } = useI18n(Astro.url.pathname, Astro.locals);
+
+const title = t('solutions-review-plates.title');
+const description = t('solutions-review-plates.description');
+const orderHref = plateOrderUrl(Astro.locals);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: t('nav.solutions.reviewPlates'),
+    provider: { '@type': 'Organization', name: t('org.legalName'), url: siteOrigin(Astro.locals) },
+    description,
+    url: new URL(l('/solutions/review-plates/'), siteOrigin(Astro.locals)).toString(),
+    areaServed: t('solutions-review-plates.jsonld.areaServed'),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(l('/'), siteOrigin(Astro.locals)).toString() },
+      { '@type': 'ListItem', position: 2, name: t('nav.solutions'), item: new URL(l('/solutions/'), siteOrigin(Astro.locals)).toString() },
+      { '@type': 'ListItem', position: 3, name: t('nav.solutions.reviewPlates') },
+    ],
+  },
+];
+
+const features: { icon: IconName; title: string; description: string }[] = [
+  { icon: 'tag', title: t('solutions-review-plates.feature.plate.title'), description: t('solutions-review-plates.feature.plate.desc') },
+  { icon: 'link', title: t('solutions-review-plates.feature.destination.title'), description: t('solutions-review-plates.feature.destination.desc') },
+  { icon: 'repeat', title: t('solutions-review-plates.feature.noReprint.title'), description: t('solutions-review-plates.feature.noReprint.desc') },
+];
+
+const destinations = [
+  t('solutions-review-plates.destinations.reviews'),
+  t('solutions-review-plates.destinations.social'),
+  t('solutions-review-plates.destinations.chat'),
+  t('solutions-review-plates.destinations.site'),
+];
+
+const steps = [
+  { label: t('solutions-review-plates.step.order') },
+  { label: t('solutions-review-plates.step.place') },
+  { label: t('solutions-review-plates.step.tap') },
+  { label: t('solutions-review-plates.step.land') },
+];
+---
+
+<BaseLayout title={title} description={description} ogImage="/og/default.png" jsonLd={jsonLd}>
+  <div class="page-top">
+    <div class="container">
+      <Breadcrumb items={[
+        { label: t('breadcrumb.home'), href: l('/') },
+        { label: t('nav.solutions'), href: l('/solutions/') },
+        { label: t('nav.solutions.reviewPlates') },
+      ]} />
+    </div>
+  </div>
+
+  <Hero
+    headline={t('solutions-review-plates.hero.headline')}
+    subheadline={t('solutions-review-plates.hero.subheadline')}
+    badge={t('solutions-review-plates.hero.badge')}
+    primaryCta={ctaTo(t('solutions-review-plates.hero.cta.primary'), orderHref)}
+    secondaryCta={{ label: t('solutions-review-plates.hero.cta.secondary'), href: '#how-it-works' }}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('solutions-review-plates.whatYouGet.eyebrow')}</p>
+        <h2 class="statement__lead">{t('solutions-review-plates.whatYouGet.lead')}</h2>
+      </div>
+      <div class="features">
+        {features.map((feature) => (
+          <Card icon={feature.icon} title={feature.title} description={feature.description} class="reveal" />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt" id="how-it-works">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('solutions-review-plates.howItWorks.eyebrow')}</p>
+      </div>
+      <h2 class="section__lead">{t('solutions-review-plates.howItWorks.lead')}</h2>
+      <ProcessSpine steps={steps} label={t('solutions-review-plates.howItWorks.aria')} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-review-plates.destinations.eyebrow')}</p>
+          <h2>{t('solutions-review-plates.destinations.title')}</h2>
+          <p>{t('solutions-review-plates.destinations.desc')}</p>
+        </div>
+        <ul class="included">
+          {destinations.map((item) => (
+            <li class="included__item">
+              <Check yes label={t('solutions-review-plates.destinations.includedLabel')} />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="split">
+        <div class="split__copy reveal">
+          <p class="eyebrow">{t('solutions-review-plates.listing.eyebrow')}</p>
+          <h2>{t('solutions-review-plates.listing.title')}</h2>
+          <p>{t('solutions-review-plates.listing.desc')}</p>
+        </div>
+        <div class="note reveal">
+          <Icon name="globe-check" size={20} />
+          <p>{t('solutions-review-plates.listing.note')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="next reveal">
+        <div>
+          <p class="eyebrow">{t('solutions-review-plates.next.eyebrow')}</p>
+          <h2 class="next__title">{t('solutions-review-plates.next.title')}</h2>
+          <p class="next__desc">{t('solutions-review-plates.next.desc')}</p>
+        </div>
+        <div class="next__actions">
+          {orderHref && (
+            <a href={orderHref} class="btn btn--primary">{t('solutions-review-plates.hero.cta.primary')}</a>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The hero carries its own header offset, so it is neutralised below the
+     breadcrumb strip to avoid stacking two header heights of space. */
+  .page-top {
+    padding-top: calc(var(--header-offset) + var(--space-8));
+  }
+
+  .page-top + :global(.hero) {
+    padding-top: var(--space-6);
+  }
+
+  .statement {
+    max-width: 40rem;
+    margin-bottom: var(--space-12);
+  }
+
+  .statement__lead {
+    font-size: var(--text-4xl);
+    margin-top: var(--space-4);
+  }
+
+  .section__lead {
+    max-width: 34rem;
+    margin-bottom: var(--space-10);
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .split__copy h2 {
+    margin-block: var(--space-4);
+  }
+
+  .split__copy p {
+    margin: 0;
+  }
+
+  .included {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3) var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .included__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* A qualification set beside the claim, not beneath it in small print. */
+  .caveats {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    color: var(--color-text-secondary);
+  }
+
+  .note :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--color-accent);
+  }
+
+  .note p {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+
+  .index {
+    display: grid;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 52rem;
+  }
+
+  .index__item {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .index__item:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .index__title {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+  }
+
+  .index__link {
+    color: var(--color-text);
+  }
+
+  .index__link:hover {
+    color: var(--color-accent);
+  }
+
+  .index__desc {
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .link-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-cue :global(svg) {
+      transition: transform var(--duration-fast) var(--ease-out-expo);
+    }
+
+    .link-cue:hover :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+
+  .next__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4);
+  }
+
+  .next__desc {
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .next__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  @media (min-width: 900px) {
+    #how-it-works :global(.spine) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    .features {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .included {
+      grid-template-columns: 1fr;
+    }
+
+    .statement__lead {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

@@ -1,0 +1,209 @@
+compare-served: 102 baseline routes against http://127.0.0.1:14421
+  identical : 51
+  differing : 51
+  wrong     : 0   (status, destination, or unreachable)
+  normalisers applied: trailing-newline, json-ld-whitespace, scoped-style-order
+  DIFFERS    /  (baseline 35021B vs served 34985B)
+      first divergence at byte 32979
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html><script type=\"module\">var e=null,t;function n(){let n="
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html><script type=\"module\">var e=null,t;function n(){let n="
+  DIFFERS    /404.html  (baseline 21107B vs served 21081B)
+      first divergence at byte 21044
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /about/  (baseline 43756B vs served 43724B)
+      first divergence at byte 43683
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /blog/  (baseline 29086B vs served 29067B)
+      first divergence at byte 27596
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html><script type=\"module\">var e;function t(){e?.();let t=d"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html><script type=\"module\">var e;function t(){e?.();let t=d"
+  DIFFERS    /blog/1platform-vs-custom-toolchain/  (baseline 21022B vs served 20999B)
+      first divergence at byte 20962
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /blog/ai-content-best-practices/  (baseline 21369B vs served 21338B)
+      first divergence at byte 21301
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /blog/automate-seo-pipeline/  (baseline 22933B vs served 22886B)
+      first divergence at byte 22849
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /blog/electronic-invoicing-online-business/  (baseline 32946B vs served 32828B)
+      first divergence at byte 32791
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /blog/getting-started-5-minutes/  (baseline 23151B vs served 23128B)
+      first divergence at byte 23091
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /blog/integrating-payments-into-your-saas/  (baseline 35878B vs served 35709B)
+      first divergence at byte 35672
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /blog/launch-online-store-30-minutes/  (baseline 31736B vs served 31597B)
+      first divergence at byte 31560
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /blog/programmatic-link-building/  (baseline 20977B vs served 20956B)
+      first divergence at byte 20919
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /changelog/  (baseline 34976B vs served 34805B)
+      first divergence at byte 34767
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /contact/  (baseline 25437B vs served 25406B)
+      first divergence at byte 23951
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html><script type=\"module\">var e=[`agency`,`whitelabel`,`en"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html><script type=\"module\">var e=[`agency`,`whitelabel`,`en"
+  DIFFERS    /cookies/  (baseline 21970B vs served 21953B)
+      first divergence at byte 21915
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/  (baseline 35224B vs served 35091B)
+      first divergence at byte 33085
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html><script type=\"module\">var e=null,t;function n(){let n="
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html><script type=\"module\">var e=null,t;function n(){let n="
+  DIFFERS    /es/blog/  (baseline 29715B vs served 29623B)
+      first divergence at byte 28152
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html><script type=\"module\">var e;function t(){e?.();let t=d"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html><script type=\"module\">var e;function t(){e?.();let t=d"
+  DIFFERS    /es/blog/1platform-vs-herramientas-seo-propias/  (baseline 22041B vs served 21958B)
+      first divergence at byte 21921
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/blog/automatizar-el-pipeline-de-seo/  (baseline 23725B vs served 23592B)
+      first divergence at byte 23555
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/blog/contenido-con-ia-buenas-practicas-seo/  (baseline 22139B vs served 22038B)
+      first divergence at byte 22001
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/blog/facturacion-electronica-para-negocios-online/  (baseline 35009B vs served 34637B)
+      first divergence at byte 34600
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/blog/integrar-pagos-en-tu-saas/  (baseline 37512B vs served 37186B)
+      first divergence at byte 37149
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/blog/lanzar-una-tienda-online-en-30-minutos/  (baseline 33437B vs served 33093B)
+      first divergence at byte 33056
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/blog/link-building-programatico/  (baseline 21741B vs served 21618B)
+      first divergence at byte 21581
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/blog/primeros-pasos-en-5-minutos/  (baseline 23653B vs served 23575B)
+      first divergence at byte 23538
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/contacto/  (baseline 25825B vs served 25750B)
+      first divergence at byte 24300
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html><script type=\"module\">var e=[`agency`,`whitelabel`,`en"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html><script type=\"module\">var e=[`agency`,`whitelabel`,`en"
+  DIFFERS    /es/cookies/  (baseline 22535B vs served 22415B)
+      first divergence at byte 22377
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/nosotros/  (baseline 44396B vs served 44310B)
+      first divergence at byte 44269
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/novedades/  (baseline 37926B vs served 37546B)
+      first divergence at byte 37508
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/pagos-y-facturacion/  (baseline 39631B vs served 39448B)
+      first divergence at byte 39409
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/para-agencias/  (baseline 35481B vs served 35412B)
+      first divergence at byte 35371
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/precios/  (baseline 56274B vs served 56051B)
+      first divergence at byte 56011
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/privacidad/  (baseline 33749B vs served 33462B)
+      first divergence at byte 33424
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/soluciones/  (baseline 76105B vs served 75884B)
+      first divergence at byte 75842
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/soluciones/envios/  (baseline 49930B vs served 49790B)
+      first divergence at byte 49747
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/soluciones/marca-blanca/  (baseline 36470B vs served 36386B)
+      first divergence at byte 36345
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/soluciones/publicidad/  (baseline 47385B vs served 47273B)
+      first divergence at byte 47230
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/soluciones/sitio-web-y-contenido/  (baseline 44587B vs served 44475B)
+      first divergence at byte 44432
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/soluciones/tienda-online/  (baseline 38869B vs served 38788B)
+      first divergence at byte 38745
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /es/terminos/  (baseline 27610B vs served 27411B)
+      first divergence at byte 27373
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /for-agencies/  (baseline 35023B vs served 34982B)
+      first divergence at byte 34936
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /payments-invoicing/  (baseline 38969B vs served 38925B)
+      first divergence at byte 38876
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /pricing/  (baseline 55170B vs served 55123B)
+      first divergence at byte 55083
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /privacy/  (baseline 31474B vs served 31457B)
+      first divergence at byte 31419
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /solutions/  (baseline 74064B vs served 73994B)
+      first divergence at byte 73952
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /solutions/ads/  (baseline 46785B vs served 46760B)
+      first divergence at byte 46717
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /solutions/content/  (baseline 43892B vs served 43853B)
+      first divergence at byte 43800
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /solutions/deliveries/  (baseline 49175B vs served 49152B)
+      first divergence at byte 49109
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /solutions/online-store/  (baseline 38449B vs served 38422B)
+      first divergence at byte 38379
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /solutions/whitelabel/  (baseline 35747B vs served 35702B)
+      first divergence at byte 35661
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"
+  DIFFERS    /terms/  (baseline 26010B vs served 25993B)
+      first divergence at byte 25955
+      baseline: "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.mRSH3QUv.js\"></script></body></html>"
+      served  : "footer><script type=\"module\" src=\"/_astro/BaseLayout.astro_astro_type_script_index_0_lang.eGp3FfXb.js\"></script></body></html>"

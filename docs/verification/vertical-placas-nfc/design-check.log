@@ -1,0 +1,98 @@
+
+> 1platform-website@3.5.17 check
+> ./scripts/check-tells.sh && ./scripts/check-tells-self-test.sh
+
+[0;32mok[0m    no emoji or entity glyphs as icons
+[0;32mok[0m    no retired card/kit components
+[0;32mok[0m    no fabricated prices or vanity metrics
+[0;32mok[0m    no numbered replace-count claim
+[0;32mok[0m    no hardcoded brand colours
+[0;32mok[0m    no var(--token, #fallback) colour fallbacks
+[0;32mok[0m    no retired template kit
+[0;32mok[0m    no decorative gradients
+[0;32mok[0m    fonts are self-hosted and preloaded
+[0;32mok[0m    no external provider names outside the privacy policy
+[0;32mok[0m    no client:* directives
+[0;32mok[0m    no hardcoded locale tags
+[0;32mok[0m    no untranslated literal attributes
+[0;32mok[0m    public JS inside the 64 KB gzip budget
+[0;32mok[0m    no external visual source is named
+
+[0;32mAll design-system checks passed.[0m
+
+[2mControl — the tree as committed[0m
+[0;32mok[0m    clean tree passes
+
+[2mEmoji and entity glyphs[0m
+[0;32mok[0m    literal 4-byte emoji
+[0;32mok[0m    six-digit decimal entity
+[0;32mok[0m    five-hex entity
+[0;32mok[0m    dingbat arrow
+
+[2mRetired components and template kit[0m
+[0;32mok[0m    retired card component
+[0;32mok[0m    retired template kit
+[0;32mok[0m    dot grid
+[0;32mok[0m    decorative gradient
+
+[2mFabricated numbers[0m
+[0;32mok[0m    competitor price
+[0;32mok[0m    English count claim
+[0;32mok[0m    English count, new noun
+[0;32mok[0m    Spanish count claim
+[0;32mok[0m    Spanish count, noun first
+
+[2mColour and token discipline[0m
+[0;32mok[0m    hardcoded brand hex
+[0;32mok[0m    hardcoded brand hex in lib
+[0;32mok[0m    token hex fallback
+
+[2mi18n rules added by this epic[0m
+[0;32mok[0m    pinned locale tag
+[0;32mok[0m    untranslated aria-label
+[0;32mok[0m    client directive
+
+[2mProvider names — the exemption must be exact[0m
+[0;32mok[0m    provider in ordinary page
+[0;32mok[0m    provider in privacy partial (es)
+[0;32mok[0m    provider in privacy partial (en)
+[0;32mok[0m    provider in privacy catalogue
+[0;32mok[0m    ad network in an ordinary page
+[0;32mok[0m    ad network, hyphenated
+[0;32mok[0m    ad network, second brand
+[0;32mok[0m    meta element is not a brand
+[0;32mok[0m    Spanish noun meta is not a brand
+[0;32mok[0m    social network name inside the social-links module
+[0;32mok[0m    social network name in any other file
+[0;32mok[0m    another provider inside the social-links module
+[0;32mok[0m    ad network inside the social-links module
+[0;32mok[0m    exempt word does not shield a second provider on its line
+[0;32mok[0m    ad channel names inside the advertising-channels module
+[0;32mok[0m    ad channel name in any other file
+[0;32mok[0m    another provider inside the advertising-channels module
+[0;32mok[0m    exempt word does not shield a second provider on its line
+[0;32mok[0m    an unlisted brand of the same family inside the module
+
+[2mThe content collections[0m
+[0;32mok[0m    provider name in an English post
+[0;32mok[0m    provider name in a Spanish post
+[0;32mok[0m    provider name in the changelog
+[0;32mok[0m    fabricated price in a post
+[0;32mok[0m    arrow used as punctuation in prose
+[0;32mok[0m    editorial observation about the market
+
+[2mDocumentation must stay writable[0m
+[0;32mok[0m    comment naming a tell
+
+[2mRules of the home epic (14 · 15)[0m
+[0;32mok[0m    a build over the JS budget goes red
+[0;32mok[0m    a missing build fails the budget loudly
+[0;32mok[0m    banned name caught as "zzsyntheticbrand"
+[0;32mok[0m    banned name caught as "uikit-zzsyntheticbrand-theme"
+[0;32mok[0m    banned name caught as "ZzSyntheticBrandProvider"
+[0;32mok[0m    banned name caught as "tryzzsyntheticbrand"
+
+[2mPreflight[0m
+[0;32mok[0m    missing scan directory fails loudly
+
+[0;32mAll 53 self-tests passed.[0m

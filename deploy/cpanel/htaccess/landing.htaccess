@@ -95,6 +95,7 @@ Options -Indexes +FollowSymLinks
   RedirectMatch 301 "^/es/solutions/$" /es/soluciones/
   RedirectMatch 301 "^/es/solutions/online-store/$" /es/soluciones/tienda-online/
   RedirectMatch 301 "^/es/solutions/deliveries/$" /es/soluciones/envios/
+  RedirectMatch 301 "^/es/solutions/review-plates/$" /es/soluciones/placas/
   RedirectMatch 301 "^/es/solutions/ads/$" /es/soluciones/publicidad/
   RedirectMatch 301 "^/es/solutions/whitelabel/$" /es/soluciones/marca-blanca/
   RedirectMatch 301 "^/es/solutions/content/$" /es/soluciones/sitio-web-y-contenido/

@@ -1,0 +1,16 @@
+
+Running 11 tests using 2 workers
+
+  ✓   2 [clinic-chromium] › tests/visual/clinic.spec.ts:11:3 › clinic-home-1440 (1.2s)
+  ✓   1 [chromium] › tests/visual/home.spec.ts:27:3 › home-en-1440 (1.9s)
+  ✓   3 [clinic-chromium] › tests/visual/clinic.spec.ts:11:3 › clinic-home-390 (843ms)
+  ✓   5 [clinic-chromium] › tests/visual/clinic.spec.ts:11:3 › clinic-404-1440 (730ms)
+  ✓   6 [clinic-chromium] › tests/visual/clinic.spec.ts:11:3 › clinic-404-390 (674ms)
+  ✓   4 [chromium] › tests/visual/home.spec.ts:27:3 › home-es-1440 (1.7s)
+  ✓   7 [chromium] › tests/visual/home.spec.ts:27:3 › home-en-390 (1.4s)
+  ✓   8 [commerce-chromium] › tests/visual/commerce.spec.ts:13:3 › commerce-home-1440 (2.1s)
+  ✓   9 [chromium] › tests/visual/home.spec.ts:27:3 › home-es-390 (1.5s)
+  ✓  10 [commerce-chromium] › tests/visual/commerce.spec.ts:13:3 › commerce-home-390 (1.4s)
+  ✓  11 [commerce-chromium] › tests/visual/commerce.spec.ts:13:3 › commerce-home-844 (1.6s)
+
+  11 passed (13.7s)
