@@ -1,0 +1,139 @@
+{
+  "tenant_slug": "oneplatform",
+  "domain": "1platform.pro",
+  "route": "@infrastructure-home",
+  "locales": {
+    "en": {
+      "infrastructure.capabilities.plates.name": {
+        "before": null,
+        "after": "NFC plaques"
+      },
+      "infrastructure.capabilities.plates.description": {
+        "before": null,
+        "after": "Connect your physical space with links and QR codes"
+      },
+      "infrastructure.capabilities.videos.name": {
+        "before": null,
+        "after": "Videos"
+      },
+      "infrastructure.capabilities.videos.description": {
+        "before": null,
+        "after": "Marketing assets for your campaigns and social channels"
+      },
+      "infrastructure.capabilities.sales.name": {
+        "before": null,
+        "after": "Sales"
+      },
+      "infrastructure.capabilities.sales.description": {
+        "before": null,
+        "after": "Offers and prospect follow-up"
+      },
+      "infrastructure.capabilities.scheduling.name": {
+        "before": null,
+        "after": "Scheduling"
+      },
+      "infrastructure.capabilities.scheduling.description": {
+        "before": null,
+        "after": "Appointments, availability and advisors"
+      },
+      "infrastructure.capabilities.social.name": {
+        "before": null,
+        "after": "Social media"
+      },
+      "infrastructure.capabilities.social.description": {
+        "before": null,
+        "after": "Plan and publish across your channels"
+      },
+      "infrastructure.capabilities.content.name": {
+        "before": null,
+        "after": "Content"
+      },
+      "infrastructure.capabilities.content.description": {
+        "before": null,
+        "after": "Editorial plans and articles for your site"
+      },
+      "infrastructure.capabilities.agents.description": {
+        "before": "AI inside your product",
+        "after": "AI in your product and WhatsApp support"
+      },
+      "infrastructure.connected.vision.status": {
+        "before": "AI SALES · IN DEVELOPMENT",
+        "after": "AI SALES"
+      },
+      "infrastructure.connected.note": {
+        "before": "Conceptual workflow: WhatsApp and automation across payment, invoicing and delivery are in development",
+        "after": "Conceptual workflow: configure your WhatsApp channel and connect payments, invoicing and delivery to suit your product"
+      },
+      "infrastructure.intelligence.note": {
+        "before": "Conceptual view of AI adoption. One-click activation and WhatsApp sales are in development",
+        "after": "Conceptual view of AI adoption. Integrated one-click activation is still in development"
+      }
+    },
+    "es": {
+      "infrastructure.capabilities.plates.name": {
+        "before": null,
+        "after": "Placas NFC"
+      },
+      "infrastructure.capabilities.plates.description": {
+        "before": null,
+        "after": "Conecte su espacio físico con enlaces y QR"
+      },
+      "infrastructure.capabilities.videos.name": {
+        "before": null,
+        "after": "Videos"
+      },
+      "infrastructure.capabilities.videos.description": {
+        "before": null,
+        "after": "Piezas de marketing para sus campañas y redes"
+      },
+      "infrastructure.capabilities.sales.name": {
+        "before": null,
+        "after": "Ventas"
+      },
+      "infrastructure.capabilities.sales.description": {
+        "before": null,
+        "after": "Ofertas y seguimiento de prospectos"
+      },
+      "infrastructure.capabilities.scheduling.name": {
+        "before": null,
+        "after": "Agenda"
+      },
+      "infrastructure.capabilities.scheduling.description": {
+        "before": null,
+        "after": "Citas, disponibilidad y asesores"
+      },
+      "infrastructure.capabilities.social.name": {
+        "before": null,
+        "after": "Redes sociales"
+      },
+      "infrastructure.capabilities.social.description": {
+        "before": null,
+        "after": "Planifique y publique en sus canales"
+      },
+      "infrastructure.capabilities.content.name": {
+        "before": null,
+        "after": "Contenido"
+      },
+      "infrastructure.capabilities.content.description": {
+        "before": null,
+        "after": "Planes editoriales y artículos para su sitio"
+      },
+      "infrastructure.capabilities.agents.description": {
+        "before": "IA dentro de su producto",
+        "after": "IA en su producto y atención por WhatsApp"
+      },
+      "infrastructure.connected.vision.status": {
+        "before": "VENTAS CON IA · EN PREPARACIÓN",
+        "after": "VENTAS CON IA"
+      },
+      "infrastructure.connected.note": {
+        "before": "Recorrido conceptual: WhatsApp y la automatización entre cobro, factura y entrega están en preparación",
+        "after": "Recorrido conceptual: configure su canal de WhatsApp y conecte cobro, facturación y entrega según las necesidades de su producto"
+      },
+      "infrastructure.intelligence.note": {
+        "before": "Vista conceptual de adopción de IA. La activación con un clic y las ventas por WhatsApp están en desarrollo",
+        "after": "Vista conceptual de adopción de IA. La activación integral con un clic sigue en desarrollo"
+      }
+    }
+  }
+}

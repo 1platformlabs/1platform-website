@@ -39,10 +39,10 @@ function expectNoViolations(results: ScanResults) {
 }
 
 for (const path of ['/', '/es/']) {
-  test(`${path}: selected Cloud and its availability status remain accessible at 390px`, async ({ page }) => {
+  test(`${path}: selected Cloud remains accessible at 390px`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(path);
-    const cloud = page.locator('[data-capability-status]');
+    const cloud = page.locator('#nube');
     await cloud.click();
     await expect(cloud).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('[data-selected-list] li')).toHaveCount(4);

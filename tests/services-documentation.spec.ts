@@ -1,32 +1,23 @@
 import { expect, test } from '@playwright/test';
 
-const destinations = [
-  'pagos-en-linea', 'facturacion-electronica', 'envios', 'suscripciones', 'publicidad',
-  'sitios-web-y-contenido/publicar-con-dominio', 'dominios-y-correo',
-  'agentes-de-ia/integrar-en-su-aplicacion', 'telemetria/integrar-telemetria', 'plataforma/marca-blanca', 'nube',
-];
-
 for (const locale of ['es', 'en']) {
-  test(`eleven contextual documentation links preserve illustrative controls (${locale})`, async ({ page }) => {
+  test(`capability cards share one interaction and documentation remains in its section (${locale})`, async ({ page }) => {
     await page.goto(locale === 'es' ? '/es/' : '/');
-    const cards = page.locator('.capability-entry');
-    await expect(cards).toHaveCount(11);
-    await expect(cards.last().getByRole('link')).toHaveCount(1);
-    await expect(page.locator('.capability a')).toHaveCount(0);
-    for (let index = 0; index < destinations.length; index++) {
-      const button = cards.nth(index).getByRole('button');
-      const link = cards.nth(index).getByRole('link');
-      await expect(link).toHaveAttribute('href', new RegExp(`/docs/saas/1platform-api/${destinations[index]}/$`));
-      await expect(link).toHaveAccessibleName(new RegExp(locale === 'es' ? '^Ver documentación:' : '^View documentation:'));
+    const cards = page.locator('.capability-grid button');
+    await expect(cards).toHaveCount(17);
+    await expect(page.locator('.capability-grid a')).toHaveCount(0);
+    for (let index = 0; index < 17; index++) {
+      const button = cards.nth(index);
       const before = await button.getAttribute('aria-pressed');
       await button.focus();
       await page.keyboard.press('Space');
       await expect(button).toHaveAttribute('aria-pressed', before === 'true' ? 'false' : 'true');
-      await page.keyboard.press('Tab');
-      await expect(link).toBeFocused();
-      const box = await link.boundingBox();
-      expect(box?.height).toBeGreaterThanOrEqual(44);
+      if (index < 16) {
+        await page.keyboard.press('Tab');
+        await expect(cards.nth(index + 1)).toBeFocused();
+      }
     }
-    await expect(page.locator('.capability-text em')).toHaveCount(4);
+    await expect(page.locator('.capability-text em')).toHaveCount(2);
+    await expect(page.locator('.developers .button')).toHaveAttribute('href', /\/docs\/saas\/1platform-api\/getting-started\/$/);
   });
 }

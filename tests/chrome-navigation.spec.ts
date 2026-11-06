@@ -72,8 +72,8 @@ test('reduced motion keeps the infrastructure illustration static and WebGL-free
 
 test('the infrastructure home names the approved capabilities and honest availability in both languages', async ({ page }) => {
   for (const [path, names, preparation] of [
-    ['/', ['Payments', 'Invoicing', 'Delivery', 'Subscriptions', 'Digital advertising', 'Sites and domains', 'Email', 'Agents', 'Telemetry', 'White label', 'Cloud'], ['PAYMENTS IN DEVELOPMENT', 'INTEGRATION IN DEVELOPMENT', 'WHATSAPP IN DEVELOPMENT', 'AVAILABLE']],
-    ['/es/', ['Cobros', 'Facturación', 'Delivery', 'Suscripciones', 'Publicidad digital', 'Sitios y dominios', 'Correo', 'Agentes', 'Telemetría', 'Marca blanca', 'Nube'], ['COBROS EN PREPARACIÓN', 'INTEGRACIÓN EN PREPARACIÓN', 'WHATSAPP EN PREPARACIÓN', 'DISPONIBLE']],
+    ['/', ['Payments', 'Invoicing', 'Delivery', 'Subscriptions', 'Digital advertising', 'Sites and domains', 'Email', 'Agents', 'Telemetry', 'White label', 'Cloud', 'NFC plaques', 'Videos', 'Sales', 'Scheduling', 'Social media', 'Content'], ['PAYMENTS IN DEVELOPMENT', 'INTEGRATION IN DEVELOPMENT']],
+    ['/es/', ['Cobros', 'Facturación', 'Delivery', 'Suscripciones', 'Publicidad digital', 'Sitios y dominios', 'Correo', 'Agentes', 'Telemetría', 'Marca blanca', 'Nube', 'Placas NFC', 'Videos', 'Ventas', 'Agenda', 'Redes sociales', 'Contenido'], ['COBROS EN PREPARACIÓN', 'INTEGRACIÓN EN PREPARACIÓN']],
   ] as const) {
     await page.goto(path);
     await expect(page.locator('.capability-text strong')).toHaveText([...names]);

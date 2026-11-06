@@ -3,39 +3,37 @@ import AxeBuilder from '@axe-core/playwright';
 
 const route = '/es/';
 
-for (const [path, name, description, status, count] of [
-  ['/es/', 'Nube', 'Servidores y bases de datos para sus ambientes', 'DISPONIBLE', 'capacidades seleccionadas'],
-  ['/', 'Cloud', 'Servers and databases for your environments', 'AVAILABLE', 'capabilities selected'],
+for (const [path, name, description, count] of [
+  ['/es/', 'Nube', 'Servidores y bases de datos para sus ambientes', 'capacidades seleccionadas'],
+  ['/', 'Cloud', 'Servers and databases for your environments', 'capabilities selected'],
 ]) {
-  test(`${path}: Cloud is an illustrative, keyboard-selectable available service with documentation`, async ({ page }) => {
+  test(`${path}: Cloud is keyboard-selectable without status or individual documentation`, async ({ page }) => {
     await page.goto(path);
     const cloud = page.locator(`[data-capability="${name}"]`);
     await expect(cloud.locator('.capability-number')).toHaveText('11');
     await expect(cloud.locator('small')).toHaveText(description);
-    await expect(cloud.locator('em')).toHaveText(status);
+    await expect(cloud.locator('em')).toHaveCount(0);
+    await expect(page.locator('.capability-grid a')).toHaveCount(0);
     await expect(cloud).toHaveAttribute('aria-pressed', 'false');
-    const documentation = cloud.locator('..').getByRole('link');
-    await expect(documentation).toHaveAttribute('href', 'https://developer.1platform.pro/docs/saas/1platform-api/nube/');
-    await expect(documentation).toHaveAccessibleName(`${path === '/' ? 'View documentation' : 'Ver documentación'}: ${name}`);
     await expect(page.locator('[data-selection-count]')).toHaveText(`3 ${count}`);
     const mutations: string[] = [];
     page.on('request', (request) => {
       if (!['GET', 'HEAD'].includes(request.method())) mutations.push(request.url());
     });
-    await page.locator('.capability-documentation').nth(9).focus();
+    await page.locator('[data-capability]').nth(9).focus();
     await page.keyboard.press('Tab');
     await expect(cloud).toBeFocused();
     expect(await cloud.evaluate((button) => button.matches(':focus-visible'))).toBe(true);
     expect(await cloud.evaluate((button) => getComputedStyle(button).outlineStyle)).not.toBe('none');
     await page.keyboard.press('Space');
     await expect(cloud).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('[data-selected-list] li').last()).toHaveText(`${name} · ${status}`);
+    await expect(page.locator('[data-selected-list] li').last()).toHaveText(name);
     await expect(page.locator('[data-selection-count]')).toHaveText(`4 ${count}`);
     await page.keyboard.press('Enter');
     await expect(cloud).toHaveAttribute('aria-pressed', 'false');
     await expect(page.locator('[data-selection-count]')).toHaveText(`3 ${count}`);
     await page.keyboard.press('Tab');
-    await expect(documentation).toBeFocused();
+    await expect(page.locator('[data-capability]').nth(11)).toBeFocused();
     expect(mutations).toEqual([]);
   });
 }
@@ -55,7 +53,10 @@ for (const viewport of [
     await expect(home).toBeVisible();
     await expect(home.locator('h1')).toHaveText('Infraestructura parasu próxima solución');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await expect(home.locator('[data-capability]')).toHaveCount(11);
+    await expect(home.locator('[data-capability]')).toHaveCount(17);
+    await expect(home.locator('[data-capability="Agentes"] small')).toContainText('WhatsApp');
+    await expect(home.locator('[data-capability="Agentes"] em')).toHaveCount(0);
+    await expect(home.locator('.capability-grid a')).toHaveCount(0);
     const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(accessibility.violations).toEqual([]);
     const selected = home.locator('[data-capability][aria-pressed="true"]');
@@ -64,8 +65,8 @@ for (const viewport of [
     await expect(home.locator('[data-selection-count]')).toHaveText('0 capacidades seleccionadas');
     await expect(home.locator('[data-selected-list]')).toHaveText('Seleccione servicios para su integración');
     for (const button of await home.locator('[data-capability]').all()) await button.click();
-    await expect(home.locator('[data-selected-list] li')).toHaveCount(11);
-    await expect(home.locator('[data-selection-count]')).toHaveText('11 capacidades seleccionadas');
+    await expect(home.locator('[data-selected-list] li')).toHaveCount(17);
+    await expect(home.locator('[data-selection-count]')).toHaveText('17 capacidades seleccionadas');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }
@@ -82,7 +83,7 @@ test('the keyboard-operated AI preview only changes illustrative content', async
   await expect(control).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-ai-switch-label]')).toHaveText('IA en la demo');
   await expect(page.locator('#ai-preview')).toContainText('Su producto ofrece un agente de ventas');
-  await expect(page.locator('.ai-demo-note')).toContainText('están en desarrollo');
+  await expect(page.locator('.ai-demo-note')).toContainText('sigue en desarrollo');
   await page.keyboard.press('Space');
   await expect(control).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('#ai-preview')).toContainText('Su producto conecta con un asesor');
