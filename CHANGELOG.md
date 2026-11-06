@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Integrate the approved infrastructure landing: 17 capabilities, current WhatsApp copy, consistent cards without individual documentation links or Cloud availability labels. Optional capabilities respect published tenant content in both locales.
+
 All notable changes to the 1Platform Website will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
