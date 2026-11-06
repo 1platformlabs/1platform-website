@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import test from 'node:test';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {chromium, expect} from '@playwright/test';
 const out='artifacts/landing-capabilities-refresh';
 await mkdir(out,{recursive:true});
+test('published capabilities in the isolated real bank', async () => {
 const browser=await chromium.launch({args:['--host-resolver-rules=MAP 1platform.pro 127.0.0.1, MAP medipago.gt 127.0.0.1, MAP vendefacil.1platform.pro 127.0.0.1']});
 const results=[];
 console.log('Browser started');
@@ -48,3 +50,5 @@ try {
  await context.close();
 }finally{await browser.close();await writeFile(`${out}/real-results.json`,JSON.stringify(results,null,2));}
 console.log(`${results.length} real-bank cases passed`);
+
+});

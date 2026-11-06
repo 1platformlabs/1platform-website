@@ -24,7 +24,7 @@ with MongoClient(os.environ['MONGODB_URL']) as client:
                 blocks[key] = change['before']
         collection.update_one({'_id': doc['_id']}, {'$set': {'blocks': blocks}})
     before = {doc['_id']: doc for doc in collection.find({})}
-    command = [sys.executable, str(root / 'scripts/update-landing-capabilities.py'), '--patch', str(root / 'docs/landing-capabilities-content.json')]
+    command = [sys.executable, str(root / 'scripts/update-landing-capabilities.py')]
     subprocess.run(command, check=True)
     assert before == {doc['_id']: doc for doc in collection.find({})}, 'Dry-run must not write'
     subprocess.run([*command, '--apply'], check=True)
