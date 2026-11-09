@@ -411,8 +411,8 @@
       "route": "/es/privacidad/",
       "status": 200,
       "file": "es/privacidad/index.html",
-      "sha256": "c08fcacc72bbf72cf686783833bcd3b7934d43540e0db87cf24c7deb8a81e039",
-      "bytes": 37003
+      "sha256": "3c1acfba9c021632080766dd20500e34853db9370698bcba562c2c8f68c1c21f",
+      "bytes": 36963
     },
     {
       "route": "/es/privacy/",
@@ -557,8 +557,8 @@
       "route": "/privacy/",
       "status": 200,
       "file": "privacy/index.html",
-      "sha256": "6c83d087f71a3669d871843ddcd278a24f25ce876f81f82fd2b86500daa15cef",
-      "bytes": 34580
+      "sha256": "8a8f18a06252d2695c2ea170e0bb71cbf1f6c4740de0e976eed8b416593577a4",
+      "bytes": 34529
     },
     {
       "route": "/solutions/",
