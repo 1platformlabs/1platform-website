@@ -1,12 +1,17 @@
 ---
 /**
- * The tenant's Tag Manager container, or nothing at all.
+ * The tenant's Tag Manager container and connected analytics, or nothing at all.
+ *
+ * The analytics tag rides in `part="head"` too, so the three documents that
+ * already mount this component load it with no second mount to forget (see
+ * `@lib/analytics-tag`).
  *
  * Mounted twice per document: `part="head"` as high in `<head>` as possible,
  * `part="body"` right after `<body>`. Renders NOTHING for a tenant without a
  * valid id, so every tenant that has not declared one serves byte-identical
  * HTML to before. See `@lib/tag-manager` for why only the id is data.
  */
+import { analyticsConfigScript, analyticsIdOf, analyticsLoaderSrc } from '@lib/analytics-tag'
 import { tagManagerHeadScript, tagManagerIdOf, tagManagerNoscriptSrc } from '@lib/tag-manager'
 
 interface Props {
@@ -15,8 +20,11 @@ interface Props {
 
 const { part } = Astro.props
 const id = tagManagerIdOf(Astro.locals.tenant)
+const analyticsId = analyticsIdOf(Astro.locals.tenant)
 ---
 {id && part === 'head' && <script is:inline set:html={tagManagerHeadScript(id)} />}
+{analyticsId && part === 'head' && <script is:inline async src={analyticsLoaderSrc(analyticsId)} />}
+{analyticsId && part === 'head' && <script is:inline set:html={analyticsConfigScript(analyticsId)} />}
 {id && part === 'body' && (
   <noscript><iframe src={tagManagerNoscriptSrc(id)} height="0" width="0" style="display:none;visibility:hidden" /></noscript>
 )}

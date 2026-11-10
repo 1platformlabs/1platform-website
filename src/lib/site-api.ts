@@ -142,6 +142,13 @@ export interface SiteTenant {
    */
   tag_manager_id?: string | null
   /**
+   * Measurement id (`G-XXXXXXXX`) of the traffic analytics connected to this
+   * site from the panel, or absent/null for none. Derived by the API on every
+   * read; optional and outside `isTenant()` like `tag_manager_id`. Read it only
+   * through `analyticsIdOf()`.
+   */
+  analytics_measurement_id?: string | null
+  /**
    * The host this request should be redirected to, or absent/null when it
    * should be served here.
    *
