@@ -120,3 +120,18 @@ test('locale aliases and noncanonical dot paths cannot inflate coverage', async 
     expect(report.resolvedHosts).toEqual([EXTRA])
   }
 })
+
+test('a localised article route that 301s to its translation is followed once, any other 301 stays red', async () => {
+  // deploy-prod 2026-11-10: `/es/blog/<en-slug>/` is the legacy redirect to the Spanish slug.
+  const { transport } = fixture((url) => {
+    if (url.hostname === EXTRA && url.pathname === '/es/blog/example/') {
+      return { status: 301, headers: { location: `https://${EXTRA}/es/blog/ejemplo/` }, body: '' }
+    }
+    if (url.hostname === REFERENCE && url.pathname === '/es/blog/example/') {
+      return { status: 301, headers: { location: 'https://elsewhere.example/es/blog/ejemplo/' }, body: '' }
+    }
+  })
+  const report = await scan(transport)
+  expect(report.visited).toContain(`https://${EXTRA}/es/blog/ejemplo/`)
+  expect(report.errors).toEqual([`https://${REFERENCE}/es/blog/example/: HTTP 301`])
+})
