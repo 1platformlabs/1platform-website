@@ -2,7 +2,10 @@ import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { useI18n, type Locale } from '@i18n';
 import { bareSlug, getLocalized } from '@i18n/collections';
+import { loadBlogEntries } from '@lib/blog-entry';
 import { siteOrigin } from '@lib/site-origin';
+import { isEditorialBlog } from '@lib/site-routes';
+import { resolveArchive, resolveEditorial } from '@lib/site-blog';
 
 /**
  * The channel `<link>` — the element that says "this feed describes THIS site".
@@ -33,8 +36,16 @@ function channelSite(context: APIContext, locale: Locale): string {
  */
 
 export async function blogFeed(context: APIContext, locale: Locale) {
+  // blog-sitio-de-marca-generado §23 E-8: a site whose blog lives in the Core
+  // gets ITS posts. Without this branch the repository's posts — another
+  // site's writing — would be served as this site's feed.
+  if (isEditorialBlog(context.locals.tenant)) return editorialFeed(context, locale);
   const { t, l } = useI18n(locale, context.locals);
-  const posts = await getLocalized('blog', locale);
+  // The platform's posts come from the Core (D-9), cached; no data and no cache
+  // is a 503, a site without a blog an empty feed.
+  const loaded = await loadBlogEntries(context.locals.tenant, locale);
+  if (loaded.outcome === 'unavailable') return new Response('', { status: 503, headers: { 'retry-after': '30', 'cache-control': 'no-store' } });
+  const posts = loaded.outcome === 'resolved' ? loaded.value : [];
 
   return rss({
     title: t('blog.feed.title'),
@@ -70,6 +81,31 @@ export async function changelogFeed(context: APIContext, locale: Locale) {
       // anchor makes each guid unique and still lands on the right release.
       link: `${l('/changelog/')}#${entry.data.version ?? bareSlug(entry.id)}`,
       categories: [entry.data.category],
+    })),
+  });
+}
+
+async function editorialFeed(context: APIContext, locale: Locale) {
+  const tenant = context.locals.tenant;
+  const [archive, editorial] = await Promise.all([
+    resolveArchive(tenant.slug, locale),
+    resolveEditorial(tenant.slug, locale),
+  ]);
+  if (archive.outcome !== 'resolved' || editorial.outcome !== 'resolved') {
+    return new Response('', { status: archive.outcome === 'unavailable' ? 503 : 404 });
+  }
+  const l = (path: string) => context.locals.localizePath(path, locale);
+  return rss({
+    title: tenant.brand_name,
+    description: editorial.value.home?.intro ?? tenant.brand_name,
+    site: channelSite(context, locale),
+    customData: `<language>${locale}</language>`,
+    items: archive.value.map((post) => ({
+      title: post.title,
+      description: post.description,
+      pubDate: post.published_at ? new Date(post.published_at) : undefined,
+      link: l(`/blog/${post.slug}/`),
+      categories: [post.category],
     })),
   });
 }

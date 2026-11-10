@@ -1,0 +1,37 @@
+---
+/** The site's commercial call to action — a configured SITE block (§23 E-4),
+ * never part of a post. Text, URL and presentation come from the Core. */
+import Icon from '@components/editorial/EditorialIcon.astro';
+import type { Editorial } from '@lib/site-blog';
+import { editorialStrings } from '@i18n/editorial';
+
+interface Props {
+  cta: NonNullable<Editorial['cta']>;
+}
+const { cta } = Astro.props;
+const s = editorialStrings(Astro.locals.locale);
+// The Core already demands https with a host; the page checks again instead of trusting
+// a value it renders as a link: an invalid URL used to throw (503 for the whole site) and
+// a `javascript:` one would have become the href (red team, deploy-prod 2026-11-10).
+const safeUrl = (() => {
+  try {
+    const parsed = new URL(cta.url);
+    return parsed.protocol === 'https:' && parsed.hostname && !parsed.username && !parsed.password ? parsed : null;
+  } catch {
+    return null;
+  }
+})();
+const host = safeUrl?.hostname ?? '';
+---
+
+{safeUrl && <section class:list={['store-bridge', `store-bridge--${cta.presentation}`]} aria-labelledby="ed-cta-title" data-cta>
+  <div>
+    <span class="eyebrow">{s.nextStep}</span>
+    <h2 id="ed-cta-title">{cta.title}</h2>
+    {cta.body && <p>{cta.body}</p>}
+  </div>
+  <div class="bridge-action">
+    <a class="button" href={cta.url}>{cta.button}<Icon name="arrow-up-right" size={16} /></a>
+    <p>{s.ctaContinue(host)}</p>
+  </div>
+</section>}

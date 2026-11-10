@@ -1,11 +1,13 @@
 ---
-import { bareSlug, getLocalized } from '@i18n/collections';
+import { categoryLabel } from '@lib/blog-category';
+import { bareSlug } from '@i18n/collections';
+import { blogEntriesOrEmpty } from '@lib/blog-entry';
 import { useI18n } from '@i18n';
 import { displayHeading, editorialOrder } from '@lib/blog-presentation';
 interface Props { currentSlug: string; currentCategory: string; }
 const { currentSlug } = Astro.props;
 const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
-const related = editorialOrder(await getLocalized('blog', locale))
+const related = editorialOrder(await blogEntriesOrEmpty(Astro.locals.tenant, locale))
   .filter((post) => bareSlug(post.id) !== currentSlug).slice(0, 2);
 ---
 {related.length > 0 && <section class="section section--wash" aria-label={t('related.title')}>
@@ -13,7 +15,7 @@ const related = editorialOrder(await getLocalized('blog', locale))
     <p class="eyebrow">{t('interiors.related')}</p><h2 class="section-title">{t('interiors.related_lede')}</h2>
     <div class="related-grid">{related.map((post) =>
       <a class="related-card" href={l(`/blog/${bareSlug(post.id)}/`)}>
-        <span class="eyebrow">{t(`interiors.category.${post.data.category}`)}</span>
+        <span class="eyebrow">{categoryLabel(t, post.data.category)}</span>
         <h3>{displayHeading(post.data.title)}</h3><p>{displayHeading(post.data.description)}</p>
       </a>
     )}</div>

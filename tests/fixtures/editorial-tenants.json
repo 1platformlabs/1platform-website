@@ -1,0 +1,530 @@
+{
+  "note": "DEVELOPMENT FIXTURE — not approved content; never import to production.",
+  "tenants": [
+    {
+      "manifest": {
+        "slug": "peptidos",
+        "brand_name": "péptidos.gt",
+        "brand_mark": null,
+        "brand_wordmark": "péptidos.gt",
+        "domain": "peptidos.localhost",
+        "locales": [
+          "es"
+        ],
+        "default_locale": "es",
+        "region": "GT",
+        "home_template": "editorial-blog",
+        "theme": {
+          "accent": "#203d30",
+          "accent_contrast": "#ffffff",
+          "display_font": "manrope"
+        },
+        "destinations": {
+          "docs": null,
+          "app": null,
+          "support": null,
+          "status": null
+        },
+        "pages": [
+          "/",
+          "/blog/"
+        ],
+        "indexable": false,
+        "google_site_verification": null
+      },
+      "editorial": {
+        "categories": [
+          {
+            "id": "guias",
+            "labels": {
+              "es": {
+                "name": "Guías básicas",
+                "description": "Conceptos y documentos para empezar a leer con orden."
+              }
+            }
+          },
+          {
+            "id": "investigacion",
+            "labels": {
+              "es": {
+                "name": "Investigación",
+                "description": "Cómo acercarte a una publicación sin quedarte con el titular."
+              }
+            }
+          },
+          {
+            "id": "calidad",
+            "labels": {
+              "es": {
+                "name": "Calidad y almacenamiento",
+                "description": "Qué documentación pedir y cómo conservarla."
+              }
+            }
+          },
+          {
+            "id": "preguntas",
+            "labels": {
+              "es": {
+                "name": "Preguntas frecuentes",
+                "description": "Respuestas breves a las dudas que más se repiten."
+              }
+            }
+          }
+        ],
+        "home": {
+          "es": {
+            "kicker": "Péptidos, con contexto · Guatemala",
+            "title": "Entiende más. Elige con criterio.",
+            "intro": "Tu punto de partida para entender los péptidos, leer sus documentos y hacer mejores preguntas.",
+            "featured_post": "leer-documentacion"
+          }
+        },
+        "illustration": "connections",
+        "reading_paths": [
+          {
+            "id": "entender",
+            "labels": {
+              "es": {
+                "title": "Quiero entender lo básico.",
+                "description": "Ficha, etiqueta e informe: pon cada término en su lugar.",
+                "post": "glosario-documental"
+              }
+            }
+          },
+          {
+            "id": "comparar",
+            "labels": {
+              "es": {
+                "title": "Estoy comparando presentaciones.",
+                "description": "Ordena las diferencias antes de seguir explorando.",
+                "post": "comparar-presentaciones"
+              }
+            }
+          },
+          {
+            "id": "revisar",
+            "labels": {
+              "es": {
+                "title": "Quiero revisar los documentos.",
+                "description": "Conecta la ficha, el lote y las preguntas pendientes.",
+                "post": "numero-lote"
+              }
+            }
+          }
+        ],
+        "cta": {
+          "url": "https://aurumlabsgt.com/",
+          "presentation": "band",
+          "labels": {
+            "es": {
+              "title": "Más contexto. Mejores preguntas.",
+              "body": "Lleva lo que aprendiste a las fichas de Aurum Labs. Revisa la información de cada presentación y consulta lo que necesites aclarar.",
+              "button": "Explorar Aurum Labs"
+            }
+          }
+        },
+        "byline": {
+          "es": "Redacción péptidos.gt"
+        },
+        "legal": {
+          "approved": false,
+          "labels": {
+            "es": {
+              "text": "PENDIENTE DE REDACCIÓN LEGAL DEL DUEÑO"
+            }
+          }
+        },
+        "newsletter": {
+          "enabled": false,
+          "consent_version": null,
+          "labels": {}
+        },
+        "palette": {
+          "canvas": "#fafbf6",
+          "ink": "#17231d",
+          "highlight": "#705421"
+        },
+        "reading_font": "system-serif"
+      },
+      "posts": [
+        {
+          "locale": "es",
+          "slug": "leer-documentacion",
+          "translation_key": "leer-documentacion",
+          "title": "Antes de comparar péptidos: una guía para leer la documentación de un producto",
+          "description": "Nombre, lote y documentos: aprende a ordenar la información y a reconocer las preguntas que todavía necesitan una respuesta.",
+          "body": "## Empieza por la información, no por la promesa\n\nUna ficha puede reunir nombres, siglas y cifras en muy poco espacio. Antes de comparar dos productos, separa lo que identifica al producto de lo que describe un documento. Esta lectura trata de cómo organizar esa información; no evalúa un producto concreto.\n\nAnota el nombre tal como aparece y la fecha en que consultaste la ficha. Si encuentras un término que no conoces, conviértelo en una pregunta. Un campo vacío sigue siendo una pregunta abierta: no lo completes por intuición.\n\n> Una buena lectura también deja claro qué información sigue faltando.\n\n## El lote conecta la ficha con sus documentos\n\nAl revisar un documento, busca a qué muestra o lote se refiere. Copiar un número de un archivo a una nota no basta para establecer que pertenece al producto que estás viendo. La correspondencia necesita ser explícita.\n\nSi no encuentras esa relación, pide una aclaración al comercio. Guarda la respuesta junto al documento original para que tu comparación pueda revisarse después.\n\n### Una ficha de revisión, paso a paso\n\nPuedes usar esta tabla para ordenar tus preguntas. No representa un informe ni certifica un producto.\n\n| Qué revisar | Qué anotar |\n| --- | --- |\n| Identificación | Nombre y referencia tal como aparecen. |\n| Documento | Título, fecha y autoría declarada. |\n| Correspondencia | Relación explícita con el lote o la muestra. |\n| Dudas | Información ausente o por aclarar. |\n\n## Lee también qué información falta\n\nUna cifra aislada ocupa poco espacio, pero deja fuera su contexto. Revisa el título del documento, la identificación de la muestra, la fecha, el método que declara y el alcance que describe.\n\nNo conviertas una parte del informe en una conclusión sobre todo el producto. Tampoco supongas que dos cifras son comparables solo porque se presentan con la misma unidad.\n\n## Haz una comparación que puedas volver a revisar\n\nSi estás consultando desde Guatemala, confirma también dónde puedes pedir la documentación y quién responderá tus dudas. Separa esa conversación comercial de tu revisión del contenido.\n\nCrea una carpeta por producto, conserva los archivos sin modificar y registra qué falta por aclarar. Así podrás volver a la fuente cuando la ficha cambie, en vez de depender de una captura sin contexto.\n\n## Las preguntas que vale la pena llevarte\n\n¿Qué documento corresponde a este lote? ¿Cuándo se emitió? ¿Quién lo firma? ¿Dónde se describen sus límites? Una respuesta útil te permite encontrar el dato en su fuente.\n\nAntes de seguir explorando el catálogo, revisa tu lista. Si una pregunta sigue abierta, déjala marcada como pendiente. La claridad empieza por distinguir lo que sabes de lo que todavía necesitas confirmar.\n",
+          "category": "guias",
+          "illustration": "chain",
+          "reading_minutes": 6,
+          "status": "published",
+          "published_at": "2026-11-06T15:00:00+00:00",
+          "updated_at": "2026-11-06T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "numero-lote",
+          "translation_key": "numero-lote",
+          "title": "Qué te cuenta un número de lote y por qué conviene conservarlo junto a la ficha",
+          "description": "Una forma sencilla de organizar referencias sin confundir la identidad del producto con la de una muestra.",
+          "body": "## Un identificador con contexto\n\nEl número de lote es un punto de referencia para ordenar documentos. En este ejemplo editorial, no validamos lotes reales ni la autenticidad de un producto.\n\nCopia el identificador completo y conserva el archivo donde lo encontraste.\n\n> Una buena lectura también deja claro qué información sigue faltando.\n\n## Evita unir documentos por parecido\n\nDos nombres parecidos no bastan para vincular una ficha y un informe. Busca una referencia explícita y consulta cualquier diferencia.\n\nSi el documento no identifica el lote, registra esa ausencia antes de continuar.\n\n### Una ficha de revisión, paso a paso\n\nPuedes usar esta tabla para ordenar tus preguntas. No representa un informe ni certifica un producto.\n\n| Qué revisar | Qué anotar |\n| --- | --- |\n| Identificación | Nombre y referencia tal como aparecen. |\n| Documento | Título, fecha y autoría declarada. |\n| Correspondencia | Relación explícita con el lote o la muestra. |\n| Dudas | Información ausente o por aclarar. |\n\n## Deja una ruta de consulta\n\nGuarda la fecha de consulta y el enlace de origen junto con tus notas.\n\nUna carpeta ordenada facilita formular preguntas concretas al comercio.\n",
+          "category": "calidad",
+          "illustration": "labels",
+          "reading_minutes": 3,
+          "status": "published",
+          "published_at": "2026-11-04T15:00:00+00:00",
+          "updated_at": "2026-11-04T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "leer-investigacion",
+          "translation_key": "leer-investigacion",
+          "title": "Cómo acercarte a una publicación sobre péptidos sin quedarte solo con el titular",
+          "description": "Autoría, fecha, pregunta y límites: cuatro puntos para empezar una lectura crítica.",
+          "body": "## Primero, encuentra la fuente\n\nUn titular resume; el documento original explica el contexto. Antes de sacar conclusiones, identifica la publicación de la que se habla.\n\nEste artículo de muestra no resume un estudio real ni atribuye resultados a un producto.\n\n> Una buena lectura también deja claro qué información sigue faltando.\n\n## Reconoce la pregunta del texto\n\nAnota qué pregunta plantea la publicación y qué información presenta para abordarla.\n\nDistingue las palabras de sus autores de la interpretación de quien comparte el enlace.\n\n### Una ficha de revisión, paso a paso\n\nPuedes usar esta tabla para ordenar tus preguntas. No representa un informe ni certifica un producto.\n\n| Qué revisar | Qué anotar |\n| --- | --- |\n| Identificación | Nombre y referencia tal como aparecen. |\n| Documento | Título, fecha y autoría declarada. |\n| Correspondencia | Relación explícita con el lote o la muestra. |\n| Dudas | Información ausente o por aclarar. |\n\n## Los límites también forman parte del resultado\n\nBusca qué dudas quedan abiertas y qué alcance declaran sus autores.\n\nEvita trasladar una conclusión fuera del contexto que el propio texto describe.\n",
+          "category": "investigacion",
+          "illustration": "orbit",
+          "reading_minutes": 4,
+          "status": "published",
+          "published_at": "2026-11-02T15:00:00+00:00",
+          "updated_at": "2026-11-02T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "almacenamiento-documentado",
+          "translation_key": "almacenamiento-documentado",
+          "title": "Almacenamiento y transporte: qué documentación pedir antes de asumir condiciones",
+          "description": "Una lista de preguntas para revisar las indicaciones específicas de cada presentación.",
+          "body": "## No completes una instrucción ausente\n\nLas condiciones deben estar documentadas para el producto concreto. Esta guía no prescribe temperaturas ni procedimientos.\n\nSi falta una indicación, anota la pregunta y solicita la documentación correspondiente.\n\n> Una buena lectura también deja claro qué información sigue faltando.\n\n## Separa transporte de almacenamiento\n\nOrganiza las preguntas de cada etapa por separado. Una respuesta sobre el transporte no resuelve por sí sola una duda sobre almacenamiento.\n\nPide que la respuesta identifique la presentación a la que se refiere.\n\n### Una ficha de revisión, paso a paso\n\nPuedes usar esta tabla para ordenar tus preguntas. No representa un informe ni certifica un producto.\n\n| Qué revisar | Qué anotar |\n| --- | --- |\n| Identificación | Nombre y referencia tal como aparecen. |\n| Documento | Título, fecha y autoría declarada. |\n| Correspondencia | Relación explícita con el lote o la muestra. |\n| Dudas | Información ausente o por aclarar. |\n\n## Conserva la versión que consultaste\n\nGuarda el documento y la fecha de la consulta. Si hay versiones diferentes, pide que aclaren cuál corresponde.\n\nEvita convertir una recomendación genérica en una instrucción para cualquier producto.\n",
+          "category": "calidad",
+          "illustration": "grid",
+          "reading_minutes": 3,
+          "status": "published",
+          "published_at": "2026-10-30T15:00:00+00:00",
+          "updated_at": "2026-10-30T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "glosario-documental",
+          "translation_key": "glosario-documental",
+          "title": "Ficha, etiqueta e informe: un pequeño glosario para no confundir los documentos",
+          "description": "Tres piezas de información que puedes leer juntas, sin dar por hecho que dicen lo mismo.",
+          "body": "## La ficha como punto de partida\n\nUsa la ficha para identificar los datos que el comercio presenta y las preguntas que te genera.\n\nEn este prototipo, todos los ejemplos son ficticios y no certifican documentación comercial.\n\n> Una buena lectura también deja claro qué información sigue faltando.\n\n## La etiqueta como referencia\n\nRegistra el nombre y los identificadores visibles sin interpretar lo que no está escrito.\n\nSi hay diferencias con la ficha, pide una aclaración antes de unir ambas referencias.\n\n### Una ficha de revisión, paso a paso\n\nPuedes usar esta tabla para ordenar tus preguntas. No representa un informe ni certifica un producto.\n\n| Qué revisar | Qué anotar |\n| --- | --- |\n| Identificación | Nombre y referencia tal como aparecen. |\n| Documento | Título, fecha y autoría declarada. |\n| Correspondencia | Relación explícita con el lote o la muestra. |\n| Dudas | Información ausente o por aclarar. |\n\n## El informe dentro de su alcance\n\nLee qué describe el documento y a qué muestra se refiere.\n\nUn informe debe leerse completo y dentro de sus propios límites; una captura parcial puede dejar preguntas importantes fuera.\n",
+          "category": "guias",
+          "illustration": "pages",
+          "reading_minutes": 3,
+          "status": "published",
+          "published_at": "2026-10-28T15:00:00+00:00",
+          "updated_at": "2026-10-28T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "comparar-presentaciones",
+          "translation_key": "comparar-presentaciones",
+          "title": "Mismo nombre, distinta presentación: cómo ordenar lo que ves en un catálogo",
+          "description": "Compara la información publicada, identifica diferencias y prepara tus preguntas al comercio.",
+          "body": "## Crea una nota por presentación\n\nAnota por separado el nombre, la descripción y los documentos enlazados en cada ficha.\n\nNo deduzcas que una presentación incluye lo mismo que otra por compartir parte del nombre.\n\n> Una buena lectura también deja claro qué información sigue faltando.\n\n## Compara campos equivalentes\n\nColoca la información lado a lado y marca los campos que no están disponibles.\n\nEste ejercicio organiza datos; no recomienda un producto ni establece equivalencias.\n\n### Una ficha de revisión, paso a paso\n\nPuedes usar esta tabla para ordenar tus preguntas. No representa un informe ni certifica un producto.\n\n| Qué revisar | Qué anotar |\n| --- | --- |\n| Identificación | Nombre y referencia tal como aparecen. |\n| Documento | Título, fecha y autoría declarada. |\n| Correspondencia | Relación explícita con el lote o la muestra. |\n| Dudas | Información ausente o por aclarar. |\n\n## Consulta las diferencias\n\nReúne tus preguntas en un solo mensaje y solicita referencias claras para cada respuesta.\n\nConserva las respuestas con la fecha de consulta para poder revisar la comparación.\n",
+          "category": "guias",
+          "illustration": "pairs",
+          "reading_minutes": 3,
+          "status": "published",
+          "published_at": "2026-10-25T15:00:00+00:00",
+          "updated_at": "2026-10-25T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "fuentes-fechas",
+          "translation_key": "fuentes-fechas",
+          "title": "Fuentes y fechas: cómo construir una biblioteca de lecturas que puedas verificar",
+          "description": "Un método editorial para guardar referencias y distinguir una actualización de una nueva publicación.",
+          "body": "## Guarda algo más que el enlace\n\nAnota título, autoría y fecha junto al enlace original.\n\nEsta organización permite volver al texto incluso cuando cambie la página que lo presenta.\n\n> Una buena lectura también deja claro qué información sigue faltando.\n\n## Distingue publicación de actualización\n\nBusca si el sitio diferencia ambas fechas. Si no lo hace, deja el dato como no indicado.\n\nUna fecha reciente, por sí sola, no explica qué parte del texto se revisó.\n\n### Una ficha de revisión, paso a paso\n\nPuedes usar esta tabla para ordenar tus preguntas. No representa un informe ni certifica un producto.\n\n| Qué revisar | Qué anotar |\n| --- | --- |\n| Identificación | Nombre y referencia tal como aparecen. |\n| Documento | Título, fecha y autoría declarada. |\n| Correspondencia | Relación explícita con el lote o la muestra. |\n| Dudas | Información ausente o por aclarar. |\n\n## Separa fuente y comentario\n\nEscribe tus observaciones en una nota aparte y conserva el documento original.\n\nAsí podrás reconocer qué afirma la fuente y qué preguntas surgieron durante tu lectura.\n",
+          "category": "investigacion",
+          "illustration": "lines",
+          "reading_minutes": 3,
+          "status": "published",
+          "published_at": "2026-10-22T15:00:00+00:00",
+          "updated_at": "2026-10-22T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "preguntas-documentacion",
+          "translation_key": "preguntas-documentacion",
+          "title": "No encuentro la documentación de una ficha: ¿qué puedo preguntar y dónde empezar?",
+          "description": "Preguntas frecuentes para dar el siguiente paso cuando la información publicada no alcanza.",
+          "body": "## ¿Por dónde empiezo?\n\nIdentifica la ficha y la presentación concreta. Después, enumera los datos o documentos que no encontraste.\n\nUna consulta específica es más fácil de responder que una pregunta sobre todo el catálogo.\n\n> Una buena lectura también deja claro qué información sigue faltando.\n\n## ¿Qué hago si recibo otro documento?\n\nComprueba si identifica el producto o el lote que consultaste. Si no es claro, pide que expliquen la relación.\n\nNo asumas que un archivo corresponde a tu consulta solo porque llegó como respuesta.\n\n### Una ficha de revisión, paso a paso\n\nPuedes usar esta tabla para ordenar tus preguntas. No representa un informe ni certifica un producto.\n\n| Qué revisar | Qué anotar |\n| --- | --- |\n| Identificación | Nombre y referencia tal como aparecen. |\n| Documento | Título, fecha y autoría declarada. |\n| Correspondencia | Relación explícita con el lote o la muestra. |\n| Dudas | Información ausente o por aclarar. |\n\n## ¿Y si sigue faltando información?\n\nConserva la pregunta como pendiente y evita completar la respuesta por tu cuenta.\n\nPuedes volver a consultar la ficha más adelante y registrar si la documentación cambió.\n",
+          "category": "preguntas",
+          "illustration": "questions",
+          "reading_minutes": 3,
+          "status": "published",
+          "published_at": "2026-10-20T15:00:00+00:00",
+          "updated_at": "2026-10-20T15:00:00+00:00"
+        }
+      ]
+    },
+    {
+      "manifest": {
+        "slug": "cuaderno-demo",
+        "brand_name": "Cuaderno de Cocina Lenta",
+        "brand_mark": "C",
+        "brand_wordmark": "Cuaderno",
+        "domain": "cuaderno.localhost",
+        "locales": [
+          "es",
+          "en"
+        ],
+        "default_locale": "es",
+        "region": null,
+        "home_template": "editorial-blog",
+        "theme": {
+          "accent": "#8a3b1f",
+          "accent_contrast": "#ffffff",
+          "display_font": "system-serif"
+        },
+        "destinations": {
+          "docs": null,
+          "app": null,
+          "support": null,
+          "status": null
+        },
+        "pages": [
+          "/",
+          "/blog/"
+        ],
+        "indexable": false,
+        "google_site_verification": null
+      },
+      "editorial": {
+        "categories": [
+          {
+            "id": "guias",
+            "labels": {
+              "es": {
+                "name": "Guías de cocina",
+                "description": "Técnica antes que receta."
+              },
+              "en": {
+                "name": "Cooking guides",
+                "description": "Technique before recipe."
+              }
+            }
+          },
+          {
+            "id": "recetas",
+            "labels": {
+              "es": {
+                "name": "Recetas",
+                "description": "Platos para una tarde larga."
+              },
+              "en": {
+                "name": "Recipes",
+                "description": "Dishes for a long afternoon."
+              }
+            }
+          },
+          {
+            "id": "despensa",
+            "labels": {
+              "es": {
+                "name": "Despensa",
+                "description": "Qué guardar y cómo."
+              },
+              "en": {
+                "name": "Pantry",
+                "description": "What to keep and how."
+              }
+            }
+          }
+        ],
+        "home": {
+          "es": {
+            "kicker": "Cuaderno · Edición demo",
+            "title": "Cocina despacio. Anota todo.",
+            "intro": "Notas para cocinar sin prisa y repetir lo que salió bien.",
+            "featured_post": "leer-documentacion"
+          },
+          "en": {
+            "kicker": "Notebook · Demo edition",
+            "title": "Cook slowly. Write it down.",
+            "intro": "Notes for unhurried cooking.",
+            "featured_post": "read-the-recipe"
+          }
+        },
+        "illustration": "grid",
+        "reading_paths": [
+          {
+            "id": "empezar",
+            "labels": {
+              "es": {
+                "title": "Empiezo de cero.",
+                "description": "Lo primero que conviene leer.",
+                "post": "leer-documentacion"
+              },
+              "en": {
+                "title": "Starting out.",
+                "description": "Read this first.",
+                "post": "read-the-recipe"
+              }
+            }
+          },
+          {
+            "id": "guardar",
+            "labels": {
+              "es": {
+                "title": "Quiero ordenar mi despensa.",
+                "description": "Qué guardar y cómo.",
+                "post": "despensa-basica"
+              },
+              "en": {
+                "title": "Organising the pantry.",
+                "description": "What to keep.",
+                "post": "read-the-recipe"
+              }
+            }
+          },
+          {
+            "id": "cocinar",
+            "labels": {
+              "es": {
+                "title": "Tengo una tarde libre.",
+                "description": "Un plato largo y tranquilo.",
+                "post": "frijoles-de-olla"
+              },
+              "en": {
+                "title": "A free afternoon.",
+                "description": "A long, calm dish.",
+                "post": "read-the-recipe"
+              }
+            }
+          }
+        ],
+        "cta": {
+          "url": "https://mercado-demo.example/",
+          "presentation": "card",
+          "labels": {
+            "es": {
+              "title": "¿Te faltan ingredientes?",
+              "body": "El mercado asociado de esta demo tiene lo de la lista.",
+              "button": "Ir al mercado"
+            },
+            "en": {
+              "title": "Missing ingredients?",
+              "body": "This demo's partner market has the list.",
+              "button": "Go to the market"
+            }
+          }
+        },
+        "byline": {
+          "es": "Equipo del Cuaderno",
+          "en": "The Notebook team"
+        },
+        "legal": {
+          "approved": true,
+          "labels": {
+            "es": {
+              "text": "Sitio de demostración. Contenido ficticio."
+            },
+            "en": {
+              "text": "Demo site. Fictional content."
+            }
+          }
+        },
+        "newsletter": {
+          "enabled": true,
+          "consent_version": "demo-2026-11",
+          "labels": {
+            "es": {
+              "title": "Una receta al mes.",
+              "body": "Sin prisa, como el resto.",
+              "consent_text": "Acepto recibir el boletín de esta demostración.",
+              "button": "Suscribirme"
+            },
+            "en": {
+              "title": "One recipe a month.",
+              "body": "Unhurried, like everything else.",
+              "consent_text": "I agree to receive this demo's newsletter.",
+              "button": "Subscribe"
+            }
+          }
+        },
+        "palette": {
+          "canvas": "#fbf6ef",
+          "ink": "#2b1a12",
+          "highlight": "#8a3b1f"
+        },
+        "reading_font": "system-sans"
+      },
+      "posts": [
+        {
+          "locale": "es",
+          "slug": "leer-documentacion",
+          "translation_key": "leer-la-receta",
+          "title": "Leer la receta antes de empezar",
+          "description": "Una lectura completa ahorra la mitad de los errores.",
+          "body": "## Antes de encender el fuego\n\nLee la receta completa una vez, sin cocinar. Marca los pasos que necesitan espera.\n\n> Una receta leída dos veces se cocina una sola vez.\n\n### Qué anotar\n\n| Paso | Tiempo |\n| --- | --- |\n| Remojo | Una noche |\n| Cocción | Dos horas |\n\n## Después de cocinar\n\nAnota qué cambiarías la próxima vez.\n",
+          "category": "guias",
+          "illustration": "pages",
+          "reading_minutes": 4,
+          "status": "published",
+          "published_at": "2026-11-05T15:00:00+00:00",
+          "updated_at": "2026-11-05T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "frijoles-de-olla",
+          "translation_key": "frijoles-de-olla",
+          "title": "Frijoles de olla, sin apuro",
+          "description": "Remojo largo y fuego bajo.",
+          "body": "## La olla\n\nUna olla de barro o de hierro.\n\n## El tiempo\n\nDos horas a fuego bajo.\n",
+          "category": "recetas",
+          "illustration": "orbit",
+          "reading_minutes": 4,
+          "status": "published",
+          "published_at": "2026-11-03T15:00:00+00:00",
+          "updated_at": "2026-11-03T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "despensa-basica",
+          "translation_key": "despensa-basica",
+          "title": "Una despensa básica",
+          "description": "Lo mínimo para cocinar una semana.",
+          "body": "## Granos\n\nFrijol, arroz y maíz.\n\n## Especias\n\nPocas y frescas.\n",
+          "category": "despensa",
+          "illustration": "labels",
+          "reading_minutes": 4,
+          "status": "published",
+          "published_at": "2026-10-30T15:00:00+00:00",
+          "updated_at": "2026-10-30T15:00:00+00:00"
+        },
+        {
+          "locale": "es",
+          "slug": "cuaderno-de-notas",
+          "translation_key": "cuaderno-de-notas",
+          "title": "Cómo llevar un cuaderno de cocina",
+          "description": "Fecha, cambio y resultado.",
+          "body": "## Una página por plato\n\nAnota fecha, cambio y resultado.\n",
+          "category": "guias",
+          "illustration": "lines",
+          "reading_minutes": 4,
+          "status": "published",
+          "published_at": "2026-10-28T15:00:00+00:00",
+          "updated_at": "2026-10-28T15:00:00+00:00"
+        },
+        {
+          "locale": "en",
+          "slug": "read-the-recipe",
+          "translation_key": "leer-la-receta",
+          "title": "Read the recipe before you start",
+          "description": "A full read saves half the mistakes.",
+          "body": "## Before you light the stove\n\nRead the whole recipe once, without cooking. Mark the steps that need waiting.\n\n> A recipe read twice is cooked once.\n\n## After cooking\n\nWrite down what you would change next time.\n",
+          "category": "guias",
+          "illustration": "pages",
+          "reading_minutes": 4,
+          "status": "published",
+          "published_at": "2026-11-05T15:00:00+00:00",
+          "updated_at": "2026-11-05T15:00:00+00:00"
+        }
+      ]
+    }
+  ]
+}

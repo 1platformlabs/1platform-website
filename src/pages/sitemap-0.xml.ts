@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro'
 
 import { publishedUrls } from '@lib/site-routes'
+import { blogPostUrls } from '@lib/blog-sitemap'
 import { infrastructureChrome } from '@lib/site-chrome'
 
 /**
@@ -38,6 +39,18 @@ export const GET: APIRoute = async ({ locals }) => {
 
   const excluded = infrastructureChrome(locals.messages) && tenant.destinations.docs ? ['/for-developers/'] : []
   const urls = await publishedUrls(tenant, excluded)
+  // D-10d: posts are data, not `pages`. Each locale's archive comes from the
+  // Core (cached) and each post carries the alternates its translation_key pairs;
+  // a post with no twin carries none. No data and no cache is a 503, not a
+  // sitemap that silently lost its articles.
+  if (tenant.pages.includes('/blog/')) {
+    const posts = await blogPostUrls(tenant, locals.localizePath)
+    if (posts === null) {
+      return new Response('', { status: 503, headers: { 'retry-after': '30', 'cache-control': 'no-store' } })
+    }
+    urls.push(...posts)
+    urls.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
+  }
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',

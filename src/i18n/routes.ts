@@ -34,16 +34,13 @@
  *    `/` boundary, so `/solutions-hub/` can never be rewritten by
  *    `/solutions/`.
  *
- * 3. **Blog posts ARE listed, even though their slug already comes from the
- *    Spanish filename.** `entryAlternates` pairs the two languages by
- *    `translationKey` and hands each entry its own slug, so the page's own
- *    hreflang would work with this map empty — but `@astrojs/sitemap` cannot
- *    see any of that. It pairs languages by literal string equality of the
- *    path with the locale prefix removed (`parse-i18n-url.js`), so the moment
- *    the slugs differ it emits NO `<xhtml:link rel="alternate">` for either
- *    side. Listing the pairs here is what lets the config rebuild them.
- *    `tests/i18n-routes.spec.ts` asserts these entries agree with the
- *    `translationKey` pairing, so the second copy cannot drift from the first.
+ * 3. **Blog posts are NOT listed.** They come from the Core
+ *    (blog-sitio-de-marca-generado), which pairs the two languages by
+ *    `translation_key` and hands each post its own slug; the page's hreflang,
+ *    the language switcher and the sitemap's alternates all read that pairing.
+ *    The eight English→Spanish pairs that used to live here survive only as
+ *    `LEGACY_ES_BLOG_REDIRECTS` below, because their OLD addresses
+ *    (`/es/blog/<english-slug>/`) still owe a 301.
  */
 export const ES_PATHS: Readonly<Record<string, string>> = {
   // — Pages ————————————————————————————————————————————————————————————
@@ -65,17 +62,28 @@ export const ES_PATHS: Readonly<Record<string, string>> = {
   '/solutions/ads/': '/es/soluciones/publicidad/',
   '/solutions/whitelabel/': '/es/soluciones/marca-blanca/',
   '/solutions/content/': '/es/soluciones/sitio-web-y-contenido/',
+};
 
-  // — Blog posts, paired by `translationKey` in the collection ——————————
-  '/blog/1platform-vs-custom-toolchain/': '/es/blog/1platform-vs-herramientas-seo-propias/',
-  '/blog/ai-content-best-practices/': '/es/blog/contenido-con-ia-buenas-practicas-seo/',
-  '/blog/automate-seo-pipeline/': '/es/blog/automatizar-el-pipeline-de-seo/',
-  '/blog/electronic-invoicing-online-business/':
-    '/es/blog/facturacion-electronica-para-negocios-online/',
-  '/blog/getting-started-5-minutes/': '/es/blog/primeros-pasos-en-5-minutos/',
-  '/blog/integrating-payments-into-your-saas/': '/es/blog/integrar-pagos-en-tu-saas/',
-  '/blog/launch-online-store-30-minutes/': '/es/blog/lanzar-una-tienda-online-en-30-minutos/',
-  '/blog/programmatic-link-building/': '/es/blog/link-building-programatico/',
+/**
+ * The eight Spanish blog addresses that moved when the Spanish tree got its own
+ * slugs: `/es/blog/<english-slug>/` → `/es/blog/<spanish-slug>/`.
+ *
+ * A fixed table on purpose (D-10b): the blog is no longer a collection whose
+ * pairs the build can derive, and these 301s are an obligation to what search
+ * engines indexed, not a property of whatever the Core publishes today. They
+ * are part of `movedEsPaths()` (so `astro.config.mjs` still emits the redirect
+ * and the `.htaccess` contract still carries it) and the request gate accepts
+ * their keys even when the Core lists no post under that slug.
+ */
+export const LEGACY_ES_BLOG_REDIRECTS: Readonly<Record<string, string>> = {
+  '/es/blog/1platform-vs-custom-toolchain/': '/es/blog/1platform-vs-herramientas-seo-propias/',
+  '/es/blog/ai-content-best-practices/': '/es/blog/contenido-con-ia-buenas-practicas-seo/',
+  '/es/blog/automate-seo-pipeline/': '/es/blog/automatizar-el-pipeline-de-seo/',
+  '/es/blog/electronic-invoicing-online-business/': '/es/blog/facturacion-electronica-para-negocios-online/',
+  '/es/blog/getting-started-5-minutes/': '/es/blog/primeros-pasos-en-5-minutos/',
+  '/es/blog/integrating-payments-into-your-saas/': '/es/blog/integrar-pagos-en-tu-saas/',
+  '/es/blog/launch-online-store-30-minutes/': '/es/blog/lanzar-una-tienda-online-en-30-minutos/',
+  '/es/blog/programmatic-link-building/': '/es/blog/link-building-programatico/',
 };
 
 /**
@@ -144,5 +152,5 @@ export function movedEsPaths(): Record<string, string> {
   for (const [canonical, translated] of Object.entries(ES_PATHS)) {
     moved[`/es${canonical}`] = translated;
   }
-  return moved;
+  return { ...moved, ...LEGACY_ES_BLOG_REDIRECTS };
 }

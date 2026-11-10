@@ -1,0 +1,43 @@
+---
+/**
+ * The newsletter capture (§23 E-5). Rendered ONLY when the Core says it is
+ * available in this locale (enabled + consent text + consent version). The
+ * form posts to the site's own `/blog/` handler, which forwards to the Core and
+ * reports success only after the Core answered 202.
+ */
+import type { Editorial } from '@lib/site-blog';
+import { editorialStrings } from '@i18n/editorial';
+
+interface Props {
+  newsletter: Editorial['newsletter'];
+  variant?: 'band' | 'side';
+  /** Outcome of a no-JS submission, read from a one-shot cookie set by the handler. */
+  outcome?: 'ok' | 'error' | null;
+}
+const { newsletter, variant = 'band', outcome = null } = Astro.props;
+const locale = Astro.locals.locale;
+const s = editorialStrings(locale);
+const action = Astro.locals.localizePath('/blog/', locale);
+const id = `ed-newsletter-${variant}`;
+---
+
+{newsletter.available && (
+  <section class:list={['newsletter', variant === 'side' && 'newsletter-side']} id={variant === 'band' ? 'boletin' : undefined} aria-labelledby={`${id}-title`} data-newsletter-block>
+    <div>
+      <h2 id={`${id}-title`}>{newsletter.title}</h2>
+      {newsletter.body && <p>{newsletter.body}</p>}
+    </div>
+    <form class="subscribe-form" method="post" action={action} data-newsletter data-ok={s.subscribed} data-error={s.subscribeError}>
+      <input type="hidden" name="intent" value="newsletter" />
+      <label for={`${id}-email`}>{s.emailLabel}</label>
+      <div class="input-row">
+        <input id={`${id}-email`} name="email" type="email" required autocomplete="email" />
+        <button type="submit">{newsletter.button}</button>
+      </div>
+      <p class="small">
+        <label><input type="checkbox" name="consent" value="true" required style="appearance:auto;width:auto;min-height:0" /> {newsletter.consent_text}</label>
+      </p>
+      <p class="form-status" role="status" aria-live="polite" data-form-status data-state={outcome ?? undefined}>{outcome === 'ok' ? s.subscribed : outcome === 'error' ? s.subscribeError : ''}</p>
+    </form>
+  </section>
+)}

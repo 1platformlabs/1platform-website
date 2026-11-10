@@ -302,6 +302,19 @@ function startStubApi(): Promise<{ server: Server; baseUrl: string }> {
       }
     }
 
+    // The Core's blog surface, like the real one: an empty blog lists with 200 and a post it
+    // does not have is a TYPED 404. A bare 404 means "no such route" ⇒ the site answers 503.
+    const blogMatch = /\/sites\/[^/]+\/blog(?:\/([^/]+))?$/.exec(url.pathname)
+    if (blogMatch) {
+      if (!blogMatch[1]) {
+        response.end(JSON.stringify({ success: true, data: { items: [], page: 1, page_size: 50, total: 0 }, msg: 'Site blog listed' }))
+        return
+      }
+      response.statusCode = 404
+      response.end(JSON.stringify({ success: false, data: { code: blogMatch[1] === 'editorial' ? 'site_unresolved' : 'site_blog_post_not_found' }, msg: 'Not found' }))
+      return
+    }
+
     response.statusCode = 404
     response.end(JSON.stringify({ success: false, data: null, msg: 'Not found' }))
   })
@@ -388,6 +401,9 @@ test('the route edge selects a closed template catalogue and contains no tenant 
     'platform-commerce',
     'service-lead',
     'photographic-service',
+    // blog-sitio-de-marca-generado §23 E-1 (2026-11-09): the editorial preset,
+    // selected by data, rendered from its own physical routes.
+    'editorial-blog',
   ])
   expect(routingSource).toContain('HOME_RENDER_ROUTES[tenant.home_template]')
 
@@ -859,4 +875,28 @@ test('home and compact 404 pass Axe and reflow at mobile, desktop and 200% equiv
     }),
   )
   expect(motion.every((value) => value === '0s|0s')).toBe(true)
+})
+
+test('the editorial preset is shared code: no customer name, domain, copy or slug branch', () => {
+  // blog-sitio-de-marca-generado §23: the identity of a customer lives in its
+  // editorial block in the Core, never in a component. The fixtures' names are
+  // listed so a copy-paste from the dev fixture into a component turns red.
+  const files = [
+    'src/lib/site-blog.ts',
+    'src/lib/editorial-page.ts',
+    'src/lib/editorial-render.ts',
+    'src/i18n/editorial.ts',
+    'src/layouts/EditorialLayout.astro',
+    'src/components/editorial/Card.astro',
+    'src/components/editorial/Cta.astro',
+    'src/components/editorial/Newsletter.astro',
+    'src/pages/render/editorial-blog/index.astro',
+    'src/pages/render/editorial-blog/blog/index.astro',
+    'src/pages/render/editorial-blog/blog/[slug].astro',
+    'src/styles/editorial.css',
+  ]
+  const customer = /p[eé]ptido|aurum|cuaderno|mercado-demo|\.gt\b|tenant\.slug\s*[!=]==|tenant\.domain\s*[!=]==/i
+  const offenders = files.filter((file) => customer.test(readFileSync(join(ROOT, file), 'utf8')))
+  expect(files.length).toBeGreaterThan(10)
+  expect(offenders).toEqual([])
 })

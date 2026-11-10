@@ -1,7 +1,6 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
-import { ES_PATHS, movedEsPaths } from '../src/i18n/routes';
+import { ES_PATHS, LEGACY_ES_BLOG_REDIRECTS, movedEsPaths } from '../src/i18n/routes';
 import { repoTenantForHost } from '../src/data/site-tenants';
 import { publishedPages, publishedRoutes, servedHead, servedText } from './helpers/served';
 
@@ -33,17 +32,14 @@ import { publishedPages, publishedRoutes, servedHead, servedText } from './helpe
  * the same process production runs — and the enumeration comes from the served
  * sitemap, which is generated from the real route table.
  *
- * Two checks deliberately did NOT move. The blog-pairing test reads
- * `src/content/blog/**` because its subject is the collection's frontmatter,
- * which was never a build output; and the `.htaccess` test reads a file in the
+ * Two checks deliberately did NOT move. The blog-pairing test reads the
+ * repo-mode fixture (`src/data/blog-fixture.json`; the posts used to be
+ * `src/content/blog/**`) because its subject is the posts' own metadata, which
+ * is not a build output; and the `.htaccess` test reads a file in the
  * repo because its subject is the edge configuration that ships to cPanel.
  */
 
 const HTACCESS = 'deploy/cpanel/htaccess/landing.htaccess';
-
-function frontmatter(file: string, field: string): string | null {
-  return new RegExp(`^${field}:\\s*"?([^"\\n]+)"?`, 'm').exec(readFileSync(file, 'utf8'))?.[1] ?? null;
-}
 
 test('the map is a bijection and both sides of every pair answer', async () => {
   const offences: string[] = [];
@@ -78,75 +74,61 @@ test('the map is a bijection and both sides of every pair answer', async () => {
   }
 
   expect(offences, offences.join('\n')).toEqual([]);
-  expect(Object.keys(ES_PATHS).length).toBeGreaterThan(20);
+  // 18 pages: the map no longer carries the 8 blog pairs (26 before; they are the
+  // fixture's, see the legacy-redirects test below).
+  expect(Object.keys(ES_PATHS).length).toBeGreaterThanOrEqual(18);
 });
 
 /**
- * The blog half of the map is a second copy of a fact the collection already
- * holds — posts are paired by `translationKey`, not by slug. The copy exists
- * because `@astrojs/sitemap` cannot read frontmatter, and it is safe only for
- * as long as this test keeps the two honest.
- *
- * This one still reads the repo, and should: its subject is the source of
- * truth in `src/content/blog/**`, not anything the build produced.
+ * The eight legacy blog redirects are a fixed table (`LEGACY_ES_BLOG_REDIRECTS`,
+ * D-10b) that pairs English slugs with Spanish ones — a second copy of a fact the
+ * posts already hold, since they are paired by `translation_key`, not by slug.
+ * The copy is an obligation to what search engines indexed (the old address owes
+ * a 301), so this test keeps it honest against the repo-mode fixture
+ * (`src/data/blog-fixture.json`, generated from the original sixteen files).
  */
-test('every blog pair in the map is the pair the collection declares', () => {
-  const keyBySlug = (locale: 'en' | 'es') => {
-    const dir = join('src', 'content', 'blog', locale);
-    const map = new Map<string, string>();
-    for (const name of readdirSync(dir)) {
-      if (!name.endsWith('.md')) continue;
-      const key = frontmatter(join(dir, name), 'translationKey');
-      expect(key, `${locale}/${name} has no translationKey`).not.toBeNull();
-      map.set(name.replace(/\.md$/, ''), key!);
-    }
-    return map;
+test('every legacy blog redirect is the pair the fixture declares', () => {
+  const fixture = JSON.parse(readFileSync('src/data/blog-fixture.json', 'utf8')) as {
+    posts: { locale: string; slug: string; translation_key: string }[];
   };
-
+  const keyBySlug = (locale: 'en' | 'es') =>
+    new Map(fixture.posts.filter((p) => p.locale === locale).map((p) => [p.slug, p.translation_key]));
   const en = keyBySlug('en');
   const es = keyBySlug('es');
 
-  // Floor, and it counts POSTS because posts are what this test enumerates.
-  // A `readdirSync` that comes back short — a moved content root, a filter
-  // that stopped matching — leaves every list below empty and every assertion
-  // green, which is the one outcome that must be impossible. The map itself
-  // supplies the expected count, so the floor scales with the site instead of
-  // becoming a number somebody has to remember to raise.
-  const blogPairs = Object.keys(ES_PATHS).filter((p) => p.startsWith('/blog/')).length;
-  expect(blogPairs, 'the route map declares no blog pairs — nothing would be compared').toBeGreaterThan(5);
-  expect(en.size, `only ${en.size} English posts found for ${blogPairs} mapped pairs — broken probe, not a pass`)
-    .toBeGreaterThanOrEqual(blogPairs);
-  expect(es.size, `only ${es.size} Spanish posts found for ${blogPairs} mapped pairs — broken probe, not a pass`)
-    .toBeGreaterThanOrEqual(blogPairs);
+  // Floor, and it counts POSTS because posts are what this test enumerates. A
+  // fixture that came back short leaves every list below empty and every
+  // assertion green, which is the one outcome that must be impossible. The table
+  // itself supplies the expected count, so the floor scales with the site.
+  const pairs = Object.entries(LEGACY_ES_BLOG_REDIRECTS);
+  expect(pairs.length, 'the legacy table declares no blog pairs — nothing would be compared').toBeGreaterThan(5);
+  expect(en.size, `only ${en.size} English posts in the fixture for ${pairs.length} legacy pairs — broken probe, not a pass`)
+    .toBeGreaterThanOrEqual(pairs.length);
+  expect(es.size, `only ${es.size} Spanish posts in the fixture for ${pairs.length} legacy pairs — broken probe, not a pass`)
+    .toBeGreaterThanOrEqual(pairs.length);
 
   const offences: string[] = [];
-
-  for (const [canonical, translated] of Object.entries(ES_PATHS)) {
-    if (!canonical.startsWith('/blog/')) continue;
-    const enSlug = canonical.slice('/blog/'.length, -1);
-    const esSlug = translated.slice('/es/blog/'.length, -1);
-
-    if (!en.has(enSlug)) offences.push(`${canonical} — no English post with that slug`);
-    else if (!es.has(esSlug)) offences.push(`${translated} — no Spanish post with that slug`);
+  for (const [from, to] of pairs) {
+    const enSlug = from.slice('/es/blog/'.length, -1);
+    const esSlug = to.slice('/es/blog/'.length, -1);
+    if (!en.has(enSlug)) offences.push(`${from} — no English post with that slug`);
+    else if (!es.has(esSlug)) offences.push(`${to} — no Spanish post with that slug`);
     else if (en.get(enSlug) !== es.get(esSlug)) {
-      offences.push(
-        `${canonical} ↔ ${translated} — the map pairs them, the collection does not ` +
-          `(${en.get(enSlug)} vs ${es.get(esSlug)})`,
-      );
+      offences.push(`${from} → ${to} — the table pairs them, the fixture does not (${en.get(enSlug)} vs ${es.get(esSlug)})`);
     }
   }
-
   expect(offences, offences.join('\n')).toEqual([]);
 
-  // Both directions: a Spanish post the map never names would publish a URL
+  // Both directions: a Spanish post the table never names would publish a URL
   // with no 301 behind its old address.
-  const mapped = new Set(
-    Object.values(ES_PATHS)
-      .filter((p) => p.startsWith('/es/blog/'))
-      .map((p) => p.slice('/es/blog/'.length, -1)),
-  );
-  const unmapped = [...es.keys()].filter((slug) => !mapped.has(slug));
-  expect(unmapped, `Spanish posts absent from the route map: ${unmapped.join(', ')}`).toEqual([]);
+  const named = new Set(Object.values(LEGACY_ES_BLOG_REDIRECTS).map((p) => p.slice('/es/blog/'.length, -1)));
+  const unnamed = [...es.keys()].filter((slug) => !named.has(slug));
+  expect(unnamed, `Spanish posts absent from the legacy table: ${unnamed.join(', ')}`).toEqual([]);
+
+  // The table is part of the moves the config, the htaccess and the 301 test loop over.
+  for (const from of Object.keys(LEGACY_ES_BLOG_REDIRECTS)) {
+    expect(Object.hasOwn(movedEsPaths(), from), `${from} is missing from movedEsPaths()`).toBe(true);
+  }
 });
 
 /**
@@ -264,7 +246,7 @@ test('the serving contract carries a 301 for every address that moved', () => {
   }
 
   expect(offences, offences.join('\n')).toEqual([]);
-  expect(rules.size).toBe(Object.keys(ES_PATHS).length);
+  expect(rules.size).toBe(Object.keys(movedEsPaths()).length);
 });
 
 test('every sitemap alternate names a URL the sitemap itself lists', async () => {

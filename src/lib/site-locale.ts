@@ -221,7 +221,12 @@ export function alternatesForTenantPath(
   for (const locale of locales) {
     const path = candidateMap[locale]
     if (!path?.startsWith('/')) continue
-    if (!published.has(canonicalCandidate(locale, path))) continue
+    const identity = canonicalCandidate(locale, path)
+    // A post is data in the Core, not a page of the manifest (D-7/D-10d): a
+    // candidate the CORE paired (`supplied`) for a site that publishes `/blog/`
+    // is a published address whether or not `pages` lists it.
+    const isPost = supplied && published.has('/blog/') && /^\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*\/$/.test(identity)
+    if (!published.has(identity) && !isPost) continue
     // Explicit content alternates are built by the established i18n helpers,
     // so adapt their prefix while preserving their locale-specific slug. This
     // matters for translated blog slugs, which cannot be regenerated from the

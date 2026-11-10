@@ -1,0 +1,187 @@
+---
+/**
+ * The editorial preset's page (blog-sitio-de-marca-generado §23 E-1).
+ *
+ * Standalone on purpose: it does not extend `BaseLayout`, whose chrome reads the
+ * platform's own copy through `t()` and whose stylesheet shares class names with
+ * this one. Everything a site would change comes from data: the manifest
+ * (brand, accent, display font, icon, locales) and the editorial block
+ * (palette, reading font, categories, CTA, legal notice). No customer name,
+ * domain or copy lives in this file.
+ *
+ * The tokens are injected as a `style` attribute built only from values the Core
+ * validated (six-digit hex, closed font set) and re-checked here: anything else
+ * falls back to the compiled default instead of reaching the page.
+ */
+import Icon from '@components/editorial/EditorialIcon.astro';
+import TagManager from '@components/TagManager.astro';
+import '@styles/editorial.css';
+import type { Editorial } from '@lib/site-blog';
+import { resolveIcon } from '@lib/tenant-brand-assets';
+import { siteOrigin } from '@lib/site-origin';
+import { editorialStrings } from '@i18n/editorial';
+
+interface Props {
+  title: string;
+  description: string;
+  editorial: Editorial | null;
+  /** Canonical, locale-independent route of this page (`/`, `/blog/`, `/blog/x/`). */
+  route: string;
+  /** Path per locale for hreflang; only the locales that really exist. */
+  alternates?: Record<string, string>;
+  current?: 'home' | 'library' | string;
+  noIndex?: boolean;
+}
+
+const { title, description, editorial, route, alternates = {}, current, noIndex = false } = Astro.props;
+const tenant = Astro.locals.tenant;
+const locale = Astro.locals.locale;
+const l = (path: string) => Astro.locals.localizePath(path, locale);
+const s = editorialStrings(locale);
+
+const HEX = /^#[0-9a-fA-F]{6}$/;
+const hex = (value: string | undefined, fallback: string) => (value && HEX.test(value) ? value : fallback);
+const FONTS: Record<string, string> = {
+  manrope: 'Manrope, system-ui, sans-serif',
+  'system-sans': 'system-ui, sans-serif',
+  'system-serif': 'Georgia, "Times New Roman", serif',
+  'instrument-serif': '"Instrument Serif", Georgia, serif',
+  'space-grotesk': '"Space Grotesk", system-ui, sans-serif',
+  'system-mono': 'ui-monospace, monospace',
+};
+const tokens = [
+  `--ink:${hex(tenant.theme.accent, '#203d30')}`,
+  `--paper:${hex(editorial?.palette.canvas, '#fafbf6')}`,
+  `--text:${hex(editorial?.palette.ink, '#17231d')}`,
+  `--hl:${hex(editorial?.palette.highlight, '#705421')}`,
+  `--serif:${editorial?.reading_font === 'system-sans' ? FONTS['system-sans'] : FONTS['system-serif']}`,
+  `--display:${FONTS[tenant.theme.display_font] ?? FONTS['system-sans']}`,
+].join(';');
+
+const origin = siteOrigin(Astro.locals);
+const canonical = `${origin}${l(route)}`;
+const wordmark = tenant.brand_wordmark ?? tenant.brand_name;
+const ctaHost = editorial?.cta ? new URL(editorial.cta.url).hostname : null;
+const icon = resolveIcon(tenant);
+const robots = noIndex || !tenant.indexable ? 'noindex,nofollow' : 'index,follow';
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <TagManager part="head" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <link rel="canonical" href={canonical} />
+    {Object.entries(alternates).map(([lang, path]) => <link rel="alternate" hreflang={lang} href={`${origin}${path}`} />)}
+    <link rel="icon" href={icon} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {tenant.theme.display_font === 'manrope' && (
+      <style is:inline>@font-face{font-family:Manrope;src:url('/fonts/manrope-variable.woff2') format('woff2');font-style:normal;font-weight:200 800;font-display:swap}</style>
+    )}
+  </head>
+  <body class="ed" style={tokens} data-preset="editorial-blog">
+    <TagManager part="body" />
+    <a class="skip" href="#contenido">{s.skip}</a>
+    <header class="header">
+      <div class="wrap masthead">
+        <a class="brand" href={l('/')} style="font-family:var(--display)">
+          {tenant.brand_mark && <span class="avatar" aria-hidden="true">{tenant.brand_mark}</span>}
+          {wordmark}
+        </a>
+        {editorial?.cta && <a class="store-link" href={editorial.cta.url}>{editorial.cta.button} <Icon name="arrow-up-right" size={16} /></a>}
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="editorial-nav" hidden>{s.menu}</button>
+      </div>
+      <nav class="wrap main-nav" id="editorial-nav" aria-label={s.nav}>
+        <a href={l('/')} aria-current={current === 'home' ? 'page' : undefined}>{s.home}</a>
+        <a href={l('/blog/')} aria-current={current === 'library' ? 'page' : undefined}>{s.library}</a>
+        {editorial?.categories.map((c) => (
+          <a href={`${l('/blog/')}?category=${encodeURIComponent(c.id)}#resultados`} aria-current={current === c.id ? 'page' : undefined}>{c.name}</a>
+        ))}
+        {editorial?.cta && <a class="mobile-store-link" href={editorial.cta.url}>{editorial.cta.button} <Icon name="arrow-up-right" size={16} /></a>}
+      </nav>
+    </header>
+    <main id="contenido" tabindex="-1">
+      <slot />
+    </main>
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footer-top">
+          <a class="brand" href={l('/')} style="font-family:var(--display)">{wordmark}</a>
+          {editorial?.home?.title && <p>{editorial.home.title}</p>}
+          <a href={l('/blog/')}>{s.exploreLibrary} <Icon name="arrow-up-right" size={16} /></a>
+        </div>
+        {editorial?.legal && (
+          <div class="legal-footer" data-legal-status={editorial.legal.approved ? 'approved' : 'pending'}>
+            <strong>{s.legalKicker}</strong>
+            {!editorial.legal.approved && <span class="ed-legal-pending">{s.legalPending}</span>}
+            <p>{editorial.legal.text}</p>
+          </div>
+        )}
+        <div class="footer-bottom">
+          <span>{tenant.brand_name}</span>
+          {editorial?.cta && ctaHost && <a href={editorial.cta.url}>{ctaHost} <Icon name="arrow-up-right" size={16} /></a>}
+        </div>
+      </div>
+    </footer>
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+      const nav = document.getElementById('editorial-nav');
+      if (toggle && nav && window.matchMedia('(max-width: 699px)').matches) {
+        toggle.hidden = false;
+        toggle.addEventListener('click', () => {
+          const open = toggle.getAttribute('aria-expanded') !== 'true';
+          toggle.setAttribute('aria-expanded', String(open));
+          nav.classList.toggle('is-open', open);
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+            toggle.setAttribute('aria-expanded', 'false');
+            nav.classList.remove('is-open');
+            toggle.focus();
+          }
+        });
+      }
+      // Newsletter: the success message appears ONLY after a real 202 from the
+      // site's handler, which in turn only says ok after the Core answered 202.
+      for (const form of document.querySelectorAll<HTMLFormElement>('form[data-newsletter]')) {
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const status = form.querySelector<HTMLElement>('[data-form-status]');
+          const button = form.querySelector('button');
+          if (!status || !button) return;
+          button.disabled = true;
+          status.textContent = '';
+          try {
+            const response = await fetch(form.action, {
+              method: 'POST',
+              body: new FormData(form),
+              headers: { accept: 'application/json' },
+            });
+            const ok = response.status === 202;
+            status.dataset.state = ok ? 'ok' : 'error';
+            status.textContent = ok ? form.dataset.ok ?? '' : form.dataset.error ?? '';
+            if (ok) form.reset();
+          } catch {
+            status.dataset.state = 'error';
+            status.textContent = form.dataset.error ?? '';
+          } finally {
+            button.disabled = false;
+          }
+        });
+      }
+      for (const form of document.querySelectorAll<HTMLFormElement>('form[data-search]')) {
+        form.addEventListener('submit', () => {
+          form.setAttribute('aria-busy', 'true');
+          const button = form.querySelector('button');
+          if (button) button.textContent = form.dataset.busy ?? button.textContent;
+        });
+      }
+    </script>
+  </body>
+</html>

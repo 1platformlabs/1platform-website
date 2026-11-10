@@ -1,0 +1,140 @@
+---
+/**
+ * Editorial article (BSM-07 CA-4). Existence is decided by the cached archive
+ * of THIS site and locale (D-7/D-9) before any body is asked for; a slug the
+ * Core does not list answers the site's own 404, a Core that cannot answer
+ * answers 503. Never another site's post.
+ */
+import EditorialLayout from '@layouts/EditorialLayout.astro';
+import Card from '@components/editorial/Card.astro';
+import Cta from '@components/editorial/Cta.astro';
+import Newsletter from '@components/editorial/Newsletter.astro';
+import { ILLUSTRATIONS, postIsListed, resolvePost } from '@lib/site-blog';
+import { categoryNamer, loadEditorial, takeFlash } from '@lib/editorial-page';
+import { renderBody, renderedBodyIsSafe } from '@lib/editorial-render';
+import { editorialStrings, formatEditorialDate } from '@i18n/editorial';
+
+const { slug } = Astro.params;
+// Local on purpose: importing `@lib/site-routes` here pulled the platform's
+// stylesheets into this page's bundle (`svg{display:block}` broke every icon
+// link — /verify-epic-e2e 2026-11-09). Same shape as its POST_SEGMENT.
+const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const tenant = Astro.locals.tenant;
+const locale = Astro.locals.locale;
+const l = (path: string) => Astro.locals.localizePath(path, locale);
+const s = editorialStrings(locale);
+const data = await loadEditorial(Astro);
+
+let status: 200 | 404 | 503 = data.ok ? 200 : data.status;
+let post = null;
+if (data.ok && slug) {
+  // A segment that can never be a slug (the middleware's 404 marker, or any
+  // refused address) is a 404 without asking the Core anything.
+  if (!SLUG.test(slug) || !(await postIsListed(tenant.slug, locale, slug))) {
+    status = 404;
+  } else {
+    const resolved = await resolvePost(tenant.slug, locale, slug);
+    if (resolved.outcome === 'resolved') post = resolved.value;
+    else status = resolved.outcome === 'absent' ? 404 : 503;
+  }
+}
+// Rendered here, before the status is final: a body whose HTML is not safe is
+// refused like raw HTML — a recoverable 503, never an unsafe page.
+let rendered = post ? await renderBody(post.body) : null;
+if (rendered && !renderedBodyIsSafe(rendered.html)) {
+  post = null;
+  rendered = null;
+  status = 503;
+}
+if (status !== 200) {
+  Astro.response.status = status;
+  Astro.response.headers.set('cache-control', 'no-store');
+}
+
+const editorial = data.ok ? data.editorial : null;
+const name = editorial ? categoryNamer(editorial) : (id: string) => id;
+const flash = takeFlash(Astro);
+const art = post?.illustration && (ILLUSTRATIONS as readonly string[]).includes(post.illustration) ? `/editorial/${post.illustration}.svg` : post?.image;
+const byline = post?.author ?? editorial?.byline ?? null;
+const alternates = post
+  ? Object.fromEntries([[locale, l(`/blog/${post.slug}/`)], ...Object.entries(post.alternates).map(([loc, other]) => [loc, Astro.locals.localizePath(`/blog/${other}/`, loc as never)])])
+  : {};
+const route = post ? `/blog/${post.slug}/` : '/blog/';
+---
+
+<EditorialLayout
+  title={post ? `${post.title} · ${tenant.brand_name}` : status === 404 ? s.notFoundTitle : s.errorTitle}
+  description={post?.description ?? ''}
+  editorial={editorial}
+  route={route}
+  current={post?.category}
+  alternates={alternates}
+  noIndex={!post}
+>
+  <div class="wrap">
+    {!post ? (
+      <section class="empty-state" data-state={status === 404 ? 'not-found' : 'error'}>
+        <h1>{status === 404 ? s.notFoundTitle : s.errorTitle}</h1>
+        <p>{status === 404 ? s.notFoundBody : s.errorBody}</p>
+        <a class="button" href={status === 404 ? l('/blog/') : l(`/blog/${slug}/`)}>{status === 404 ? s.seeAll : s.retry}</a>
+      </section>
+    ) : (
+      <>
+        <nav class="breadcrumbs" aria-label={s.breadcrumbs}>
+          <a href={l('/blog/')}>{s.library}</a><span aria-hidden="true">/</span>
+          <a href={`${l('/blog/')}?category=${encodeURIComponent(post.category)}#resultados`}>{name(post.category)}</a>
+        </nav>
+        <div class="article-opening">
+          <header class="article-heading">
+            <a class="eyebrow" href={`${l('/blog/')}?category=${encodeURIComponent(post.category)}#resultados`}>{name(post.category)}</a>
+            <h1 style="font-family:var(--display)">{post.title}</h1>
+            <p class="article-lead">{post.description}</p>
+            <div class="article-byline">
+              {byline && <><span class="avatar" aria-hidden="true">{byline.charAt(0)}</span><span data-byline>{byline}</span></>}
+              <div class="meta">
+                {post.published_at && <time datetime={post.published_at}>{formatEditorialDate(post.published_at, locale)}</time>}
+                {post.reading_minutes && (<><span aria-hidden="true">·</span><span>{s.readingMinutes(post.reading_minutes)}</span></>)}
+              </div>
+            </div>
+          </header>
+          {art && <figure class="article-cover"><img src={art} width="720" height="420" alt="" /></figure>}
+        </div>
+        <div class="reading-layout">
+          <article class="prose">
+            {rendered && rendered.headings.length > 0 && (
+              <nav class="toc" aria-label={s.toc}>
+                <p class="eyebrow">{s.toc}</p>
+                <ol>{rendered.headings.map((h) => <li data-depth={h.depth}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+              </nav>
+            )}
+            <div data-body set:html={rendered?.html} />
+            {editorial?.legal && (
+              <aside class="legal-box" aria-labelledby="ed-legal" data-legal-status={editorial.legal.approved ? 'approved' : 'pending'}>
+                <span class="eyebrow">{s.legalKicker}</span>
+                {!editorial.legal.approved && <span class="ed-legal-pending">{s.legalPending}</span>}
+                <h2 id="ed-legal">{editorial.legal.text}</h2>
+              </aside>
+            )}
+            <div class="article-end">
+              <span class="eyebrow">{s.endOfReading}</span>
+              <a href="#contenido">{s.backToTop}</a>
+            </div>
+          </article>
+          <aside class="reading-sidebar">
+            {editorial && <Newsletter newsletter={editorial.newsletter} variant="side" outcome={flash} />}
+          </aside>
+        </div>
+        {/* Full width after the reading, as in the approved prototype: the block is
+            built for the page width, and inside the narrow sidebar its title was
+            cut and its button fell outside the card (/verify-epic-e2e 2026-11-09). */}
+        {editorial?.cta && <Cta cta={editorial.cta} />}
+        {post.related.length > 0 && (
+          <section class="related" aria-labelledby="ed-related">
+            <div class="section-heading"><h2 id="ed-related">{s.related}</h2></div>
+            <div class="article-grid">{post.related.map((r) => <Card post={r} categoryName={name(r.category)} />)}</div>
+          </section>
+        )}
+      </>
+    )}
+  </div>
+</EditorialLayout>

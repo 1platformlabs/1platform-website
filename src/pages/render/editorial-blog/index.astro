@@ -1,0 +1,128 @@
+---
+/**
+ * Editorial home (blog-sitio-de-marca-generado §23 E-1, BSM-07 CA-1). Reached
+ * only through the middleware rewrite of `/` for a site whose template is
+ * `editorial-blog`; requested directly it is not a published route (404).
+ */
+import Icon from '@components/editorial/EditorialIcon.astro';
+import EditorialLayout from '@layouts/EditorialLayout.astro';
+import Card from '@components/editorial/Card.astro';
+import Cta from '@components/editorial/Cta.astro';
+import Newsletter from '@components/editorial/Newsletter.astro';
+import { ILLUSTRATIONS } from '@lib/site-blog';
+import { categoryNamer, loadEditorial, takeFlash } from '@lib/editorial-page';
+import { editorialStrings, formatEditorialDate } from '@i18n/editorial';
+
+const locale = Astro.locals.locale;
+const l = (path: string) => Astro.locals.localizePath(path, locale);
+const s = editorialStrings(locale);
+const data = await loadEditorial(Astro);
+if (!data.ok) {
+  Astro.response.status = data.status;
+  Astro.response.headers.set('cache-control', 'no-store');
+}
+const editorial = data.ok ? data.editorial : null;
+const archive = data.ok ? data.archive : [];
+const name = editorial ? categoryNamer(editorial) : (id: string) => id;
+const home = editorial?.home ?? null;
+const featured = archive.find((p) => p.slug === home?.featured_post) ?? archive[0] ?? null;
+const recent = archive.filter((p) => p.slug !== featured?.slug).slice(0, 6);
+const bySlug = new Map(archive.map((p) => [p.slug, p]));
+const paths = (editorial?.reading_paths ?? []).filter((p) => bySlug.has(p.post));
+const illustration = home && (ILLUSTRATIONS as readonly string[]).includes(home.illustration) ? home.illustration : 'connections';
+const flash = takeFlash(Astro);
+const title = home?.title ? `${home.title} · ${Astro.locals.tenant.brand_name}` : Astro.locals.tenant.brand_name;
+const alternates = Object.fromEntries(Astro.locals.tenant.locales.map((loc: string) => [loc, Astro.locals.localizePath('/', loc as never)]));
+---
+
+<EditorialLayout title={title} description={home?.intro ?? ''} editorial={editorial} route="/" current="home" alternates={alternates}>
+  {!data.ok ? (
+    <section class="wrap empty-state" data-state="error">
+      <h1>{s.errorTitle}</h1>
+      <p>{s.errorBody}</p>
+      <a class="button" href={l('/')}>{s.retry}</a>
+    </section>
+  ) : (
+    <>
+      <section class="wrap editorial-hero" aria-labelledby="ed-hero-title">
+        <div class="hero-copy">
+          {home?.kicker && <span class="eyebrow"><span class="status-dot" aria-hidden="true"></span>{home.kicker}</span>}
+          <h1 id="ed-hero-title" style="font-family:var(--display)">{home?.title}</h1>
+          {home?.intro && <p class="hero-lead">{home.intro}</p>}
+          <div class="hero-actions">
+            {paths.length > 0 && <a class="button" href="#rutas">{s.findReading}<Icon name="chevron-down" size={16} /></a>}
+            <a class="text-link" href={l('/blog/')}>{s.exploreLibrary} <Icon name="arrow-up-right" size={16} /></a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src={`/editorial/${illustration}.svg`} width="720" height="720" alt="" />
+          {featured && (
+            <article class="hero-feature" data-featured={featured.slug}>
+              <div class="featured-kicker">
+                <a class="eyebrow" href={`${l('/blog/')}?category=${encodeURIComponent(featured.category)}#resultados`}>{name(featured.category)}</a>
+                <span class="small">{s.featured}</span>
+              </div>
+              <h2><a href={l(`/blog/${featured.slug}/`)}>{featured.title} <Icon name="arrow-up-right" size={16} /></a></h2>
+              <div class="meta">
+                {featured.published_at && <time datetime={featured.published_at}>{formatEditorialDate(featured.published_at, locale)}</time>}
+                {featured.reading_minutes && (<><span aria-hidden="true">·</span><span>{s.readingMinutes(featured.reading_minutes)}</span></>)}
+              </div>
+              {(featured.author ?? editorial?.byline) && <p class="feature-author">{featured.author ?? editorial?.byline}</p>}
+            </article>
+          )}
+        </div>
+      </section>
+
+      {paths.length > 0 && (
+        <section class="wrap reading-paths" id="rutas" aria-labelledby="ed-paths-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{s.pathsKicker}</p>
+              <h2 id="ed-paths-title">{s.pathsTitle}</h2>
+            </div>
+          </div>
+          <div class="path-grid">
+            {paths.map((path, index) => (
+              <a class="path-card" href={l(`/blog/${path.post}/`)} data-path={path.id}>
+                <span class="path-number">{String(index + 1).padStart(2, '0')}<Icon name="arrow-up-right" size={16} /></span>
+                <h3>{path.title}</h3>
+                {path.description && <p>{path.description}</p>}
+                <span class="path-link">{s.pathsOpen}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Only the featured post in this language: it already leads the hero, and a
+          «recent» heading with filters over an empty grid read as broken
+          (/verify-epic-e2e 2026-11-09). An archive with nothing at all keeps its
+          empty state below. */}
+      {(recent.length > 0 || !featured) && (
+      <section class="wrap recent" aria-labelledby="ed-recent-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{s.recentKicker}</p>
+            <h2 id="ed-recent-title">{s.recentTitle}</h2>
+          </div>
+          <a href={l('/blog/')}>{s.viewArchive} <Icon name="arrow-up-right" size={16} /></a>
+        </div>
+        <nav class="filters" aria-label={s.nav}>
+          <a href={l('/blog/')}>{s.allPosts}</a>
+          {editorial?.categories.map((c) => <a href={`${l('/blog/')}?category=${encodeURIComponent(c.id)}#resultados`}>{c.name}</a>)}
+        </nav>
+        {recent.length === 0 && !featured ? (
+          <p class="empty-state">{s.emptyArchiveTitle}</p>
+        ) : (
+          <div class="article-grid">{recent.map((post) => <Card post={post} categoryName={name(post.category)} />)}</div>
+        )}
+      </section>
+      )}
+
+      <div class="wrap">
+        {editorial?.cta && <Cta cta={editorial.cta} />}
+        {editorial && <Newsletter newsletter={editorial.newsletter} outcome={flash} />}
+      </div>
+    </>
+  )}
+</EditorialLayout>

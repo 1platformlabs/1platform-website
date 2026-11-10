@@ -4,13 +4,14 @@ import Breadcrumb from '@components/Breadcrumb.astro';
 import BlogPostCard from '@components/LegacyBlogPostCard.astro';
 import Icon from '@components/Icon.astro';
 import { useI18n } from '@i18n';
-import { bareSlug, getLocalized } from '@i18n/collections';
+import { bareSlug } from '@i18n/collections';
+import { blogEntriesOrEmpty } from '@lib/blog-entry';
 
 const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
 // Filtered by locale: an unfiltered read here is what would have put English
 // posts on the Spanish index.
-const posts = await getLocalized('blog', locale);
+const posts = await blogEntriesOrEmpty(Astro.locals.tenant, locale);
 
 const [lead, ...archive] = posts;
 ---

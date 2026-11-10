@@ -4,6 +4,7 @@ import { createServer, type Server } from 'node:http';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { repoTenantForHost } from '../src/data/site-tenants';
+import { answerBlog, platformBlogFromFixture } from './helpers/fake-site-api';
 import { getWithHost } from './helpers/http-host';
 
 const host = 'legacy-interiors.example';
@@ -14,6 +15,7 @@ const tenant = {
   // support copy and must not inherit the new platform WhatsApp destination.
   destinations: { ...platform.destinations, support: null },
 };
+const blog = platformBlogFromFixture();
 let api: Server;
 let adapter: ChildProcessWithoutNullStreams;
 let baseUrl = '';
@@ -48,7 +50,13 @@ test.beforeAll(async () => {
   api = createServer((request, response) => {
     const url = new URL(request.url ?? '/', 'http://contract');
     response.setHeader('content-type', 'application/json');
-    if (url.pathname.endsWith('/sites/by-host') && url.searchParams.get('host') === host) {
+    const blogAnswer = url.pathname.includes(`/sites/${tenant.slug}/blog`)
+      ? answerBlog({ tenant, pages: new Map(), blog }, url, request.method ?? 'GET', '')
+      : null;
+    if (blogAnswer) {
+      response.statusCode = blogAnswer.status;
+      response.end(JSON.stringify({ success: blogAnswer.status < 400, data: blogAnswer.data ?? null, msg: 'blog' }));
+    } else if (url.pathname.endsWith('/sites/by-host') && url.searchParams.get('host') === host) {
       response.end(JSON.stringify({ success: true, data: tenant, msg: 'ok' }));
     } else if (url.pathname.endsWith(`/sites/${tenant.slug}/pages`)) {
       response.end(JSON.stringify({ success: true, data: { slug: tenant.slug, locale: 'en', pages, messages }, msg: 'ok' }));

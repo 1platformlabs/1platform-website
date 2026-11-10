@@ -1,36 +1,54 @@
 ---
 import BlogLayout from '@layouts/BlogLayout.astro';
-import { localizePath } from '@i18n';
-import { bareSlug, entryAlternates } from '@i18n/collections';
-import { render, type CollectionEntry } from 'astro:content';
+import { localizePath, type Locale } from '@i18n';
+import type { BlogPost as CorePost } from '@lib/site-blog';
+import type { RenderedBody } from '@lib/editorial-render';
 
 interface Props {
-  post: CollectionEntry<'blog'>;
+  post: CorePost;
+  rendered: RenderedBody;
+  locale: Locale;
 }
 
-const { post } = Astro.props;
-const { Content, headings } = await render(post);
-const slug = bareSlug(post.id);
+const { post, rendered, locale } = Astro.props;
 
 /**
  * Which languages this post exists in.
  *
- * Derived from the collection rather than assumed, because a post is the one
- * kind of page that can legitimately have no twin. When it has none, the map
- * has a single entry and three things follow at once: no hreflang promises a
- * translation, the language switcher shows the other language as unavailable,
- * and the auto-detect script finds nothing to redirect to. One fact, read once.
+ * Read from the Core (`alternates`: published posts of THIS site with the same
+ * translation key, in languages the site declares) rather than assumed, because
+ * a post is the one kind of page that can legitimately have no twin. When it
+ * has none, the map has a single entry and three things follow at once: no
+ * hreflang promises a translation, the language switcher shows the other
+ * language as unavailable, and the auto-detect script finds nothing to redirect
+ * to. One fact, read once.
  */
-const alternates = await entryAlternates('blog', post.data.translationKey, (locale, entrySlug) =>
-  localizePath(`/blog/${entrySlug}/`, locale),
-);
+const alternates: Partial<Record<Locale, string>> = {
+  [locale]: localizePath(`/blog/${post.slug}/`, locale),
+};
+for (const [other, otherSlug] of Object.entries(post.alternates)) {
+  alternates[other as Locale] = localizePath(`/blog/${otherSlug}/`, other as Locale);
+}
+
+const frontmatter = {
+  title: post.title,
+  description: post.description,
+  pubDate: new Date(post.published_at ?? 0),
+  updatedDate: post.updated_at ? new Date(post.updated_at) : undefined,
+  author: post.author ?? Astro.locals.tenant.brand_name,
+  category: post.category,
+  image: post.image ?? undefined,
+  ogImage: post.og_image ?? undefined,
+  readingTime: post.reading_minutes ?? undefined,
+  tags: post.tags,
+};
 ---
 
 <BlogLayout
-  frontmatter={post.data}
-  headings={headings}
-  slug={slug}
+  frontmatter={frontmatter}
+  headings={rendered.headings}
+  slug={post.slug}
   alternates={alternates}
 >
-  <Content />
+  <Fragment set:html={rendered.html} />
 </BlogLayout>

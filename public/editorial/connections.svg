@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="720" viewBox="0 0 640 720" fill="none">
+<defs>
+ <linearGradient id="bg" x1="80" y1="0" x2="590" y2="690" gradientUnits="userSpaceOnUse"><stop stop-color="#e9eee0"/><stop offset=".6" stop-color="#c4d3c4"/><stop offset="1" stop-color="#688878"/></linearGradient>
+ <radialGradient id="gold" cx="0" cy="0" r="1" gradientTransform="translate(263 181) rotate(52) scale(200)" gradientUnits="userSpaceOnUse"><stop stop-color="#fcf0c8"/><stop offset=".48" stop-color="#c7a764"/><stop offset=".8" stop-color="#8d793e"/><stop offset="1" stop-color="#344c39"/></radialGradient>
+ <radialGradient id="green" cx="0" cy="0" r="1" gradientTransform="translate(418 283) rotate(60) scale(190)" gradientUnits="userSpaceOnUse"><stop stop-color="#c3d5b7"/><stop offset=".48" stop-color="#74937a"/><stop offset="1" stop-color="#254739"/></radialGradient>
+ <linearGradient id="stem" x1="250" y1="200" x2="430" y2="350" gradientUnits="userSpaceOnUse"><stop stop-color="#d9c68c"/><stop offset="1" stop-color="#496c50"/></linearGradient>
+ <filter id="shadow"><feGaussianBlur stdDeviation="20"/></filter>
+</defs>
+<path fill="url(#bg)" d="M0 0h640v720H0z"/>
+<g stroke="#fbfbea" stroke-opacity=".5"><circle cx="320" cy="275" r="234"/><circle cx="320" cy="275" r="181"/><path d="M32 275h576M320 42v466"/><path stroke-dasharray="3 8" d="M66 118l508 320M83 472L558 92"/></g>
+<ellipse cx="340" cy="410" rx="170" ry="38" fill="#294f3c" opacity=".22" filter="url(#shadow)"/>
+<path d="M245 214l182 123" stroke="url(#stem)" stroke-width="43" stroke-linecap="round"/>
+<circle cx="244" cy="208" r="99" fill="url(#gold)"/>
+<circle cx="431" cy="336" r="77" fill="url(#green)"/>
+<g stroke="#42634c" stroke-width="1.5"><path d="M244 208L128 300H70M431 336l72-116h67"/><circle cx="244" cy="208" r="5" fill="#f8edc6"/><circle cx="431" cy="336" r="5" fill="#d3e0c8"/></g>
+<g fill="#42634c"><circle cx="70" cy="300" r="4"/><circle cx="570" cy="220" r="4"/></g>
+<path d="M111 85v18m-9-9h18M529 448v18m-9-9h18" stroke="#526b51" stroke-width="2"/>
+</svg>

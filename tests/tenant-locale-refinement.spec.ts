@@ -74,7 +74,8 @@ test('explicit translated content alternates keep their slugs under reversed top
     ...clinic,
     locales: ['es', 'en'],
     default_locale: 'es',
-    pages: ['/blog/ai-content-best-practices/'],
+    // Posts are data in the Core: the tenant only has to publish the section.
+    pages: ['/blog/'],
   }
 
   expect(
