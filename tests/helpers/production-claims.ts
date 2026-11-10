@@ -97,12 +97,41 @@ function responseError(response: HostResponse, page: SurfacePage): string | null
   return response.status === 200 ? null : `HTTP ${response.status}`
 }
 
+const BLOG_POST_ROUTE = /^\/blog\/[^/]+\/$/
+
+/** The same-host, same-locale blog URL a 301 of a localised article route points to, else null. */
+function translationRedirect(response: HostResponse, page: SurfacePage): string | null {
+  if (response.status !== 301 || !BLOG_POST_ROUTE.test(page.route)) return null
+  const raw = response.headers.location
+  if (typeof raw !== 'string') return null
+  let target: URL
+  try {
+    target = new URL(raw, `https://${page.host}${page.url}`)
+  } catch {
+    return null
+  }
+  const prefix = page.url.slice(0, page.url.length - page.route.length) // '' or '/es'
+  if (target.protocol !== 'https:' || target.host !== page.host) return null
+  if (!new RegExp(`^${prefix}/blog/[^/]+/$`).test(target.pathname) || target.pathname === page.url) return null
+  return target.href
+}
+
 async function scanPage(page: SurfacePage, patterns: ClaimPatterns, report: ClaimsReport,
   transport: ClaimsTransport, timeoutMs: number) {
-  const url = `https://${page.host}${page.url}`
+  let url = `https://${page.host}${page.url}`
   report.visited.push(url)
   try {
-    const response = await request(url, transport, timeoutMs)
+    let response = await request(url, transport, timeoutMs)
+    const translated = translationRedirect(response, page)
+    if (translated) {
+      // A post's translation lives in the Core under its OWN slug, so a published article
+      // route localised by prefix (`/es/blog/<en-slug>/`) is the legacy 301 to the Spanish
+      // slug. Follow exactly that one hop and scan the article it lands on (deploy-prod
+      // 2026-11-10: the scan read the eight legacy redirects as eight errors).
+      url = translated
+      report.visited.push(url)
+      response = await request(url, transport, timeoutMs)
+    }
     const error = responseError(response, page)
     if (error) throw new Error(error)
     report.scanned += 1
