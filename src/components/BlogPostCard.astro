@@ -1,10 +1,10 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { BlogEntry } from '@lib/blog-entry';
 import Icon from '@components/Icon.astro';
 import { useI18n, formatDate } from '@i18n';
 import { bareSlug } from '@i18n/collections';
 import { archiveSummary, displayHeading } from '@lib/blog-presentation';
-interface Props { post: CollectionEntry<'blog'>; hidden?: boolean; }
+interface Props { post: BlogEntry; hidden?: boolean; }
 const { post, hidden = false } = Astro.props;
 const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 ---

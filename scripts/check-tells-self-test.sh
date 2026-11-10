@@ -187,24 +187,32 @@ assert_red "an unlisted brand of the same family inside the module" "external pr
 printf '\n%sThe content collections%s\n' "$DIM" "$RESET"
 # ~17,500 words of client-facing prose that no rule looked at until now. A
 # provider name in a blog post reached production with this script green.
-assert_red "provider name in an English post" "external provider names" \
-  "src/content/blog/en/automate-seo-pipeline.md" \
+assert_red "provider name in an English changelog entry" "external provider names" \
+  "src/content/changelog/en/2026-04-05-v1.2.0.md" \
   "We generate every article with OpenAI and bill it through Stripe."
-assert_red "provider name in a Spanish post"  "external provider names" \
-  "src/content/blog/es/automate-seo-pipeline.md" \
+assert_red "provider name in a Spanish changelog entry"  "external provider names" \
+  "src/content/changelog/es/2026-04-05-v1.2.0.md" \
   "Generamos cada artículo con OpenAI y lo cobramos con Stripe."
 assert_red "provider name in the changelog"   "external provider names" \
   "src/content/changelog/en/2026-04-05-v1.2.0.md" \
   "- **Added** Pixabay image sourcing."
-assert_red "fabricated price in a post"       "fabricated prices" \
-  "src/content/blog/en/automate-seo-pipeline.md" "Most tools cost around \$40/mo."
+assert_red "fabricated price in a changelog entry" "fabricated prices" \
+  "src/content/changelog/en/2026-04-05-v1.2.0.md" "Most tools cost around \$40/mo."
+# The posts moved to the Core (D-10): the repo-mode fixture is the one place
+# their prose still lives in the tree, and `check-tells.sh` scans `*.json` under
+# `src`, so a provider name or a price there must go red too.
+assert_red "provider name in the blog fixture" "external provider names" \
+  "src/data/blog-fixture.json" \
+  '"body": "We generate every article with OpenAI and bill it through Stripe."'
+assert_red "fabricated price in the blog fixture" "fabricated prices" \
+  "src/data/blog-fixture.json" '"body": "Most tools cost around \$40/mo."'
 # Design-system rules deliberately stop at markup: an arrow is punctuation in a
 # sentence, and an article observing what the market does is not a product
 # claim. Both of these exist in the real posts today and must stay quiet.
 assert_green "arrow used as punctuation in prose" \
-  "src/content/blog/en/automate-seo-pipeline.md" "The webhook fires → the UI updates."
+  "src/content/changelog/en/2026-04-05-v1.2.0.md" "The webhook fires → the UI updates."
 assert_green "editorial observation about the market" \
-  "src/content/blog/en/automate-seo-pipeline.md" "Most teams juggle 5-10 different tools."
+  "src/content/changelog/en/2026-04-05-v1.2.0.md" "Most teams juggle 5-10 different tools."
 
 printf '\n%sDocumentation must stay writable%s\n' "$DIM" "$RESET"
 # Naming a retired pattern in a comment is how the reason it went away survives.

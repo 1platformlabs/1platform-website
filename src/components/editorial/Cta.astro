@@ -1,0 +1,26 @@
+---
+/** The site's commercial call to action — a configured SITE block (§23 E-4),
+ * never part of a post. Text, URL and presentation come from the Core. */
+import Icon from '@components/editorial/EditorialIcon.astro';
+import type { Editorial } from '@lib/site-blog';
+import { editorialStrings } from '@i18n/editorial';
+
+interface Props {
+  cta: NonNullable<Editorial['cta']>;
+}
+const { cta } = Astro.props;
+const s = editorialStrings(Astro.locals.locale);
+const host = new URL(cta.url).hostname;
+---
+
+<section class:list={['store-bridge', `store-bridge--${cta.presentation}`]} aria-labelledby="ed-cta-title" data-cta>
+  <div>
+    <span class="eyebrow">{s.nextStep}</span>
+    <h2 id="ed-cta-title">{cta.title}</h2>
+    {cta.body && <p>{cta.body}</p>}
+  </div>
+  <div class="bridge-action">
+    <a class="button" href={cta.url}>{cta.button}<Icon name="arrow-up-right" size={16} /></a>
+    <p>{s.ctaContinue(host)}</p>
+  </div>
+</section>

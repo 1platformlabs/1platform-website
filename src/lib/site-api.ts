@@ -24,7 +24,14 @@ export const DISPLAY_FONTS = [
 
 export type DisplayFont = (typeof DISPLAY_FONTS)[number]
 
-export const HOME_TEMPLATES = ['platform-commerce', 'service-lead', 'photographic-service'] as const
+export const HOME_TEMPLATES = [
+  'platform-commerce',
+  'service-lead',
+  'photographic-service',
+  // blog-sitio-de-marca-generado §23 E-1: the home IS the blog. Configured by
+  // the site's editorial block in the Core, never by tenant code.
+  'editorial-blog',
+] as const
 
 export type HomeTemplate = (typeof HOME_TEMPLATES)[number]
 

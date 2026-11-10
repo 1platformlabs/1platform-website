@@ -299,12 +299,16 @@ test('publishedUrls enumerates 54 URLs for oneplatform, and every alternate is o
   const { platform, clinic } = tenantsBySlug(tenants)
 
   const urls = await routes.publishedUrls(platform)
-  // 27 canonical routes x 2 locales. The number is the F0 baseline the whole
-  // conversion is measured against, so it is asserted exactly rather than as a
-  // floor: 52 before the manifest became the source and 52 after (54 once the review plates page was added).
-  expect(urls.length, 'the published URL set changed size — that is a regression or an intended change nobody wrote down').toBe(54)
-  expect(new Set(urls.map((u) => u.path)).size, 'a URL was enumerated twice').toBe(54)
-  expect(urls.filter((u) => u.path === '/es/' || u.path.startsWith('/es/')).length).toBe(27)
+  // 19 canonical PAGES x 2 locales. The manifest still lists the 8 article
+  // routes (until F3b trims them) but `publishedUrls` no longer enumerates them:
+  // posts are data in the Core and the sitemap adds them from there, with the
+  // alternates the Core pairs (tests/blog-from-api.spec.ts counts those: 16).
+  // Before the blog moved: 27 routes x 2 = 54, i.e. 38 + 16 posts. Asserted
+  // exactly, not as a floor.
+  expect(urls.length, 'the published URL set changed size — that is a regression or an intended change nobody wrote down').toBe(38)
+  expect(new Set(urls.map((u) => u.path)).size, 'a URL was enumerated twice').toBe(38)
+  expect(urls.filter((u) => u.path === '/es/' || u.path.startsWith('/es/')).length).toBe(19)
+  expect(urls.some((u) => /\/blog\/[^/]+\/$/.test(u.path)), 'a post leaked into the manifest enumeration').toBe(false)
 
   const published = new Set(urls.map((u) => u.path))
   const dangling = urls.flatMap((u) =>

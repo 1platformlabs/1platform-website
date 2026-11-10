@@ -1,6 +1,7 @@
 ---
 import BlogPostCard from './LegacyBlogPostCard.astro';
-import { bareSlug, getLocalized } from '@i18n/collections';
+import { bareSlug } from '@i18n/collections';
+import { blogEntriesOrEmpty } from '@lib/blog-entry';
 
 import { useI18n } from '@i18n';
 const { t, locale } = useI18n(Astro.url.pathname, Astro.locals);
@@ -14,7 +15,7 @@ const { currentSlug, currentCategory } = Astro.props;
 
 // Same language only: an unfiltered read here would have put English posts
 // under a Spanish article, which is the most visible form of language leak.
-const allPosts = await getLocalized('blog', locale);
+const allPosts = await blogEntriesOrEmpty(Astro.locals.tenant, locale);
 const related = allPosts
   .filter((p) => bareSlug(p.id) !== currentSlug)
   .sort((a, b) => {

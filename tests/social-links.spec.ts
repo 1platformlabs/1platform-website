@@ -5,7 +5,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { chromium, expect, test, type Browser, type Page } from '@playwright/test';
 
 import { repoTenantForHost } from '../src/data/site-tenants';
-import { exportRepoContent, startFakeSiteStack, type FakeSite, type FakeSiteStack, type PagesDocument } from './helpers/fake-site-api';
+import { exportRepoContent, platformBlogFromFixture, startFakeSiteStack, type FakeSite, type FakeSiteStack, type PagesDocument } from './helpers/fake-site-api';
 import { getWithHost } from './helpers/http-host';
 
 /**
@@ -68,6 +68,7 @@ test.beforeAll(async () => {
     {
       tenant: { ...platform, slug: 'legacy-redes', domain: 'legacy-redes.example', locales: ['en'], default_locale: 'en', destinations: { ...platform.destinations, support: null }, social_links: WITH_LINKS },
       pages: legacyPages,
+      blog: platformBlogFromFixture(),
     },
   ];
   stack = await startFakeSiteStack(sites, { host: 'medipago.gt', path: '/' });

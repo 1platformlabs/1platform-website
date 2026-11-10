@@ -1,0 +1,35 @@
+---
+/** One post card (archive, home, related). Data only: title, excerpt, category, date. */
+import Icon from '@components/editorial/EditorialIcon.astro';
+import type { BlogCard } from '@lib/site-blog';
+import { ILLUSTRATIONS } from '@lib/site-blog';
+import { editorialStrings, formatEditorialDate } from '@i18n/editorial';
+
+interface Props {
+  post: BlogCard;
+  categoryName: string;
+  headingLevel?: 'h2' | 'h3';
+}
+const { post, categoryName, headingLevel = 'h3' } = Astro.props;
+const locale = Astro.locals.locale;
+const l = (path: string) => Astro.locals.localizePath(path, locale);
+const s = editorialStrings(locale);
+const href = l(`/blog/${post.slug}/`);
+const art = post.illustration && (ILLUSTRATIONS as readonly string[]).includes(post.illustration) ? `/editorial/${post.illustration}.svg` : post.image;
+const Heading = headingLevel;
+---
+
+<article class="card" data-post={post.slug}>
+  {art && (
+    <a class="card-image" href={href} tabindex="-1" aria-hidden="true">
+      <img src={art} width="720" height="420" alt="" loading="lazy" />
+    </a>
+  )}
+  <a class="eyebrow" href={`${l('/blog/')}?category=${encodeURIComponent(post.category)}#resultados`}>{categoryName}</a>
+  <Heading><a href={href}>{post.title}<span class="arrow"><Icon name="arrow-up-right" size={16} /></span></a></Heading>
+  <p>{post.description}</p>
+  <div class="meta">
+    {post.published_at && <time datetime={post.published_at}>{formatEditorialDate(post.published_at, locale)}</time>}
+    {post.reading_minutes && (<><span aria-hidden="true">·</span><span>{s.readingMinutes(post.reading_minutes)}</span></>)}
+  </div>
+</article>

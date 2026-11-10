@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { translateToEs } from '../src/i18n/routes';
+import { postRouteIn } from './helpers/site-surface';
 import {
   publishedPages,
   publishedPagesByLocale,
@@ -106,7 +107,12 @@ test('every English page has a Spanish counterpart', async () => {
   const { en, all } = await publishedPagesByLocale();
   const published = new Set(all.map((p) => p.route));
 
-  const missing = en.map((p) => p.route).filter((route) => !published.has(translateToEs(route)));
+  // A post's twin is the Core's pairing (the fixture here), not the route map.
+  const counterpartOf = (route: string) => {
+    const post = postRouteIn(route, 'es');
+    return post !== route ? `/es${post}` : translateToEs(route);
+  };
+  const missing = en.map((p) => p.route).filter((route) => !published.has(counterpartOf(route)));
   expect(missing, `Spanish pages missing: ${missing.join(', ')}`).toEqual([]);
 
   // Floor against a stale enumeration, not an inventory, and it counts PAGES —

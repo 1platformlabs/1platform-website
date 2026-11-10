@@ -1,11 +1,12 @@
 ---
-import { bareSlug, getLocalized } from '@i18n/collections';
+import { bareSlug } from '@i18n/collections';
+import { blogEntriesOrEmpty } from '@lib/blog-entry';
 import { useI18n } from '@i18n';
 import { displayHeading, editorialOrder } from '@lib/blog-presentation';
 interface Props { currentSlug: string; currentCategory: string; }
 const { currentSlug } = Astro.props;
 const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
-const related = editorialOrder(await getLocalized('blog', locale))
+const related = editorialOrder(await blogEntriesOrEmpty(Astro.locals.tenant, locale))
   .filter((post) => bareSlug(post.id) !== currentSlug).slice(0, 2);
 ---
 {related.length > 0 && <section class="section section--wash" aria-label={t('related.title')}>

@@ -1,0 +1,136 @@
+---
+/**
+ * Editorial library (BSM-07 CA-2/CA-3). Search, category and page are QUERY
+ * parameters of `/blog/` (§23 E-1), computed over the cached archive of THIS
+ * site and locale; nothing about the query is cached on its own (E-8).
+ *
+ * POST is the newsletter handler (E-5): it lives here so it is inside a route
+ * the site publishes, and answers success only after the Core's 202.
+ */
+import EditorialLayout from '@layouts/EditorialLayout.astro';
+import Card from '@components/editorial/Card.astro';
+import Cta from '@components/editorial/Cta.astro';
+import Newsletter from '@components/editorial/Newsletter.astro';
+import { searchCards } from '@lib/site-blog';
+import { categoryNamer, handleNewsletterPost, loadEditorial, takeFlash } from '@lib/editorial-page';
+import { editorialStrings } from '@i18n/editorial';
+
+if (Astro.request.method === 'POST') return handleNewsletterPost(Astro);
+
+const PAGE_SIZE = 6;
+const locale = Astro.locals.locale;
+const l = (path: string) => Astro.locals.localizePath(path, locale);
+const s = editorialStrings(locale);
+const data = await loadEditorial(Astro);
+if (!data.ok) {
+  Astro.response.status = data.status;
+  Astro.response.headers.set('cache-control', 'no-store');
+}
+const editorial = data.ok ? data.editorial : null;
+const archive = data.ok ? data.archive : [];
+const name = editorial ? categoryNamer(editorial) : (id: string) => id;
+
+const params = Astro.url.searchParams;
+const q = (params.get('q') ?? '').trim().slice(0, 100);
+const requested = params.get('category') ?? '';
+const category = editorial?.categories.find((c) => c.id === requested) ?? null;
+const inCategory = category ? archive.filter((p) => p.category === category.id) : archive;
+const results = searchCards(inCategory, q, name);
+const pages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
+const page = Math.min(pages, Math.max(1, Number.parseInt(params.get('page') ?? '1', 10) || 1));
+const shown = results.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+function href(next: { category?: string | null; q?: string; page?: number }): string {
+  const out = new URLSearchParams();
+  const cat = next.category === undefined ? category?.id : next.category;
+  const query = next.q === undefined ? q : next.q;
+  if (cat) out.set('category', cat);
+  if (query) out.set('q', query);
+  if (next.page && next.page > 1) out.set('page', String(next.page));
+  const qs = out.toString();
+  return `${l('/blog/')}${qs ? `?${qs}` : ''}#resultados`;
+}
+
+const flash = takeFlash(Astro);
+const heading = category?.name ?? s.library;
+const description = category?.description ?? editorial?.home?.intro ?? '';
+const alternates = Object.fromEntries(Astro.locals.tenant.locales.map((loc: string) => [loc, Astro.locals.localizePath('/blog/', loc as never)]));
+const state = !data.ok ? 'error' : archive.length === 0 ? 'empty-archive' : inCategory.length === 0 ? 'empty-category' : results.length === 0 ? 'no-match' : 'results';
+---
+
+<EditorialLayout title={`${heading} · ${Astro.locals.tenant.brand_name}`} description={description} editorial={editorial} route="/blog/" current={category?.id ?? 'library'} alternates={alternates} noIndex={Boolean(q) || page > 1}>
+  <div class="wrap">
+    <nav class="breadcrumbs" aria-label={s.breadcrumbs}>
+      <a href={l('/')}>{s.home}</a><span aria-hidden="true">/</span><a href={l('/blog/')}>{s.library}</a>
+      {category && (<><span aria-hidden="true">/</span><span>{category.name}</span></>)}
+    </nav>
+    <header class="category-heading">
+      <p class="eyebrow">{s.library}</p>
+      <h1 style="font-family:var(--display)">{heading}</h1>
+      {description && <p>{description}</p>}
+    </header>
+
+    {state === 'error' ? (
+      <section class="empty-state" data-state="error" role="alert">
+        <h2>{s.errorTitle}</h2>
+        <p>{s.errorBody}</p>
+        <a class="button" href={href({})}>{s.retry}</a>
+      </section>
+    ) : (
+      <>
+        <form class="article-search" role="search" method="get" action={l('/blog/')} data-search data-busy={s.searching}>
+          <label for="ed-q">{s.searchLabel}</label>
+          {category && <input type="hidden" name="category" value={category.id} />}
+          <div class="search-row">
+            <input id="ed-q" type="search" name="q" value={q} placeholder={s.searchPlaceholder} maxlength="100" />
+            <button type="submit">{s.searchButton}</button>
+          </div>
+          <p class="small">{s.searchHint}</p>
+          {q && <a id="clear-search" href={href({ q: '' })}>{s.clearSearch}</a>}
+        </form>
+
+        <nav class="filters" aria-label={s.nav}>
+          <a href={href({ category: null, page: 1 })} aria-current={!category ? 'page' : undefined}>{s.allPosts}</a>
+          {editorial?.categories.map((c) => (
+            <a href={href({ category: c.id, page: 1 })} aria-current={category?.id === c.id ? 'page' : undefined} data-category={c.id}>{c.name}</a>
+          ))}
+        </nav>
+
+        <section id="resultados" aria-labelledby="ed-results" data-state={state}>
+          <div class="results-heading">
+            <h2 id="ed-results" aria-live="polite">{q ? s.resultsFor(q) : heading} · <span data-count>{s.count(results.length)}</span></h2>
+          </div>
+          {state === 'results' && (
+            <div class="article-grid" style="margin-top:28px">{shown.map((post) => <Card post={post} categoryName={name(post.category)} />)}</div>
+          )}
+          {state === 'no-match' && (
+            <div class="empty-state">
+              <h2>{s.noMatchTitle}</h2>
+              <p>{s.noMatchBody}</p>
+              <a class="button" href={href({ q: '', category: null })}>{s.seeAll}</a>
+            </div>
+          )}
+          {state === 'empty-category' && (
+            <div class="empty-state">
+              <h2>{s.emptyCategoryTitle}</h2>
+              <p>{s.emptyCategoryBody}</p>
+              <a class="button" href={href({ q: '', category: null })}>{s.seeAll}</a>
+            </div>
+          )}
+          {state === 'empty-archive' && <div class="empty-state"><h2>{s.emptyArchiveTitle}</h2></div>}
+          {pages > 1 && (
+            <nav class="pagination" aria-label={s.pagination}>
+              {page > 1 && <a href={href({ page: page - 1 })} rel="prev">{s.previous}</a>}
+              {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+                <a href={href({ page: n })} aria-current={n === page ? 'page' : undefined} aria-label={s.pageN(n)}>{n}</a>
+              ))}
+              {page < pages && <a href={href({ page: page + 1 })} rel="next">{s.next}</a>}
+            </nav>
+          )}
+        </section>
+        {editorial?.cta && <Cta cta={editorial.cta} />}
+        {editorial && <Newsletter newsletter={editorial.newsletter} outcome={flash} />}
+      </>
+    )}
+  </div>
+</EditorialLayout>

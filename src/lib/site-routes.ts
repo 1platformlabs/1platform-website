@@ -108,7 +108,11 @@ export async function publishedUrls(tenant: SiteTenant, excludedRoutes: readonly
   const localise = makeLocalizePath(tenant)
   const bilingual = locales.includes('en') && locales.includes('es')
 
-  const canonical = tenant.pages.filter((p) => !NEVER_INDEXED.has(p) && !excludedRoutes.includes(p))
+  // A post is not a page of the manifest: it is listed from the Core's archive
+  // with the alternates the Core pairs (`blogPostUrls`), never rebuilt from here.
+  const canonical = tenant.pages.filter(
+    (p) => !NEVER_INDEXED.has(p) && !excludedRoutes.includes(p) && !blogPostSlugOf(p),
+  )
 
   const all = [
     ...new Set(canonical.flatMap((path) => locales.map((locale) => localise(path, locale)))),
@@ -248,6 +252,14 @@ function publishedContentRouteOf(pathname: string, tenant: SiteTenant): string |
     if (requested !== expected) return null
   }
 
+  // D-7: the post list is DATA in the Core, not part of `pages`. The route is
+  // served when the site publishes `/blog/`, listed or not in `pages` (so F3 and
+  // F3b can land in any order and a rollback works). Whether the SLUG exists is
+  // asked of the cached archive by `blogGateFor` (src/lib/blog-gate.ts), before
+  // the render; an editorial page answers its own 404.
+  if (published.has('/blog/') && blogPostSlugOf(canonical)) {
+    return canonical
+  }
   if (canonical === '/rss.xml') return published.has('/blog/') ? canonical : null
   if (canonical === '/changelog/feed.xml') {
     return published.has('/changelog/') ? canonical : null
@@ -268,7 +280,44 @@ export const HOME_RENDER_ROUTES = {
   'platform-commerce': null,
   'service-lead': '/render/service-lead/',
   'photographic-service': '/render/photographic-service/',
+  'editorial-blog': '/render/editorial-blog/',
 } as const satisfies Record<HomeTemplate, string | null>
+
+/**
+ * blog-sitio-de-marca-generado §23 E-1 · the editorial preset renders its blog
+ * from its OWN physical routes, so its stylesheet never shares a page bundle
+ * with `global.css` (both declare `.wrap`, `.card`, `.prose`…).
+ *
+ * A tenant whose blog comes from the Core is selected by its TEMPLATE, never by
+ * slug or domain: every site with `editorial-blog` gets the same routes.
+ */
+export const EDITORIAL_BLOG_ROOT = '/render/editorial-blog/blog/'
+
+const POST_SEGMENT = /^\/blog\/([a-z0-9]+(?:-[a-z0-9]+)*)\/$/
+/** Never a post slug (POST_SEGMENT cannot match a lone hyphen): renders the 404. */
+const NOT_A_POST = '-'
+
+/**
+ * The page that renders a refusal (an address this site does not publish).
+ *
+ * The generic `/404` is drawn with the platform layout, which needs the copy an
+ * editorial site never writes: its render died mid-stream and EVERY unpublished
+ * address of an editorial site answered 503 + Retry-After — `/pricing/`, a typo,
+ * an old link (/verify-epic-e2e 2026-11-09). The preset's own article route
+ * renders its 404 with its own chrome; the middleware sets the status.
+ */
+export function notFoundRouteOf(tenant: SiteTenant): string {
+  return isEditorialBlog(tenant) ? `${EDITORIAL_BLOG_ROOT}${NOT_A_POST}/` : '/404'
+}
+
+export function isEditorialBlog(tenant: SiteTenant): boolean {
+  return tenant.home_template === 'editorial-blog'
+}
+
+/** The post slug a canonical `/blog/<slug>/` route names, or null. */
+export function blogPostSlugOf(canonical: string): string | null {
+  return POST_SEGMENT.exec(canonical)?.[1] ?? null
+}
 
 export function physicalRouteOf(pathname: string, tenant: SiteTenant): string {
   const canonical = publishedContentRouteOf(pathname, tenant)
@@ -276,8 +325,18 @@ export function physicalRouteOf(pathname: string, tenant: SiteTenant): string {
     const templateRoute = HOME_RENDER_ROUTES[tenant.home_template]
     if (templateRoute) return templateRoute
   }
+  if (isEditorialBlog(tenant) && canonical !== null) {
+    if (canonical === '/blog/') return EDITORIAL_BLOG_ROOT
+    const post = blogPostSlugOf(canonical)
+    if (post) return `${EDITORIAL_BLOG_ROOT}${post}/`
+  }
 
   if (defaultLocaleOf(tenant) === 'en') return pathname
+  // D-7: since a post's route is accepted by the gate (not listed in `pages`),
+  // `canonical` is non-null for it, and its physical file is chosen by LANGUAGE
+  // here — the `en` tree at the root, the `es` tree under `/es/` — also for a
+  // site whose default is Spanish. (It used to fall through as `pathname`,
+  // which for a Spanish-default site would read the English list.)
   if (canonical === null) return pathname
   return localizePath(canonical, localeForRequest(pathname, tenant))
 }

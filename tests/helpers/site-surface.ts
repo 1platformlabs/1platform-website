@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { repoTenants } from '../../src/data/site-tenants'
 import { localesOf, makeLocalizePath } from '../../src/lib/site-locale'
 
@@ -24,13 +26,29 @@ export interface SurfacePage {
   url: string
 }
 
+/**
+ * A post's address in another language. The Spanish slug is not derivable from
+ * the English one (the route map stopped carrying the posts when they moved to
+ * the Core), so it comes from the repo-mode fixture by `translation_key`.
+ */
+const FIXTURE_POSTS = (JSON.parse(readFileSync(join(process.cwd(), 'src/data/blog-fixture.json'), 'utf8')) as {
+  posts: { locale: string; slug: string; translation_key: string }[]
+}).posts
+
+export function postRouteIn(route: string, locale: string): string {
+  const slug = /^\/blog\/([^/]+)\/$/.exec(route)?.[1]
+  const source = slug ? FIXTURE_POSTS.find((p) => p.locale === 'en' && p.slug === slug) : undefined
+  const twin = source && FIXTURE_POSTS.find((p) => p.translation_key === source.translation_key && p.locale === locale)
+  return twin ? `/blog/${twin.slug}/` : route
+}
+
 export function surface(): SurfacePage[] {
   const out: SurfacePage[] = []
   for (const tenant of repoTenants()) {
     const localise = makeLocalizePath(tenant)
     for (const locale of localesOf(tenant)) {
       for (const route of tenant.pages) {
-        out.push({ slug: tenant.slug, host: tenant.domain, locale, route, url: localise(route, locale) })
+        out.push({ slug: tenant.slug, host: tenant.domain, locale, route, url: localise(postRouteIn(route, locale), locale) })
       }
     }
   }

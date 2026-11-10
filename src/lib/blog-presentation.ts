@@ -1,10 +1,10 @@
 import summaries from '../data/blog-archive-summaries.json';
 import type { Locale } from '@i18n';
 import { localeOf } from '@i18n/collections';
-import type { CollectionEntry } from 'astro:content';
+import type { BlogEntry } from './blog-entry';
 
 /** Short presentation summaries preserve editorial descriptions, RSS and metadata. */
-export function archiveSummary(post: CollectionEntry<'blog'>, locale: Locale): string {
+export function archiveSummary(post: BlogEntry, locale: Locale): string {
   const localized: Record<string, string> = summaries[locale];
   return localized[post.data.translationKey] ?? post.data.description;
 }
@@ -15,11 +15,11 @@ const sameDayOrder: Record<Locale, readonly string[]> = {
   en: ['electronic-invoicing-online-business', 'integrating-payments-into-your-saas', 'launch-online-store-30-minutes'],
   es: ['electronic-invoicing-online-business', 'launch-online-store-30-minutes', 'integrating-payments-into-your-saas'],
 };
-function sameDayRank(post: CollectionEntry<'blog'>): number {
+function sameDayRank(post: BlogEntry): number {
   const rank = sameDayOrder[localeOf(post.id)].indexOf(post.data.translationKey);
   return rank === -1 ? Number.MAX_SAFE_INTEGER : rank;
 }
-export function editorialOrder(posts: CollectionEntry<'blog'>[]): CollectionEntry<'blog'>[] {
+export function editorialOrder(posts: BlogEntry[]): BlogEntry[] {
   return [...posts].sort((a, b) =>
     b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || sameDayRank(a) - sameDayRank(b),
   );

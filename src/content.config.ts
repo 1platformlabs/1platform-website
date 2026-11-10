@@ -2,48 +2,16 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
 /**
+ * Only the changelog is a content collection. The blog moved to the Core
+ * (blog-sitio-de-marca-generado): its posts are read over HTTP through
+ * `src/lib/site-blog.ts`, and `src/data/blog-fixture.json` stands in for them in
+ * repo mode.
+ *
  * The locale is NOT a field here: it is the directory the file lives in
- * (`blog/en/…`, `blog/es/…`). See src/i18n/collections.ts for why.
- *
- * `translationKey` is what pairs an entry with its twin in the other language.
- * It is required rather than optional so a new post cannot be added without
- * saying what it is a translation of — including when the answer is "nothing
- * yet", which is expressed by simply having no twin carrying that key.
- *
- * The `glob` loader replaced the implicit `type: 'content'` collection: from
- * Astro 6 the legacy form is removed and the config has to live at
- * `src/content.config.ts` rather than `src/content/config.ts`. The entry `id`
- * it produces is the path under `base` without its extension — `en/foo` —
- * which is the same shape the old `slug` had, so `bareSlug()` and `localeOf()`
- * keep working unchanged and the public URLs do not move.
+ * (`changelog/en/…`, `changelog/es/…`). See src/i18n/collections.ts for why.
+ * The entry `id` the `glob` loader produces is the path under `base` without
+ * its extension — `en/foo`.
  */
-
-const blog = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    pubDate: z.coerce.date(),
-    updatedDate: z.coerce.date().optional(),
-    author: z.string(),
-    category: z.enum([
-      'seo-automation',
-      'ai-content',
-      'api-tutorials',
-      'product-updates',
-      'ecommerce',
-      'payments-invoicing',
-    ]),
-    image: z.string().optional(),
-    ogImage: z.string().optional(),
-    // A number, not "8 min read". The unit is composed once per language from
-    // the catalogue; storing the rendered phrase would mean translating eight
-    // strings that are mostly digits, and letting them drift.
-    readingTime: z.number().int().positive().optional(),
-    tags: z.array(z.string()).optional(),
-    translationKey: z.string(),
-  }),
-});
 
 const changelog = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/changelog' }),
@@ -56,4 +24,4 @@ const changelog = defineCollection({
   }),
 });
 
-export const collections = { blog, changelog };
+export const collections = { changelog };

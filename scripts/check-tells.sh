@@ -39,7 +39,10 @@ SRC="src/pages src/components src/layouts src/i18n src/page-content src/lib"
 # is editorial context, not the site claiming it replaces them. Pointing those
 # rules at prose produces false positives that teach people to ignore the
 # script, which costs more than the coverage is worth.
-PROSE="src/content"
+# `src/data` joined when the blog left `src/content` for the Core (D-10): its
+# repo-mode fixture (`blog-fixture.json`) is where the sixteen posts' prose still
+# lives in the tree, and the two absolute rules must keep reading it.
+PROSE="src/content src/data"
 
 
 # Documentation comments legitimately name the patterns they removed, so a

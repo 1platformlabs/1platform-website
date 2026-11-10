@@ -176,6 +176,18 @@ export class TenantCache<T> {
   }
 
   /**
+   * Replace the value KEEPING its `storedAt` (blog-sitio-de-marca-generado D-9
+   * rev-3). The blog's page-1 rescue adds a just-published post to a cached
+   * archive; storing would make an old archive look fresh and postpone the full
+   * refresh that is still due. A key with no entry is left alone.
+   */
+  merge(key: string, value: T): void {
+    const current = this.positive.get(key)
+    if (!current) return
+    this.positive.set(key, value, current.storedAt)
+  }
+
+  /**
    * Refresh in the background, at most one flight per key.
    *
    * The promise is deliberately not awaited by the caller: the point of a stale

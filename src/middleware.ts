@@ -8,7 +8,8 @@ import { HEALTH_PATHS } from './lib/served-health'
 import type { SiteTenant } from './lib/site-api'
 import { REDIRECT_MAX_AGE_SECONDS, decideRedirect } from './lib/site-redirect'
 import { resolveContent } from './lib/site-content'
-import { isPublishedRequest, physicalRouteOf } from './lib/site-routes'
+import { isPublishedRequest, notFoundRouteOf, physicalRouteOf } from './lib/site-routes'
+import { blogGateFor } from './lib/blog-gate'
 import {
   UnsupportedTenantLocale,
   localeForRequest,
@@ -315,7 +316,20 @@ async function renderFor(
   url: URL,
   host: string,
 ): Promise<Response> {
-  const published = isPublishedRequest(url.pathname, tenant)
+  let published = isPublishedRequest(url.pathname, tenant)
+
+  // D-7: a blog address is accepted by SHAPE above; whether the slug exists is
+  // asked of the site's cached archive here (one list read per site and locale,
+  // not per request). No data and no cache is a 503, never another site's post.
+  let blogMiss = false
+  if (published) {
+    const gate = await blogGateFor(url.pathname, tenant)
+    if (gate === 'unavailable') return edgeFailure(503, 'Service Unavailable')
+    if (gate === 'absent') {
+      published = false
+      blogMiss = true
+    }
+  }
 
   let rendered: Response
   try {
@@ -329,7 +343,7 @@ async function renderFor(
       // a real regression the browser suite caught: every address a tenant does
       // not publish, `/404.html` included, lost the rendered page with its
       // chrome and its language control.
-      rendered = await next('/404')
+      rendered = await next(notFoundRouteOf(tenant))
     }
   } catch (err) {
     // A render that throws BEFORE the first byte. Astro turns this into its own
@@ -366,7 +380,11 @@ async function renderFor(
   // The status has to be restored explicitly on the 404 rewrite: it renders the
   // target route, and that route answers 200 on its own. A soft 404 would be
   // worse than plain text — it poisons the index instead of merely looking bad.
-  return new Response(complete.body, { status: 404, headers: complete.headers })
+  const headers = new Headers(complete.headers)
+  // A slug the Core did not list may be listed a second from now (D-9): this 404
+  // must not be remembered by a cache.
+  if (blogMiss) headers.set('cache-control', 'no-store')
+  return new Response(complete.body, { status: 404, headers })
 }
 
 /**

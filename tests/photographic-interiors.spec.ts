@@ -1,8 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const contentRoot = join(process.cwd(), 'src/content/blog');
+// The posts live in the Core; repo mode serves the fixture generated from the
+// original files (scripts/export-blog-posts.mjs). It is the reference here too.
+const fixture = JSON.parse(readFileSync(join(process.cwd(), 'src/data/blog-fixture.json'), 'utf8')) as {
+  posts: { locale: string; slug: string; title: string; published_at: string }[];
+};
 const locales = ['en', 'es'] as const;
 const blogPath = (locale: string) => locale === 'es' ? '/es/blog/' : '/blog/';
 const storePath = (locale: string) => locale === 'es' ? '/es/soluciones/tienda-online/' : '/solutions/online-store/';
@@ -62,12 +66,12 @@ for (const locale of locales) {
     });
 
     test('every existing editorial route retains title, date, language and deep headings', async ({ page }) => {
-      const files = readdirSync(join(contentRoot, locale)).filter((name) => name.endsWith('.md'));
-      for (const file of files) {
-        const source = readFileSync(join(contentRoot, locale, file), 'utf8');
-        const title = JSON.parse(source.match(/^title: (".*")$/m)![1]) as string;
-        const pubDate = source.match(/^pubDate: (.+)$/m)![1];
-        const route = `${blogPath(locale)}${file.replace(/\.md$/, '')}/`;
+      const posts = fixture.posts.filter((post) => post.locale === locale);
+      expect(posts.length, 'the fixture holds the 8 articles of each language').toBe(8);
+      for (const post of posts) {
+        const title = post.title;
+        const pubDate = post.published_at.slice(0, 10);
+        const route = `${blogPath(locale)}${post.slug}/`;
         const response = await page.goto(route);
         expect(response?.status(), route).toBe(200);
         await expect(page.locator('h1')).toHaveText(title.replace(/[.\s]+$/, ''));

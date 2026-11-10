@@ -40,22 +40,22 @@
       "route": "/blog/1platform-vs-custom-toolchain/",
       "status": 200,
       "file": "blog/1platform-vs-custom-toolchain/index.html",
-      "sha256": "6309e44ae52a98000de8f95ac21a841808c8744911f1c874f32e463e44111f93",
-      "bytes": 21022
+      "sha256": "192c20e535f1a1cc8defa1b372f1a16543ac7c548bb875aa5d8b9d3b4fb5514f",
+      "bytes": 21023
     },
     {
       "route": "/blog/ai-content-best-practices/",
       "status": 200,
       "file": "blog/ai-content-best-practices/index.html",
-      "sha256": "853d5e2e7e71d8d94aaa9f7eeb4257fcad18d28e567913fb6e3235e91e965451",
-      "bytes": 21369
+      "sha256": "8cb9c4da0b95fee4abe94ea58f6bfa9a60e9a5481f456a14fe6f904da50cbbbe",
+      "bytes": 21370
     },
     {
       "route": "/blog/automate-seo-pipeline/",
       "status": 200,
       "file": "blog/automate-seo-pipeline/index.html",
-      "sha256": "93f16e170454621d945eec1f39bd2b17a68684afa1436eacefc0e285c9b64f33",
-      "bytes": 22933
+      "sha256": "a93310f19afcdf0880705b5d5260a403fd5b3091ce21ab1fbf8a4624fce73fd9",
+      "bytes": 22934
     },
     {
       "route": "/blog/category/ai-content/",
@@ -91,36 +91,36 @@
       "route": "/blog/electronic-invoicing-online-business/",
       "status": 200,
       "file": "blog/electronic-invoicing-online-business/index.html",
-      "sha256": "fbfd4d7290570830e757f428b04422dd03ed978f904cc9aed04593cc799dbcf9",
-      "bytes": 32946
+      "sha256": "fcbc62c901983532c67ca2ded3fae8e1f96aeb261dbd971b953e5343fe930ea9",
+      "bytes": 32947
     },
     {
       "route": "/blog/getting-started-5-minutes/",
       "status": 200,
       "file": "blog/getting-started-5-minutes/index.html",
-      "sha256": "faf56106c233ec60632702b4c59e9a85051765b6dd584fa27797c1cf16fe9647",
-      "bytes": 23151
+      "sha256": "8752b68ed3526e7a24b44c02e76e4579f084411a5d6b6ae21884057d09d3b49c",
+      "bytes": 23152
     },
     {
       "route": "/blog/integrating-payments-into-your-saas/",
       "status": 200,
       "file": "blog/integrating-payments-into-your-saas/index.html",
-      "sha256": "2ef05b78d7d5c0cc7c3ce83d4b4f8aa2493e42035e0b059da949ee71a84d23b2",
-      "bytes": 35878
+      "sha256": "0ed5830637b856b36b867dcbc22cd2b4426587e5727326c1022bd05c294d7874",
+      "bytes": 35879
     },
     {
       "route": "/blog/launch-online-store-30-minutes/",
       "status": 200,
       "file": "blog/launch-online-store-30-minutes/index.html",
-      "sha256": "308af51ab830b461d17c58efb2d31a2312a7afa4de51f0ce9c967b7ae492deab",
-      "bytes": 31736
+      "sha256": "bb76aff17bf31f35a1a1575497b2f722120de771c30d779c92dc5ee750b92b07",
+      "bytes": 31737
     },
     {
       "route": "/blog/programmatic-link-building/",
       "status": 200,
       "file": "blog/programmatic-link-building/index.html",
-      "sha256": "c8f9aad5afd250c6d98ba821ab958f2e2585ce1bde4a45e48f242bb7f28d7c6a",
-      "bytes": 20977
+      "sha256": "abda5951caa188bb691e3e68de4c99fa05f987b77f004b54399dff1aedfb6b05",
+      "bytes": 20978
     },
     {
       "route": "/changelog/",
@@ -186,8 +186,8 @@
       "route": "/es/blog/1platform-vs-herramientas-seo-propias/",
       "status": 200,
       "file": "es/blog/1platform-vs-herramientas-seo-propias/index.html",
-      "sha256": "902446f7b9d626e0d029a8445516251384c1754ae2fd8c8cf83291ac8d02903e",
-      "bytes": 22041
+      "sha256": "cfff1b5f9666d87f3181b17d517b0d02892871f6d1a6e09fa32081ab541fcc3f",
+      "bytes": 22042
     },
     {
       "route": "/es/blog/ai-content-best-practices/",
@@ -203,8 +203,8 @@
       "route": "/es/blog/automatizar-el-pipeline-de-seo/",
       "status": 200,
       "file": "es/blog/automatizar-el-pipeline-de-seo/index.html",
-      "sha256": "2fca0a3d79f08ac9b6f76ae1d0feb5bf4b5f596a1541a7c16fd73a49a0713011",
-      "bytes": 23725
+      "sha256": "463df155a4016b97dac38db184d2970cbbea0c9c14a3fdffb0f120b6397767a6",
+      "bytes": 23726
     },
     {
       "route": "/es/blog/category/ai-content/",
@@ -240,8 +240,8 @@
       "route": "/es/blog/contenido-con-ia-buenas-practicas-seo/",
       "status": 200,
       "file": "es/blog/contenido-con-ia-buenas-practicas-seo/index.html",
-      "sha256": "c7a94513e42b893dc702edd21a86afb938c079c5c62c7a71df11b5f8331b40eb",
-      "bytes": 22139
+      "sha256": "803144894bf0c61958800e0df79255847a7dfed94ffbaa2d6afd9a5608266ced",
+      "bytes": 22140
     },
     {
       "route": "/es/blog/electronic-invoicing-online-business/",
@@ -252,8 +252,8 @@
       "route": "/es/blog/facturacion-electronica-para-negocios-online/",
       "status": 200,
       "file": "es/blog/facturacion-electronica-para-negocios-online/index.html",
-      "sha256": "93fb032a5634833ae4f4d7673b536b7c3fba6e02578b5f212470cadc22aae469",
-      "bytes": 35009
+      "sha256": "efa76842f2dc5ab65f4dbe70481b351c87fedc0ecbd93bcd98344085b0f4ca5d",
+      "bytes": 35010
     },
     {
       "route": "/es/blog/getting-started-5-minutes/",
@@ -264,8 +264,8 @@
       "route": "/es/blog/integrar-pagos-en-tu-saas/",
       "status": 200,
       "file": "es/blog/integrar-pagos-en-tu-saas/index.html",
-      "sha256": "2886c4bd81eb2167f4da161268fc141dfd3621b3981729fc677644db09483acc",
-      "bytes": 37512
+      "sha256": "62d0b1f1661ebb8d05c3b07459709f6f0d1d599f2e8472b5bd65bb23acdbfc9c",
+      "bytes": 37513
     },
     {
       "route": "/es/blog/integrating-payments-into-your-saas/",
@@ -276,8 +276,8 @@
       "route": "/es/blog/lanzar-una-tienda-online-en-30-minutos/",
       "status": 200,
       "file": "es/blog/lanzar-una-tienda-online-en-30-minutos/index.html",
-      "sha256": "3411697641e32724fe293d9cd75f1689ffe59b9b84bf1530013d2a36544ffed3",
-      "bytes": 33437
+      "sha256": "9e1f77f565ceca2ec6ed4196e20127ab7fdfe6ef3c5e17bf40a37579b0882210",
+      "bytes": 33438
     },
     {
       "route": "/es/blog/launch-online-store-30-minutes/",
@@ -288,15 +288,15 @@
       "route": "/es/blog/link-building-programatico/",
       "status": 200,
       "file": "es/blog/link-building-programatico/index.html",
-      "sha256": "808838163d33885a7402576ac02147e9ed87b6988657565c43d61ea7c03fa69a",
-      "bytes": 21741
+      "sha256": "197ccb40e7c115e4e6495588969cc68ce8a7261bc9419840c11e3b5d7a0dfeb0",
+      "bytes": 21742
     },
     {
       "route": "/es/blog/primeros-pasos-en-5-minutos/",
       "status": 200,
       "file": "es/blog/primeros-pasos-en-5-minutos/index.html",
-      "sha256": "4dd797e5fd874422b03f0af19c1dd5146b711cea9a6bd2e9cf69f761c1cc2a3d",
-      "bytes": 23653
+      "sha256": "ec6b66dcf16c3bb4c3ebc29df6f0c52a24a1c6f9bac5c34ff0821a2df571638c",
+      "bytes": 23654
     },
     {
       "route": "/es/blog/programmatic-link-building/",
