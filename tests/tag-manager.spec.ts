@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 
 import { repoTenantForHost } from '../src/data/site-tenants';
+import { analyticsConfigScript, analyticsIdOf, analyticsLoaderSrc } from '../src/lib/analytics-tag';
 import { TAG_MANAGER_ID, tagManagerHeadScript, tagManagerIdOf, tagManagerNoscriptSrc } from '../src/lib/tag-manager';
 import { exportRepoContent, startFakeSiteStack, type FakeSite, type FakeSiteStack, type PagesDocument } from './helpers/fake-site-api';
 import { getWithHost } from './helpers/http-host';
@@ -20,6 +21,7 @@ import { getWithHost } from './helpers/http-host';
 const ROOT = process.cwd();
 const GTM = 'GTM-M6FVQLML';
 const LOADER = 'googletagmanager.com';
+const GA = 'G-JVNRYLJ9YZ';
 
 type Fixture = { tenant: FakeSite['tenant']; pagesResponse: { data: { pages: PagesDocument[] } } };
 const photographicFixture = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/photographic-site.json'), 'utf8')) as Fixture;
@@ -31,6 +33,17 @@ test.describe('the id rule', () => {
     for (const junk of [undefined, null, '', 'gtm-m6fvqlml', 'GTM-ABC', ' GTM-M6FVQLML', `${GTM}');alert(1);//`, `<script>'${GTM}'</script>`, 12]) {
       expect(tagManagerIdOf({ tag_manager_id: junk as string | null }), String(junk)).toBeNull();
     }
+  });
+
+  test('a measurement id passes and anything else is dropped, not repaired', () => {
+    expect(analyticsIdOf({ analytics_measurement_id: GA })).toBe(GA);
+    for (const junk of [undefined, null, '', 'g-jvnrylj9yz', 'G-ABC', ` ${GA}`, `${GA}');alert(1);//`, GTM, 12]) {
+      expect(analyticsIdOf({ analytics_measurement_id: junk as string | null }), String(junk)).toBeNull();
+    }
+    expect(analyticsLoaderSrc(GA)).toBe(`https://www.${LOADER}/gtag/js?id=${GA}`);
+    expect(analyticsConfigScript(GA)).toContain(`gtag('config','${GA}');`);
+    expect(() => analyticsLoaderSrc(`${GA}" onload="alert(1)`)).toThrow();
+    expect(() => analyticsConfigScript(`${GA}');alert(1);//`)).toThrow();
   });
 
   test('the snippet builders refuse to interpolate anything but an id', () => {
@@ -90,6 +103,10 @@ test.describe('served HTML', () => {
         { tenant: { ...platform, slug: 'plataforma-gtm', domain: 'plataforma-gtm.example', tag_manager_id: GTM }, pages: platformPages },
         photographic('medipago.gt', 'medipago', { tag_manager_id: GTM }),
         photographic('sin-gtm.example', 'sin-gtm', {}),
+        photographic('con-analitica.example', 'con-analitica', { analytics_measurement_id: GA }),
+        photographic('ambos.example', 'ambos', { tag_manager_id: GTM, analytics_measurement_id: GA }),
+        photographic('ga-podrido.example', 'ga-podrido', { analytics_measurement_id: `${GA}');alert(1);//` }),
+        { tenant: { ...platform, slug: 'plataforma-ga', domain: 'plataforma-ga.example', analytics_measurement_id: GA }, pages: platformPages },
         photographic('podrido.example', 'podrido', { tag_manager_id: `${GTM}');alert(1);//` }),
       ],
       { host: 'medipago.gt', path: '/' },
@@ -136,6 +153,38 @@ test.describe('served HTML', () => {
   test('a malformed id switches the container off instead of reaching the markup', async () => {
     const page = await html('podrido.example');
     expect(page).not.toContain(LOADER);
+    expect(page).not.toContain('alert(1)');
+  });
+
+  const expectAnalytics = (page: string, label: string) => {
+    const head = page.slice(0, page.indexOf('</head>'));
+    expect(head, `${label}: loader in <head>`).toContain(`<script async src="https://www.${LOADER}/gtag/js?id=${GA}"></script>`);
+    expect(head, `${label}: config in <head>`).toContain(`gtag('config','${GA}');`);
+    expect(page.split(GA).length - 1, `${label}: exactly one loader and one config`).toBe(2);
+  };
+
+  test('the connected analytics loads by itself on the site that has it — no tag to paste', async () => {
+    const page = await html('con-analitica.example');
+    expectAnalytics(page, 'con-analitica.example');
+    expect(page, 'no container was declared').not.toContain('gtm.js');
+  });
+
+  test('the shared layout loads it too', async () => {
+    expectAnalytics(await html('plataforma-ga.example'), 'plataforma-ga.example');
+  });
+
+  test('a site with both loads both, once each', async () => {
+    const page = await html('ambos.example');
+    expectAnalytics(page, 'ambos.example');
+    expectContainer(page, 'ambos.example');
+  });
+
+  test('no other tenant gets the analytics, and a malformed id never reaches the markup', async () => {
+    for (const host of ['1platform.pro', 'sin-gtm.example', 'medipago.gt']) {
+      expect(await html(host), host).not.toContain(GA);
+    }
+    const page = await html('ga-podrido.example');
+    expect(page).not.toContain('gtag/js');
     expect(page).not.toContain('alert(1)');
   });
 });
