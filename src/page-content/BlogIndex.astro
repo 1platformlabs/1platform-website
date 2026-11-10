@@ -1,4 +1,5 @@
 ---
+import { categoryLabel } from '@lib/blog-category';
 import LegacyBlogIndex from '@page-content/legacy/BlogIndex.astro';
 import { infrastructureChrome } from '@lib/site-chrome';
 
@@ -39,7 +40,7 @@ const approvedInteriors = infrastructureChrome(Astro.locals.messages);
       {lead && <a class="blog-feature" href={l(`/blog/${bareSlug(lead.id)}/`)}>
         <Image src={storeImage} alt="" widths={[640, 960, 1280]} sizes="(max-width: 760px) 100vw, 50vw" loading="lazy" />
         <div class="blog-feature-content">
-          <p class="eyebrow">{t('interiors.latest')} · {t(`interiors.category.${lead.data.category}`)}</p>
+          <p class="eyebrow">{t('interiors.latest')} · {categoryLabel(t, lead.data.category)}</p>
           <h2>{displayHeading(lead.data.title)}</h2>
           <p>{displayHeading(archiveSummary(lead, locale))}</p>
           <span class="meta-line"><time datetime={lead.data.pubDate.toISOString()}>{formatDate(lead.data.pubDate, locale)}</time>{lead.data.readingTime && <> · {t('blog.readingTime', { n: lead.data.readingTime })}</>}</span>
@@ -51,13 +52,13 @@ const approvedInteriors = infrastructureChrome(Astro.locals.messages);
           <p class="eyebrow archive-topics">{t('interiors.topics')}</p>
           <div class="filters" role="group" aria-label={t('interiors.filter_label')}>
             <a class="filter" href={`${l('/blog/')}#articulos`} data-filter="all" aria-current={category === 'all' ? 'true' : undefined} aria-controls="archive-list">{t('interiors.all')}</a>
-            {categories.map((value) => <a class="filter" href={`${l('/blog/')}?category=${value}#articulos`} data-filter={value} aria-current={category === value ? 'true' : undefined} aria-controls="archive-list">{t(`interiors.category.${value}`)}</a>)}
+            {categories.map((value) => <a class="filter" href={`${l('/blog/')}?category=${value}#articulos`} data-filter={value} aria-current={category === value ? 'true' : undefined} aria-controls="archive-list">{categoryLabel(t, value)}</a>)}
           </div>
           <form class="archive-mobile-filter" action={`${l('/blog/')}#articulos`} method="get">
             <label for="archive-topic">{t('interiors.topics')}</label>
             <select id="archive-topic" name="category" aria-controls="archive-list">
               <option value="all" selected={category === 'all'}>{t('interiors.all')}</option>
-              {categories.map((value) => <option value={value} selected={category === value}>{t(`interiors.category.${value}`)}</option>)}
+              {categories.map((value) => <option value={value} selected={category === value}>{categoryLabel(t, value)}</option>)}
             </select>
             <noscript><button class="button button--navy" type="submit">{t('interiors.filter_label')}</button></noscript>
           </form>

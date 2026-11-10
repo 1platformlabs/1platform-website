@@ -229,6 +229,16 @@ test.beforeAll(async () => {
         return response.end(JSON.stringify(selected.pagesResponse));
       }
     }
+    // The Core's blog surface, like the real one: a published site lists an empty blog
+    // (200) and answers a typed 404 for a post or block it does not have. A bare 404 now
+    // means "the Core has no such route" and the site answers 503 (red team, 2026-11-10).
+    const blog = /\/sites\/[^/]+\/blog(?:\/([^/]+))?$/.exec(url.pathname);
+    if (blog) {
+      if (!blog[1]) return response.end(JSON.stringify({ success: true, data: { items: [], page: 1, page_size: 50, total: 0 }, msg: 'Site blog listed' }));
+      response.statusCode = 404;
+      const code = blog[1] === 'editorial' ? 'site_unresolved' : 'site_blog_post_not_found';
+      return response.end(JSON.stringify({ success: false, data: { code }, msg: 'Not found' }));
+    }
     response.statusCode = 404;
     response.end(JSON.stringify({ success: false, data: null, msg: 'Site not found' }));
   });

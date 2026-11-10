@@ -1,4 +1,5 @@
 ---
+import { categoryLabel } from '@lib/blog-category';
 import type { BlogEntry } from '@lib/blog-entry';
 import Icon from '@components/Icon.astro';
 import { useI18n, formatDate } from '@i18n';
@@ -10,7 +11,7 @@ const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 ---
 <article class="archive-item" data-category={post.data.category} hidden={hidden}>
   <a class="archive-link" href={l(`/blog/${bareSlug(post.id)}/`)} aria-labelledby={`article-${post.data.translationKey}`}>
-    <div class="archive-meta"><span class="category">{t(`interiors.category.${post.data.category}`)}</span>{post.data.readingTime && <span>{t('blog.readingTime', { n: post.data.readingTime })}</span>}</div>
+    <div class="archive-meta"><span class="category">{categoryLabel(t, post.data.category)}</span>{post.data.readingTime && <span>{t('blog.readingTime', { n: post.data.readingTime })}</span>}</div>
     <h3 id={`article-${post.data.translationKey}`}>{displayHeading(post.data.title)}</h3>
     <p class="archive-summary">{displayHeading(archiveSummary(post, locale))}</p>
     <div class="archive-foot"><time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate, locale)}</time><span class="archive-read">{t('interiors.read')}<Icon name="arrow-right-short" /></span></div>

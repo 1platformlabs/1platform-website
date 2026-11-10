@@ -1,4 +1,5 @@
 ---
+import { categoryLabel as labelOfCategory } from '@lib/blog-category';
 import LegacyBlogLayout from './LegacyBlogLayout.astro';
 import { infrastructureChrome } from '@lib/site-chrome';
 
@@ -37,7 +38,7 @@ interface Props {
 const { frontmatter, headings = [], slug, alternates } = Astro.props;
 const { t, l, locale } = useI18n(Astro.url.pathname, Astro.locals);
 
-const categoryLabel = infrastructureChrome(Astro.locals.messages) ? t(`interiors.category.${frontmatter.category}`) : '';
+const categoryLabel = infrastructureChrome(Astro.locals.messages) ? labelOfCategory(t, frontmatter.category) : '';
 const brandName = Astro.locals.tenant.brand_name;
 const tenantLogo = await resolveLogo(Astro.locals.tenant);
 const sameAs = socialLinksOf(Astro.locals.tenant).map((link) => link.href);

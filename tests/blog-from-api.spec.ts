@@ -46,6 +46,9 @@ const HOSTS = {
   spanishDefault: 'default-es.example',
   withoutBlog: 'no-blog.example',
   coreDown: 'core-down.example',
+  oldCore: 'old-core.example',
+  newCategory: 'new-category.example',
+  cold: 'cold.example',
   fresh: 'fresh.example',
   budget: 'budget.example',
   withdrawn: 'withdrawn.example',
@@ -98,12 +101,19 @@ test.beforeAll(async () => {
     site('withoutBlog', 'plat-sin-blog', { pages: TRIMMED_PAGES.filter((p) => p !== '/blog/') }),
     // A Core that answers 503 to every blog read.
     site('coreDown', 'plat-caido', { pages: TRIMMED_PAGES }),
+    // A Core WITHOUT the blog route (older or rolled back): FastAPI's bare 404.
+    site('oldCore', 'plat-viejo', { pages: TRIMMED_PAGES }),
+    site('newCategory', 'plat-categoria', { pages: TRIMMED_PAGES }),
+    site('cold', 'plat-frio', { pages: TRIMMED_PAGES }),
     site('fresh', 'plat-fresco', { pages: TRIMMED_PAGES }),
     site('budget', 'plat-presupuesto', { pages: TRIMMED_PAGES }),
     site('withdrawn', 'plat-retirado', { pages: TRIMMED_PAGES }),
     site('many', 'plat-muchos', { pages: TRIMMED_PAGES }),
   ];
   blogs.coreDown.failWith = () => 503;
+  blogs.oldCore.bareNotFound = true;
+  // The newest post sits in a category the site has no copy for (staff taxonomy).
+  blogs.newCategory.posts = blogs.newCategory.posts.map((p, i) => (p.locale === 'en' && i === 0 ? { ...p, category: 'field-notes', published_at: '2026-11-01T00:00:00Z', updated_at: '2026-11-01T00:00:00Z' } : p));
   // 120 extra posts so the archive spans three pages of 50.
   for (let i = 0; i < 120; i++) {
     blogs.many.posts.push({
@@ -264,6 +274,43 @@ test.describe('a post published a moment ago', () => {
     expect(served.body).toContain('Just published');
     // and the index now lists it, without waiting for the 60 s refresh
     expect(await (await get(HOSTS.fresh, '/blog/')).body).toContain('/blog/recien-publicado/');
+  });
+});
+
+test.describe('a Core without the blog route', () => {
+  // Red team, deploy-prod 2026-11-10: any 404 read as "no blog" ⇒ an empty archive with
+  // 200, empty feeds and the 16 indexed articles in 404 — and monitoring stays green.
+  test('a bare 404 (no typed code) is "unavailable", never an empty blog', async () => {
+    for (const path of ['/blog/', `/blog/${EN[0].slug}/`, '/rss.xml']) {
+      const served = await get(HOSTS.oldCore, path);
+      expect(served.status, path).toBe(503);
+    }
+  });
+});
+
+test.describe('a cold start', () => {
+  // Red team, deploy-prod 2026-11-10: on a miss every concurrent request read the Core
+  // itself, so a deploy under traffic spent the shared budgets into 503s.
+  test('30 simultaneous visitors of one article cost one list read and one body read', async () => {
+    const blog = blogs.cold
+    blog.delayMs = () => 300
+    const path = `/blog/${EN[2].slug}/`
+    const answers = await Promise.all(Array.from({ length: 30 }, () => get(HOSTS.cold, path)))
+    blog.delayMs = () => 0
+    expect(new Set(answers.map((a) => a.status))).toEqual(new Set([200]))
+    expect(blog.listReads!.filter((r) => r === 'en:1').length, 'list reads').toBe(1)
+    expect(blog.detailReads!.filter((r) => r === `en:${EN[2].slug}`).length, 'body reads').toBe(1)
+  })
+})
+
+test.describe('a category the site has no copy for', () => {
+  // Red team, deploy-prod 2026-11-10: `t()` throws on a missing key, so one post in a new
+  // category took down the archive and every article (the related box) with a 503.
+  test('the archive and the articles render, the category reads as words', async () => {
+    const archive = await get(HOSTS.newCategory, '/blog/');
+    expect(archive.status).toBe(200);
+    expect(archive.body).toContain('Field notes');
+    expect((await get(HOSTS.newCategory, `/blog/${EN[1].slug}/`)).status).toBe(200);
   });
 });
 

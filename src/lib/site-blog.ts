@@ -18,6 +18,7 @@
  * answers the site's 404 — never 503 — and the miss is not remembered.
  */
 import { manifestSource } from '../data/site-tenants'
+import { bodyHasRawHtml } from './body-safety'
 import { repoPage, repoPost } from './blog-repo-source'
 import { apiBaseUrl, API_TIMEOUT_MS, SiteApiUnavailable } from './site-api'
 import { MissBudget, TenantCache } from './tenant-cache'
@@ -94,7 +95,18 @@ async function getJson(path: string): Promise<unknown | null> {
   } catch (cause) {
     throw new SiteApiUnavailable(`could not reach the site API for ${path}`, cause)
   }
-  if (response.status === 404) return null
+  if (response.status === 404) {
+    // Only the Core's OWN 404 (a typed `data.code`: no such site, post or language) means
+    // "absent". A bare 404 is a route the API does not have — an older or rolled-back
+    // Core — and reading it as "no blog" served an empty archive with 200 while the 16
+    // indexed articles 404'd (red team, deploy-prod 2026-11-10).
+    const typed = await response
+      .json()
+      .then((b: { data?: { code?: unknown } } | null) => typeof b?.data?.code === 'string')
+      .catch(() => false)
+    if (typed) return null
+    throw new SiteApiUnavailable(`site API has no route for ${path} (bare 404)`)
+  }
   if (!response.ok) throw new SiteApiUnavailable(`site API answered ${response.status} for ${path}`)
   let body: unknown
   try {
@@ -161,17 +173,34 @@ async function resolveCached<T>(
   // A site with no blog is asked again in 30 s, not on every request. Bodies are
   // not remembered as missing: a post republished a second ago must show.
   if (rememberAbsent && cache.isKnownMissing(key, now)) return { outcome: 'absent' }
-  try {
-    const value = await fetcher()
-    if (value === null) {
-      if (rememberAbsent) cache.rememberMissing(key, now)
-      return { outcome: 'absent' }
-    }
-    cache.store(key, value, now)
-    return { outcome: 'resolved', value }
-  } catch (err) {
-    return { outcome: 'unavailable', reason: err instanceof Error ? err.message : String(err) }
+  // ONE read per key on a miss: concurrent requests for the same key share it. Without
+  // this a cold start (deploy, restart) sent N reads to the Core for N simultaneous
+  // visitors and spent the shared budgets into 503s (red team, deploy-prod 2026-11-10).
+  let pending = missesOf(cache).get(key) as Promise<Resolved<T>> | undefined
+  if (!pending) {
+    pending = (async (): Promise<Resolved<T>> => {
+      try {
+        const value = await fetcher()
+        if (value === null) {
+          if (rememberAbsent) cache.rememberMissing(key, now)
+          return { outcome: 'absent' }
+        }
+        cache.store(key, value, now)
+        return { outcome: 'resolved', value }
+      } catch (err) {
+        return { outcome: 'unavailable', reason: err instanceof Error ? err.message : String(err) }
+      }
+    })().finally(() => missesOf(cache).delete(key))
+    missesOf(cache).set(key, pending)
   }
+  return pending
+}
+
+const misses = new WeakMap<object, Map<string, Promise<unknown>>>()
+function missesOf(cache: object): Map<string, Promise<unknown>> {
+  let map = misses.get(cache)
+  if (!map) misses.set(cache, (map = new Map()))
+  return map
 }
 
 export function resolveArchive(slug: string, locale: string): Promise<Resolved<BlogCard[]>> {
@@ -236,20 +265,7 @@ export async function postIsListed(slug: string, locale: string, post: string, n
   return (await checkListed(slug, locale, post, now)) === 'listed'
 }
 
-/** Raw HTML would pass through the renderer (F0). The Core refuses it at write
- * time; the site refuses to render it too. Code spans and fences are ignored. */
-export function bodyHasRawHtml(body: string): boolean {
-  let inFence = false
-  for (const raw of body.split('\n')) {
-    if (/^\s*(```|~~~)/.test(raw)) {
-      inFence = !inFence
-      continue
-    }
-    if (inFence) continue
-    if (/<\s*[/!?a-zA-Z]/.test(raw.replace(/`[^`\n]*`/g, ''))) return true
-  }
-  return false
-}
+export { bodyHasRawHtml, stripCodeSpans } from './body-safety'
 
 export async function resolvePost(slug: string, locale: string, post: string): Promise<Resolved<BlogPost>> {
   return resolveCached(posts, postKey(slug, locale, post), async () => {

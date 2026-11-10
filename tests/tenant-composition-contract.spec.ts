@@ -302,6 +302,19 @@ function startStubApi(): Promise<{ server: Server; baseUrl: string }> {
       }
     }
 
+    // The Core's blog surface, like the real one: an empty blog lists with 200 and a post it
+    // does not have is a TYPED 404. A bare 404 means "no such route" ⇒ the site answers 503.
+    const blogMatch = /\/sites\/[^/]+\/blog(?:\/([^/]+))?$/.exec(url.pathname)
+    if (blogMatch) {
+      if (!blogMatch[1]) {
+        response.end(JSON.stringify({ success: true, data: { items: [], page: 1, page_size: 50, total: 0 }, msg: 'Site blog listed' }))
+        return
+      }
+      response.statusCode = 404
+      response.end(JSON.stringify({ success: false, data: { code: blogMatch[1] === 'editorial' ? 'site_unresolved' : 'site_blog_post_not_found' }, msg: 'Not found' }))
+      return
+    }
+
     response.statusCode = 404
     response.end(JSON.stringify({ success: false, data: null, msg: 'Not found' }))
   })

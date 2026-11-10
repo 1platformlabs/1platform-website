@@ -44,20 +44,52 @@ const SAFE_ATTRS: Record<string, Set<string>> = {
   input: new Set(['type', 'disabled', 'checked']),
 }
 const SAFE_HREF = /^(https:\/\/[^/\s]|\/(?!\/)|#)/
+/** `style` only carries what the renderer itself emits: table alignment and the code
+ * highlighter's colours and scroll. No `position`, `url()`, `inset`, `z-index`… */
+const SAFE_STYLE_DECL =
+  /^\s*(?:text-align\s*:\s*(?:left|center|right)|(?:background-)?color\s*:\s*#[0-9a-fA-F]{3,8}|--shiki-[\w-]+\s*:\s*#[0-9a-fA-F]{3,8}|overflow-x\s*:\s*auto)\s*$/
+
+function styleIsSafe(value: string): boolean {
+  return value
+    .split(';')
+    .filter((decl) => decl.trim() !== '')
+    .every((decl) => SAFE_STYLE_DECL.test(decl))
+}
+
+/**
+ * One tag, anchored where a `<` was found. Attribute values must be QUOTED and carry
+ * no `<` or `>`: the earlier pattern stopped at the first `>` — even inside a quoted
+ * value — so `<a href="/x>" onclick="…">` read as `<a href="/x>` and passed
+ * (red team, deploy-prod 2026-11-10).
+ */
+const TAG_AT = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s+[a-zA-Z_:][-a-zA-Z0-9_:.]*(?:\s*=\s*(?:"[^"<>]*"|'[^'<>]*'))?)*)\s*(\/?)>/y
+const ATTR = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)(?:\s*=\s*("[^"<>]*"|'[^'<>]*'))?/g
 
 export function renderedBodyIsSafe(html: string): boolean {
-  for (const tag of html.matchAll(/<\s*([a-zA-Z][\w:-]*)([^>]*)>/g)) {
-    const name = tag[1].toLowerCase()
+  if (/<!--|<!\[CDATA\[|<\?|<!/i.test(html)) return false
+  let at = html.indexOf('<')
+  while (at !== -1) {
+    TAG_AT.lastIndex = at
+    const tag = TAG_AT.exec(html)
+    // Every `<` must open or close a well-formed allowed tag; anything else is raw
+    // HTML the renderer let through: refuse the page.
+    if (!tag) return false
+    const [whole, closing, rawName, attrs] = tag
+    const name = rawName.toLowerCase()
     if (!SAFE_TAGS.has(name)) return false
+    if (closing && attrs.trim() !== '') return false
     const allowed = SAFE_ATTRS[name] ?? new Set<string>()
-    for (const attr of tag[2].matchAll(/([^\s=/"']+)(?:\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))?/g)) {
+    for (const attr of attrs.matchAll(ATTR)) {
       const key = attr[1].toLowerCase()
+      const value = (attr[2] ?? '').slice(1, -1)
       if (!allowed.has(key)) return false
-      if (key === 'href' && !SAFE_HREF.test((attr[2] ?? '').replace(/^["']|["']$/g, '').trim())) return false
-      if (name === 'input' && key === 'type' && !/^["']?checkbox["']?$/i.test(attr[2] ?? '')) return false
+      if (key === 'href' && !SAFE_HREF.test(value.trim())) return false
+      if (key === 'style' && !styleIsSafe(value)) return false
+      if (name === 'input' && key === 'type' && value.toLowerCase() !== 'checkbox') return false
     }
+    at = html.indexOf('<', at + whole.length)
   }
-  return !/<!--|<!\[CDATA\[|<\?/.test(html)
+  return true
 }
 
 export async function renderBody(markdown: string): Promise<RenderedBody> {

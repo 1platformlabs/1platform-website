@@ -50,6 +50,8 @@ export interface FakeBlog {
   listReads?: string[];
   /** Per-request overrides: a post body the Core has just withdrawn, a slow Core… */
   delayMs?: () => number;
+  /** Answer every blog read with FastAPI's bare 404 (no `data.code`): a Core without the route. */
+  bareNotFound?: boolean;
 }
 
 export interface FixturePost {
@@ -116,12 +118,12 @@ export function answerBlog(site: FakeSite, url: URL, method: string, body: strin
   const blog = site.blog;
   const locale = url.searchParams.get('locale') ?? '';
   const tenant = site.tenant as unknown as { locales: string[]; pages: string[] };
-  if (!blog) return { status: 404 };
+  if (!blog) return { status: 404, data: { code: 'site_unresolved' } };
   const failure = blog.failWith?.();
   if (failure) return { status: failure };
   const sub = match[1];
   if (sub === 'newsletter' && method === 'POST') {
-    if (!blog.editorial) return { status: 404 };
+    if (!blog.editorial) return { status: 404, data: { code: 'site_unresolved' } };
     const req = JSON.parse(body || '{}');
     const view = projectEditorial(blog.editorial, req.locale);
     if (!view.newsletter.available) return { status: 404, data: { code: 'site_newsletter_unavailable' } };
@@ -129,16 +131,16 @@ export function answerBlog(site: FakeSite, url: URL, method: string, body: strin
     blog.captured = [...(blog.captured ?? []), { email: String(req.email).toLowerCase(), locale: req.locale }];
     return { status: 202, data: { code: 'site_newsletter_received' } };
   }
-  if (!tenant.locales.includes(locale) || !tenant.pages.includes('/blog/')) return { status: 404 };
+  if (!tenant.locales.includes(locale) || !tenant.pages.includes('/blog/')) return { status: 404, data: { code: 'site_unresolved' } };
   const now = Date.now();
   const published = blog.posts
     .filter((p) => p.locale === locale && p.status === 'published' && Date.parse(p.published_at) <= now)
     .sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at) || a.slug.localeCompare(b.slug));
-  if (sub === 'editorial') return blog.editorial ? { status: 200, data: projectEditorial(blog.editorial, locale) } : { status: 404 };
+  if (sub === 'editorial') return blog.editorial ? { status: 200, data: projectEditorial(blog.editorial, locale) } : { status: 404, data: { code: 'site_unresolved' } };
   if (sub) {
     blog.detailReads = [...(blog.detailReads ?? []), `${locale}:${sub}`];
     const post = published.find((p) => p.slug === sub);
-    if (!post) return { status: 404 };
+    if (!post) return { status: 404, data: { code: 'site_blog_post_not_found' } };
     const alternates = Object.fromEntries(
       blog.posts.filter((p) => p.translation_key === post.translation_key && p.locale !== locale && p.status === 'published' && tenant.locales.includes(p.locale)).map((p) => [p.locale, p.slug]),
     );
@@ -203,11 +205,17 @@ export async function startFakeSiteStack(sites: FakeSite[], readyProbe: { host: 
       let body = '';
       for await (const chunk of request) body += String(chunk);
       const site = bySlug.get(blogSlug);
-      const answer = site ? answerBlog(site, url, request.method ?? 'GET', body) : { status: 404 };
+      // A Core without the blog route answers FastAPI's bare 404 (no `data.code`).
+      const answer = site?.blog?.bareNotFound
+        ? { status: 404, bare: true }
+        : site
+          ? answerBlog(site, url, request.method ?? 'GET', body)
+          : { status: 404, data: { code: 'site_unresolved' } };
       const delay = site?.blog?.delayMs?.() ?? 0;
       if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
       if (answer) {
         response.statusCode = answer.status;
+        if ('bare' in answer) return response.end(JSON.stringify({ detail: 'Not Found' }));
         return response.end(JSON.stringify({ success: answer.status < 400, data: answer.data ?? null, msg: 'blog' }));
       }
     }
