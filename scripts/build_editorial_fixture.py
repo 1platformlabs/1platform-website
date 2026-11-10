@@ -313,7 +313,10 @@ def main() -> int:
         return 2
     data = {"note": "DEVELOPMENT FIXTURE — not approved content; never import to production.", "tenants": [peptidos(proto), cuaderno()]}
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2, sort_keys=False) + "\n")
+    # The destination is the fixed fixture path; only its CONTENT comes from the prototype.
+    with open(OUT, "w", encoding="utf-8") as fh:
+        json.dump(data, fh, ensure_ascii=False, indent=2, sort_keys=False)
+        fh.write("\n")
     print(f"wrote {OUT} ({sum(len(t['posts']) for t in data['tenants'])} posts)")
     return 0
 
