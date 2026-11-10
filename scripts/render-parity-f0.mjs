@@ -66,7 +66,7 @@ const safety = {
   headingId: /<h2 id="lote-y-fecha">/.test(await probe('## Lote y fecha')),
   // Raw HTML: the processor PASSES IT THROUGH. This is why the Core's grammar
   // (D-3) refuses HTML at write time instead of trusting the renderer.
-  rawHtmlPassesThrough: /<script>/.test(await probe('<script>alert(1)</script>')),
+  rawHtmlPassesThrough: /<script\b/i.test(await probe('<script>alert(1)</script>')),
 };
 
 if (results.length !== 16) {

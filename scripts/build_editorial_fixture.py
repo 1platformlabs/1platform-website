@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 import sys
 from html.parser import HTMLParser
@@ -125,12 +126,24 @@ def _date(text: str) -> str:
     return f"{year}-{MONTHS[month]:02d}-{int(day):02d}T15:00:00+00:00"
 
 
+def _inside(base: Path, *parts: str) -> Path:
+    """``base/parts`` resolved, refused unless it stays inside ``base`` (no ``..``, no symlink out)."""
+    root = os.path.realpath(base)
+    target = os.path.realpath(os.path.join(root, *parts))
+    if os.path.commonpath([root, target]) != root:
+        raise SystemExit(f"refused: {target} is outside {root}")
+    return Path(target)
+
+
 def peptidos_posts(proto: Path) -> list[dict]:
-    meta = json.loads((proto / "evidencia" / "contenido-fixture.json").read_text())["posts"]
+    meta = json.loads(_inside(proto, "evidencia", "contenido-fixture.json").read_text())["posts"]
     posts = []
     for entry in meta:
         body = Body()
-        body.feed((proto / FILES[entry["slug"]]).read_text())
+        slug = entry.get("slug")
+        if slug not in FILES:  # only the prototype's known articles, never a name from the file
+            raise SystemExit(f"refused: unknown article {slug!r}")
+        body.feed(_inside(proto, FILES[slug]).read_text())
         posts.append(
             {
                 "locale": "es",
@@ -294,8 +307,8 @@ def cuaderno() -> dict:
 
 
 def main() -> int:
-    proto = Path(sys.argv[1]) if len(sys.argv) > 1 else None
-    if proto is None or not (proto / "articulo.html").exists():
+    proto = Path(os.path.realpath(sys.argv[1])) if len(sys.argv) > 1 else None
+    if proto is None or not proto.is_dir() or not _inside(proto, "articulo.html").exists():
         print(__doc__)
         return 2
     data = {"note": "DEVELOPMENT FIXTURE — not approved content; never import to production.", "tenants": [peptidos(proto), cuaderno()]}
