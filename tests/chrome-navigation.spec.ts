@@ -72,8 +72,8 @@ test('reduced motion keeps the infrastructure illustration static and WebGL-free
 
 test('the infrastructure home names the approved capabilities and honest availability in both languages', async ({ page }) => {
   for (const [path, names, preparation] of [
-    ['/', ['Payments', 'Invoicing', 'Delivery', 'Subscriptions', 'Digital advertising', 'Sites and domains', 'Email', 'Agents', 'Telemetry', 'White label', 'Cloud', 'NFC plaques', 'Videos', 'Sales', 'Scheduling', 'Social media', 'Content'], ['PAYMENTS IN DEVELOPMENT', 'INTEGRATION IN DEVELOPMENT']],
-    ['/es/', ['Cobros', 'Facturación', 'Delivery', 'Suscripciones', 'Publicidad digital', 'Sitios y dominios', 'Correo', 'Agentes', 'Telemetría', 'Marca blanca', 'Nube', 'Placas NFC', 'Videos', 'Ventas', 'Agenda', 'Redes sociales', 'Contenido'], ['COBROS EN PREPARACIÓN', 'INTEGRACIÓN EN PREPARACIÓN']],
+    ['/', ['Payments', 'Invoicing', 'Delivery', 'Subscriptions', 'Digital advertising', 'Sites and domains', 'Email', 'Agents', 'Telemetry', 'White label', 'Cloud', 'NFC plaques', 'Videos', 'Sales', 'Scheduling', 'Social media', 'Content'], ['INTEGRATION IN DEVELOPMENT']],
+    ['/es/', ['Cobros', 'Facturación', 'Delivery', 'Suscripciones', 'Publicidad digital', 'Sitios y dominios', 'Correo', 'Agentes', 'Telemetría', 'Marca blanca', 'Nube', 'Placas NFC', 'Videos', 'Ventas', 'Agenda', 'Redes sociales', 'Contenido'], ['INTEGRACIÓN EN PREPARACIÓN']],
   ] as const) {
     await page.goto(path);
     await expect(page.locator('.capability-text strong')).toHaveText([...names]);
@@ -82,7 +82,8 @@ test('the infrastructure home names the approved capabilities and honest availab
     await expect(page.locator('.integration-preview')).toHaveAttribute('aria-labelledby', 'integration-title');
     await expect(page.locator('.connected-note')).toContainText('WhatsApp');
     await expect(page.locator('.ai-demo-note')).toContainText(path === '/' ? 'in development' : 'en desarrollo');
-    await expect(page.locator('.payment-card').nth(1)).toContainText(path === '/' ? 'in development' : 'en preparación');
+    await expect(page.locator('.payment-card .payment-index')).toHaveText(path === '/' ? ['01 / AVAILABLE', '02 / AVAILABLE', '03 / AVAILABLE'] : ['01 / ACTIVO', '02 / ACTIVO', '03 / ACTIVO']);
+    for (const card of await page.locator('.payment-card').all()) await expect(card).not.toContainText(path === '/' ? 'in development' : 'en preparación');
     const text = await page.locator('main').innerText();
     expect(text).not.toMatch(/Salesforce|HubSpot|Zapier|Slack|100%|unlimited sales|ventas ilimitadas/);
   }
