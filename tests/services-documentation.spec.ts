@@ -17,7 +17,7 @@ for (const locale of ['es', 'en']) {
         await expect(cards.nth(index + 1)).toBeFocused();
       }
     }
-    await expect(page.locator('.capability-text em')).toHaveCount(1);
+    await expect(page.locator('.capability-text em')).toHaveCount(0);
     await expect(page.locator('.developers .button')).toHaveAttribute('href', /\/docs\/saas\/1platform-api\/getting-started\/$/);
   });
 }

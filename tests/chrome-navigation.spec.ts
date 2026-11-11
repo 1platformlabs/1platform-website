@@ -71,13 +71,13 @@ test('reduced motion keeps the infrastructure illustration static and WebGL-free
 });
 
 test('the infrastructure home names the approved capabilities and honest availability in both languages', async ({ page }) => {
-  for (const [path, names, preparation] of [
-    ['/', ['Payments', 'Invoicing', 'Delivery', 'Subscriptions', 'Digital advertising', 'Sites and domains', 'Email', 'Agents', 'Telemetry', 'White label', 'Cloud', 'NFC plaques', 'Videos', 'Sales', 'Scheduling', 'Social media', 'Content'], ['INTEGRATION IN DEVELOPMENT']],
-    ['/es/', ['Cobros', 'Facturación', 'Delivery', 'Suscripciones', 'Publicidad digital', 'Sitios y dominios', 'Correo', 'Agentes', 'Telemetría', 'Marca blanca', 'Nube', 'Placas NFC', 'Videos', 'Ventas', 'Agenda', 'Redes sociales', 'Contenido'], ['INTEGRACIÓN EN PREPARACIÓN']],
+  for (const [path, names] of [
+    ['/', ['Payments', 'Invoicing', 'Delivery', 'Subscriptions', 'Digital advertising', 'Sites and domains', 'Email', 'Agents', 'Telemetry', 'White label', 'Cloud', 'NFC plaques', 'Videos', 'Sales', 'Scheduling', 'Social media', 'Content']],
+    ['/es/', ['Cobros', 'Facturación', 'Delivery', 'Suscripciones', 'Publicidad digital', 'Sitios y dominios', 'Correo', 'Agentes', 'Telemetría', 'Marca blanca', 'Nube', 'Placas NFC', 'Videos', 'Ventas', 'Agenda', 'Redes sociales', 'Contenido']],
   ] as const) {
     await page.goto(path);
     await expect(page.locator('.capability-text strong')).toHaveText([...names]);
-    await expect(page.locator('.capability-text em')).toHaveText([...preparation]);
+    await expect(page.locator('.capability-text em')).toHaveCount(0);
     await expect(page.locator('.hero-pulse')).toHaveAttribute('aria-hidden', 'true');
     await expect(page.locator('.integration-preview')).toHaveAttribute('aria-labelledby', 'integration-title');
     await expect(page.locator('.connected-note')).toContainText('WhatsApp');
