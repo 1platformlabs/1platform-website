@@ -33,16 +33,29 @@ def next_timestamp(previous):
     return now
 
 
-def validate_patch(patch):
-    assert (patch['tenant_slug'], patch['domain'], patch['route']) == (
-        'oneplatform', '1platform.pro', '@infrastructure-home')
-    assert set(patch['locales']) == {'en', 'es'}
+def landing_capability_keys():
     keys = {f'infrastructure.capabilities.{key}.{field}'
             for key in ['plates', 'videos', 'sales', 'scheduling', 'social', 'content']
             for field in ['name', 'description']}
     keys.update(['infrastructure.capabilities.agents.description',
                  'infrastructure.connected.vision.status',
                  'infrastructure.connected.note', 'infrastructure.intelligence.note'])
+    return keys
+
+
+# Each versioned patch may only touch its own reviewed keys.
+PATCHES = {
+    'landing-capabilities-content.json': landing_capability_keys(),
+    'payment-availability-content.json': {
+        f'infrastructure.payments.{card}.{field}'
+        for card in ['phone', 'subscriptions'] for field in ['status', 'description']},
+}
+
+
+def validate_patch(patch, keys):
+    assert (patch['tenant_slug'], patch['domain'], patch['route']) == (
+        'oneplatform', '1platform.pro', '@infrastructure-home')
+    assert set(patch['locales']) == {'en', 'es'}
     for changes in patch['locales'].values():
         assert set(changes) == keys
         assert all(isinstance(c['after'], str) and c['after'].strip() for c in changes.values())
@@ -78,6 +91,7 @@ def apply_prepared(db, prepared):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--patch', choices=sorted(PATCHES), default='landing-capabilities-content.json')
     args = parser.parse_args()
     from app.core.config import settings
     allowed = {
@@ -85,8 +99,8 @@ def main():
         'production': '1platform-api-prod',
     }
     assert allowed.get(settings.ENVIRONMENT.lower()) == settings.MONGODB_DB_NAME
-    patch = json.loads((Path(__file__).resolve().parents[1] / 'docs/landing-capabilities-content.json').read_text())
-    validate_patch(patch)
+    patch = json.loads((Path(__file__).resolve().parents[1] / 'docs' / args.patch).read_text())
+    validate_patch(patch, PATCHES[args.patch])
     with MongoClient(settings.MONGODB_URL, serverSelectionTimeoutMS=10000) as client:
         db = client[settings.MONGODB_DB_NAME]
         assert db.site_tenants.count_documents({
@@ -96,7 +110,7 @@ def main():
         assert len(docs) == 2 and {doc['locale'] for doc in docs} == {'en', 'es'}
         prepared = [(doc, updated_blocks(doc['blocks'], patch['locales'][doc['locale']])) for doc in docs]
         print(json.dumps({'mode': 'apply' if args.apply else 'dry-run',
-            'tenant': 'oneplatform', 'documents': 2, 'keys_per_locale': len(patch['locales']['en']),
+            'patch': args.patch, 'tenant': 'oneplatform', 'documents': 2, 'keys_per_locale': len(patch['locales']['en']),
             'changed_documents': sum(doc['blocks'] != blocks for doc, blocks in prepared)}))
         if not args.apply:
             return

@@ -12,8 +12,8 @@
       "route": "/",
       "status": 200,
       "file": "index.html",
-      "sha256": "ce765b8f0262b41748c7f7499fdac22a2843104438450d9244aef67f4b9fed89",
-      "bytes": 35196
+      "sha256": "fda6190b00c974c0f7b3546343c983e93ac87d3514b4ac06493b59084de36f88",
+      "bytes": 35104
     },
     {
       "route": "/404.html",
@@ -162,8 +162,8 @@
       "route": "/es/",
       "status": 200,
       "file": "es/index.html",
-      "sha256": "4fb9114e8def01ae5545389840f983bd44f8c726407332cce5022895a7ce9833",
-      "bytes": 35388
+      "sha256": "12025f6bf75e1777c6f1d7f26855e53be9d3edc085b7aa0af13cc0069fb49d44",
+      "bytes": 35295
     },
     {
       "route": "/es/about/",

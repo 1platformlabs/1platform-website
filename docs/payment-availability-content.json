@@ -1,0 +1,43 @@
+{
+  "tenant_slug": "oneplatform",
+  "domain": "1platform.pro",
+  "route": "@infrastructure-home",
+  "locales": {
+    "en": {
+      "infrastructure.payments.phone.status": {
+        "before": "02 / IN DEVELOPMENT",
+        "after": "02 / AVAILABLE"
+      },
+      "infrastructure.payments.phone.description": {
+        "before": "Terminal enrollment is available. In-person payments in your solution are in development",
+        "after": "Accept in-person card payments in your solution"
+      },
+      "infrastructure.payments.subscriptions.status": {
+        "before": "03 / IN DEVELOPMENT",
+        "after": "03 / AVAILABLE"
+      },
+      "infrastructure.payments.subscriptions.description": {
+        "before": "Define plans for your customers. Recurring payments still require integration",
+        "after": "Define plans for your customers and charge them on a recurring basis"
+      }
+    },
+    "es": {
+      "infrastructure.payments.phone.status": {
+        "before": "02 / EN PREPARACIÓN",
+        "after": "02 / ACTIVO"
+      },
+      "infrastructure.payments.phone.description": {
+        "before": "Alta de terminales disponible. Cobro presencial en su solución, en preparación",
+        "after": "Cobre con tarjeta de forma presencial desde su solución"
+      },
+      "infrastructure.payments.subscriptions.status": {
+        "before": "03 / EN PREPARACIÓN",
+        "after": "03 / ACTIVO"
+      },
+      "infrastructure.payments.subscriptions.description": {
+        "before": "Defina planes para sus clientes. El cobro recurrente aún requiere integración",
+        "after": "Defina planes para sus clientes y cobre de forma recurrente"
+      }
+    }
+  }
+}
