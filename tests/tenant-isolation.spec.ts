@@ -181,6 +181,52 @@ test('a stale copy is served while the API is down, and it is bounded', async ()
   ).toBe('unavailable')
 })
 
+test('a site the API stopped publishing (404) stops being served after the refresh', async () => {
+  // alta-de-blog-desde-el-panel BDP-04 CA-6 (found by /verify-epic-e2e): the
+  // owner deletes the blog, the API suspends the site and `by-host` answers 404.
+  // The stale-while-revalidate branch used to swallow that answer and keep the
+  // old copy for up to MAX_STALE_MS — a deleted blog stayed online for a day.
+  const t0 = 2_000_000
+  expect((await resolveTenant(HOST_A, t0)).outcome).toBe('resolved')
+
+  const gone = { ...TENANTS }
+  delete gone[HOST_A]
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    const host = new URL(String(input)).searchParams.get('host') ?? ''
+    const found = gone[host]
+    return found
+      ? new Response(JSON.stringify({ success: true, data: found }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        })
+      : new Response(JSON.stringify({ success: false }), { status: 404 })
+  }) as typeof globalThis.fetch
+
+  // First request past FRESH: still the copy (the visitor never waits) and it
+  // triggers the refresh...
+  const stale = await resolveTenant(HOST_A, t0 + 2 * 60_000)
+  expect(stale.outcome).toBe('resolved')
+  await new Promise((r) => setTimeout(r, 20))
+  // ...whose 404 is the API's definitive answer: the next request is a 404 too.
+  const after = await resolveTenant(HOST_A, t0 + 2 * 60_000 + 1_000)
+  expect(after.outcome, 'a host the API no longer publishes must not keep serving the old copy').toBe(
+    'unknown-host',
+  )
+  // The other tenant is untouched.
+  expect((await resolveTenant(HOST_B, t0 + 2 * 60_000 + 1_000)).outcome).toBe('resolved')
+})
+
+test('a refresh that FAILS (API down) keeps serving the stale copy', async () => {
+  const t0 = 3_000_000
+  expect((await resolveTenant(HOST_A, t0)).outcome).toBe('resolved')
+  globalThis.fetch = (async () => {
+    throw new Error('down')
+  }) as typeof globalThis.fetch
+  await resolveTenant(HOST_A, t0 + 2 * 60_000)
+  await new Promise((r) => setTimeout(r, 20))
+  expect((await resolveTenant(HOST_A, t0 + 2 * 60_000 + 1_000)).outcome).toBe('resolved')
+})
+
 test('the miss budget refuses without touching the API', async () => {
   let calls = 0
   globalThis.fetch = (async () => {

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- A site the platform stops publishing (a blog its owner deleted, a site suspended) stops being served at the next refresh instead of up to 24 h later: a 404 on the background refresh now evicts the cached tenant (an unreachable API still keeps the stale copy).
+- The editorial home title no longer repeats the site name when the home title is the name itself («Péptidos GT», not «Péptidos GT · Péptidos GT»).
 - Integrate the approved infrastructure landing: 17 capabilities, current WhatsApp copy, consistent cards without individual documentation links or Cloud availability labels. Optional capabilities respect published tenant content in both locales.
 
 All notable changes to the 1Platform Website will be documented in this file.
