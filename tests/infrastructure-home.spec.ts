@@ -20,6 +20,7 @@ for (const [path, name, description, count] of [
     page.on('request', (request) => {
       if (!['GET', 'HEAD'].includes(request.method())) mutations.push(request.url());
     });
+    await page.locator('[data-capabilities-more]').click();
     await page.locator('[data-capability]').nth(9).focus();
     await page.keyboard.press('Tab');
     await expect(cloud).toBeFocused();
@@ -64,6 +65,7 @@ for (const viewport of [
     while (await selected.count()) await selected.first().click();
     await expect(home.locator('[data-selection-count]')).toHaveText('0 capacidades seleccionadas');
     await expect(home.locator('[data-selected-list]')).toHaveText('Seleccione servicios para su integración');
+    await home.locator('[data-capabilities-more]').click();
     for (const button of await home.locator('[data-capability]').all()) await button.click();
     await expect(home.locator('[data-selected-list] li')).toHaveCount(17);
     await expect(home.locator('[data-selection-count]')).toHaveText('17 capacidades seleccionadas');
@@ -101,7 +103,7 @@ test('the hero runs continuously and pauses outside the viewport with a static r
   await expect(wire).toHaveCSS('animation-play-state', 'running');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(wire).toHaveCSS('animation-name', 'none');
-  await expect(page.getByRole('button', { name: /Pausar|Ver animaciones|Repetir recorrido/ })).toHaveCount(0);
+  await expect(page.locator('.hero').getByRole('button', { name: /Pausar|Ver animaciones|Repetir recorrido/ })).toHaveCount(0);
 });
 
 test('locale content, deep links and browser history preserve the real routes', async ({ page }) => {

@@ -2,6 +2,7 @@ import { defineMessages } from '@i18n/ui';
 
 export default defineMessages({
   en: {
+    'site.brand.presentation': "symbol-and-name",
     'site.theme.profile': "infrastructure",
     'photographic.theme.layout': "infrastructure",
     'site.cta': "Let’s discuss your project",
@@ -14,9 +15,10 @@ export default defineMessages({
     'site.footer.description': "Infrastructure to create and connect solutions",
     'site.footer.explore': "EXPLORE",
     'site.footer.resources': "RESOURCES",
-    'site.footer.company': "1PLATFORM",
+    'site.footer.company': "ONE PLATFORM",
     'site.footer.copyright': "© {year} 1Platform Labs",
     'site.footer.reference': "API reference",
+    'site.footer.mcp': "Integrate with MCP",
     'site.navigation.0.label': "Solutions",
     'site.navigation.0.href': "/#capacidades",
     'site.navigation.1.label': "Infrastructure",
@@ -31,6 +33,7 @@ export default defineMessages({
     'site.navigation.5.href': "@contact",
   },
   es: {
+    'site.brand.presentation': "symbol-and-name",
     'site.theme.profile': "infrastructure",
     'photographic.theme.layout': "infrastructure",
     'site.cta': "Hablemos de su proyecto",
@@ -43,9 +46,10 @@ export default defineMessages({
     'site.footer.description': "Infraestructura para crear y conectar soluciones",
     'site.footer.explore': "EXPLORE",
     'site.footer.resources': "RECURSOS",
-    'site.footer.company': "1PLATFORM",
+    'site.footer.company': "ONE PLATFORM",
     'site.footer.copyright': "© {year} 1Platform Labs",
     'site.footer.reference': "Referencia API",
+    'site.footer.mcp': "Integrar con MCP",
     'site.navigation.0.label': "Soluciones",
     'site.navigation.0.href': "/#capacidades",
     'site.navigation.1.label': "Infraestructura",

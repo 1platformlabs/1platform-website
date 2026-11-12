@@ -120,6 +120,9 @@ function manifestPatch(snapshot, tenant) {
   const {theme, destinations} = snapshot.manifest;
   if (!/^#[0-9a-f]{6}$/i.test(theme.accent_contrast ?? '') || ['docs', 'app', 'support', 'status'].some(key => !own(destinations, key))) fail('Incomplete current manifest theme or destinations');
   return {
+    brand_name: 'One Platform',
+    brand_wordmark: 'One Platform',
+    brand_assets: {...snapshot.manifest.brand_assets, icon: '/brand/one-platform-symbol.png'},
     home_template: 'photographic-service',
     theme: {...theme, accent: '#2854a7', display_font: 'manrope'},
     destinations: {...destinations, support: 'https://wa.me/50253946564'},

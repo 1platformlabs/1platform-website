@@ -1,12 +1,19 @@
 ---
 import WhatsAppContact from '@components/WhatsAppContact.astro';
 import TenantBrand from '@components/TenantBrand.astro';
+import { resolveIcon } from '@lib/tenant-brand-assets';
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { useI18n } from '@i18n';
 import { docsUrl, supportUrl } from '@lib/site-destinations';
 import LandingReviews from '@components/LandingReviews.astro';
 import { resolveSiteReviews } from '@lib/site-reviews';
 import '@styles/infrastructure-home.css';
+import '@styles/infrastructure-refresh.css';
+import InfrastructureSocial from '@components/InfrastructureSocial.astro';
+import InfrastructureMcp from '@components/InfrastructureMcp.astro';
+import { hasInfrastructureSection } from '@lib/infrastructure-refresh';
+const showSocial = hasInfrastructureSection(Astro.locals.messages, 'social');
+const showMcp = hasInfrastructureSection(Astro.locals.messages, 'mcp');
 
 const { t } = useI18n(Astro.url.pathname, Astro.locals);
 const tenant = Astro.locals.tenant;
@@ -58,8 +65,8 @@ const additionalCapabilities = ['cloud', 'plates', 'videos', 'sales', 'schedulin
           <h1 id="hero-title">{t('infrastructure.hero.title')}<br /><span>{t('infrastructure.hero.titleEmphasis')}</span></h1>
           <p class="hero-lede">{t('infrastructure.hero.description')}</p>
           <div class="hero-actions">
-            <a class="button button--white" href="#capacidades">{t('infrastructure.hero.explore')}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>
-            {contactHref && (<a class="button button--outline" href={contactHref}>{t('infrastructure.contact.cta')}<svg class="icon" aria-hidden="true"><use href="#infra-i-up" /></svg></a>)}
+            <a class="button button--white" href={showMcp ? "#mcp" : "#capacidades"}>{showMcp && Astro.locals.messages['infrastructure.hero.integrate'] ? t('infrastructure.hero.integrate') : t('infrastructure.hero.explore')}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>
+            {showSocial && Astro.locals.messages['infrastructure.hero.demo'] ? <a class="button button--outline" href="#agente-redes">{t('infrastructure.hero.demo')}<svg class="icon" aria-hidden="true"><use href="#infra-i-up" /></svg></a> : contactHref && (<a class="button button--outline" href={contactHref}>{t('infrastructure.contact.cta')}<svg class="icon" aria-hidden="true"><use href="#infra-i-up" /></svg></a>)}
           </div>
         </div>
         <div class="wrap hero-bottom">
@@ -68,6 +75,7 @@ const additionalCapabilities = ['cloud', 'plates', 'videos', 'sales', 'schedulin
         </div>
       </section>
 
+      {showSocial && <InfrastructureSocial />}
       <section class="section premise" id="propuesta" aria-labelledby="premise-title">
         <div class="wrap premise-grid">
           <div><p class="eyebrow">{t('infrastructure.premise.eyebrow')}</p><h2 id="premise-title">{t('infrastructure.premise.title')}</h2></div>
@@ -80,10 +88,11 @@ const additionalCapabilities = ['cloud', 'plates', 'videos', 'sales', 'schedulin
         </div>
       </section>
 
+      {showMcp && <InfrastructureMcp />}
       <section class="section capabilities" id="capacidades" aria-labelledby="capabilities-title">
         <div class="wrap section-heading"><div><p class="eyebrow">{t('infrastructure.capabilities.eyebrow')}</p><h2 id="capabilities-title">{t('infrastructure.capabilities.title')}</h2></div><p>{t('infrastructure.capabilities.description')}</p></div>
         <div class="wrap capability-layout">
-          <div class="capability-grid" aria-label={t('infrastructure.aria.capabilities')}>
+          <div class="capability-options"><div id="capability-options" class="capability-grid" aria-label={t('infrastructure.aria.capabilities')}>
             <button class="capability is-selected" type="button" data-capability={t('infrastructure.capabilities.payments.name')} aria-pressed="true"><span class="capability-number">01</span><span class="capability-text"><strong>{t('infrastructure.capabilities.payments.name')}</strong><small>{t('infrastructure.capabilities.payments.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
             <button class="capability is-selected" type="button" data-capability={t('infrastructure.capabilities.invoicing.name')} aria-pressed="true"><span class="capability-number">02</span><span class="capability-text"><strong>{t('infrastructure.capabilities.invoicing.name')}</strong><small>{t('infrastructure.capabilities.invoicing.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
             <button class="capability is-selected" type="button" data-capability={t('infrastructure.capabilities.delivery.name')} aria-pressed="true"><span class="capability-number">03</span><span class="capability-text"><strong>{t('infrastructure.capabilities.delivery.name')}</strong><small>{t('infrastructure.capabilities.delivery.description')}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
@@ -98,11 +107,13 @@ const additionalCapabilities = ['cloud', 'plates', 'videos', 'sales', 'schedulin
               <button id={key === 'cloud' ? 'nube' : undefined} class="capability" type="button" data-capability={t(`infrastructure.capabilities.${key}.name`)} aria-pressed="false"><span class="capability-number">{number}</span><span class="capability-text"><strong>{t(`infrastructure.capabilities.${key}.name`)}</strong><small>{t(`infrastructure.capabilities.${key}.description`)}</small></span><span class="capability-indicator" aria-hidden="true">+</span></button>
             ))}
           </div>
+          {Astro.locals.messages['infrastructure.capabilities.more'] && Astro.locals.messages['infrastructure.capabilities.less'] && <button class="capabilities-more" type="button" data-capabilities-more data-more={t('infrastructure.capabilities.more').replace('{count}', String(10 + additionalCapabilities.length))} data-less={t('infrastructure.capabilities.less')} aria-expanded="false" aria-controls="capability-options" hidden>{t('infrastructure.capabilities.more').replace('{count}', String(10 + additionalCapabilities.length))}</button>}
+          </div>
           <div class="integration-preview" aria-labelledby="integration-title">
             <p class="integration-kicker">{t('infrastructure.integration.eyebrow')}</p>
             <div class="integration-source"><h3 id="integration-title">{t('infrastructure.integration.title')}</h3><div class="integration-clients"><span>{t('infrastructure.integration.saas')}</span><span>{t('infrastructure.integration.applications')}</span><span>{t('infrastructure.integration.erp')}</span></div></div>
             <div class="integration-bridge"><span>{t('infrastructure.integration.bridge')}</span></div>
-            <div class="integration-core"><span class="integration-logo" aria-hidden="true"><TenantBrand variant="symbol">{tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><div><strong>{tenant.brand_name}</strong><small>{t('infrastructure.integration.description')}</small></div></div>
+            <div class="integration-core"><span class="integration-logo" aria-hidden="true"><TenantBrand variant="symbol">{Astro.locals.messages['site.brand.presentation'] === 'symbol-and-name' ? <img class="integration-symbol-artwork" src={resolveIcon(tenant)} alt="" width="48" height="48" /> : tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span><div><strong>{tenant.brand_name}</strong><small>{t('infrastructure.integration.description')}</small></div></div>
             <div class="integration-branch" aria-hidden="true"></div>
             <p class="integration-services-label">{t('infrastructure.integration.services')}</p>
             <ul class="selected-list" data-selected-list><li>{t('infrastructure.capabilities.payments.name')}</li><li>{t('infrastructure.capabilities.invoicing.name')}</li><li>{t('infrastructure.capabilities.delivery.name')}</li></ul>
@@ -189,5 +200,5 @@ const additionalCapabilities = ['cloud', 'plates', 'videos', 'sales', 'schedulin
 <WhatsAppContact href={contactHref} locale={locale} />
 </BaseLayout>
 <script>
-  import '@scripts/infrastructure-home';
+  import '@scripts/infrastructure-home'; import '@scripts/social-agent';
 </script>

@@ -39,6 +39,28 @@ function initInfrastructureHome() {
   }, { signal }));
   updatePreview();
 
+  const more = root.querySelector<HTMLButtonElement>('[data-capabilities-more]');
+  const extra = capabilities.slice(8);
+  const setExpanded = (expanded: boolean) => {
+    if (!more) return;
+    extra.forEach(button => { button.hidden = !expanded; });
+    more.setAttribute('aria-expanded', String(expanded));
+    more.textContent = (expanded ? more.dataset.less : more.dataset.more) ?? '';
+  };
+  const revealHash = () => {
+    const id = location.hash.slice(1);
+    if (!id) return;
+    const target = extra.find(button => button.id === id || [...button.querySelectorAll('[id]')].some(child => child.id === id));
+    if (target) { setExpanded(true); target.scrollIntoView({block: 'start'}); }
+  };
+  if (more && extra.length) {
+    more.hidden = false;
+    setExpanded(false);
+    more.addEventListener('click', () => setExpanded(more.getAttribute('aria-expanded') !== 'true'), {signal});
+    window.addEventListener('hashchange', revealHash, {signal});
+    revealHash();
+  }
+
   const aiSwitch = root.querySelector<HTMLButtonElement>('[data-ai-switch]');
   const aiDemo = root.querySelector<HTMLElement>('[data-ai-demo]');
   const aiLabel = root.querySelector<HTMLElement>('[data-ai-switch-label]');

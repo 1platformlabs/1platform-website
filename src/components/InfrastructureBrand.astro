@@ -1,0 +1,14 @@
+---
+import TenantBrand from '@components/TenantBrand.astro';
+import { resolveIcon } from '@lib/tenant-brand-assets';
+const { tenant, messages } = Astro.locals;
+const symbolAndName = messages['site.brand.presentation'] === 'symbol-and-name';
+---
+{symbolAndName ? <><span class="brand-artwork" aria-hidden="true"><TenantBrand variant="symbol" tone="white"><img src={resolveIcon(tenant)} alt="" width="42" height="42" /></TenantBrand></span><span class="brand-name">{tenant.brand_name}</span></> : <TenantBrand tone="white"><span class="brand-symbol" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><span class="brand-name">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>}
+
+<style is:global>
+.brand-artwork { display: inline-flex; width: 42px; height: 42px; flex: none; }
+.brand-artwork > img { display: block; width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1); }
+.brand-artwork + .brand-name { white-space: nowrap; font-weight: 800; letter-spacing: -.055em; word-spacing: .07em; }
+@media (max-width: 680px) { .brand-artwork { width: 32px; height: 32px; } }
+</style>

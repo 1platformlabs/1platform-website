@@ -68,9 +68,9 @@ test('the wordmark is the tenant\'s, not the platform\'s', async () => {
 
   // POSITIVE CONTROL: the platform draws its own, or the scan is broken. Its
   // "1" is a numeral doing the work of a glyph, so it still gets boxed.
-  expect(mark(platform), 'the platform wordmark should still be boxed "1"').toBe('1')
-  expect(text(platform)).toBe('Platform')
-  expect(label(platform)).toContain('1Platform')
+  expect(platform).toContain('/brand/one-platform-symbol.png')
+  expect(text(platform)).toBe('One Platform')
+  expect(label(platform)).toContain('One Platform')
 
   // The same component, the same page, a different tenant.
   expect(mark(clinic), 'the clinic lockup should render its declared symbol').toBe('C')
@@ -81,9 +81,9 @@ test('the wordmark is the tenant\'s, not the platform\'s', async () => {
     'Clínica Delta',
   )
   const { html: home } = await serve(PLATFORM_HOST)
-  expect(home).toMatch(/class="brand-symbol"[^>]*>1<\/span>/)
-  expect(home).toMatch(/class="brand-name">Platform<\/span>/)
-  expect(home).toContain('aria-label="1Platform, back to home"')
+  expect(home).toContain('/brand/one-platform-symbol.png')
+  expect(home).toMatch(/class="brand-name">One Platform<\/span>/)
+  expect(home).toContain('aria-label="One Platform, back to home"')
 })
 
 test('the leak that is LEFT is content, and its size is pinned', async () => {

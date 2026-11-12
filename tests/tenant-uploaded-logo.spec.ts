@@ -247,22 +247,22 @@ test('favicon, touch icon, social card and JSON-LD logo are made from the logo',
     await resolveUploadedLogo({ ...base('oneplatform'), brand_logo: { sha256: SHA_A, width: 1, height: 1 } }),
     'a declared asset outranks the upload',
   ).toBeNull()
-  expect(await resolveLogo(base('oneplatform')), 'tenant #1 keeps its declared icon').toBe('/favicon.svg')
+  expect(await resolveLogo(base('oneplatform')), 'tenant #1 keeps its declared icon').toBe('/brand/one-platform-symbol.png')
 })
 
 // ── served regression: tenants without a logo are unchanged ─────────────────
 
-test('without a logo the served favicon is still the SVG it was', async () => {
+test('declared PNG and derived SVG favicons advertise their actual media types', async () => {
   const [platform, clinic, logoRoute] = await Promise.all([
     getWithHost(`${BASE}/`, '1platform.pro'),
     getWithHost(`${BASE}/`, 'clinicas.1platform.dev'),
     getWithHost(`${BASE}/brand/logo/${SHA_A}.png`, 'clinicas.1platform.dev'),
   ])
   // Attribute order differs between the two heads (BaseLayout and the
-  // photographic home); both must keep advertising an SVG for an SVG.
+  // photographic home); the MIME type must match the selected asset.
   const iconLink = (html: string) => /<link rel="icon"[^>]*>/.exec(html)?.[0] ?? ''
-  expect(iconLink(platform.body)).toContain('href="/favicon.svg"')
-  expect(iconLink(platform.body)).toContain('type="image/svg+xml"')
+  expect(iconLink(platform.body)).toContain('href="/brand/one-platform-symbol.png"')
+  expect(iconLink(platform.body)).toContain('type="image/png"')
   expect(iconLink(clinic.body)).toMatch(/href="\/brand\/icon\.svg\?v=[0-9a-f]{12}"/)
   expect(iconLink(clinic.body)).toContain('type="image/svg+xml"')
   expect(logoRoute.status, 'a tenant without a logo has no logo route').toBe(404)

@@ -47,7 +47,7 @@ test('preserves every unrelated document, route, locale, publication state and m
     assert.equal(actual.operator_note, original.operator_note);
     for (const [key, value] of Object.entries(original.blocks)) if (key.startsWith('editorial.') || key.startsWith('draft.')) assert.equal(actual.blocks[key], value);
   }
-  assert.deepEqual(manifestPatch, {home_template: 'photographic-service', theme: {...before.manifest.theme, accent: '#2854a7', display_font: 'manrope'}, destinations: {...before.manifest.destinations, support: 'https://wa.me/50253946564'}});
+  assert.deepEqual(manifestPatch, {brand_name: 'One Platform', brand_wordmark: 'One Platform', brand_assets: {...before.manifest.brand_assets, icon: '/brand/one-platform-symbol.png'}, home_template: 'photographic-service', theme: {...before.manifest.theme, accent: '#2854a7', display_font: 'manrope'}, destinations: {...before.manifest.destinations, support: 'https://wa.me/50253946564'}});
   assert.equal(report.published_routes_unchanged, true);
   assert.equal(report.input_sha256.length, 64);
 });

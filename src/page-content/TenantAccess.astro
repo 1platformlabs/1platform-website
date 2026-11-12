@@ -1,5 +1,6 @@
 ---
 import TenantBrand from '@components/TenantBrand.astro';
+import InfrastructureBrand from '@components/InfrastructureBrand.astro';
 import { Image } from 'astro:assets';
 import { iconPaths } from '@components/icons';
 import { useI18n } from '@i18n';
@@ -59,8 +60,8 @@ const icon = resolveIcon(tenant);
     <a class="skip-link" href="#contenido">{copy('skip')}</a>
     <header class="site-header">
       <a class="brand" href={l('/')} aria-label={copy('brandHome')}>
-        <TenantBrand tone="white"><span class="brand-mark" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span>
-        <span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>
+        {infrastructure && Astro.locals.messages['site.brand.presentation'] === 'symbol-and-name' ? <InfrastructureBrand /> : <TenantBrand tone="white"><span class="brand-mark" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span>
+        <span class="wordmark">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>}
       </a>
       <a class="access-home" href={l('/')}><svg class="icon access-back" aria-hidden="true"><use href="#access-arrow" /></svg>{copy('home')}</a>
     </header>

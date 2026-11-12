@@ -121,12 +121,14 @@ No replique claves en un nuevo documento publicado para eludirla.
 
 El parche 1Platform propone únicamente:
 
+- `brand_name` y `brand_wordmark`: `One Platform`
+- `brand_assets.icon: /brand/one-platform-symbol.png` (arte original; conserva los demás assets)
 - `home_template: photographic-service`
 - `theme.accent: #2854a7`, `theme.display_font: manrope`
 - `destinations.support: https://wa.me/50253946564`
 
-El resto de theme/destinations conserva los valores del snapshot. No cambia
-brand, dominio, aliases, rutas, estado de publicación ni indexabilidad. El
+El resto de theme/destinations/brand_assets conserva los valores del snapshot. No cambia
+dominio, aliases, rutas, estado de publicación ni indexabilidad. El
 manifiesto Medipago no cambia. Repetir la preparación sobre el resultado deja el
 contenido idéntico y produce cero cambios de claves.
 
@@ -224,3 +226,25 @@ La activación en un entorno compartido/producción es un paso posterior al merg
 **con autorización separada**, snapshot reciente y revisión del paquete exacto.
 Nada de lo preparado aquí autoriza ni realiza ese paso. Las lecturas públicas de
 producción sólo prueban su estado observado; no sustituyen el banco local.
+
+## Refresh One Platform (2026-11-12)
+
+El catálogo `@components/site-chrome` opta por `site.brand.presentation =
+"symbol-and-name"`: el chrome muestra el símbolo del tenant y su nombre actual.
+Sin esa clave conserva el lockup subido y el comportamiento previo. Los destinos
+se siguen leyendo del manifiesto; no se reemplazan dominios ni credenciales.
+
+`@infrastructure-home` incorpora las claves `infrastructure.social.*` y
+`infrastructure.mcp.*`. Cada sección exige su conjunto completo de textos; un
+release anterior o parcial omite esa sección, sin textos de otro tenant. El
+listado de capacidades se contrae sólo si existen ambas etiquetas de expansión.
+Sin JavaScript conserva todas las capacidades y la conversación completa.
+
+Orden de activación: renderer y asset del Website → snapshot administrativo
+fresco → revisar y aplicar el parche de `oneplatform` y sus SitePages → verificar
+ES/EN y enlaces al MCP. Developer actualiza su chrome independientemente, sin
+alterar los slugs técnicos, paquetes ni contratos de API. No hace falta migración
+de esquema: `SiteTenantPatchRequest` en Core `5d255ff8c2434e2db0d61168a33a216c8f807087`
+ya acepta `brand_name`, `brand_wordmark` y `brand_assets`. El demo de conversación es una simulación local, no ejecuta mensajes
+ni reservas. Las reseñas reales siguen su flujo existente; no se porta la política
+de ocultación del panel de reseñas del prototipo.
