@@ -248,3 +248,26 @@ de esquema: `SiteTenantPatchRequest` en Core `5d255ff8c2434e2db0d61168a33a216c8f
 ya acepta `brand_name`, `brand_wordmark` y `brand_assets`. El demo de conversación es una simulación local, no ejecuta mensajes
 ni reservas. Las reseñas reales siguen su flujo existente; no se porta la política
 de ocultación del panel de reseñas del prototipo.
+
+### Medido en el banco real (2026-11-12, `/verify-epic-e2e`)
+
+Banco privado con el censo de producción del 2026-11-12, staff real y Core `origin/main` `2df1d520`:
+
+- **Sin activar** (lo que verá producción apenas se despliegue este renderer): `1platform.pro`,
+  `medipago.gt`, `vendefacil.gt` y un tenant independiente renderizan igual que `origin/main`:
+  mismo favicon, mismo lockup, sin secciones nuevas. Sólo cambian un bloque CSS sin uso y el
+  script de la home, que pasa a ser un archivo externo.
+- **Activado** (preparador → seed `--verify` → PATCH): la rama muestra agente social, MCP,
+  símbolo con nombre y enlaces al MCP de Developer. `origin/main` sirve esos mismos datos con
+  **200**, ignorando las claves nuevas. Revertir sólo el código con el contenido activado ya no
+  tumba el sitio.
+- **El PATCH de `brand_name` reescribe menciones de la marca dentro de los SitePages**
+  (`home.jsonld.name` EN/ES y `layout.logoLabel` ES, del lado del Core). Por eso, para repetir el seed,
+  **no** se reutiliza el `*-prepared.json` original: eso devolvería esas tres claves a «1Platform».
+  Hay que tomar un snapshot fresco, re-preparar (resultado medido: 0 claves cambiadas, parche
+  idéntico) y correr el seed en `--dry` (resultado medido: 0 escrituras).
+- **Catálogo parcial:** si a ES le falta una clave `infrastructure.social.*`, ES omite la sección
+  y su CTA del hero, mientras EN la conserva. No aparece texto de otro idioma ni de otro tenant.
+- El favicon subido del tenant tiene prioridad sobre `brand_assets.icon` en el símbolo del chrome. En
+  producción ese archivo existe y es el mismo arte. En un banco sin sus bytes se ve como imagen rota,
+  y eso es una limitación del banco, no del renderer.
