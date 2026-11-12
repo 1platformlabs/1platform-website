@@ -11,6 +11,7 @@ import Cta from '@components/editorial/Cta.astro';
 import Newsletter from '@components/editorial/Newsletter.astro';
 import { ILLUSTRATIONS } from '@lib/site-blog';
 import { categoryNamer, loadEditorial, takeFlash } from '@lib/editorial-page';
+import { editorialHomeTitle } from '@lib/editorial-title';
 import { editorialStrings, formatEditorialDate } from '@i18n/editorial';
 
 const locale = Astro.locals.locale;
@@ -31,7 +32,7 @@ const bySlug = new Map(archive.map((p) => [p.slug, p]));
 const paths = (editorial?.reading_paths ?? []).filter((p) => bySlug.has(p.post));
 const illustration = home && (ILLUSTRATIONS as readonly string[]).includes(home.illustration) ? home.illustration : 'connections';
 const flash = takeFlash(Astro);
-const title = home?.title ? `${home.title} · ${Astro.locals.tenant.brand_name}` : Astro.locals.tenant.brand_name;
+const title = editorialHomeTitle(home?.title, Astro.locals.tenant.brand_name);
 const alternates = Object.fromEntries(Astro.locals.tenant.locales.map((loc: string) => [loc, Astro.locals.localizePath('/', loc as never)]));
 ---
 

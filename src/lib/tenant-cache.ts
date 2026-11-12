@@ -190,18 +190,34 @@ export class TenantCache<T> {
   /**
    * Refresh in the background, at most one flight per key.
    *
+   * `evictWhenAbsent`: a fetcher's `null` drops the copy (callers whose `null`
+   * means "the API said this does not exist"); without it `null` is ignored.
+   *
    * The promise is deliberately not awaited by the caller: the point of a stale
    * copy is that the visitor does not wait. Failures are swallowed HERE, with
    * the reason, because a rejected floating promise takes the process down in
    * Node — and a background refresh failing is exactly the case the stale copy
    * exists to survive.
    */
-  refreshInBackground(key: string, fetcher: () => Promise<T | null>, now: number): void {
+  refreshInBackground(
+    key: string,
+    fetcher: () => Promise<T | null>,
+    now: number,
+    options: { evictWhenAbsent?: boolean } = {},
+  ): void {
     if (this.inFlight.has(key)) return
     const flight = (async () => {
       try {
         const value = await fetcher()
         if (value !== null) this.store(key, value, now)
+        else if (options.evictWhenAbsent) {
+          // `null` is the API's DEFINITIVE "no such key" (a 404), not a failure
+          // — failures throw and keep the stale copy below. Serving the old copy
+          // after that answer is how a deleted or suspended site stayed online
+          // for up to MAX_STALE_MS (alta-de-blog-desde-el-panel, BDP-04 CA-6).
+          this.positive.delete(key)
+          this.rememberMissing(key, now)
+        }
       } catch {
         // Deliberately silent to the visitor; the caller logs the miss.
       } finally {

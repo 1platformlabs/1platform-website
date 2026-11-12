@@ -146,7 +146,8 @@ export async function resolveTenant(host: string, now: number = Date.now()): Pro
   if (hit.age === 'stale' && hit.value) {
     // Serve now, refresh behind the visitor's back. This is the branch that
     // keeps the site up while the API is slow.
-    cache.refreshInBackground(key, () => fetchTenantByHost(key), now)
+    // A 404 on the refresh evicts: the site was deleted or suspended (BDP-04 CA-6).
+    cache.refreshInBackground(key, () => fetchTenantByHost(key), now, { evictWhenAbsent: true })
     return { outcome: 'resolved', tenant: hit.value, ageMs: hit.ageMs, stale: true }
   }
 
