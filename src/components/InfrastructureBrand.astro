@@ -1,8 +1,12 @@
 ---
 import TenantBrand from '@components/TenantBrand.astro';
 import { resolveIcon } from '@lib/tenant-brand-assets';
+import { tenantBrandImage } from '@lib/tenant-brand-display';
 const { tenant, messages } = Astro.locals;
-const symbolAndName = messages['site.brand.presentation'] === 'symbol-and-name';
+// The opt-in is tenant content; an uploaded lockup is tenant data too and wins:
+// a catalogue copied from another tenant must never hide this tenant's own logo.
+const uploadedLockup = await tenantBrandImage(tenant, 'lockup');
+const symbolAndName = messages['site.brand.presentation'] === 'symbol-and-name' && !uploadedLockup;
 ---
 {symbolAndName ? <><span class="brand-artwork" aria-hidden="true"><TenantBrand variant="symbol" tone="white"><img src={resolveIcon(tenant)} alt="" width="42" height="42" /></TenantBrand></span><span class="brand-name">{tenant.brand_name}</span></> : <TenantBrand tone="white"><span class="brand-symbol" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><span class="brand-name">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>}
 

@@ -65,6 +65,8 @@ test('reduced motion keeps the infrastructure illustration static and WebGL-free
   }
   await expect(page.locator('[data-replay], .hero-motion')).toHaveCount(0);
   const capability = page.locator('[data-capability]').last();
+  // Declared: the list is collapsed to eight; expanding it must work with reduced motion too.
+  await page.locator('[data-capabilities-more]').click();
   await capability.click();
   await expect(capability).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-selected-list] li')).toHaveCount(4);
@@ -145,6 +147,8 @@ test('the home retains reciprocal SEO alternatives and focused project CTAs', as
   await expect(page.locator('link[hreflang="es"]')).toHaveAttribute('href', 'https://1platform.pro/es/');
   const actions = page.locator('.hero-actions a');
   await expect(actions).toHaveCount(2);
-  await expect(actions.first()).toHaveAttribute('href', '#capacidades');
-  await expect(actions.last()).toHaveAttribute('href', 'https://wa.me/50253946564');
+  await expect(actions.first()).toHaveAttribute('href', '#mcp');
+  await expect(actions.last()).toHaveAttribute('href', '#agente-redes');
+  await expect(page.locator('#mcp')).toHaveCount(1);
+  await expect(page.locator('#agente-redes')).toHaveCount(1);
 });

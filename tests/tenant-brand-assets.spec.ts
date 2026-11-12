@@ -33,13 +33,14 @@ test('declared platform assets preserve their compiled paths while a tenant with
   const platform = tenant('oneplatform')
   const clinic = tenant('clinicas')
 
-  expect(resolveIcon(platform)).toBe('/favicon.svg')
+  // The repo fixture declares the One Platform symbol (activation state); the declared path is kept verbatim.
+  expect(resolveIcon(platform)).toBe('/brand/one-platform-symbol.png')
   expect(resolveSocial(platform)).toBe('/og/default.png')
   expect(resolveAppleTouchIcon(platform)).toBe('/logo-oauth-120x120.png')
   expect(resolveIcon(clinic)).toMatch(/^\/brand\/icon\.svg\?v=[0-9a-f]{12}$/)
   expect(resolveSocial(clinic)).toMatch(/^\/brand\/social\.png\?v=[0-9a-f]{12}$/)
   expect(resolveAppleTouchIcon(clinic)).toMatch(/^\/brand\/apple-touch-icon\.png\?v=[0-9a-f]{12}$/)
-  expect(await resolveLogo(platform)).toBe('/favicon.svg')
+  expect(await resolveLogo(platform)).toBe('/brand/one-platform-symbol.png')
   expect(await resolveLogo(clinic)).toBe(resolveSocial(clinic))
 })
 
