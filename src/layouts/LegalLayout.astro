@@ -27,7 +27,7 @@ const documents = [
 const currentPath = Astro.originPathname;
 ---
 
-<BaseLayout title={`${title} | 1Platform`} description={description}>
+<BaseLayout title={`${title} | ${Astro.locals.tenant.brand_name}`} description={description}>
   <div class="legal section">
     <div class="container container--narrow">
       <Breadcrumb items={[
