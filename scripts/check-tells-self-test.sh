@@ -219,6 +219,23 @@ printf '\n%sDocumentation must stay writable%s\n' "$DIM" "$RESET"
 assert_green "comment naming a tell" "$PAGE" \
   '<!-- the old kit used linear-gradient and gradient-text here -->'
 
+printf '\n%sThe brand is One Platform (16)%s\n' "$DIM" "$RESET"
+# website-rebranding-one-platform D-6. Three cases, each half proved: a value
+# with the old brand goes red; the continuation of a block comment -- a line
+# with NO marker, which the line-prefix filter of the other rules would read as
+# a live value -- stays green; and the legal entity plus a lower-case URL stay
+# green, because neither is the brand.
+assert_red "old brand in a catalogue value" "brand is One Platform" "$CATALOG" \
+  "  'x.seeded': '1Platform',"
+assert_red "old brand in a legal partial" "brand is One Platform" \
+  "src/page-content/legal/terms.en.astro" '<p>1Platform never stores card data.</p>'
+assert_green "old brand inside a block-comment continuation" "$CATALOG" \
+  "$(printf '/*\n  the site used to call itself 1Platform\n*/')"
+assert_green "old brand inside an HTML-comment continuation" "$PAGE" \
+  "$(printf '<!--\n  the site used to call itself 1Platform\n-->')"
+assert_green "legal entity and a lower-case URL are not the brand" "$CATALOG" \
+  "  'x.seeded': '1Platform Labs · https://1platform.pro',"
+
 printf '\n%sRules of the home epic (14 · 15)%s\n' "$DIM" "$RESET"
 # 14 — a build that outgrows the budget goes red; a missing build never passes
 # quietly. The payload is random (incompressible), so 250 KB stays ~250 KB
