@@ -278,7 +278,7 @@ test('neither RSS feed carries the other language', async () => {
     `the Spanish feed lists ${esItems.length} links for ${esPosts.length} published posts`,
   ).toBeGreaterThanOrEqual(esPosts.length);
 
-  expect(es).toContain('<title>Blog de 1Platform</title>');
+  expect(es).toContain('<title>Blog de One Platform</title>');
 });
 
 test('no provider name appears under /es/ outside the privacy policy', async () => {

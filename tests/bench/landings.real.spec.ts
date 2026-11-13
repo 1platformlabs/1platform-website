@@ -245,7 +245,7 @@ test('secondary routes preserve their content with approved chrome and the indep
       const baseline = JSON.parse(readFileSync(join(output, 'control-render.json'), 'utf8'));
       expect(text).toBe(baseline[id].text);
       await expect(page.locator('.brand-header')).toBeVisible();
-      await expect(page.locator('#site-header .brand-lockup')).toHaveAttribute('aria-label', /^1Platform\b/);
+      await expect(page.locator('#site-header .brand-lockup')).toHaveAttribute('aria-label', /^One Platform\b/);
       await expect(page.locator('.brand-cta')).toHaveAttribute('href', 'https://wa.me/50253946564');
       continue;
     }

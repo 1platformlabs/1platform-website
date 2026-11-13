@@ -12,7 +12,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'contact.title': 'Contact — Custom Quotes & Help Getting Started | 1Platform',
+    'contact.title': 'Contact — Custom Quotes & Help Getting Started | One Platform',
     'contact.description':
       'Write to us about custom quotes, a live demo, help getting your business running, or a partnership. We reply within 24 hours, business days.',
     'contact.breadcrumb': 'Contact',
@@ -51,11 +51,11 @@ export default defineMessages({
     'contact.panel.copyEmail': 'Copy Email',
     'contact.panel.copiedLabel': 'Copied!',
     'contact.panel.selectedLabel': 'Email selected — press Cmd/Ctrl+C',
-    'contact.panel.hint.pre': 'Already on 1Platform? Sign in at',
+    'contact.panel.hint.pre': 'Already on One Platform? Sign in at',
     'contact.panel.hint.post': 'and use the in-app chat for faster support.',
   },
   es: {
-    'contact.title': 'Contacto — Cotizaciones a tu medida y ayuda para empezar | 1Platform',
+    'contact.title': 'Contacto — Cotizaciones a tu medida y ayuda para empezar | One Platform',
     'contact.description':
       'Escríbenos por una cotización a tu medida, una demo en vivo, ayuda para poner tu negocio en marcha o una alianza. Respondemos en 24 horas, días hábiles.',
     'contact.breadcrumb': 'Contacto',
@@ -95,7 +95,7 @@ export default defineMessages({
     'contact.panel.copyEmail': 'Copiar correo',
     'contact.panel.copiedLabel': '¡Copiado!',
     'contact.panel.selectedLabel': 'Correo seleccionado — presiona Cmd/Ctrl+C',
-    'contact.panel.hint.pre': '¿Ya usas 1Platform? Inicia sesión en',
+    'contact.panel.hint.pre': '¿Ya usas One Platform? Inicia sesión en',
     'contact.panel.hint.post': 'y usa el chat dentro de la app para soporte más rápido.',
   },
 });

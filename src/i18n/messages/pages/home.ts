@@ -20,17 +20,17 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'home.title': '1Platform — Online Store, Payments, Invoicing & Delivery',
+    'home.title': 'One Platform — Online Store, Payments, Invoicing & Delivery',
     'home.description':
       'Open your online store, take card payments, issue the invoice on every sale, and dispatch your deliveries — your whole business, from one place.',
-    'home.jsonld.name': '1Platform',
+    'home.jsonld.name': 'One Platform',
     'home.jsonld.brandName': '1Platform Labs',
 
     // — Hero ——————————————————————————————————————————————————
     'home.hero.badge': 'Connected commerce',
     'home.hero.headline': 'Sell online. Get paid, invoice and deliver.',
     'home.hero.lead':
-      'A customer buys in your store. 1Platform takes the online payment, issues the invoice and moves the order into delivery — one connected flow from checkout to door.',
+      'A customer buys in your store. One Platform takes the online payment, issues the invoice and moves the order into delivery — one connected flow from checkout to door.',
     'home.hero.scene.aria':
       'A sale moves from an online store to an approved online payment, an automatically issued invoice and a tracked delivery.',
     'home.hero.store.kicker': 'Storefront',
@@ -101,12 +101,12 @@ export default defineMessages({
       'Run your clients’ stores and sites from one dashboard — your own brand up front, billing kept separate for each client.',
     'home.useCase.developers.title': 'Teams building their own product',
     'home.useCase.developers.description':
-      'Use 1Platform as the engine of your own product — payments, invoicing, deliveries, content and dashboard included.',
+      'Use One Platform as the engine of your own product — payments, invoicing, deliveries, content and dashboard included.',
 
     // — FAQ ————————————————————————————————————————————————————
     'home.faq.eyebrow': 'Before you start',
     'home.faq.title': 'Frequently asked questions',
-    'home.faq.whatIs.question': 'What is 1Platform?',
+    'home.faq.whatIs.question': 'What is One Platform?',
     'home.faq.whatIs.answer':
       'One account your business sells from, takes card payments through, issues its invoices with, dispatches its deliveries from and publishes its content on — from one dashboard, or through one REST API if you are building your own product.',
     'home.faq.technical.question': 'Do I need to be technical to use it?',
@@ -117,17 +117,17 @@ export default defineMessages({
       'Yes. Everything the dashboard does is exposed through the REST API, with two-token authentication and webhooks — and the whitelabel dashboard can run under your own brand.',
   },
   es: {
-    'home.title': '1Platform — Tienda online, pagos, facturación y envíos',
+    'home.title': 'One Platform — Tienda online, pagos, facturación y envíos',
     'home.description':
       'Abre tu tienda en línea, cobra con tarjeta, emite la factura sola en cada venta y despacha tus entregas — todo tu comercio, desde un solo lugar.',
-    'home.jsonld.name': '1Platform',
+    'home.jsonld.name': 'One Platform',
     'home.jsonld.brandName': '1Platform Labs',
 
     // — Portada ———————————————————————————————————————————————
     'home.hero.badge': 'Comercio conectado',
     'home.hero.headline': 'Vende en línea. Cobra, factura y entrega.',
     'home.hero.lead':
-      'Tu cliente compra en la tienda. 1Platform recibe el pago en línea, emite la factura y mueve el pedido a reparto — un solo flujo desde el checkout hasta la puerta.',
+      'Tu cliente compra en la tienda. One Platform recibe el pago en línea, emite la factura y mueve el pedido a reparto — un solo flujo desde el checkout hasta la puerta.',
     'home.hero.scene.aria':
       'Una venta pasa de la tienda en línea a un pago aprobado, una factura emitida automáticamente y un envío con seguimiento.',
     'home.hero.store.kicker': 'Escaparate',
@@ -188,12 +188,12 @@ export default defineMessages({
       'Administra las tiendas y los sitios de tus clientes desde un solo panel — con tu marca al frente y la facturación separada para cada uno.',
     'home.useCase.developers.title': 'Equipos que construyen su producto',
     'home.useCase.developers.description':
-      'Usa 1Platform como el motor de tu propio producto — pagos, facturación, envíos, contenido y panel ya incluidos.',
+      'Usa One Platform como el motor de tu propio producto — pagos, facturación, envíos, contenido y panel ya incluidos.',
 
     // — Preguntas frecuentes ——————————————————————————————————
     'home.faq.eyebrow': 'Antes de empezar',
     'home.faq.title': 'Preguntas frecuentes',
-    'home.faq.whatIs.question': '¿Qué es 1Platform?',
+    'home.faq.whatIs.question': '¿Qué es One Platform?',
     'home.faq.whatIs.answer':
       'Una sola cuenta desde la que tu comercio vende, cobra con tarjeta, emite sus facturas, despacha sus entregas y publica su contenido — desde un panel, o con una sola API REST si construyes tu propio producto.',
     'home.faq.technical.question': '¿Necesito saber de tecnología para usarlo?',

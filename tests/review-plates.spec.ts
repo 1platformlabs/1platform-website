@@ -113,7 +113,7 @@ test.describe('tenant mode (API manifest)', () => {
     documents.map((d) => ({
       ...d,
       blocks: Object.fromEntries(
-        Object.entries(d.blocks).map(([k, v]) => [k, typeof v === 'string' ? v.replace(/1Platform/g, 'Clínica Delta') : v]),
+        Object.entries(d.blocks).map(([k, v]) => [k, typeof v === 'string' ? v.replace(/One Platform/g, 'Clínica Delta') : v]),
       ),
     }));
 

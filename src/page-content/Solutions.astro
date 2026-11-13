@@ -28,7 +28,7 @@ const jsonLd = {
   url: new URL(l('/solutions/'), siteOrigin(Astro.locals)).toString(),
   isPartOf: {
     '@type': 'WebSite',
-    name: '1Platform',
+    name: Astro.locals.tenant.brand_name,
     url: siteOrigin(Astro.locals),
   },
 };

@@ -13,7 +13,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'solutions-review-plates.title': 'Review plates — One tap or scan to your reviews and profiles | 1Platform',
+    'solutions-review-plates.title': 'Review plates — One tap or scan to your reviews and profiles | One Platform',
     'solutions-review-plates.description':
       'A counter plate with NFC and QR. Your customer taps or scans, and lands where you choose: your reviews, your social profile, your chat or your site. Change the destination any time without new plates.',
     'solutions-review-plates.jsonld.areaServed': 'Worldwide',
@@ -69,7 +69,7 @@ export default defineMessages({
       'Sign in, choose how many plates you need and place the order from your panel.',
   },
   es: {
-    'solutions-review-plates.title': 'Placas de reseñas — Un toque o un escaneo a tus reseñas y perfiles | 1Platform',
+    'solutions-review-plates.title': 'Placas de reseñas — Un toque o un escaneo a tus reseñas y perfiles | One Platform',
     'solutions-review-plates.description':
       'Una placa de mostrador con NFC y QR. Tu cliente la acerca o la escanea y llega a donde tú elijas: tus reseñas, tu perfil en redes, tu chat o tu sitio. Cambia el destino cuando quieras sin placas nuevas.',
     'solutions-review-plates.jsonld.areaServed': 'Todo el mundo',

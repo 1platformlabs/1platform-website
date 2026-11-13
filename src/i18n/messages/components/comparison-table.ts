@@ -10,9 +10,9 @@ import { defineMessages } from '@i18n/ui';
 export default defineMessages({
   en: {
     'comparisonTable.eyebrow.without': 'Separate tools',
-    'comparisonTable.eyebrow.with': '1Platform',
+    'comparisonTable.eyebrow.with': 'One Platform',
     'comparisonTable.mark.without': 'Separate tools:',
-    'comparisonTable.mark.with': '1Platform:',
+    'comparisonTable.mark.with': 'One Platform:',
     'comparisonTable.row1.without': 'A separate subscription per tool to manage and renew',
     'comparisonTable.row1.with': 'One account, one bill',
     'comparisonTable.row2.without': 'You wire the integrations between them yourself',
@@ -28,9 +28,9 @@ export default defineMessages({
   },
   es: {
     'comparisonTable.eyebrow.without': 'Herramientas sueltas',
-    'comparisonTable.eyebrow.with': '1Platform',
+    'comparisonTable.eyebrow.with': 'One Platform',
     'comparisonTable.mark.without': 'Herramientas sueltas:',
-    'comparisonTable.mark.with': '1Platform:',
+    'comparisonTable.mark.with': 'One Platform:',
     'comparisonTable.row1.without':
       'Una suscripción por separado para cada herramienta, que hay que gestionar y renovar',
     'comparisonTable.row1.with': 'Una cuenta, una factura',

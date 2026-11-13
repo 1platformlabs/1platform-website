@@ -21,7 +21,7 @@ export default defineMessages({
     'interconnect.output.storefront': 'storefront',
     'interconnect.output.payments': 'payments',
     'interconnect.output.invoicing': 'invoicing',
-    'interconnect.aria': 'Schematic of the platform: keywords, AI content, images and indexing all resolve through one 1Platform API, which delivers a storefront, payments and invoicing.',
+    'interconnect.aria': 'Schematic of the platform: keywords, AI content, images and indexing all resolve through one One Platform API, which delivers a storefront, payments and invoicing.',
   },
   es: {
     'interconnect.input.keywords': 'palabras clave',
@@ -31,6 +31,6 @@ export default defineMessages({
     'interconnect.output.storefront': 'tienda',
     'interconnect.output.payments': 'pagos',
     'interconnect.output.invoicing': 'facturación',
-    'interconnect.aria': 'Esquema de la plataforma: palabras clave, contenido con IA, imágenes e indexación se resuelven a través de una única API de 1Platform, que entrega una tienda, pagos y facturación.',
+    'interconnect.aria': 'Esquema de la plataforma: palabras clave, contenido con IA, imágenes e indexación se resuelven a través de una única API de One Platform, que entrega una tienda, pagos y facturación.',
   },
 });

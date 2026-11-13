@@ -25,7 +25,7 @@ import { defineMessages } from '@i18n/ui';
 export default defineMessages({
   en: {
     'solutions-content.title':
-      'Website with AI content, your own domain and SEO | 1Platform',
+      'Website with AI content, your own domain and SEO | One Platform',
     'solutions-content.description':
       'Register a domain, get a site raised on it, and fill it with SEO-optimized articles and images. Keyword research, CMS publishing and internal linking — all from one platform.',
     'solutions-content.serviceName': 'Website & AI content',
@@ -101,7 +101,7 @@ export default defineMessages({
   },
   es: {
     'solutions-content.title':
-      'Sitio web con contenido de IA, dominio propio y SEO | 1Platform',
+      'Sitio web con contenido de IA, dominio propio y SEO | One Platform',
     'solutions-content.description':
       'Registra un dominio, levantamos el sitio sobre él y lo llenas con artículos e imágenes optimizados para SEO. Palabras clave, publicación en tu CMS y enlazado interno — todo desde una sola plataforma.',
     'solutions-content.serviceName': 'Sitio web y contenido con IA',

@@ -6,7 +6,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'solutions-online-store.title': 'Online Store Platform — Launch Your Store in Minutes | 1Platform',
+    'solutions-online-store.title': 'Online Store Platform — Launch Your Store in Minutes | One Platform',
     'solutions-online-store.description':
       'Launch a full online store with checkout, payments, electronic invoicing, and your own domain — all from one platform. No plugins, no patchwork.',
     'solutions-online-store.jsonld.areaServed': 'Worldwide',
@@ -98,7 +98,7 @@ export default defineMessages({
     'solutions-online-store.next.actions.viewPricing': 'See Pricing',
   },
   es: {
-    'solutions-online-store.title': 'Plataforma de tienda online — Lanza tu tienda en minutos | 1Platform',
+    'solutions-online-store.title': 'Plataforma de tienda online — Lanza tu tienda en minutos | One Platform',
     'solutions-online-store.description':
       'Lanza una tienda online completa con checkout, pagos, facturación electrónica y tu propio dominio — todo desde una sola plataforma. Sin plugins, sin parches.',
     'solutions-online-store.jsonld.areaServed': 'Todo el mundo',

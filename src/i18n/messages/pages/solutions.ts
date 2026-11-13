@@ -8,7 +8,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'solutions.title': 'Solutions — Online Store, Website, Payments, Content | 1Platform',
+    'solutions.title': 'Solutions — Online Store, Website, Payments, Content | One Platform',
     'solutions.description':
       'Sell online, build a website, generate content, and ship a developer platform — all from one unified platform. Outcome-driven solutions for every business.',
 
@@ -53,12 +53,12 @@ export default defineMessages({
     'solutions.group.intelligence.item.domainManagement.replaces': 'A separate registrar dashboard',
     'solutions.group.intelligence.item.subscriptionsBilling.title': 'Balance & Usage',
     'solutions.group.intelligence.item.subscriptionsBilling.desc':
-      'Your own account with 1Platform: watch the balance, see what each operation consumed, and top it up. Credits-based, pay-per-use, transparent.',
+      'Your own account with One Platform: watch the balance, see what each operation consumed, and top it up. Credits-based, pay-per-use, transparent.',
     'solutions.group.intelligence.item.subscriptionsBilling.replaces': 'Guessing what a platform bill will say',
 
     'solutions.group.intelligence.item.paymentLinks.title': 'Payment Links',
     'solutions.group.intelligence.item.paymentLinks.desc':
-      'Send a link to charge someone who is not a 1Platform user. They pay without an account and without signing in.',
+      'Send a link to charge someone who is not a One Platform user. They pay without an account and without signing in.',
     'solutions.group.intelligence.item.paymentLinks.replaces': 'Chasing a bank transfer by message',
 
     'solutions.group.intelligence.item.cardPresent.title': 'Card-Present Payments',
@@ -201,7 +201,7 @@ export default defineMessages({
     'solutions.next.actions.viewPricing': 'See Pricing',
   },
   es: {
-    'solutions.title': 'Soluciones — Tienda online, sitio web, pagos, contenido | 1Platform',
+    'solutions.title': 'Soluciones — Tienda online, sitio web, pagos, contenido | One Platform',
     'solutions.description':
       'Vende por internet, crea un sitio web, genera contenido y lanza una plataforma para desarrolladores — todo desde una sola plataforma unificada. Soluciones orientadas a resultados para cualquier negocio.',
 
@@ -246,12 +246,12 @@ export default defineMessages({
     'solutions.group.intelligence.item.domainManagement.replaces': 'Un panel de registrador aparte',
     'solutions.group.intelligence.item.subscriptionsBilling.title': 'Saldo y consumo',
     'solutions.group.intelligence.item.subscriptionsBilling.desc':
-      'Tu propia cuenta con 1Platform: mira el saldo, ve qué consumió cada operación y recárgalo. Por créditos, por uso y de forma transparente.',
+      'Tu propia cuenta con One Platform: mira el saldo, ve qué consumió cada operación y recárgalo. Por créditos, por uso y de forma transparente.',
     'solutions.group.intelligence.item.subscriptionsBilling.replaces': 'Adivinar qué va a decir la factura de la plataforma',
 
     'solutions.group.intelligence.item.paymentLinks.title': 'Enlaces de cobro',
     'solutions.group.intelligence.item.paymentLinks.desc':
-      'Manda un enlace para cobrarle a alguien que no es usuario de 1Platform. Paga sin cuenta y sin iniciar sesión.',
+      'Manda un enlace para cobrarle a alguien que no es usuario de One Platform. Paga sin cuenta y sin iniciar sesión.',
     'solutions.group.intelligence.item.paymentLinks.replaces': 'Perseguir una transferencia por mensaje',
 
     'solutions.group.intelligence.item.cardPresent.title': 'Cobro con tarjeta presente',

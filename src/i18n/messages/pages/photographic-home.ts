@@ -1,7 +1,7 @@
 import { defineMessages } from '@i18n/ui';
 
 /**
- * 1Platform copy for the shared photographic landing composition.
+ * One Platform copy for the shared photographic landing composition.
  *
  * The layout is shared with other tenants; the business story and pricing are
  * not. Capabilities follow home.ts and payments-invoicing.ts. Pricing follows
@@ -116,7 +116,7 @@ export default defineMessages({
     'photographic.closing.title': 'Less work between steps.\nMore time for your business.',
     'photographic.footer.description': 'Online store, payments, automatic invoicing and delivery. Your business, connected.',
     'photographic.footer.solutions': 'Solutions',
-    'photographic.footer.information': '1Platform',
+    'photographic.footer.information': 'One Platform',
     'photographic.footer.contact': 'Get in touch',
     'photographic.footer.coverage': 'Find help, documentation and support for your business.',
     'photographic.footer.back': 'Back to top',
@@ -126,8 +126,8 @@ export default defineMessages({
     'photographic.footer.docs': 'Documentation',
     'photographic.footer.terms': 'Terms of service',
     'photographic.footer.privacy': 'Privacy policy',
-    'photographic.meta.title': '1Platform — Online Store, Payments, Invoicing & Delivery',
-    'photographic.meta.description': 'Open your online store, take card payments, issue invoices automatically and dispatch deliveries. Connect every step of your business with 1Platform.',
+    'photographic.meta.title': 'One Platform — Online Store, Payments, Invoicing & Delivery',
+    'photographic.meta.description': 'Open your online store, take card payments, issue invoices automatically and dispatch deliveries. Connect every step of your business with One Platform.',
     'photographic.ui.skip_link': 'Skip to content',
     'photographic.ui.label': 'Your balances,',
     'photographic.ui.label2': 'kept separate.',
@@ -211,7 +211,7 @@ export default defineMessages({
     'photographic.faq.items.0.question': 'What can I connect from my account?',
     'photographic.faq.items.0.answer': 'Your online store, payments, invoicing and deliveries work together. You can also add a website, content and advertising to help customers find your business.',
     'photographic.faq.items.1.question': 'Can I charge without an online store?',
-    'photographic.faq.items.1.answer': 'Yes. Share a payment link with your customer. The link opens a checkout, and the person paying does not need a 1Platform account.',
+    'photographic.faq.items.1.answer': 'Yes. Share a payment link with your customer. The link opens a checkout, and the person paying does not need a One Platform account.',
     'photographic.faq.items.2.question': 'Is the invoice issued automatically?',
     'photographic.faq.items.2.answer': 'Yes, when electronic invoicing is configured for your business. Electronic invoicing currently supports Guatemala; availability and setup depend on the jurisdiction.',
     'photographic.faq.items.3.question': 'How are rates calculated?',
@@ -334,7 +334,7 @@ export default defineMessages({
     'photographic.closing.title': 'Menos trabajo entre pasos.\nMás tiempo para su negocio.',
     'photographic.footer.description': 'Tienda en línea, pagos, facturación automática y entregas. Su negocio, conectado.',
     'photographic.footer.solutions': 'Soluciones',
-    'photographic.footer.information': '1Platform',
+    'photographic.footer.information': 'One Platform',
     'photographic.footer.contact': 'Contacto',
     'photographic.footer.coverage': 'Encuentre ayuda, documentación y soporte para su negocio.',
     'photographic.footer.back': 'Volver arriba',
@@ -344,8 +344,8 @@ export default defineMessages({
     'photographic.footer.docs': 'Documentación',
     'photographic.footer.terms': 'Términos del servicio',
     'photographic.footer.privacy': 'Política de privacidad',
-    'photographic.meta.title': '1Platform — Tienda, pagos, facturación y entregas',
-    'photographic.meta.description': 'Abra su tienda en línea, reciba pagos con tarjeta, emita facturas automáticamente y despache sus entregas. Conecte cada paso de su negocio con 1Platform.',
+    'photographic.meta.title': 'One Platform — Tienda, pagos, facturación y entregas',
+    'photographic.meta.description': 'Abra su tienda en línea, reciba pagos con tarjeta, emita facturas automáticamente y despache sus entregas. Conecte cada paso de su negocio con One Platform.',
     'photographic.ui.skip_link': 'Ir al contenido',
     'photographic.ui.label': 'Sus saldos,',
     'photographic.ui.label2': 'por separado.',
@@ -429,7 +429,7 @@ export default defineMessages({
     'photographic.faq.items.0.question': '¿Qué puedo conectar desde mi cuenta?',
     'photographic.faq.items.0.answer': 'Su tienda en línea, pagos, facturación y entregas trabajan juntos. También puede añadir un sitio web, contenido y publicidad para que sus clientes encuentren su negocio.',
     'photographic.faq.items.1.question': '¿Puedo cobrar sin una tienda en línea?',
-    'photographic.faq.items.1.answer': 'Sí. Comparta un enlace de cobro con su cliente. El enlace abre una página de pago y la persona que paga no necesita una cuenta de 1Platform.',
+    'photographic.faq.items.1.answer': 'Sí. Comparta un enlace de cobro con su cliente. El enlace abre una página de pago y la persona que paga no necesita una cuenta de One Platform.',
     'photographic.faq.items.2.question': '¿La factura se emite automáticamente?',
     'photographic.faq.items.2.answer': 'Sí, cuando la facturación electrónica está configurada para su negocio. Actualmente está disponible para Guatemala; la disponibilidad y la configuración dependen de la jurisdicción.',
     'photographic.faq.items.3.question': '¿Cómo se calculan las tarifas?',

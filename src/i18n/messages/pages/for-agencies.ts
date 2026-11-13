@@ -2,7 +2,7 @@ import { defineMessages } from '@i18n/ui';
 
 export default defineMessages({
   en: {
-    'for-agencies.title': 'Manage Client Websites & Stores from One Dashboard | 1Platform',
+    'for-agencies.title': 'Manage Client Websites & Stores from One Dashboard | One Platform',
     'for-agencies.description':
       'Run client stores and websites from one dashboard. Whitelabel branding, per-client billing, and a built-in content engine — for agencies and consultants.',
 
@@ -21,7 +21,7 @@ export default defineMessages({
       'AI articles, images, comments and legal pages across every client site — generated and published at scale.',
     'for-agencies.features.whitelabel.title': 'Whitelabel optional',
     'for-agencies.features.whitelabel.description':
-      'Surface every dashboard under your agency brand — or use 1Platform directly. Your call, per client.',
+      'Surface every dashboard under your agency brand — or use One Platform directly. Your call, per client.',
     'for-agencies.features.payments.title': 'Payments & invoicing',
     'for-agencies.features.payments.description':
       'Accept payments and issue compliant invoices for every client — without juggling separate services.',
@@ -44,14 +44,14 @@ export default defineMessages({
     'for-agencies.cta.readApiDocs': 'Read API Docs',
 
     'for-agencies.related.eyebrow': 'Related',
-    'for-agencies.related.lead': 'Build your agency stack on top of 1Platform',
+    'for-agencies.related.lead': 'Build your agency stack on top of One Platform',
     'for-agencies.related.whitelabel.description': 'Brand every client dashboard under your agency name.',
     'for-agencies.related.content.title': 'AI Content Generation',
     'for-agencies.related.content.description': 'Scale content production across every client site.',
-    'for-agencies.related.developers.description': 'Integrate 1Platform into your agency stack via REST API.',
+    'for-agencies.related.developers.description': 'Integrate One Platform into your agency stack via REST API.',
   },
   es: {
-    'for-agencies.title': 'Gestiona sitios web y tiendas de clientes desde un solo panel | 1Platform',
+    'for-agencies.title': 'Gestiona sitios web y tiendas de clientes desde un solo panel | One Platform',
     'for-agencies.description':
       'Opera tiendas y sitios web de tus clientes desde un solo panel. Marca blanca, facturación por cliente y un motor de contenido integrado — para agencias y consultores.',
 
@@ -70,7 +70,7 @@ export default defineMessages({
       'Artículos, imágenes, comentarios y páginas legales generados con IA en cada sitio de cliente — creados y publicados a escala.',
     'for-agencies.features.whitelabel.title': 'Marca blanca opcional',
     'for-agencies.features.whitelabel.description':
-      'Muestra cada panel bajo la marca de tu agencia — o usa 1Platform directamente. Tú decides, por cliente.',
+      'Muestra cada panel bajo la marca de tu agencia — o usa One Platform directamente. Tú decides, por cliente.',
     'for-agencies.features.payments.title': 'Pagos y facturación',
     'for-agencies.features.payments.description':
       'Acepta pagos y emite facturas conformes para cada cliente — sin hacer malabares con servicios sueltos.',
@@ -93,10 +93,10 @@ export default defineMessages({
     'for-agencies.cta.readApiDocs': 'Ver documentación de la API',
 
     'for-agencies.related.eyebrow': 'Relacionado',
-    'for-agencies.related.lead': 'Construye el stack de tu agencia sobre 1Platform',
+    'for-agencies.related.lead': 'Construye el stack de tu agencia sobre One Platform',
     'for-agencies.related.whitelabel.description': 'Marca cada panel de cliente con el nombre de tu agencia.',
     'for-agencies.related.content.title': 'Generación de contenido con IA',
     'for-agencies.related.content.description': 'Escala la producción de contenido en cada sitio de cliente.',
-    'for-agencies.related.developers.description': 'Integra 1Platform en el stack de tu agencia vía API REST.',
+    'for-agencies.related.developers.description': 'Integra One Platform en el stack de tu agencia vía API REST.',
   },
 });
