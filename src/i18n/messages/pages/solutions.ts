@@ -63,7 +63,7 @@ export default defineMessages({
 
     'solutions.group.intelligence.item.cardPresent.title': 'Card-Present Payments',
     'solutions.group.intelligence.item.cardPresent.desc':
-      'Apply for a card terminal, attach the documents, and follow the application through to its answer.',
+      'Apply for a card terminal, attach the documents, and follow the application through to its answer. Charging on it from your system is in preparation.',
     'solutions.group.intelligence.item.cardPresent.replaces': 'A separate acquirer relationship',
 
     'solutions.group.intelligence.item.merchantSubscriptions.title': 'Customer Subscriptions',
@@ -256,7 +256,7 @@ export default defineMessages({
 
     'solutions.group.intelligence.item.cardPresent.title': 'Cobro con tarjeta presente',
     'solutions.group.intelligence.item.cardPresent.desc':
-      'Solicita una terminal, adjunta los documentos y sigue la solicitud hasta su respuesta.',
+      'Solicita una terminal, adjunta los documentos y sigue la solicitud hasta su respuesta. Cobrar en ella desde tu sistema está en preparación.',
     'solutions.group.intelligence.item.cardPresent.replaces': 'Una relación aparte con un adquirente',
 
     'solutions.group.intelligence.item.merchantSubscriptions.title': 'Suscripciones de tus clientes',

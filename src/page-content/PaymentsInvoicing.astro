@@ -23,6 +23,13 @@ const description = t('paymentsInvoicing.description');
 const homeUrl = new URL(l('/'), siteOrigin(Astro.locals)).toString();
 const pageUrl = new URL(l('/payments-invoicing/'), siteOrigin(Astro.locals)).toString();
 
+// The guide for remote terminal charges (1platform-api-developer, page
+// `terminal-de-tarjetas/cobros-remotos`). Not confirmed live when this shipped:
+// the docs PR creates it. `docsUrl` is null for a tenant with no docs
+// destination, and then the link is simply not rendered.
+const REMOTE_GUIDE_PATH = '/docs/saas/1platform-api/terminal-de-tarjetas/cobros-remotos';
+const remoteGuideHref = docsUrl(Astro.locals, REMOTE_GUIDE_PATH);
+
 const paymentsCrumbLabel = t('nav.solutions.payments');
 
 const jsonLd = [
@@ -216,6 +223,29 @@ const related: { icon: IconName; title: string; description: string; href: strin
     </div>
   </section>
 
+  <!-- Remote charges to a card terminal. The status line is the ONLY thing that
+       moves from "in preparation" to "available": it is copy (SitePages), not code. -->
+  <section class="section">
+    <div class="container">
+      <div class="section__rule">
+        <p class="eyebrow">{t('paymentsInvoicing.remote.eyebrow')}</p>
+      </div>
+      <div class="remote reveal">
+        <p class="remote__status">{t('paymentsInvoicing.remote.status')}</p>
+        <h2 class="remote__title">{t('paymentsInvoicing.remote.title')}</h2>
+        <p class="remote__desc">{t('paymentsInvoicing.remote.description')}</p>
+        <p class="remote__currency">{t('paymentsInvoicing.remote.currency')}</p>
+        <p class="remote__warning">{t('paymentsInvoicing.remote.warning')}</p>
+        {remoteGuideHref && (
+          <a class="remote__link" href={remoteGuideHref}>
+            {t('paymentsInvoicing.remote.guideCta')}
+            <Icon name="arrow-right" size={16} />
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+
   <!-- One call, two outcomes -->
   <section class="section section--alt">
     <div class="container">
@@ -355,6 +385,45 @@ const related: { icon: IconName; title: string; description: string; href: strin
     border-top: 1px solid var(--color-border);
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
+  }
+
+  /* ===== Remote charges ===== */
+  .remote {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 44rem;
+  }
+
+  .remote__title {
+    margin: 0;
+  }
+
+  .remote__status {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .remote__desc,
+  .remote__currency {
+    margin: 0;
+  }
+
+  .remote__warning {
+    margin: 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .remote__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 600;
   }
 
   @media (max-width: 900px) {

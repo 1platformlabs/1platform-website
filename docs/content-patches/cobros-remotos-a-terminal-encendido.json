@@ -1,0 +1,35 @@
+{
+  "tenant_slug": "oneplatform",
+  "domain": "1platform.pro",
+  "note": "Encendido: pasa «Cobros remotos a terminal» a «disponible». Aplicar sólo con remote_charges_enabled encendido en PROD.",
+  "routes": {
+    "/payments-invoicing/": {
+      "en": {
+        "paymentsInvoicing.remote.status": {
+          "before": "In preparation",
+          "after": "Available"
+        }
+      },
+      "es": {
+        "paymentsInvoicing.remote.status": {
+          "before": "En preparación",
+          "after": "Disponible"
+        }
+      }
+    },
+    "/solutions/": {
+      "en": {
+        "solutions.group.intelligence.item.cardPresent.desc": {
+          "before": "Apply for a card terminal, attach the documents, and follow the application through to its answer. Charging on it from your system is in preparation.",
+          "after": "Apply for a card terminal, attach the documents, and follow the application through to its answer. Then charge on it from your own system."
+        }
+      },
+      "es": {
+        "solutions.group.intelligence.item.cardPresent.desc": {
+          "before": "Solicita una terminal, adjunta los documentos y sigue la solicitud hasta su respuesta. Cobrar en ella desde tu sistema está en preparación.",
+          "after": "Solicita una terminal, adjunta los documentos y sigue la solicitud hasta su respuesta. Después, cobra en ella desde tu sistema."
+        }
+      }
+    }
+  }
+}

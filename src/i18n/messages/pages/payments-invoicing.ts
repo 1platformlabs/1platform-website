@@ -46,7 +46,18 @@ export default defineMessages({
     'paymentsInvoicing.charge.terminal.description':
       'Apply for a card terminal for a business, attach the documents it asks for, send the application, and follow where it is. If something needs fixing you can correct it, and you can withdraw it while it is still open.',
     'paymentsInvoicing.charge.terminal.prerequisite':
-      'It is an application, not an instant activation. Before you can open one, the business needs its tax identification and electronic invoicing already working, or the request comes back listing exactly what is missing. Only a branch administrator can file it, and the answer can be a rejection.',
+      'It is an application, not an instant activation. Only a branch administrator can file it, the business does not need electronic invoicing to open one, and if anything is missing the request comes back listing exactly what, or with a rejection.',
+
+    'paymentsInvoicing.remote.eyebrow': 'Remote charges',
+    'paymentsInvoicing.remote.status': 'In preparation',
+    'paymentsInvoicing.remote.title': 'Charge on the terminal from your system',
+    'paymentsInvoicing.remote.description':
+      "Send the amount from your own system to a business's card terminal. The customer taps or inserts their card there, and you follow the charge until it is approved, declined or expires. You can cancel one that has not been paid yet.",
+    'paymentsInvoicing.remote.currency':
+      "The charge is made in the terminal's currency: you do not send one.",
+    'paymentsInvoicing.remote.warning':
+      'A charge with no answer yet can still be approved. Check before charging again.',
+    'paymentsInvoicing.remote.guideCta': 'Read the guide',
 
     'paymentsInvoicing.charge.subscriptions.title': 'Charge your own customers monthly',
     'paymentsInvoicing.charge.subscriptions.description':
@@ -127,7 +138,18 @@ export default defineMessages({
     'paymentsInvoicing.charge.terminal.description':
       'Solicita una terminal para un comercio, adjunta los documentos que pide, envía la solicitud y sigue en qué punto está. Si algo hay que corregir puedes hacerlo, y puedes retirarla mientras siga abierta.',
     'paymentsInvoicing.charge.terminal.prerequisite':
-      'Es una solicitud, no un alta inmediata. Antes de poder abrirla, el comercio necesita su identificación tributaria y la facturación electrónica ya funcionando, o la solicitud vuelve enumerando exactamente lo que falta. Sólo un administrador de sucursal puede presentarla, y la respuesta puede ser un rechazo.',
+      'Es una solicitud, no un alta inmediata. Sólo un administrador de sucursal puede presentarla, el comercio no necesita facturación electrónica para abrirla y, si algo falta, la solicitud vuelve enumerando exactamente qué, o con un rechazo.',
+
+    'paymentsInvoicing.remote.eyebrow': 'Cobros remotos',
+    'paymentsInvoicing.remote.status': 'En preparación',
+    'paymentsInvoicing.remote.title': 'Cobra en la terminal desde tu sistema',
+    'paymentsInvoicing.remote.description':
+      'Envía el monto desde tu propio sistema a la terminal de un comercio. El cliente acerca o inserta ahí su tarjeta, y sigues el cobro hasta que se aprueba, se rechaza o vence. Puedes cancelar uno que aún no se haya pagado.',
+    'paymentsInvoicing.remote.currency':
+      'El cobro se hace en la moneda de la terminal: tú no envías una.',
+    'paymentsInvoicing.remote.warning':
+      'Un cobro sin respuesta todavía puede aprobarse. Revisa antes de volver a cobrar.',
+    'paymentsInvoicing.remote.guideCta': 'Lee la guía',
 
     'paymentsInvoicing.charge.subscriptions.title': 'Cóbrale cada mes a tus clientes',
     'paymentsInvoicing.charge.subscriptions.description':

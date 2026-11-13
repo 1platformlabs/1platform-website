@@ -54,7 +54,7 @@ export default defineConfig({
       // Keep the historical project name so the four real platform baselines
       // retain their filenames and are compared rather than regenerated.
       name: 'chromium',
-      testMatch: 'home.spec.ts',
+      testMatch: ['home.spec.ts', 'terminal-services.spec.ts'],
       use: { ...devices['Desktop Chrome'], baseURL: platformBaseURL },
     },
     {

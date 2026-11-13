@@ -375,8 +375,8 @@
       "route": "/es/pagos-y-facturacion/",
       "status": 200,
       "file": "es/pagos-y-facturacion/index.html",
-      "sha256": "ab6eeab43676716a6ebc6b69c3bd8d4d5ed17597ebfbd1486d52994287bd2f5f",
-      "bytes": 40292
+      "sha256": "9ccf63758dada68e41fa017010c29e9a4541995a3412c01a64d8135cb70e8d44",
+      "bytes": 41667
     },
     {
       "route": "/es/para-agencias/",
@@ -423,8 +423,8 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "65f297a0784ce0d96a47f9d227183a686f9e230df1fe150abf44b71a5116645b",
-      "bytes": 76751
+      "sha256": "80378fe3097693c9f873d8476932d032718fafd7761e8352f8a9e5d9f75c0b25",
+      "bytes": 76806
     },
     {
       "route": "/es/soluciones/envios/",
@@ -543,8 +543,8 @@
       "route": "/payments-invoicing/",
       "status": 200,
       "file": "payments-invoicing/index.html",
-      "sha256": "ad27d62789fce4f7529ec95dd729793c92f6503a6e956249e849c87df51a989b",
-      "bytes": 39632
+      "sha256": "0d7b474393d1addcbe6ef15712360122f8ffb5255b4db0c427d50fcce2b53b9c",
+      "bytes": 41047
     },
     {
       "route": "/pricing/",
@@ -564,8 +564,8 @@
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "72284c37be6f55f2b79df4f58428f808be65ed7b4df59f458118f1712fcbce40",
-      "bytes": 74712
+      "sha256": "c75250bc2ac2f4927e9b79f94e3b9fe81158ebc8f8ce618155cf36e99e51399b",
+      "bytes": 74763
     },
     {
       "route": "/solutions/ads/",
