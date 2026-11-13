@@ -271,3 +271,33 @@ Banco privado con el censo de producción del 2026-11-12, staff real y Core `ori
 - El favicon subido del tenant tiene prioridad sobre `brand_assets.icon` en el símbolo del chrome. En
   producción ese archivo existe y es el mismo arte. En un banco sin sus bytes se ve como imagen rota,
   y eso es una limitación del banco, no del renderer.
+
+## Renombre del contenido a One Platform (website-rebranding-one-platform)
+
+El contenido guardado de `oneplatform` todavía nombraba «1Platform» en 107
+valores (contacto, agencias, soluciones, precios, 404, índice y feed del blog,
+FAQ de la home). El renombre se aplica con el mismo contrato que la
+activación: snapshot administrativo completo → fixture offline → seed.
+
+1. Snapshot fresco por contenedor (`site_ops.py`), nunca con sesión de staff.
+   Guardarlo como `oneplatform-pre-wro.json`: es el respaldo para volver atrás.
+2. `node scripts/rename-brand-content.mjs --current oneplatform-pre-wro.json
+   --out oneplatform-renamed.json`. El reporte lista cada clave cambiada (antes y
+   después) y las ya renombradas, y tiene que decir `remaining: 0`. Conserva
+   «1Platform Labs», el texto dentro de URLs, rutas, documentos y `published`.
+3. `seed_site_pages.py --fixture oneplatform-renamed.json --uri "$MONGODB_URL"
+   --db "$MONGODB_DB_NAME" --dry`: sólo «updated», 0 inserted.
+4. El mismo comando sin `--dry` y con `--verify`.
+5. Snapshot nuevo y re-correr el paso 2 sobre él: 0 cambios. Correr también
+   `prepare-branding-content.mjs --tenant oneplatform`: 0 cambios.
+6. Pasados 60 s de caché, leer el HTML servido de las rutas renombradas: ningún
+   «1Platform» fuera de «1Platform Labs» y de los títulos de los artículos
+   publicados del blog (se conservan por decisión del dueño). medipago.gt y
+   vendefacil.gt sin cambios.
+
+Volver atrás: re-sembrar `oneplatform-pre-wro.json` **sin** `--verify`; después,
+si hace falta, revertir el PR. Primero los datos, después el código.
+
+Medido el 2026-11-13 sobre el snapshot posterior a la activación: 107 valores
+cambiados en 23 rutas, 13 ya renombrados, `remaining: 0`; la segunda corrida y la
+re-preparación dieron 0.
