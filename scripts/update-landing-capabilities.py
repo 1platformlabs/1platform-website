@@ -51,6 +51,24 @@ PATCHES = {
         for card in ['phone', 'subscriptions'] for field in ['status', 'description']},
 }
 
+# Multi-route patches (`routes` instead of `route`): each route maps to the exact
+# keys it may touch. A key whose `before` is null is created; any other key must
+# still hold `before` (or already hold `after`, which makes re-runs idempotent).
+_REMOTE = 'paymentsInvoicing.remote.'
+_CARD_PRESENT = 'solutions.group.intelligence.item.cardPresent.desc'
+ROUTE_PATCHES = {
+    'content-patches/cobros-remotos-a-terminal-preparacion.json': {
+        '/payments-invoicing/': {'paymentsInvoicing.charge.terminal.prerequisite',
+            *(_REMOTE + k for k in ['eyebrow', 'status', 'title', 'description',
+                                    'currency', 'warning', 'guideCta'])},
+        '/solutions/': {_CARD_PRESENT},
+    },
+    'content-patches/cobros-remotos-a-terminal-encendido.json': {
+        '/payments-invoicing/': {_REMOTE + 'status'},
+        '/solutions/': {_CARD_PRESENT},
+    },
+}
+
 
 def validate_patch(patch, keys):
     assert (patch['tenant_slug'], patch['domain'], patch['route']) == (
@@ -59,6 +77,16 @@ def validate_patch(patch, keys):
     for changes in patch['locales'].values():
         assert set(changes) == keys
         assert all(isinstance(c['after'], str) and c['after'].strip() for c in changes.values())
+
+def validate_route_patch(patch, routes):
+    assert (patch['tenant_slug'], patch['domain']) == ('oneplatform', '1platform.pro')
+    assert set(patch['routes']) == set(routes)
+    for route, locales in patch['routes'].items():
+        assert set(locales) == {'en', 'es'}
+        for changes in locales.values():
+            assert set(changes) == routes[route]
+            assert all(isinstance(c['after'], str) and c['after'].strip() for c in changes.values())
+
 
 def apply_prepared(db, prepared):
     changed = []
@@ -91,7 +119,7 @@ def apply_prepared(db, prepared):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply', action='store_true')
-    parser.add_argument('--patch', choices=sorted(PATCHES), default='landing-capabilities-content.json')
+    parser.add_argument('--patch', choices=sorted([*PATCHES, *ROUTE_PATCHES]), default='landing-capabilities-content.json')
     args = parser.parse_args()
     from app.core.config import settings
     allowed = {
@@ -100,17 +128,27 @@ def main():
     }
     assert allowed.get(settings.ENVIRONMENT.lower()) == settings.MONGODB_DB_NAME
     patch = json.loads((Path(__file__).resolve().parents[1] / 'docs' / args.patch).read_text())
-    validate_patch(patch, PATCHES[args.patch])
+    multi = args.patch in ROUTE_PATCHES
+    if multi:
+        validate_route_patch(patch, ROUTE_PATCHES[args.patch])
+    else:
+        validate_patch(patch, PATCHES[args.patch])
     with MongoClient(settings.MONGODB_URL, serverSelectionTimeoutMS=10000) as client:
         db = client[settings.MONGODB_DB_NAME]
         assert db.site_tenants.count_documents({
             'slug': 'oneplatform', 'domain': '1platform.pro', 'status': 'published'}) == 1
+        routes = list(patch['routes']) if multi else ['@infrastructure-home']
         docs = list(db.site_pages.find({'tenant_slug': 'oneplatform',
-            'route': '@infrastructure-home', 'locale': {'$in': ['en', 'es']}, 'published': True}))
-        assert len(docs) == 2 and {doc['locale'] for doc in docs} == {'en', 'es'}
-        prepared = [(doc, updated_blocks(doc['blocks'], patch['locales'][doc['locale']])) for doc in docs]
+            'route': {'$in': routes}, 'locale': {'$in': ['en', 'es']}, 'published': True}))
+        expected_docs = 2 * len(routes)
+        assert len(docs) == expected_docs and {(doc['route'], doc['locale']) for doc in docs} == {
+            (r, l) for r in routes for l in ('en', 'es')}
+        changes_for = (lambda doc: patch['routes'][doc['route']][doc['locale']]) if multi else (
+            lambda doc: patch['locales'][doc['locale']])
+        prepared = [(doc, updated_blocks(doc['blocks'], changes_for(doc))) for doc in docs]
         print(json.dumps({'mode': 'apply' if args.apply else 'dry-run',
-            'patch': args.patch, 'tenant': 'oneplatform', 'documents': 2, 'keys_per_locale': len(patch['locales']['en']),
+            'patch': args.patch, 'tenant': 'oneplatform', 'documents': expected_docs,
+            'keys_per_locale': sum(len(v['en']) for v in patch['routes'].values()) if multi else len(patch['locales']['en']),
             'changed_documents': sum(doc['blocks'] != blocks for doc, blocks in prepared)}))
         if not args.apply:
             return
@@ -119,7 +157,7 @@ def main():
         with os.fdopen(fd, 'w') as output:
             output.write(dumps(docs))
         count = apply_prepared(db, prepared)
-        print(json.dumps({'updated': count, 'verified_documents': 2, 'backup': str(backup)}))
+        print(json.dumps({'updated': count, 'verified_documents': expected_docs, 'backup': str(backup)}))
 
 
 if __name__ == '__main__':
