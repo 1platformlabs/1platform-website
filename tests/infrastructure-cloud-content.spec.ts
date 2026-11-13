@@ -25,6 +25,7 @@ test('optional capabilities require tenant copy without fallback or obsolete sta
         blocks['infrastructure.capabilities.cloud.status'] = 'AVAILABLE';
         blocks['infrastructure.capabilities.agents.status'] = 'WHATSAPP IN DEVELOPMENT';
         blocks['infrastructure.capabilities.subscriptions.status'] = 'PAYMENTS IN DEVELOPMENT';
+        blocks['infrastructure.capabilities.ads.status'] = 'INTEGRATION IN DEVELOPMENT';
       }
       return { ...document, blocks };
     })])),
@@ -39,6 +40,7 @@ test('optional capabilities require tenant copy without fallback or obsolete sta
         expect(response.body).not.toContain('data-capability-status=');
         expect(response.body).not.toContain('WHATSAPP IN DEVELOPMENT');
         expect(response.body).not.toContain('PAYMENTS IN DEVELOPMENT');
+        expect(response.body).not.toContain('INTEGRATION IN DEVELOPMENT');
         expect(response.body).not.toContain('capability-documentation');
       }
     }

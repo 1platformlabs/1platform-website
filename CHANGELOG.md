@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Publicidad digital se presenta como disponible: su tarjeta del catálogo de capacidades deja de llevar estado (ES/EN). Un estado almacenado en SitePages ya no se renderiza.
 - Tap to Phone y Suscripciones se presentan como disponibles en la portada de infraestructura ES/EN (tarjetas de cobros y catálogo de capacidades). El contenido publicado se actualiza por separado en SitePages con `scripts/update-landing-capabilities.py --patch payment-availability-content.json`.
 - Nube / Cloud se presenta como disponible en el catálogo ES/EN y enlaza a su guía de servidores y bases de datos desde el destino de documentación del tenant. El contenido publicado se actualiza por separado en SitePages.
 
