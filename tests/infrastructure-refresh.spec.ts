@@ -96,3 +96,17 @@ test('older or incomplete tenant content omits new sections without a cross-tena
     }
   } finally { await stack.stop(); }
 });
+
+test('the integration map draws the tenant symbol on its accent plate, never white on the light card', async ({page}) => {
+  await page.goto('/');
+  const logo = page.locator('.integration-core .integration-logo');
+  await expect(logo.locator('img.integration-symbol-artwork')).toHaveCount(1);
+  const [plate, card] = await Promise.all([
+    logo.evaluate(el => getComputedStyle(el).backgroundColor),
+    page.locator('.integration-core').evaluate(el => getComputedStyle(el).backgroundColor),
+  ]);
+  // The silhouette is white: its plate must be opaque and must not be the card colour.
+  expect(plate).not.toBe('rgba(0, 0, 0, 0)');
+  expect(plate).not.toBe(card);
+  await expect(logo.locator('img')).toHaveCSS('filter', /invert/);
+});

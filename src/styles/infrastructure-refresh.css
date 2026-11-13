@@ -105,8 +105,8 @@
   .button:hover { transform: none; }
 }
 
-.integration-logo:has(.integration-symbol-artwork) { padding: 0; background: transparent; }
-.integration-symbol-artwork { width: 48px; height: 48px; object-fit: contain; filter: brightness(0) invert(1); }
+/* The core card is light: the white silhouette sits on the tenant's accent plate (as in the approved prototype), never on white. */
+.integration-symbol-artwork { width: 28px; height: 28px; object-fit: contain; filter: brightness(0) invert(1); }
 .capability-options { min-width: 0; }
 .capability[hidden], .capabilities-more[hidden] { display: none; }
 .capabilities-more { display: flex; justify-content: center; align-items: center; gap: 12px; width: 100%; min-height: 48px; margin-top: 16px; padding: 12px 18px; border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--blue); font-size: 15px; font-weight: 750; }
