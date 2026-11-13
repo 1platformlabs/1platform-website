@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Rename the brand to One Platform across the site sources: every compiled catalogue, the Solutions JSON-LD and the legal title (now `tenant.brand_name`). Terms, Privacy and Cookies name the service One Platform; the operating entity stays 1Platform Labs. A new `check-tells` rule keeps `1Platform` (outside `1Platform Labs` and comments) out of catalogues, page content, layouts and components. `scripts/rename-brand-content.mjs` prepares the same rename offline for the stored `oneplatform` content (report with `remaining: 0`); applying it to production is a separate step (see `docs/infrastructure-branding-activation.md`).
+
 - Apply the approved One Platform refresh: configurable symbol/name chrome, API + MCP integration section, compact capabilities and alternating section backgrounds. Add a local WhatsApp-style lead-to-appointment demo with typing, internal scrolling, pause and reduced-motion support in ES/EN. The offline tenant-content preparer includes the brand patch; publication remains a separate step.
 
 - A site the platform stops publishing (a blog its owner deleted, a site suspended) stops being served at the next refresh instead of up to 24 h later: a 404 on the background refresh now evicts the cached tenant (an unreachable API still keeps the stale copy).
