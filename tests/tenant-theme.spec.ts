@@ -336,7 +336,8 @@ test('the infrastructure and invoice illustrations carry the TENANT’s mark', a
   // Tenant #1 must be unchanged — `1P` is what the frozen baseline holds, and
   // every page carries this scene.
   const platform = repoTenants().find((t) => t.slug === 'oneplatform')!
-  expect(brandChip(platform), 'tenant #1’s chip changed — that is the byte-for-byte baseline').toBe('1P')
+  // The repo fixture carries the approved name «One Platform» (re-frozen baseline); PROD keeps its stored name until activation.
+  expect(brandChip(platform), 'tenant #1’s chip changed — that is the byte-for-byte baseline').toBe('OP')
 
   const clinic = repoTenants().find((t) => t.slug === 'clinicas')!
   expect(brandChip(clinic)).toBe('CD')
@@ -352,6 +353,12 @@ test('the infrastructure and invoice illustrations carry the TENANT’s mark', a
     const res = await getWithHost(`${BASE}/`, tenant.domain)
     expect(res.status).toBe(200)
     if (res.body.includes('data-infrastructure-home')) {
+      // A tenant that opts into symbol-and-name carries ITS OWN declared symbol artwork instead of the text mark.
+      const artwork = /class="integration-logo"[^>]*><img[^>]*class="integration-symbol-artwork"[^>]*src="([^"]*)"|class="integration-logo"[^>]*><img[^>]*src="([^"]*)"[^>]*class="integration-symbol-artwork"/s.exec(res.body)
+      if (artwork) {
+        expect(artwork[1] ?? artwork[2], `${tenant.slug}: infrastructure must carry its tenant symbol`).toBe(tenant.brand_assets?.icon)
+        continue
+      }
       const rendered = /class="integration-logo"[^>]*>([^<]*)</s.exec(res.body)?.[1]
       expect(rendered, `${tenant.slug}: infrastructure must carry its tenant mark`).toBe(tenant.brand_mark ?? tenant.brand_name)
       continue

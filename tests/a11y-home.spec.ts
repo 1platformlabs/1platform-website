@@ -43,6 +43,9 @@ for (const path of ['/', '/es/']) {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(path);
     const cloud = page.locator('#nube');
+    // Declared: only the first eight capabilities show until the visitor expands the list.
+    await expect(cloud).toBeHidden();
+    await page.locator('[data-capabilities-more]').click();
     await cloud.click();
     await expect(cloud).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('[data-selected-list] li')).toHaveCount(4);

@@ -1,5 +1,5 @@
 ---
-import TenantBrand from '@components/TenantBrand.astro';
+import InfrastructureBrand from '@components/InfrastructureBrand.astro';
 import { siteChrome } from '@lib/site-chrome';
 import type { Locale } from '@i18n';
 import LanguageSwitcher from '@components/LanguageSwitcher.astro';
@@ -16,7 +16,7 @@ const current = (href: string) => href.endsWith('/blog/') && Astro.originPathnam
 ---
 <header class="brand-header" id="site-header">
   <a class="brand-lockup" href={home} aria-label={copy('homeLabel').replace('{brand}', tenant.brand_name)}>
-    <TenantBrand tone="white"><span class="brand-symbol" aria-hidden="true">{tenant.brand_mark ?? tenant.brand_name}</span><span class="brand-name">{tenant.brand_wordmark ?? tenant.brand_name}</span></TenantBrand>
+    <InfrastructureBrand />
   </a>
   <nav class="brand-nav" aria-label={copy('mainNav')}>
     {navigation.map(({ label, href }) => <a href={href} aria-current={current(href)}>{label}</a>)}

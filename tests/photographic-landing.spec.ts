@@ -703,11 +703,15 @@ for (const [locale, home, accessPath, requestPath, entry] of [
   ['en', '/', '/access/', '/request-access/', 'Access'],
 ] as const) {
   test(`infrastructure access ${locale} keeps header, footer and onboarding reachable`, async ({ landingPage: page }) => {
-    for (const [width, height] of [[320, 740], [390, 844], [844, 390], [1440, 900]]) {
+    for (const [width, height] of [[320, 740], [390, 844], [844, 390], [1291, 900], [1366, 900], [1440, 900]]) {
       await page.setViewportSize({ width, height });
       await page.goto(`http://${INFRA_ACCESS_HOST}:${appPort}${home}`);
       await expect(page.locator('.brand-access')).toHaveText(entry);
       await expect(page.locator('.brand-access')).toBeVisible();
+      expect(await page.locator('.brand-header').evaluate(header => {
+        const rects = [...header.querySelectorAll('a, button')].map(node => node.getBoundingClientRect()).filter(rect => rect.width > 0);
+        return rects.every((a, index) => rects.slice(index + 1).every(b => Math.min(a.right, b.right) <= Math.max(a.left, b.left) || Math.min(a.bottom, b.bottom) <= Math.max(a.top, b.top)));
+      }), `${width}px: header controls must not overlap`).toBe(true);
       await checkOverflow(page);
       await expect(page.locator('.brand-footer [data-access-entry]')).toHaveAttribute('href', accessPath);
       if (width < 1291) {
@@ -730,7 +734,7 @@ for (const [locale, home, accessPath, requestPath, entry] of [
       await checkOverflow(page);
       const support = new URL((await page.locator('[data-access-action="support"]').getAttribute('href'))!);
       expect(support.origin + support.pathname).toBe(platformTenant.destinations.support);
-      expect(support.searchParams.get('text')).toContain('1Platform');
+      expect(support.searchParams.get('text')).toContain(platformTenant.brand_name);
       if (width === 390) expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     }
     await page.goto(`http://${INFRA_ACCESS_HOST}:${appPort}${home}blog/`);
@@ -811,7 +815,7 @@ test('tenant access keeps login and WhatsApp onboarding reachable with tenant-ow
 });
 
 test('tenant access remains readable and navigable on narrow and landscape screens', async ({ landingPage: page }) => {
-  for (const [width, height] of [[320, 740], [390, 844], [844, 390], [1440, 900]]) {
+  for (const [width, height] of [[320, 740], [390, 844], [844, 390], [1291, 900], [1366, 900], [1440, 900]]) {
     await page.setViewportSize({ width, height });
     await gotoLanding(page, ACCESS_HOST);
     await expect(page.locator('.header-access')).toBeVisible();

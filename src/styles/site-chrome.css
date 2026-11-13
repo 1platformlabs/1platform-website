@@ -98,3 +98,14 @@ body.brand-menu-open { overflow: hidden; }
    line sat under the navbar or the selector (real-bank E2E, every legacy route measured).
    Reserve the chrome's height once, for legacy pages only; dark-hero pages own their top. */
 .infrastructure-site body:not(:has(.infrastructure-home, .photographic-interior)) #main-content { padding-top: 108px; }
+
+@media (min-width: 1291px) and (max-width: 1550px) {
+  .brand-header:has(.brand-access) { gap: 14px; }
+  .brand-header:has(.brand-access) .brand-nav { gap: 10px; }
+  .brand-header:has(.brand-access) .brand-nav a { font-size: 14px; }
+  .brand-header:has(.brand-access) .brand-cta { padding-inline: 18px; gap: 12px; font-size: 14px; }
+}
+@media (max-width: 380px) {
+  .brand-header:has(.brand-access) .brand-artwork { width: 24px; height: 24px; }
+  .brand-header:has(.brand-access) .brand-artwork + .brand-name { font-size: 16px; }
+}

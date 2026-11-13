@@ -135,7 +135,7 @@ const test = base.extend<{}, { legacyCommerce: LegacyCommerce }>({
 
 test.describe('cross-tenant: the same supported commerce composition under both palettes', () => {
   test('legacy commerce keeps its platform artwork and tenant invoice chips', async ({ legacyCommerce }) => {
-    for (const [host, chip] of [[PLATFORM_HOST, '1P'], [CLINIC_HOST, 'CD']]) {
+    for (const [host, chip] of [[PLATFORM_HOST, 'OP'], [CLINIC_HOST, 'CD']]) {
       const { browser, page } = await legacyCommerce.open(host)
       try {
         await expect(page.locator('.invoice-preview__number')).toHaveText(chip)
@@ -227,7 +227,9 @@ test.describe('explicit tenant mark and platform-only regression sites', () => {
     const { browser, page } = await openTenantPage(PLATFORM_HOST, '/about/')
     try {
       expect(await computedProperty(page, '.brand-footer', 'background-color')).toBe('rgb(8, 21, 47)')
-      expect(await computedProperty(page, '.brand-footer .brand-symbol', 'color')).toBe('rgb(40, 84, 167)')
+      // Opt-in symbol-and-name (repo fixture): the tenant's own symbol, as a white silhouette, beside its name.
+      await expect(page.locator('.brand-footer .brand-artwork img')).toHaveCount(1)
+      expect(await computedProperty(page, '.brand-footer .brand-artwork img', 'filter')).toContain('invert')
       expect(await computedProperty(page, '.brand-cta', 'background-color')).toBe('rgb(255, 255, 255)')
       expect(await computedProperty(page, '.brand-cta', 'color')).toBe('rgb(13, 28, 58)')
     } finally { await browser.close() }
@@ -305,11 +307,12 @@ test('the infrastructure home and its interior pages share Manrope and configure
   try {
     await expect(page.locator('[data-infrastructure-home]')).toBeVisible()
     expect(await computedProperty(page, '.hero h1', 'font-family')).toContain('Manrope')
-    expect(await computedProperty(page, '.brand-symbol', 'color')).toBe('rgb(40, 84, 167)')
+    await expect(page.locator('.brand-header .brand-artwork img')).toHaveCount(1)
+    expect(await computedProperty(page, '.capability-number', 'color')).toBe('rgb(40, 84, 167)')
     expect(await computedProperty(page, '.contact .button', 'background-color')).toBe('rgb(13, 28, 58)')
     await page.goto(`http://${PLATFORM_HOST}:${process.env.PLAYWRIGHT_PORT ?? 4321}/about/`)
     expect(await computedProperty(page, '.brand-lockup', 'font-family')).toContain('Manrope')
-    expect(await computedProperty(page, '.brand-symbol', 'color')).toBe('rgb(40, 84, 167)')
+    await expect(page.locator('.brand-header .brand-artwork img')).toHaveCount(1)
     await expect(page.locator('[data-infrastructure-home]')).toHaveCount(0)
   } finally { await browser.close() }
 })

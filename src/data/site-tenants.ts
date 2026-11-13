@@ -40,12 +40,12 @@ import type { SiteTenant } from '../lib/site-api'
  */
 const ONEPLATFORM: SiteTenant = {
   slug: 'oneplatform',
-  brand_name: '1Platform',
+  brand_name: 'One Platform',
   // Lockup parts are explicit. `Logo.astro` does not cut the brand name to
   // guess where the boxed symbol ends, so a multi-character mark and a normal
   // wordmark cannot corrupt each other.
   brand_mark: '1',
-  brand_wordmark: 'Platform',
+  brand_wordmark: 'One Platform',
   domain: '1platform.pro',
   locales: ['en', 'es'],
   default_locale: 'en',
@@ -64,7 +64,7 @@ const ONEPLATFORM: SiteTenant = {
   // Data, not a branch for tenant #1: these are exactly the compiled assets
   // the historical page emitted, so resolving them preserves its HTML bytes.
   brand_assets: {
-    icon: '/favicon.svg',
+    icon: '/brand/one-platform-symbol.png',
     social_image: '/og/default.png',
     // The compiled touch icon this page has always carried. Declaring it is
     // what keeps tenant #1's bytes identical now that the element is resolved

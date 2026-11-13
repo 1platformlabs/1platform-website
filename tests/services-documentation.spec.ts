@@ -5,6 +5,9 @@ for (const locale of ['es', 'en']) {
     await page.goto(locale === 'es' ? '/es/' : '/');
     const cards = page.locator('.capability-grid button');
     await expect(cards).toHaveCount(17);
+    // Declared: eight cards until expanded; once expanded all 17 share one keyboard interaction.
+    await expect(cards.nth(8)).toBeHidden();
+    await page.locator('[data-capabilities-more]').click();
     await expect(page.locator('.capability-grid a')).toHaveCount(0);
     for (let index = 0; index < 17; index++) {
       const button = cards.nth(index);
