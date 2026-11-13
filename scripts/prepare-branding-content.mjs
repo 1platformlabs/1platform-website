@@ -191,6 +191,24 @@ export function prepareBrandingContent(current, tenant, overlay = loadOverlay(te
   }};
 }
 
+/**
+ * Write every output of one run as private JSON (0600), all or nothing: each
+ * value is staged next to its destination and only then renamed into place,
+ * so a failure halfway never leaves one output updated and another stale.
+ * Shared with rename-brand-content.mjs (website-rebranding-one-platform D-2).
+ */
+export function writePrivateJson(paths, values) {
+  if (!Array.isArray(paths) || !Array.isArray(values) || paths.length !== values.length || !paths.length) fail('writePrivateJson needs one value per output path');
+  const directory = dirname(paths[0]);
+  if (paths.some(path => dirname(path) !== directory)) fail('All outputs of one run must share a directory');
+  mkdirSync(directory, {recursive: true});
+  const staging = mkdtempSync(join(directory, '.branding-prepared-'));
+  try {
+    values.forEach((value, index) => writeFileSync(join(staging, String(index)), JSON.stringify(value, null, 2) + '\n', {mode: 0o600}));
+    paths.forEach((path, index) => renameSync(join(staging, String(index)), path));
+  } finally { rmSync(staging, {recursive: true, force: true}); }
+}
+
 function main(args) {
   const options = {};
   for (let i = 0; i < args.length; i += 2) {
@@ -204,12 +222,7 @@ function main(args) {
   const paths = [output, `${output}.manifest-patch.json`, `${output}.report.json`];
   if (paths.some(path => path === input || (existsSync(path) && realpathSync(path) === realpathSync(input)))) fail('Output must not replace the input snapshot');
   const prepared = prepareBrandingContent(readJson(input), options['--tenant']);
-  mkdirSync(dirname(output), {recursive: true});
-  const staging = mkdtempSync(join(dirname(output), '.branding-prepared-'));
-  try {
-    [prepared.fixture, prepared.manifestPatch, prepared.report].forEach((value, index) => writeFileSync(join(staging, String(index)), JSON.stringify(value, null, 2) + '\n', {mode: 0o600}));
-    paths.forEach((path, index) => renameSync(join(staging, String(index)), path));
-  } finally { rmSync(staging, {recursive: true, force: true}); }
+  writePrivateJson(paths, [prepared.fixture, prepared.manifestPatch, prepared.report]);
   console.log(`Prepared ${prepared.report.documents_after} documents; ${prepared.report.changes.length} key changes; no API/DB writes`);
   if (prepared.report.retained_unpublished_overlay_documents.length) console.log('Publication review required: existing unpublished documents remain unpublished');
 }
