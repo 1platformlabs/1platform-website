@@ -4,12 +4,18 @@ Linux renders, produced in the Playwright container so the letterforms are
 byte-stable (`*-linux.png`, committed). The gate **compares** — it never
 regenerates on its own.
 
-The suite has two real subjects:
+The suite has three server configurations:
 
 - four platform home renders from the repo-mode server, preserving the existing
   `1platform.pro` visual baseline;
 - four clinic renders (home and tenant-owned 404, desktop and mobile) from the
-  Node adapter in API mode against `tests/fixtures/service-lead-site.json`.
+  Node adapter in API mode against `tests/fixtures/service-lead-site.json`;
+- three photographic commerce renders against `tests/fixtures/vendefacil-site.json`.
+
+The repo-mode platform also covers eight terminal-service renders: payments
+and solutions, English and Spanish, at 1440 and 390 px. These check the proposed
+copy and composition. They do not certify the SitePages data currently served
+in production; that requires the content-patch gate in the release runbook.
 
 Ten old `showcase-*` PNGs were intentionally retired. Their only spec and the
 five showcase components it targeted were removed together in `516869a`; the
@@ -34,4 +40,11 @@ authoritative, and a green local run against a local baseline proves nothing.
 (`home-{en,es}-{1440,390}`), and `clinic.spec.ts` owns four clinic screenshots
 (`clinic-{home,404}-{1440,390}`). `tests/visual-baseline-inventory.spec.ts`
 fails if any committed PNG is orphaned or if a live visual case lacks its
-Linux baseline.
+Linux baseline. `commerce.spec.ts` owns three commerce screenshots, and
+`terminal-services.spec.ts` owns eight payments/solutions screenshots.
+
+CI uploads `visual-linux-<PR head SHA>` with committed/generated Linux PNGs
+and comparison output. A missing baseline still fails the gate. Download its
+artifact, review the new images, and commit only the intended snapshot files;
+the next CI run must compare them successfully. Never generate accepted
+baselines with a macOS browser or use the production workflow for this task.

@@ -156,6 +156,19 @@ jobs:
           set -euo pipefail
           npm run test:visual
 
+      # A new screenshot fails comparison until its Linux output is reviewed
+      # and committed. Preserve that output without updating or approving it.
+      - name: Capturas Linux para revisar
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: visual-linux-${{ github.event.pull_request.head.sha }}
+          path: |
+            tests/visual/**/*-linux.png
+            test-results/**/*.png
+          if-no-files-found: error
+          retention-days: 7
+
   baseline:
     name: Byte-for-byte non-regression
     runs-on: ubuntu-latest
