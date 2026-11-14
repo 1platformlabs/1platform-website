@@ -308,6 +308,34 @@ m=$({
 report "public JS inside the 64 KB gzip budget" \
        "motion stays CSS-first and no graphics runtime ships to visitors" "$m"
 
+# 16. The brand is "One Platform"; "1Platform" survives only as the legal entity
+#     "1Platform Labs" (website-rebranding-one-platform D-6). Lower-case
+#     `1platform` -- domains, slugs, mail addresses -- is a different token and
+#     is not matched: the pattern is case-sensitive on purpose.
+#
+#     Comments are not copy, and this rule reads each file WHOLE instead of
+#     filtering grep lines through strip_comments: that filter only drops a line
+#     that STARTS with a comment marker, so the continuation of a block comment
+#     (`Footer.astro`, `BaseLayout.astro` carry several) would read as a live
+#     value. Block comments (`/* */`, `<!-- -->`) are blanked with their
+#     newlines kept, so line numbers stay true; a `//` comment counts only after
+#     start-of-line or whitespace, which leaves every `https://` alone.
+#     The blog fixture (`src/data`) is outside on purpose: the titles of the
+#     posts already published are history the owner decided to keep.
+m=$(find src/i18n/messages src/page-content src/layouts src/components -type f \
+      \( -name '*.astro' -o -name '*.ts' \) | sort | xargs perl -CSD -0777 -ne '
+  my @orig = split /\n/, $_, -1;
+  (my $s = $_) =~ s{/\*.*?\*/|<!--.*?-->}{ (my $c = $&) =~ s/[^\n]/ /g; $c }gse;
+  my $n = 0;
+  for my $line (split /\n/, $s, -1) {
+    $n++;
+    (my $code = $line) =~ s{(^|\s)//.*$}{$1};
+    print "$ARGV:$n:$orig[$n-1]\n" if $code =~ /1Platform(?! Labs)/;
+  }
+')
+report "the brand is One Platform, not 1Platform" \
+       "only the legal entity 1Platform Labs keeps the old spelling" "$m"
+
 # 15. External visual sources must never enter the product repository. The
 # digest lets this guard enforce the rule without carrying a source identity.
 export BANNED="d965aa403593d08cf2e1cb83ba139be3e61b41469271ac94c67ffb81ba998f4a ${CHECK_TELLS_EXTRA_NAME_SHA256:-}"

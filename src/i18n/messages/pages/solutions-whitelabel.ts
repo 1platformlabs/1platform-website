@@ -8,7 +8,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'solutions-whitelabel.title': 'Whitelabel Dashboard — Branded SaaS in One API Call | 1Platform',
+    'solutions-whitelabel.title': 'Whitelabel Dashboard — Branded SaaS in One API Call | One Platform',
     'solutions-whitelabel.description':
       'Bootstrap a fully branded dashboard from one API call — branding, theme, layout, i18n, and home KPIs. Power your own product under your brand.',
     'solutions-whitelabel.breadcrumb.whitelabel': 'Whitelabel',
@@ -40,7 +40,7 @@ export default defineMessages({
       'Balance, unread counts, in-flight counters, and feature gates resolved in the same call — no extra round trips before the first screen is useful.',
     'solutions-whitelabel.spec.contract.term': 'The contract we use ourselves',
     'solutions-whitelabel.spec.contract.detail':
-      'The 1Platform dashboard is built on this bootstrap response. You are configuring the same surface we ship, not a separate whitelabel edition of it.',
+      'The One Platform dashboard is built on this bootstrap response. You are configuring the same surface we ship, not a separate whitelabel edition of it.',
 
     'solutions-whitelabel.howItWorks.eyebrow': 'How it works',
     'solutions-whitelabel.howItWorks.lead': 'From tenant configuration to a branded dashboard in production.',
@@ -67,7 +67,7 @@ export default defineMessages({
       'Let’s talk about pricing and onboarding for your tenant, or read the API reference and try the bootstrap call first.',
   },
   es: {
-    'solutions-whitelabel.title': 'Panel de marca blanca — SaaS con tu marca en una sola llamada a la API | 1Platform',
+    'solutions-whitelabel.title': 'Panel de marca blanca — SaaS con tu marca en una sola llamada a la API | One Platform',
     'solutions-whitelabel.description':
       'Arranca un panel totalmente personalizado con tu marca desde una sola llamada a la API — marca, tema, diseño, idiomas y KPIs de inicio. Impulsa tu propio producto bajo tu marca.',
     'solutions-whitelabel.breadcrumb.whitelabel': 'Marca blanca',
@@ -99,7 +99,7 @@ export default defineMessages({
       'Saldo, conteos sin leer, contadores en curso y feature gates resueltos en la misma llamada — sin viajes adicionales antes de que la primera pantalla sea útil.',
     'solutions-whitelabel.spec.contract.term': 'El contrato que usamos nosotros mismos',
     'solutions-whitelabel.spec.contract.detail':
-      'El panel de 1Platform está construido sobre esta misma respuesta de arranque. Estás configurando la misma superficie que publicamos, no una edición de marca blanca aparte.',
+      'El panel de One Platform está construido sobre esta misma respuesta de arranque. Estás configurando la misma superficie que publicamos, no una edición de marca blanca aparte.',
 
     'solutions-whitelabel.howItWorks.eyebrow': 'Cómo funciona',
     'solutions-whitelabel.howItWorks.lead': 'De la configuración del tenant a un panel con tu marca en producción.',

@@ -25,7 +25,7 @@
     "test:deploy": "bash deploy/cpanel/activate-graft.test.sh",
     "test:deploy:activator": "bash deploy/cpanel/publish-activator.test.sh",
     "test:landing-ssr": "node --test scripts/photographic-ssr.selftest.mjs",
-    "test:branding-content": "node --test scripts/prepare-branding-content.selftest.mjs"
+    "test:branding-content": "node --test scripts/prepare-branding-content.selftest.mjs scripts/rename-brand-content.selftest.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "0.4.5",

@@ -10,7 +10,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'paymentsInvoicing.title': 'Accept Payments & Issue Electronic Invoices | 1Platform',
+    'paymentsInvoicing.title': 'Accept Payments & Issue Electronic Invoices | One Platform',
     'paymentsInvoicing.description':
       'Accept online card payments and issue compliant electronic invoices automatically — all from one platform. Webhook-driven, audit-ready, ready for production.',
 
@@ -38,7 +38,7 @@ export default defineMessages({
 
     'paymentsInvoicing.charge.link.title': 'Send a payment link',
     'paymentsInvoicing.charge.link.description':
-      'Emit a link and send it to whoever owes you. The person paying does not need a 1Platform account and never signs in: the link opens straight into a hosted checkout. You can list your links, look one up, and cancel one that should no longer be paid.',
+      'Emit a link and send it to whoever owes you. The person paying does not need a One Platform account and never signs in: the link opens straight into a hosted checkout. You can list your links, look one up, and cancel one that should no longer be paid.',
     'paymentsInvoicing.charge.link.note':
       'A link that has already been paid, cancelled or expired shows a short status page instead of taking money again.',
 
@@ -52,7 +52,7 @@ export default defineMessages({
     'paymentsInvoicing.charge.subscriptions.description':
       'Build your own plans, publish them, and enrol your customers on them. Keep the customer records, read the subscriptions back, and cancel one when someone leaves. Your plans, your customers, your recurring revenue.',
     'paymentsInvoicing.charge.subscriptions.note':
-      'An invitation enrols one customer once. To bring in someone else, or the same person again after theirs is used, issue another. This is separate from the balance you hold with 1Platform.',
+      'An invitation enrols one customer once. To bring in someone else, or the same person again after theirs is used, issue another. This is separate from the balance you hold with One Platform.',
 
     'paymentsInvoicing.capability.trackEverything.title': 'Track everything',
     'paymentsInvoicing.capability.trackEverything.description':
@@ -91,7 +91,7 @@ export default defineMessages({
       'Surface payments and invoicing under your own brand.',
   },
   es: {
-    'paymentsInvoicing.title': 'Acepta pagos y emite facturas electrónicas | 1Platform',
+    'paymentsInvoicing.title': 'Acepta pagos y emite facturas electrónicas | One Platform',
     'paymentsInvoicing.description':
       'Acepta pagos con tarjeta y emite facturas electrónicas conformes de forma automática — todo desde una sola plataforma. Impulsado por webhooks, listo para auditoría y para producción.',
 
@@ -119,7 +119,7 @@ export default defineMessages({
 
     'paymentsInvoicing.charge.link.title': 'Manda un enlace de cobro',
     'paymentsInvoicing.charge.link.description':
-      'Emite un enlace y mándaselo a quien te debe. Quien paga no necesita una cuenta de 1Platform y nunca inicia sesión: el enlace abre directo en un checkout alojado. Puedes listar tus enlaces, consultar uno y cancelar el que ya no deba pagarse.',
+      'Emite un enlace y mándaselo a quien te debe. Quien paga no necesita una cuenta de One Platform y nunca inicia sesión: el enlace abre directo en un checkout alojado. Puedes listar tus enlaces, consultar uno y cancelar el que ya no deba pagarse.',
     'paymentsInvoicing.charge.link.note':
       'Un enlace ya pagado, cancelado o vencido muestra una página de estado breve en lugar de volver a cobrar.',
 
@@ -133,7 +133,7 @@ export default defineMessages({
     'paymentsInvoicing.charge.subscriptions.description':
       'Arma tus propios planes, publícalos y da de alta en ellos a tus clientes. Guarda las fichas de cliente, consulta las suscripciones y cancela una cuando alguien se va. Tus planes, tus clientes, tus ingresos recurrentes.',
     'paymentsInvoicing.charge.subscriptions.note':
-      'Una invitación da de alta a un cliente una vez. Para sumar a otra persona, o a la misma después de que use la suya, emite otra. Esto es distinto del saldo que tú tienes con 1Platform.',
+      'Una invitación da de alta a un cliente una vez. Para sumar a otra persona, o a la misma después de que use la suya, emite otra. Esto es distinto del saldo que tú tienes con One Platform.',
 
     'paymentsInvoicing.capability.trackEverything.title': 'Registra todo',
     'paymentsInvoicing.capability.trackEverything.description':

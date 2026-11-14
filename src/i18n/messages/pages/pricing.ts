@@ -11,7 +11,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'pricing.title': 'Pricing — Transparent, Pay-as-You-Use | 1Platform',
+    'pricing.title': 'Pricing — Transparent, Pay-as-You-Use | One Platform',
     'pricing.description':
       'Transparent pricing — pay only for what you use. No subscriptions, no hidden fees. Online store, payments, invoicing, content, and whitelabel dashboard.',
 
@@ -164,7 +164,7 @@ export default defineMessages({
       'Credit and debit cards, charged through the same hosted checkout the platform gives you for your own customers. For larger accounts we can arrange billing terms and consolidated invoicing.',
   },
   es: {
-    'pricing.title': 'Precios — transparentes, pago por uso | 1Platform',
+    'pricing.title': 'Precios — transparentes, pago por uso | One Platform',
     'pricing.description':
       'Precios transparentes: paga solo por lo que usas. Sin suscripciones ni cargos ocultos. Tienda online, pagos, facturación, contenido y panel de marca blanca.',
 

@@ -16,9 +16,9 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'notFound.title': 'Page Not Found | 1Platform',
+    'notFound.title': 'Page Not Found | One Platform',
     'notFound.description':
-      'The page you are looking for could not be found. Navigate back to the 1Platform homepage or explore our solutions and documentation.',
+      'The page you are looking for could not be found. Navigate back to the One Platform homepage or explore our solutions and documentation.',
 
     'notFound.status': 'HTTP 404 — Not found',
     'notFound.headline': "This page isn't here.",
@@ -33,9 +33,9 @@ export default defineMessages({
     'notFound.destination.blog.detail': 'Product notes and how-to articles.',
   },
   es: {
-    'notFound.title': 'Página no encontrada | 1Platform',
+    'notFound.title': 'Página no encontrada | One Platform',
     'notFound.description':
-      'No pudimos encontrar la página que buscas. Vuelve al inicio de 1Platform o explora nuestras soluciones y documentación.',
+      'No pudimos encontrar la página que buscas. Vuelve al inicio de One Platform o explora nuestras soluciones y documentación.',
 
     'notFound.status': 'HTTP 404 — Página no encontrada',
     'notFound.headline': 'Esta página no existe.',

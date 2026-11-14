@@ -12,9 +12,9 @@ import { defineMessages } from '@i18n/ui';
 export default defineMessages({
   en: {
     // — Blog index —————————————————————————————————————————————
-    'blog.title': 'Blog | 1Platform',
+    'blog.title': 'Blog | One Platform',
     'blog.description':
-      'Insights on launching an online store, accepting payments, electronic invoicing, AI content, and the 1Platform developer API. Tutorials and product updates.',
+      'Insights on launching an online store, accepting payments, electronic invoicing, AI content, and the One Platform developer API. Tutorials and product updates.',
     'blog.eyebrow': 'Writing',
     'blog.h1': 'Blog',
     'blog.lede':
@@ -29,8 +29,8 @@ export default defineMessages({
     'blog.archive': 'Archive',
 
     // — Category pages —————————————————————————————————————————
-    'blog.category.title': '{category} | 1Platform Blog',
-    'blog.category.description': 'Browse {category} articles on the 1Platform blog.',
+    'blog.category.title': '{category} | One Platform Blog',
+    'blog.category.description': 'Browse {category} articles on the One Platform blog.',
     'blog.category.eyebrow': 'Topic',
     'blog.category.other': 'Other topics',
     'blog.category.otherAria': 'Other topics',
@@ -50,23 +50,23 @@ export default defineMessages({
     // The post <title> was assembled from a template literal in BlogLayout, so
     // it bypassed the catalogue entirely and every Spanish post shipped an
     // English title — in the browser tab and in search results.
-    'blog.post.title': '{title} | 1Platform Blog',
+    'blog.post.title': '{title} | One Platform Blog',
     'blog.readArticle': 'Read the article',
-    'blog.feed.title': '1Platform Blog',
+    'blog.feed.title': 'One Platform Blog',
     'blog.feed.description':
-      'Insights on SEO automation, AI content generation, API tutorials, and product updates from the 1Platform team.',
+      'Insights on SEO automation, AI content generation, API tutorials, and product updates from the One Platform team.',
 
     // — Changelog ——————————————————————————————————————————————
-    'changelog.title': 'Changelog | 1Platform',
+    'changelog.title': 'Changelog | One Platform',
     'changelog.description':
-      'Every update, new feature, and improvement to 1Platform — online store, payments, invoicing, AI content, whitelabel dashboard, and developer API services.',
+      'Every update, new feature, and improvement to One Platform — online store, payments, invoicing, AI content, whitelabel dashboard, and developer API services.',
     'changelog.eyebrow': 'Product',
     'changelog.h1': 'Changelog',
     'changelog.lede':
       'Every release, in the order it shipped — new capabilities, changes to the API, and fixes.',
-    'changelog.feed.title': '1Platform Changelog',
+    'changelog.feed.title': 'One Platform Changelog',
     'changelog.feed.description':
-      'Track every update, new feature, and improvement to the 1Platform API and services.',
+      'Track every update, new feature, and improvement to the One Platform API and services.',
 
     'changelog.category.new-feature': 'New feature',
     'changelog.category.improvement': 'Improvement',
@@ -75,9 +75,9 @@ export default defineMessages({
   },
   es: {
     // — Índice del blog ————————————————————————————————————————
-    'blog.title': 'Blog | 1Platform',
+    'blog.title': 'Blog | One Platform',
     'blog.description':
-      'Ideas sobre cómo lanzar una tienda online, aceptar pagos, emitir facturas electrónicas, generar contenido con IA y usar la API de 1Platform. Tutoriales y novedades del producto.',
+      'Ideas sobre cómo lanzar una tienda online, aceptar pagos, emitir facturas electrónicas, generar contenido con IA y usar la API de One Platform. Tutoriales y novedades del producto.',
     'blog.eyebrow': 'Escribimos',
     'blog.h1': 'Blog',
     'blog.lede':
@@ -92,8 +92,8 @@ export default defineMessages({
     'blog.archive': 'Archivo',
 
     // — Páginas de categoría ———————————————————————————————————
-    'blog.category.title': '{category} | Blog de 1Platform',
-    'blog.category.description': 'Explora los artículos de {category} en el blog de 1Platform.',
+    'blog.category.title': '{category} | Blog de One Platform',
+    'blog.category.description': 'Explora los artículos de {category} en el blog de One Platform.',
     'blog.category.eyebrow': 'Tema',
     'blog.category.other': 'Otros temas',
     'blog.category.otherAria': 'Otros temas',
@@ -109,23 +109,23 @@ export default defineMessages({
     'blog.category.payments-invoicing': 'Pagos y facturación',
 
     // — Feeds RSS ——————————————————————————————————————————————
-    'blog.post.title': '{title} | Blog de 1Platform',
+    'blog.post.title': '{title} | Blog de One Platform',
     'blog.readArticle': 'Leer el artículo',
-    'blog.feed.title': 'Blog de 1Platform',
+    'blog.feed.title': 'Blog de One Platform',
     'blog.feed.description':
-      'Ideas sobre automatización de SEO, generación de contenido con IA, tutoriales de la API y novedades del producto, del equipo de 1Platform.',
+      'Ideas sobre automatización de SEO, generación de contenido con IA, tutoriales de la API y novedades del producto, del equipo de One Platform.',
 
     // — Novedades ——————————————————————————————————————————————
-    'changelog.title': 'Novedades | 1Platform',
+    'changelog.title': 'Novedades | One Platform',
     'changelog.description':
-      'Todas las actualizaciones, funciones nuevas y mejoras de 1Platform — tienda online, pagos, facturación, contenido con IA, panel de marca blanca y servicios de la API.',
+      'Todas las actualizaciones, funciones nuevas y mejoras de One Platform — tienda online, pagos, facturación, contenido con IA, panel de marca blanca y servicios de la API.',
     'changelog.eyebrow': 'Producto',
     'changelog.h1': 'Novedades',
     'changelog.lede':
       'Cada versión, en el orden en que se publicó — capacidades nuevas, cambios en la API y correcciones.',
-    'changelog.feed.title': 'Novedades de 1Platform',
+    'changelog.feed.title': 'Novedades de One Platform',
     'changelog.feed.description':
-      'Sigue todas las actualizaciones, funciones nuevas y mejoras de la API y los servicios de 1Platform.',
+      'Sigue todas las actualizaciones, funciones nuevas y mejoras de la API y los servicios de One Platform.',
 
     'changelog.category.new-feature': 'Nueva función',
     'changelog.category.improvement': 'Mejora',

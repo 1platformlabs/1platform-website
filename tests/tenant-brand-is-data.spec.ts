@@ -104,7 +104,7 @@ test('the leak that is LEFT is content, and its size is pinned', async () => {
   // count is PINNED. It may only go down. If it grows, a surface that was data
   // stopped being data, and that is exactly the regression this epic must not
   // ship — a test that waits for F3 would notice nothing in the meantime.
-  const brand = (clinic.match(/1Platform/g) ?? []).length
+  const brand = (clinic.match(/1Platform(?! Labs)|One Platform/g) ?? []).length
   const apex = (clinic.match(/1platform\.pro/g) ?? []).length
 
   expect(
@@ -141,7 +141,7 @@ test('the tenant head owns its icon, social card and structured-data logo', asyn
 
   // Positive control: the source host is expected to identify itself. Without
   // it, a missing head or a failed Host override would look like a clean scan.
-  expect(platformHead).toContain('1Platform')
+  expect(platformHead).toContain('One Platform')
   expect(platformHead).toContain('1platform.pro')
 
   // The derived assets are same-origin routes, not static platform paths.
@@ -182,6 +182,7 @@ test('the JSON-LD names the tenant, not the platform', async () => {
       // an inline literal naming the platform and its apex, which under N brands
       // told search engines each client's site belonged to us.
       expect(text, 'the Organization block still names the platform').not.toContain('1Platform')
+      expect(text, 'the Organization block still names the platform').not.toContain('One Platform')
       expect(text, 'the Organization block still points at the platform apex').not.toContain('1platform.pro')
       expect(text).toContain('Clínica Delta')
       expect(text).toContain('clinicas.1platform.dev')

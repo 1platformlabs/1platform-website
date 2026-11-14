@@ -22,7 +22,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'solutions-ads.title': 'Advertising Campaigns — Run Paid Ads From Your Balance | 1Platform',
+    'solutions-ads.title': 'Advertising Campaigns — Run Paid Ads From Your Balance | One Platform',
     'solutions-ads.description':
       'Connect the brand your ads publish as, build a campaign, fund it from your workspace balance, and get back whatever was not spent when it closes.',
     'solutions-ads.jsonld.areaServed': 'Worldwide',
@@ -116,7 +116,7 @@ export default defineMessages({
   },
 
   es: {
-    'solutions-ads.title': 'Campañas publicitarias — Anúnciate con tu saldo | 1Platform',
+    'solutions-ads.title': 'Campañas publicitarias — Anúnciate con tu saldo | One Platform',
     'solutions-ads.description':
       'Conecta la marca con la que se publican tus anuncios, arma una campaña, fondéala con el saldo de tu espacio de trabajo y recupera lo que no se gastó cuando cierra.',
     'solutions-ads.jsonld.areaServed': 'Global',

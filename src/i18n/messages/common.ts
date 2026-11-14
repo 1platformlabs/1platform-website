@@ -10,7 +10,7 @@ import { defineMessages } from '@i18n/ui';
  * it with the same word.
  *
  * One thing deliberately stays in English in both trees because it is brand,
- * not copy: the product name "1Platform". The slogan ("One platform. Every
+ * not copy: the product name "One Platform". The slogan ("One platform. Every
  * solution.") lives with the home copy (`pages/home.ts`), where the section
  * that carries it is.
  */
@@ -65,8 +65,8 @@ export default defineMessages({
 
     // — Layout chrome —————————————————————————————————————————
     'layout.skipToContent': 'Skip to main content',
-    'layout.logoLabel': '1Platform Home',
-    'layout.rssTitle': '1Platform Blog',
+    'layout.logoLabel': 'One Platform Home',
+    'layout.rssTitle': 'One Platform Blog',
 
     // — Shared components —————————————————————————————————————
     'check.yes': 'Yes',
@@ -106,7 +106,7 @@ export default defineMessages({
     'lang.unavailable': 'Not available in {language}',
 
     // — The organisation behind the site ——————————————————————
-    // The LEGAL entity, which is not the brand: "1Platform" is what the site
+    // The LEGAL entity, which is not the brand: "One Platform" is what the site
     // calls itself, "1Platform Labs" is who signs the terms. It lives here as
     // copy rather than as a manifest field because that is what it is — a
     // rendered string, in the tenant's own language, that a tenant sets for
@@ -162,8 +162,8 @@ export default defineMessages({
 
     // — Estructura de la página ———————————————————————————————
     'layout.skipToContent': 'Saltar al contenido principal',
-    'layout.logoLabel': 'Inicio de 1Platform',
-    'layout.rssTitle': 'Blog de 1Platform',
+    'layout.logoLabel': 'Inicio de One Platform',
+    'layout.rssTitle': 'Blog de One Platform',
 
     // — Componentes compartidos ———————————————————————————————
     'check.yes': 'Sí',

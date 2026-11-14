@@ -11,13 +11,13 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'for-developers.title': 'Ecommerce REST API for SaaS — Payments, Content, Whitelabel | 1Platform',
+    'for-developers.title': 'Ecommerce REST API for SaaS — Payments, Content, Whitelabel | One Platform',
     'for-developers.description':
-      'Power your SaaS on 1Platform. REST API with dual-token auth, async jobs, predictable JSON envelopes — payments, content, and whitelabel dashboard included.',
+      'Power your SaaS on One Platform. REST API with dual-token auth, async jobs, predictable JSON envelopes — payments, content, and whitelabel dashboard included.',
 
     'for-developers.hero.headline': 'Build on a developer-grade API',
     'for-developers.hero.subheadline':
-      'Power your own SaaS on top of 1Platform. One REST API, two tokens, async jobs, predictable JSON envelopes — payments, content and whitelabel dashboard included.',
+      'Power your own SaaS on top of One Platform. One REST API, two tokens, async jobs, predictable JSON envelopes — payments, content and whitelabel dashboard included.',
     'for-developers.hero.badge': 'REST API · Async Jobs · Webhooks',
     'for-developers.hero.secondaryCta': 'Power Your SaaS',
 
@@ -63,13 +63,13 @@ export default defineMessages({
     'for-developers.related.content.description': 'Embed content generation, images and SEO inside your product.',
   },
   es: {
-    'for-developers.title': 'API REST de ecommerce para SaaS — Pagos, contenido y marca blanca | 1Platform',
+    'for-developers.title': 'API REST de ecommerce para SaaS — Pagos, contenido y marca blanca | One Platform',
     'for-developers.description':
-      'Impulsa tu SaaS sobre 1Platform. API REST con autenticación de doble token, trabajos asíncronos y respuestas JSON predecibles — pagos, contenido y panel de marca blanca incluidos.',
+      'Impulsa tu SaaS sobre One Platform. API REST con autenticación de doble token, trabajos asíncronos y respuestas JSON predecibles — pagos, contenido y panel de marca blanca incluidos.',
 
     'for-developers.hero.headline': 'Construye sobre una API de nivel profesional',
     'for-developers.hero.subheadline':
-      'Impulsa tu propio SaaS sobre 1Platform. Una API REST, dos tokens, trabajos asíncronos, respuestas JSON predecibles — pagos, contenido y panel de marca blanca incluidos.',
+      'Impulsa tu propio SaaS sobre One Platform. Una API REST, dos tokens, trabajos asíncronos, respuestas JSON predecibles — pagos, contenido y panel de marca blanca incluidos.',
     'for-developers.hero.badge': 'API REST · Trabajos asíncronos · Webhooks',
     'for-developers.hero.secondaryCta': 'Impulsa tu SaaS',
 

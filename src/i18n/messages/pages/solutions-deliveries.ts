@@ -22,7 +22,7 @@ import { defineMessages } from '@i18n/ui';
  */
 export default defineMessages({
   en: {
-    'solutions-deliveries.title': 'Delivery Management — Dispatch and Track Every Order | 1Platform',
+    'solutions-deliveries.title': 'Delivery Management — Dispatch and Track Every Order | One Platform',
     'solutions-deliveries.description':
       'Register, dispatch and track shipments for your business. Works end to end with your own staff, with courier dispatch available per workspace, and a public tracking link for your buyer.',
     'solutions-deliveries.jsonld.areaServed': 'Worldwide',
@@ -87,7 +87,7 @@ export default defineMessages({
     'solutions-deliveries.courier.caveat':
       'Quoting is not a fourth thing you always do. It exists only in courier mode, it needs coordinates at both ends, and until your workspace has a delivery service configured those endpoints say so plainly instead of guessing a price.',
     'solutions-deliveries.courier.fee':
-      'The fee recorded on a shipment is a reference for your own books. 1Platform neither debits it nor charges it.',
+      'The fee recorded on a shipment is a reference for your own books. One Platform neither debits it nor charges it.',
 
     'solutions-deliveries.whatItReplaces.eyebrow': 'What it replaces',
     'solutions-deliveries.whatItReplaces.lead': 'The parts you were holding together by hand.',
@@ -120,7 +120,7 @@ export default defineMessages({
   },
 
   es: {
-    'solutions-deliveries.title': 'Gestión de envíos — Despacha y sigue cada pedido | 1Platform',
+    'solutions-deliveries.title': 'Gestión de envíos — Despacha y sigue cada pedido | One Platform',
     'solutions-deliveries.description':
       'Registra, despacha y sigue los envíos de tu comercio. Funciona de punta a punta con tu propio personal, con despacho por mensajería habilitable por espacio de trabajo y un enlace público de seguimiento para tu comprador.',
     'solutions-deliveries.jsonld.areaServed': 'Global',
@@ -182,7 +182,7 @@ export default defineMessages({
     'solutions-deliveries.courier.caveat':
       'Cotizar no es un cuarto paso que hagas siempre. Existe sólo en modo mensajería, necesita coordenadas en los dos extremos, y mientras tu espacio de trabajo no tenga un servicio de reparto configurado esos endpoints lo dicen con todas las letras en vez de inventar un precio.',
     'solutions-deliveries.courier.fee':
-      'La tarifa que queda registrada en un envío es una referencia para tus propios libros. 1Platform ni la debita ni la cobra.',
+      'La tarifa que queda registrada en un envío es una referencia para tus propios libros. One Platform ni la debita ni la cobra.',
 
     'solutions-deliveries.whatItReplaces.eyebrow': 'Qué reemplaza',
     'solutions-deliveries.whatItReplaces.lead': 'Las piezas que venías sosteniendo a mano.',
