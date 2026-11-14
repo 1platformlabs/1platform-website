@@ -60,7 +60,7 @@ const BASE = `http://127.0.0.1:${PORT}`
 /**
  * Two modes, one set of rules. On a PR (the default) the surface is the repo
  * manifest served by the local build. With `SERVED_CLAIMS_TARGET=prod` —
- * only the scheduled `served-claims.yml` sets it — the surface is every
+ * only a manual local run sets it — the surface is every
  * published, indexable site the API lists, fetched from its real address.
  */
 async function fetchServed(page: SurfacePage): Promise<HostResponse> {

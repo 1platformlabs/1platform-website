@@ -305,11 +305,12 @@ Verify with `npm test` (the complete Playwright suite against the real `dist/ser
 
 ## Verification (after implementation)
 
-Pull-request CI runs typecheck, build, design/provider guards, functional
-Playwright and the container-pinned visual comparison. `.github/workflows/prod.yml`
-remains the separate `push: [main]` / manual deployment workflow; its Lighthouse
-step is informative (`budgetPath: ""` — it warns to Slack, it does not block).
-Run the same gates locally before opening a PR:
+GitHub Actions only builds and publishes (`.github/workflows/prod.yml`, on
+`push: [main]` / manual). There is NO pull-request CI: typecheck, build,
+design/provider guards, functional Playwright, the container-pinned visual
+comparison, the byte-for-byte baseline, gitleaks, SonarCloud and the served-claims
+scan run locally (`/local-checks`) before the PR and again on the final SHA from
+`/deploy-prod`. Run the gates locally before opening a PR:
 
 ```bash
 npm run build            # Must succeed, zero errors — BEFORE check (rule 14 measures dist/)
@@ -317,6 +318,10 @@ npm run check            # Design-system/provider guard + its negative self-test
 npm test                 # Playwright tests against dist/server/entry.mjs
 npm run typecheck        # astro check
 npm run test:visual      # visual baseline, compared in the Playwright container
+npm run check:baseline -- --explain   # byte-for-byte non-regression of 1platform.pro
+npm run test:branding-content         # per-tenant content preparation
+bash deploy/cpanel/activate-graft.test.sh   # deploy channel gate (needs GNU mv)
+SERVED_CLAIMS_TARGET=prod npx playwright test -c playwright.served-claims.config.ts   # served claims over PROD
 # Lighthouse (local): Performance 90+ on the home (95+ elsewhere), A11y 100, SEO 100
 # Media: node scripts/capture-product-media.mjs --check (OCR gate; MEDIA_REQUIRED=1 pre-merge)
 # Test keyboard nav: Tab, Enter, Escape on all pages
