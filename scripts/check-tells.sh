@@ -3,9 +3,8 @@
 # check-tells.sh — guards the design system against sliding back into the
 # "AI landing template" patterns this site was rebuilt to remove.
 #
-# This repo has no pull-request CI (prod.yml runs on push to main only, and its
-# Lighthouse step is informative), so this script is the durable net. Run it
-# locally before opening a PR:
+# This repo has no pull-request CI (GitHub only builds and publishes), so this
+# script is the durable net. Run it locally before opening a PR (/local-checks):
 #
 #     ./scripts/check-tells.sh
 #

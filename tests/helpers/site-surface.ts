@@ -60,8 +60,8 @@ export function surface(): SurfacePage[] {
  *
  * `surface()` above walks the repo manifest, which is all a PR check can know —
  * CI has no API and a PR must not go red over live data. The tenants that live
- * ONLY in the API (the case #101 is about) are reached here instead, by the
- * scheduled workflow `served-claims.yml`, never by a pull request:
+ * ONLY in the API (the case #101 is about) are reached here instead, by a
+ * manual local run (`SERVED_CLAIMS_TARGET=prod`), never by a pull request:
  *
  *   GET /api/v1/sites/published-hosts   -> the published, indexable hosts
  *   GET /api/v1/sites/by-host?host=…    -> each one's pages and locales
