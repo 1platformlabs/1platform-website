@@ -108,12 +108,12 @@ test('the hero runs continuously and pauses outside the viewport with a static r
 
 test('locale content, deep links and browser history preserve the real routes', async ({ page }) => {
   await page.goto('/es/#arquitectura');
-  await expect(page.locator('#architecture-title')).toBeVisible();
-  const docs = page.locator('.layer-card--infrastructure a');
+  await expect(page.locator('#ecosystem-title')).toBeVisible();
+  const docs = page.locator('.ecosystem-product a');
   await expect(docs).toHaveAttribute('href', /\/docs\/saas\/1platform-api\/getting-started\/?$/);
   await expect(page.locator('.contact .button')).toHaveAttribute('href', 'https://wa.me/50253946564');
   await page.reload();
-  await expect(page.locator('#architecture-title')).toBeVisible();
+  await expect(page.locator('#ecosystem-title')).toBeVisible();
   await page.goto('/es/blog/');
   await page.goBack();
   await expect(page.locator('[data-infrastructure-home]')).toBeVisible();

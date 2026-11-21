@@ -70,6 +70,26 @@ const sections = {
     "step3",
     "step3Title",
     "step3Body"
+  ],
+  "ecosystem": [
+    "eyebrow",
+    "title",
+    "description",
+    "hub",
+    "groupsLabel",
+    "payments",
+    "paymentsDetail",
+    "operations",
+    "presence",
+    "marketing",
+    "ai",
+    "aiDetail",
+    "platform",
+    "platformDetail",
+    "productEyebrow",
+    "productTitle",
+    "bridge",
+    "note"
   ]
 } as const;
 export function hasInfrastructureSection(messages: Record<string, string>, section: keyof typeof sections): boolean {

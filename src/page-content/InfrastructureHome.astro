@@ -14,6 +14,20 @@ import InfrastructureMcp from '@components/InfrastructureMcp.astro';
 import { hasInfrastructureSection } from '@lib/infrastructure-refresh';
 const showSocial = hasInfrastructureSection(Astro.locals.messages, 'social');
 const showMcp = hasInfrastructureSection(Astro.locals.messages, 'mcp');
+// The ecosystem map names all 17 capabilities, so it only replaces the older
+// architecture section when the tenant release carries every label it reads.
+const ecosystemGroups = [
+  { key: 'payments', capabilities: ['payments', 'subscriptions', 'invoicing'], detail: 'paymentsDetail', side: 'left' },
+  { key: 'operations', capabilities: ['delivery', 'scheduling', 'sales'], side: 'left' },
+  { key: 'presence', capabilities: ['sites', 'email', 'whitelabel', 'plates'], side: 'left' },
+  { key: 'marketing', capabilities: ['social', 'content', 'videos', 'ads'], side: 'right' },
+  { key: 'ai', capabilities: ['agents'], detail: 'aiDetail', side: 'right' },
+  { key: 'platform', capabilities: ['cloud', 'telemetry'], detail: 'platformDetail', side: 'right' },
+] as const;
+const ecosystemCount = ecosystemGroups.reduce((total, group) => total + group.capabilities.length, 0);
+const showEcosystem = hasInfrastructureSection(Astro.locals.messages, 'ecosystem')
+  && ecosystemGroups.every(({ capabilities }) => capabilities.every((key) => Astro.locals.messages[`infrastructure.capabilities.${key}.name`]?.trim()))
+  && Boolean(Astro.locals.messages['infrastructure.capabilities.ads.status']?.trim());
 
 const { t } = useI18n(Astro.url.pathname, Astro.locals);
 const tenant = Astro.locals.tenant;
@@ -154,15 +168,50 @@ const additionalCapabilities = ['cloud', 'plates', 'videos', 'sales', 'schedulin
         <p class="wrap connected-note">{t('infrastructure.connected.note')}</p>
       </section>
 
-      <section class="section architecture" id="arquitectura" aria-labelledby="architecture-title">
-        <div class="wrap"><p class="eyebrow">{t('infrastructure.hero.kicker')}</p><div class="architecture-heading"><h2 id="architecture-title">{t('infrastructure.architecture.title')}<br />{t('infrastructure.architecture.titleEmphasis')}</h2><p>{t('infrastructure.architecture.description')}</p></div>
-          <div class="layer-grid">
-            <article class="layer-card layer-card--infrastructure"><span class="layer-index">{t('infrastructure.architecture.services')}</span><div class="layer-graphic" aria-hidden="true"><span>{t('infrastructure.architecture.api')}</span><i></i><span>{t('infrastructure.architecture.payments')}</span><i></i><span>{t('infrastructure.architecture.delivery')}</span><i></i><span>{t('infrastructure.architecture.ai')}</span></div><h3>{t('infrastructure.architecture.apiName')}</h3><p>{t('infrastructure.architecture.apiDescription')}</p>{documentationHref && (<a href={documentationHref}>{t('infrastructure.architecture.apiLink')}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}</article>
-            <article class="layer-card layer-card--ecosystem"><span class="layer-index">{t('infrastructure.architecture.applications')}</span><div class="layer-ecosystem" aria-hidden="true"><span>{t('infrastructure.integration.saas')}</span><span>{t('infrastructure.integration.erp')}</span><span>{t('infrastructure.integration.applications')}</span></div><h3>{t('infrastructure.architecture.titleEmphasis')}</h3><p>{t('infrastructure.architecture.ecosystemDescription')}</p>{contactHref && (<a href={contactHref}>{t('infrastructure.architecture.contact')}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}</article>
+      {showEcosystem ? (
+      <section class="section architecture ecosystem" id="arquitectura" aria-labelledby="ecosystem-title">
+        <div class="wrap">
+          <p class="eyebrow">{t('infrastructure.ecosystem.eyebrow')}</p>
+          <div class="architecture-heading"><h2 id="ecosystem-title">{t('infrastructure.ecosystem.title')}</h2><p>{t('infrastructure.ecosystem.description').replace('{count}', String(ecosystemCount))}</p></div>
+          <div class="ecosystem-map">
+            <div class="ecosystem-hub">
+              <span class="integration-logo" aria-hidden="true"><TenantBrand variant="symbol">{Astro.locals.messages['site.brand.presentation'] === 'symbol-and-name' ? <img class="integration-symbol-artwork" src={resolveIcon(tenant)} alt="" width="48" height="48" /> : tenant.brand_mark ?? tenant.brand_name}</TenantBrand></span>
+              <div><strong>{tenant.brand_name}</strong><small>{t('infrastructure.ecosystem.hub')}</small></div>
+            </div>
+            <ol class="ecosystem-groups" aria-label={t('infrastructure.ecosystem.groupsLabel')}>
+              {ecosystemGroups.map((group, index) => (
+                <li class={`ecosystem-group ecosystem-group--${group.side}`} style={`--row: ${index % 3 + 1}`}>
+                  <h3><span>{String(index + 1).padStart(2, '0')}</span>{t(`infrastructure.ecosystem.${group.key}`)}</h3>
+                  <ul class="ecosystem-chips">
+                    {group.capabilities.map((key) => (
+                      <li>{t(`infrastructure.capabilities.${key}.name`)}{key === 'ads' && <small>{t('infrastructure.capabilities.ads.status')}</small>}</li>
+                    ))}
+                  </ul>
+                  {'detail' in group && <p>{t(`infrastructure.ecosystem.${group.detail}`)}</p>}
+                </li>
+              ))}
+            </ol>
           </div>
-          <p class="architecture-note"><svg class="icon" aria-hidden="true"><use href="#infra-i-grid" /></svg><span>{t('infrastructure.architecture.note')}</span></p>
+          <div class="ecosystem-product">
+            <span class="ecosystem-bridge">{t('infrastructure.ecosystem.bridge')}</span>
+            <div><p class="layer-index">{t('infrastructure.ecosystem.productEyebrow')}</p><h3>{t('infrastructure.ecosystem.productTitle')}</h3></div>
+            <div class="layer-ecosystem"><span>{t('infrastructure.integration.saas')}</span><span>{t('infrastructure.integration.applications')}</span><span>{t('infrastructure.integration.erp')}</span></div>
+            {documentationHref && (<a href={documentationHref}>{t('infrastructure.architecture.apiLink')}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}
+          </div>
+          <p class="architecture-note"><svg class="icon" aria-hidden="true"><use href="#infra-i-grid" /></svg><span>{t('infrastructure.ecosystem.note')}</span></p>
         </div>
       </section>
+      ) : (
+      <section class="section architecture" id="arquitectura" aria-labelledby="architecture-title">
+          <div class="wrap"><p class="eyebrow">{t('infrastructure.hero.kicker')}</p><div class="architecture-heading"><h2 id="architecture-title">{t('infrastructure.architecture.title')}<br />{t('infrastructure.architecture.titleEmphasis')}</h2><p>{t('infrastructure.architecture.description')}</p></div>
+            <div class="layer-grid">
+              <article class="layer-card layer-card--infrastructure"><span class="layer-index">{t('infrastructure.architecture.services')}</span><div class="layer-graphic" aria-hidden="true"><span>{t('infrastructure.architecture.api')}</span><i></i><span>{t('infrastructure.architecture.payments')}</span><i></i><span>{t('infrastructure.architecture.delivery')}</span><i></i><span>{t('infrastructure.architecture.ai')}</span></div><h3>{t('infrastructure.architecture.apiName')}</h3><p>{t('infrastructure.architecture.apiDescription')}</p>{documentationHref && (<a href={documentationHref}>{t('infrastructure.architecture.apiLink')}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}</article>
+              <article class="layer-card layer-card--ecosystem"><span class="layer-index">{t('infrastructure.architecture.applications')}</span><div class="layer-ecosystem" aria-hidden="true"><span>{t('infrastructure.integration.saas')}</span><span>{t('infrastructure.integration.erp')}</span><span>{t('infrastructure.integration.applications')}</span></div><h3>{t('infrastructure.architecture.titleEmphasis')}</h3><p>{t('infrastructure.architecture.ecosystemDescription')}</p>{contactHref && (<a href={contactHref}>{t('infrastructure.architecture.contact')}<svg class="icon" aria-hidden="true"><use href="#infra-i-arrow" /></svg></a>)}</article>
+            </div>
+            <p class="architecture-note"><svg class="icon" aria-hidden="true"><use href="#infra-i-grid" /></svg><span>{t('infrastructure.architecture.note')}</span></p>
+          </div>
+        </section>
+      )}
 
       <section class="intelligence" id="inteligencia" aria-labelledby="intelligence-title">
         <div class="agent-blueprint" aria-label={t('infrastructure.aria.agent')}>
