@@ -75,10 +75,11 @@ test('older or incomplete tenant content omits new sections without a cross-tena
     tenant: {...platform, slug: `refresh-${scenario}`, brand_name: 'Example Studio', domain: `refresh-${scenario}.example`, aliases: []},
     pages: new Map(['es', 'en'].map(locale => [locale, documents.filter(doc => doc.locale === locale).map(doc => {
       const blocks = {...doc.blocks};
-      if (scenario === 'legacy') for (const key of Object.keys(blocks)) if (/^infrastructure\.(social|mcp)\./.test(key)) delete blocks[key];
+      if (scenario === 'legacy') for (const key of Object.keys(blocks)) if (/^infrastructure\.(social|mcp|ecosystem)\./.test(key)) delete blocks[key];
       if (scenario === 'partial') {
         delete blocks['infrastructure.social.message7'];
         delete blocks['infrastructure.mcp.definition'];
+        delete blocks['infrastructure.ecosystem.platformDetail'];
       }
       return {...doc, blocks};
     })])),
@@ -91,6 +92,10 @@ test('older or incomplete tenant content omits new sections without a cross-tena
       const complete = site.tenant.slug.endsWith('complete');
       expect(response.body.includes('id="agente-redes"')).toBe(complete);
       expect(response.body.includes('id="mcp"')).toBe(complete);
+      // The ecosystem map replaces the architecture cards only with a complete release.
+      expect(response.body.includes('id="ecosystem-title"')).toBe(complete);
+      expect(response.body.includes('class="layer-grid"')).toBe(!complete);
+      expect(response.body).toContain('id="arquitectura"');
       expect(response.body).toContain('class="brand-name">Example Studio');
       if (complete) expect(response.body).toContain('MCP de Example Studio');
     }
@@ -110,3 +115,44 @@ test('the integration map draws the tenant symbol on its accent plate, never whi
   expect(plate).not.toBe(card);
   await expect(logo.locator('img')).toHaveCSS('filter', /invert/);
 });
+
+for (const [path, width] of [['/es/', 1440], ['/', 1024], ['/es/', 390]] as const) {
+  test(`ecosystem map shows the 17 capabilities around the tenant at ${width}px in ${path}`, async ({page}) => {
+    await page.setViewportSize({width, height: 900});
+    await page.goto(path);
+    const map = page.locator('#arquitectura');
+    await expect(map.locator('.ecosystem-group')).toHaveCount(6);
+    await expect(map.locator('.ecosystem-chips > li')).toHaveCount(17);
+    await expect(map.locator('.ecosystem-hub strong')).toHaveText('One Platform');
+    await expect(map.locator('.architecture-heading p')).toContainText('17');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
+    // Every group stays inside the section and clear of the hub.
+    const hub = await map.locator('.ecosystem-hub').boundingBox();
+    for (const box of await map.locator('.ecosystem-group').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().toJSON()))) {
+      const overlaps = box.left < hub!.x + hub!.width && box.right > hub!.x && box.top < hub!.y + hub!.height && box.bottom > hub!.y;
+      expect(overlaps).toBe(false);
+    }
+  });
+}
+
+for (const width of [1440, 390]) {
+  test(`consecutive home sections never share a background at ${width}px`, async ({page}) => {
+    await page.setViewportSize({width, height: 900});
+    await page.goto('/es/');
+    const colors = await page.locator('[data-infrastructure-home] > section').evaluateAll(nodes => nodes.map(node => {
+      const paint = (el: Element) => { const style = getComputedStyle(el); return style.backgroundImage !== 'none' ? style.backgroundImage : style.backgroundColor; };
+      const own = paint(node);
+      if (own !== 'rgba(0, 0, 0, 0)') return {id: node.id, top: own, bottom: own};
+      const children = [...node.children].filter(child => getComputedStyle(child).display !== 'none' && child.getBoundingClientRect().height > 0);
+      const painted = children.map(paint).filter(color => color !== 'rgba(0, 0, 0, 0)');
+      // A split section shows its first panel on top and its last at the bottom.
+      const ordered = children.slice().sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top).map(paint).filter(color => color !== 'rgba(0, 0, 0, 0)');
+      const fallback = getComputedStyle(node.parentElement!).backgroundColor;
+      return {id: node.id, top: ordered[0] ?? painted[0] ?? fallback, bottom: ordered.at(-1) ?? painted.at(-1) ?? fallback};
+    }));
+    expect(colors.length).toBeGreaterThan(8);
+    for (let index = 1; index < colors.length; index++) {
+      expect(colors[index].top, `${colors[index - 1].id} → ${colors[index].id}`).not.toBe(colors[index - 1].bottom);
+    }
+  });
+}
