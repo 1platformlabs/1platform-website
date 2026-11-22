@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep the platform-address and custom-domain cards in two full-width columns on desktop, with aligned headings and a single column on mobile; long example addresses no longer split across lines at 1280 px.
+
 - Online Store solution page (es/en): new section «Start without your own domain» — a store opens on a platform address (`yourstore.1platform.pro`) and the domain is connected later, after which the platform address redirects to it keeping paths. The first step, the comparison row and the comment that denied a courtesy subdomain are rewritten in both catalogues (`solutions-online-store`, `photographic-interiors`) and in the activation overlay reference; frozen baseline of the two online-store routes re-frozen. Publish only once the capability is ON in PROD.
 
 - Rename the brand to One Platform across the site sources: every compiled catalogue, the Solutions JSON-LD and the legal title (now `tenant.brand_name`). Terms, Privacy and Cookies name the service One Platform; the operating entity stays 1Platform Labs. A new `check-tells` rule keeps `1Platform` (outside `1Platform Labs` and comments) out of catalogues, page content, layouts and components. `scripts/rename-brand-content.mjs` prepares the same rename offline for the stored `oneplatform` content (report with `remaining: 0`); applying it to production is a separate step (see `docs/infrastructure-branding-activation.md`).

@@ -65,7 +65,7 @@ const approvedInteriors = infrastructureChrome(Astro.locals.messages);
     </div></section>
     <section class="section section--wash" id="store-address"><div class="wrap">
       <div class="section-heading"><div><p class="eyebrow">{t('interiors.store.noDomain.eyebrow')}</p><h2 class="section-title">{t('interiors.store.noDomain.title')}</h2></div><p>{t('interiors.store.noDomain.lead')}</p></div>
-      <div class="feature-grid">{['first', 'later'].map((key) => <article class="feature-card"><span class="feature-icon"><Icon name="globe-meridian" /></span><h3>{t(`interiors.store.noDomain.${key}.host`)}</h3><p>{t(`interiors.store.noDomain.${key}.desc`)}</p></article>)}</div>
+      <div class="feature-grid store-address-grid">{['first', 'later'].map((key) => <article class="feature-card"><span class="feature-icon"><Icon name="globe-meridian" /></span><h3>{t(`interiors.store.noDomain.${key}.host`)}</h3><p>{t(`interiors.store.noDomain.${key}.desc`)}</p></article>)}</div>
       <p class="section-lede">{t('interiors.store.noDomain.caution')}</p>
     </div></section>
     <section class="story-section" id="incluido">
@@ -78,3 +78,11 @@ const approvedInteriors = infrastructureChrome(Astro.locals.messages);
   </div>
 </BaseLayout>
 ) : (<LegacyOnlineStore />)}
+
+<style is:global>
+  .photographic-interior .store-address-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .store-address-grid .feature-card .feature-icon { margin-bottom: 0; }
+  @media (max-width: 760px) {
+    .photographic-interior .store-address-grid { grid-template-columns: 1fr; }
+  }
+</style>
