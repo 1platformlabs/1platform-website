@@ -83,6 +83,7 @@ const ROUTE_OF = {
   'pages/solutions-content.ts': '/solutions/content/',
   'pages/solutions-deliveries.ts': '/solutions/deliveries/',
   'pages/solutions-review-plates.ts': '/solutions/review-plates/',
+  'pages/solutions-prospecting.ts': '/solutions/prospecting/',
   'pages/solutions-online-store.ts': '/solutions/online-store/',
   'pages/solutions-whitelabel.ts': '/solutions/whitelabel/',
   'pages/terms.ts': '/terms/',

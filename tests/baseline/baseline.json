@@ -3,8 +3,8 @@
   "subject": "the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo",
   "host": "1platform.pro",
   "bodies": "tests/baseline/html",
-  "total_routes": 102,
-  "ok_routes": 53,
+  "total_routes": 104,
+  "ok_routes": 55,
   "redirect_routes": 48,
   "other_routes": 1,
   "entries": [
@@ -423,8 +423,8 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "4311d1dd3b5ac1e2ec979c3931e9a49b088f45a8cb3e61771fb4337ed13a59cd",
-      "bytes": 76796
+      "sha256": "4f02a0b81f3102457f8340dd554361835e5172ab60a9bcd047d126029c8a1323",
+      "bytes": 77925
     },
     {
       "route": "/es/soluciones/envios/",
@@ -446,6 +446,13 @@
       "file": "es/soluciones/placas/index.html",
       "sha256": "5063e39ec0d354f50c5792e5dbae551c9bf75ae231d79009cb3ac66be1e823f6",
       "bytes": 37167
+    },
+    {
+      "route": "/es/soluciones/prospeccion/",
+      "status": 200,
+      "file": "es/soluciones/prospeccion/index.html",
+      "sha256": "e5c3ab7b69c66475f871d480fd82e8af7d9b907f28673a07a8f5807e4738a771",
+      "bytes": 37268
     },
     {
       "route": "/es/soluciones/publicidad/",
@@ -564,8 +571,8 @@
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "93ffbd2e6d97748010b17bae4d1861dd967ea09ee165622402532ee2ed904b5d",
-      "bytes": 74757
+      "sha256": "4dd136473f454628e98c2d9eeded0435eb97de45aaf4bacf85dcd3b66fcf61b3",
+      "bytes": 75856
     },
     {
       "route": "/solutions/ads/",
@@ -594,6 +601,13 @@
       "file": "solutions/online-store/index.html",
       "sha256": "eaecf1d593151ac826d8a9715e98d3222ecca88939752117abf88250a5b37383",
       "bytes": 39109
+    },
+    {
+      "route": "/solutions/prospecting/",
+      "status": 200,
+      "file": "solutions/prospecting/index.html",
+      "sha256": "26b023de7422e7b051586052b984a216c76bbc299a9511a228aed75a9709f080",
+      "bytes": 36843
     },
     {
       "route": "/solutions/review-plates/",
