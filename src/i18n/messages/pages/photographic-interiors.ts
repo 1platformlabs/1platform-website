@@ -83,7 +83,7 @@ export default defineMessages({
       'Your first address. It is generated from your store name; if it is already taken, you choose another name.',
     'interiors.store.noDomain.later.host': 'yourdomain.com',
     'interiors.store.noDomain.later.desc':
-      'Your own domain, later. Once the connection is verified, the platform address redirects to your domain and keeps every path.',
+      'Your own domain, later. Once the connection is verified, the store pages on the platform address redirect to your domain, keeping the path and parameters.',
     'interiors.store.noDomain.caution':
       'Connecting a domain delegates its nameservers and moves all of its DNS: review email and other services on that domain first.',
     'interiors.store.next.eyebrow': 'NEXT STEP',
@@ -169,10 +169,10 @@ export default defineMessages({
       'Dele un nombre a su tienda y empiece con una dirección de la plataforma. Cuando tenga su dominio, conéctelo a la misma tienda sin volver a cargar su catálogo.',
     'interiors.store.noDomain.first.host': 'sutienda.1platform.pro',
     'interiors.store.noDomain.first.desc':
-      'Su primera dirección. Se genera a partir del nombre de su tienda; si ya existe, elige otro nombre.',
+      'Su primera dirección. Se genera a partir del nombre de su tienda; si ya existe, elija otro nombre.',
     'interiors.store.noDomain.later.host': 'sudominio.com',
     'interiors.store.noDomain.later.desc':
-      'Después, su propio dominio. Al verificarse la conexión, la dirección de la plataforma redirige a su dominio conservando las rutas.',
+      'Después, su propio dominio. Al verificarse la conexión, las páginas de la tienda en la dirección de la plataforma redirigen a su dominio conservando la ruta y los parámetros.',
     'interiors.store.noDomain.caution':
       'Conectar un dominio delega sus nameservers y mueve todo su DNS: revise antes el correo y los demás servicios de ese dominio.',
     'interiors.store.next.eyebrow': 'SIGUIENTE PASO',

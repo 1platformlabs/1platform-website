@@ -63,7 +63,7 @@ const approvedInteriors = infrastructureChrome(Astro.locals.messages);
       <div class="section-heading"><div><p class="eyebrow">{t('interiors.store.whatYouGet.eyebrow')}</p><h2 class="section-title">{t('interiors.store.whatYouGet.lead')}</h2></div><p>{t('interiors.benefit_lede')}</p></div>
       <div class="feature-grid">{features.map(({ key, icon }) => <article class="feature-card"><span class="feature-icon"><Icon name={icon} /></span><h3>{t(`interiors.store.feature.${key}.title`)}</h3><p>{t(`interiors.store.feature.${key}.desc`)}</p></article>)}</div>
     </div></section>
-    <section class="section section--wash" id="sin-dominio"><div class="wrap">
+    <section class="section section--wash" id="store-address"><div class="wrap">
       <div class="section-heading"><div><p class="eyebrow">{t('interiors.store.noDomain.eyebrow')}</p><h2 class="section-title">{t('interiors.store.noDomain.title')}</h2></div><p>{t('interiors.store.noDomain.lead')}</p></div>
       <div class="feature-grid">{['first', 'later'].map((key) => <article class="feature-card"><span class="feature-icon"><Icon name="globe-meridian" /></span><h3>{t(`interiors.store.noDomain.${key}.host`)}</h3><p>{t(`interiors.store.noDomain.${key}.desc`)}</p></article>)}</div>
       <p class="section-lede">{t('interiors.store.noDomain.caution')}</p>

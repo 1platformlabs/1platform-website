@@ -43,7 +43,7 @@ export default defineMessages({
       'Your first address. It is generated from your store name; if it is already taken, you choose another name.',
     'solutions-online-store.noDomain.later.host': 'yourdomain.com',
     'solutions-online-store.noDomain.later.desc':
-      'Your own domain, later. Once the connection is verified, the platform address redirects to your domain and keeps every path.',
+      'Your own domain, later. Once the connection is verified, the store pages on the platform address redirect to your domain, keeping the path and parameters.',
     'solutions-online-store.noDomain.caution':
       'Connecting a domain delegates its nameservers and moves all of its DNS: review email and other services on that domain first.',
 
@@ -147,7 +147,7 @@ export default defineMessages({
       'Tu primera dirección. Se genera a partir del nombre de tu tienda; si ya existe, eliges otro nombre.',
     'solutions-online-store.noDomain.later.host': 'tudominio.com',
     'solutions-online-store.noDomain.later.desc':
-      'Después, tu propio dominio. Al verificarse la conexión, la dirección de la plataforma redirige a tu dominio conservando las rutas.',
+      'Después, tu propio dominio. Al verificarse la conexión, las páginas de la tienda en la dirección de la plataforma redirigen a tu dominio conservando la ruta y los parámetros.',
     'solutions-online-store.noDomain.caution':
       'Conectar un dominio delega sus nameservers y mueve todo su DNS: revisa antes el correo y los demás servicios de ese dominio.',
 
