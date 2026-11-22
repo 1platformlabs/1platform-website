@@ -80,9 +80,9 @@ const approvedInteriors = infrastructureChrome(Astro.locals.messages);
 ) : (<LegacyOnlineStore />)}
 
 <style is:global>
-  .photographic-interior .store-address-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .store-address-grid .feature-card .feature-icon { margin-bottom: 0; }
+  .photographic-interior .feature-grid.store-address-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .photographic-interior .store-address-grid .feature-card .feature-icon { margin-bottom: 0; }
   @media (max-width: 760px) {
-    .photographic-interior .store-address-grid { grid-template-columns: 1fr; }
+    .photographic-interior .feature-grid.store-address-grid { grid-template-columns: 1fr; }
   }
 </style>

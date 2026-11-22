@@ -465,8 +465,8 @@
       "route": "/es/soluciones/tienda-online/",
       "status": 200,
       "file": "es/soluciones/tienda-online/index.html",
-      "sha256": "9a8f5b65116ddc93ead24891b9a78c7266c819d71cf619f0907e75cbcec69648",
-      "bytes": 41526
+      "sha256": "273674356f8016d2f66b4c36103cf4847249fea0bd4cfcb7cbdcad669e7ec27d",
+      "bytes": 41575
     },
     {
       "route": "/es/solutions/",
@@ -592,8 +592,8 @@
       "route": "/solutions/online-store/",
       "status": 200,
       "file": "solutions/online-store/index.html",
-      "sha256": "33895584bdee94f559c622ec394b4c7cbd02e86e0022c2a4ef54ba9818102698",
-      "bytes": 41053
+      "sha256": "2dd12e5c54762044231997b5742a692d31c004e24bd418741da327d29c3d35f1",
+      "bytes": 41102
     },
     {
       "route": "/solutions/review-plates/",
