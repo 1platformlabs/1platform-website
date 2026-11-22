@@ -34,6 +34,19 @@ export default defineMessages({
     'solutions-online-store.feature.domain.desc':
       'Register or connect a domain in minutes. DNS, nameservers, and renewals handled for you.',
 
+    'solutions-online-store.noDomain.eyebrow': 'Online store',
+    'solutions-online-store.noDomain.title': 'Start without your own domain',
+    'solutions-online-store.noDomain.lead':
+      'Name your store and start with a platform address. When you have a domain, connect it to the same store without uploading your catalog again.',
+    'solutions-online-store.noDomain.first.host': 'yourstore.1platform.pro',
+    'solutions-online-store.noDomain.first.desc':
+      'Your first address. It is generated from your store name; if it is already taken, you choose another name.',
+    'solutions-online-store.noDomain.later.host': 'yourdomain.com',
+    'solutions-online-store.noDomain.later.desc':
+      'Your own domain, later. Once the connection is verified, the platform address redirects to your domain and keeps every path.',
+    'solutions-online-store.noDomain.caution':
+      'Connecting a domain delegates its nameservers and moves all of its DNS: review email and other services on that domain first.',
+
     'solutions-online-store.inTheBox.eyebrow': 'In the box',
     'solutions-online-store.inTheBox.title': 'No plugin list to assemble',
     'solutions-online-store.inTheBox.desc':
@@ -54,18 +67,17 @@ export default defineMessages({
     'solutions-online-store.howItWorks.eyebrow': 'How it works',
     'solutions-online-store.howItWorks.lead': 'Four steps from idea to live store.',
     'solutions-online-store.howItWorks.aria': 'How to launch a store, step by step',
-    // The order is the product's, not a marketing arc. The domain is a
-    // blocking, paid prerequisite: `ProvisioningCreateRequest.domain` is
-    // `Field(...)` with no default, and the endpoint answers 422
-    // DOMAIN_NOT_VERIFIED for an unverified external name — there is no
-    // courtesy subdomain anywhere in the product. And "Go live" was not a
-    // step at all: no Publish button exists; the store is live when the
-    // provisioning job reaches `completed`. The collection account, which the
-    // old list never mentioned, is a mandatory step for a store
-    // (MERCHANT_CREDENTIAL in `_STORE_STEPS`) — without it the store cannot
-    // charge.
-    'solutions-online-store.step.domain': 'Register or connect your domain',
-    'solutions-online-store.step.buildStore': 'Build your store on it',
+    // The order is the product's, not a marketing arc. The first step is the
+    // store's address: a platform address (`<name>.1platform.pro`, generated
+    // from the store name) or a domain of your own. A domain is no longer a
+    // blocking prerequisite — the store can open on the platform address and
+    // connect the domain later (the old address then redirects to it). "Go
+    // live" is still not a step: no Publish button exists; the store is live
+    // when the provisioning job reaches `completed`. The collection account is
+    // a mandatory step for a store (MERCHANT_CREDENTIAL in `_STORE_STEPS`) —
+    // without it the store cannot charge.
+    'solutions-online-store.step.domain': 'Choose your address: on the platform or your own domain',
+    'solutions-online-store.step.buildStore': 'Build your store at that address',
     'solutions-online-store.step.collectionAccount': 'Connect your collection account',
     'solutions-online-store.step.addProductsAndSell': 'Add products and sell',
 
@@ -77,8 +89,8 @@ export default defineMessages({
     'solutions-online-store.compare.payments.with': 'Payments built in',
     'solutions-online-store.compare.invoicing.without': 'Invoicing software billed and managed on its own',
     'solutions-online-store.compare.invoicing.with': 'Electronic invoicing included',
-    'solutions-online-store.compare.domain.without': 'A registrar dashboard you log into separately',
-    'solutions-online-store.compare.domain.with': 'Domain managed for you',
+    'solutions-online-store.compare.domain.without': 'A domain to buy and configure before you can open',
+    'solutions-online-store.compare.domain.with': 'Start on a platform address and connect your domain later',
 
     'solutions-online-store.related.eyebrow': 'Related solutions',
     'solutions-online-store.related.lead': 'Everything your store needs to grow.',
@@ -126,6 +138,19 @@ export default defineMessages({
     'solutions-online-store.feature.domain.desc':
       'Registra o conecta un dominio en minutos. DNS, nameservers y renovaciones gestionados por ti.',
 
+    'solutions-online-store.noDomain.eyebrow': 'Tienda en línea',
+    'solutions-online-store.noDomain.title': 'Empieza sin dominio propio',
+    'solutions-online-store.noDomain.lead':
+      'Dale un nombre a tu tienda y empieza con una dirección de la plataforma. Cuando tengas tu dominio, conéctalo a la misma tienda sin volver a cargar tu catálogo.',
+    'solutions-online-store.noDomain.first.host': 'tutienda.1platform.pro',
+    'solutions-online-store.noDomain.first.desc':
+      'Tu primera dirección. Se genera a partir del nombre de tu tienda; si ya existe, eliges otro nombre.',
+    'solutions-online-store.noDomain.later.host': 'tudominio.com',
+    'solutions-online-store.noDomain.later.desc':
+      'Después, tu propio dominio. Al verificarse la conexión, la dirección de la plataforma redirige a tu dominio conservando las rutas.',
+    'solutions-online-store.noDomain.caution':
+      'Conectar un dominio delega sus nameservers y mueve todo su DNS: revisa antes el correo y los demás servicios de ese dominio.',
+
     'solutions-online-store.inTheBox.eyebrow': 'Incluido',
     'solutions-online-store.inTheBox.title': 'Sin lista de plugins que armar',
     'solutions-online-store.inTheBox.desc':
@@ -146,8 +171,8 @@ export default defineMessages({
     'solutions-online-store.howItWorks.eyebrow': 'Cómo funciona',
     'solutions-online-store.howItWorks.lead': 'Cuatro pasos de la idea a una tienda en vivo.',
     'solutions-online-store.howItWorks.aria': 'Cómo lanzar una tienda, paso a paso',
-    'solutions-online-store.step.domain': 'Registra o conecta tu dominio',
-    'solutions-online-store.step.buildStore': 'Crea tu tienda sobre él',
+    'solutions-online-store.step.domain': 'Elige tu dirección: en la plataforma o tu propio dominio',
+    'solutions-online-store.step.buildStore': 'Crea tu tienda en esa dirección',
     'solutions-online-store.step.collectionAccount': 'Conecta tu cuenta de cobro',
     'solutions-online-store.step.addProductsAndSell': 'Agrega productos y vende',
 
@@ -159,8 +184,8 @@ export default defineMessages({
     'solutions-online-store.compare.payments.with': 'Pagos integrados',
     'solutions-online-store.compare.invoicing.without': 'Software de facturación pagado y gestionado por su cuenta',
     'solutions-online-store.compare.invoicing.with': 'Facturación electrónica incluida',
-    'solutions-online-store.compare.domain.without': 'Un panel de registrador al que entras por separado',
-    'solutions-online-store.compare.domain.with': 'Dominio gestionado por ti',
+    'solutions-online-store.compare.domain.without': 'Un dominio que comprar y configurar antes de poder abrir',
+    'solutions-online-store.compare.domain.with': 'Empiezas en una dirección de la plataforma y conectas tu dominio después',
 
     'solutions-online-store.related.eyebrow': 'Soluciones relacionadas',
     'solutions-online-store.related.lead': 'Todo lo que tu tienda necesita para crecer.',
