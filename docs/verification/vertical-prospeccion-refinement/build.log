@@ -1,0 +1,22 @@
+
+> 1platform-website@3.5.17 build
+> astro build
+
+09:28:48 [@astrojs/node] Enabling sessions with filesystem storage
+09:28:49 [content] Syncing content
+09:28:49 [content] Synced content
+09:28:49 [types] Generated 295ms
+09:28:49 [build] output: "server"
+09:28:49 [build] mode: "server"
+09:28:49 [build] directory: /Users/staimer/Documents/1platform-worktrees/vertical-prospeccion-1platform-website/dist/
+09:28:49 [build] adapter: @astrojs/node
+09:28:49 [build] Collecting build info...
+09:28:49 [build] ✓ Completed in 344ms.
+09:28:49 [build] Building server entrypoints...
+09:28:49 [vite] ✓ built in 230ms
+09:28:49 [vite] ✓ built in 359ms
+09:28:49 [vite] ✓ built in 48ms
+09:28:49 [build] Rearranging server assets...
+09:28:49 [build] ✓ Completed in 671ms.
+09:28:49 [build] Server built in 1.04s
+09:28:49 [build] Complete!
