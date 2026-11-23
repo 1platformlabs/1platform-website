@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Contacto: «Sign in at app.1platform.pro and use…» / «Inicia sesión en app.1platform.pro y…» con espacios alrededor del enlace (#188).
 - «Saltar al contenido» lleva el foco a `#main-content` también con movimiento normal (el desplazamiento suave cancelaba la navegación del navegador), y los anclajes internos siguen funcionando tras una navegación del lado del cliente (#197).
 - Las páginas en español del blog muestran las fechas en español en PROD: la imagen de runtime (nginx:alpine + `nodejs`) traía sólo los datos ICU en inglés; ahora instala `icu-data-full` y el build falla si `Intl` no formatea español (#179).
 - Rename the brand to One Platform across the site sources: every compiled catalogue, the Solutions JSON-LD and the legal title (now `tenant.brand_name`). Terms, Privacy and Cookies name the service One Platform; the operating entity stays 1Platform Labs. A new `check-tells` rule keeps `1Platform` (outside `1Platform Labs` and comments) out of catalogues, page content, layouts and components. `scripts/rename-brand-content.mjs` prepares the same rename offline for the stored `oneplatform` content (report with `remaining: 0`); applying it to production is a separate step (see `docs/infrastructure-branding-activation.md`).
