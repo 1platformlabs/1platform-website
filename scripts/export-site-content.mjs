@@ -44,10 +44,19 @@
  *   node scripts/export-site-content.mjs --check     # verify the map, write nothing
  */
 
-import { readFileSync, readdirSync, writeFileSync, statSync } from 'node:fs'
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { runInNewContext } from 'node:vm'
+import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
 import { transformSync } from 'esbuild'
+
+const requireModule = createRequire(import.meta.url)
+
+/** Plain code-unit order, the same order `Array#sort()` gives strings by default. */
+function byCodeUnit(a, b) {
+  if (a < b) return -1
+  return a > b ? 1 : 0
+}
 
 const MESSAGES_DIR = 'src/i18n/messages'
 const PAGES_DIR = 'src/pages'
@@ -128,18 +137,12 @@ function walk(dir, base = dir) {
  * identity function, because `defineMessages` exists to give TypeScript a
  * constraint and does nothing at runtime — verified in `src/i18n/ui.ts`.
  *
- * Evaluating rather than parsing is deliberate: these files contain template
+ * Loading rather than parsing is deliberate: these files contain template
  * literals and comments, and a regex that handles those correctly is a
  * JavaScript parser written badly. The input is this repository's own source,
  * committed and reviewed, so evaluating it is no more trusting than importing
  * it — which is what the site itself does on every request.
  */
-/** Plain code-unit order, the same order `Array#sort()` gives strings by default. */
-function byCodeUnit(a, b) {
-  if (a < b) return -1
-  return a > b ? 1 : 0
-}
-
 function readCatalogue(file) {
   const source = readFileSync(file, 'utf8')
   const withoutImport = source.replace(
@@ -147,10 +150,18 @@ function readCatalogue(file) {
     'const defineMessages = (x) => x;',
   )
   const js = transformSync(withoutImport, { loader: 'ts', format: 'cjs' }).code
-  const module = { exports: {} }
-  // A fresh context with only `module`/`exports`: the catalogue sees no Node globals.
-  runInNewContext(js, { module, exports: module.exports }, { filename: file })
-  const value = module.exports.default ?? module.exports
+  // Load the transpiled catalogue as an ordinary CommonJS module (no eval): write
+  // it to a private temp dir, require it once, and remove it.
+  const dir = mkdtempSync(join(tmpdir(), 'site-catalogue-'))
+  let exported
+  try {
+    const compiled = join(dir, 'catalogue.cjs')
+    writeFileSync(compiled, js)
+    exported = requireModule(compiled)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+  const value = exported.default ?? exported
   if (!value || typeof value !== 'object' || !value.en || !value.es) {
     throw new Error(`${file}: expected a default export with 'en' and 'es' objects`)
   }
