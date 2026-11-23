@@ -81,6 +81,11 @@ export default defineMessages({
       'A counter plate with NFC and QR that takes your customer to your reviews, your profile or your chat, and that you can re-point at any time.',
     'solutions.group.intelligence.item.reviewPlates.replaces': 'A printed code that goes stale',
 
+    'solutions.group.intelligence.item.prospecting.title': 'Prospecting',
+    'solutions.group.intelligence.item.prospecting.desc':
+      'Describe who you want to reach: Sofia finds companies that fit, researches their sites and prepares a message for each one. You approve every message before it is sent.',
+    'solutions.group.intelligence.item.prospecting.replaces': 'A spreadsheet of leads and copy-pasted emails',
+
     // — Group: build your site ———————————————————————————————————
     'solutions.group.content.eyebrow': 'Build your site',
     'solutions.group.content.title': 'Everything the storefront is made of',
@@ -273,6 +278,11 @@ export default defineMessages({
     'solutions.group.intelligence.item.reviewPlates.desc':
       'Una placa de mostrador con NFC y QR que lleva a tu cliente a tus reseñas, tu perfil o tu chat, y que puedes redirigir cuando quieras.',
     'solutions.group.intelligence.item.reviewPlates.replaces': 'Un código impreso que queda viejo',
+
+    'solutions.group.intelligence.item.prospecting.title': 'Prospección',
+    'solutions.group.intelligence.item.prospecting.desc':
+      'Describe a quién quieres llegar: Sofia encuentra empresas que encajan, investiga sus sitios y prepara un mensaje para cada una. Tú apruebas cada mensaje antes de que se envíe.',
+    'solutions.group.intelligence.item.prospecting.replaces': 'Una hoja de cálculo de contactos y correos copiados a mano',
 
     // — Grupo: crea tu sitio —————————————————————————————————————
     'solutions.group.content.eyebrow': 'Crea tu sitio',
