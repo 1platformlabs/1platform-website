@@ -472,8 +472,8 @@
       "route": "/es/soluciones/tienda-online/",
       "status": 200,
       "file": "es/soluciones/tienda-online/index.html",
-      "sha256": "dfa0933640f261e47ee7395b6122bc38186b5522f1f32ae27bf3af66c0b66f49",
-      "bytes": 39527
+      "sha256": "273674356f8016d2f66b4c36103cf4847249fea0bd4cfcb7cbdcad669e7ec27d",
+      "bytes": 41575
     },
     {
       "route": "/es/solutions/",
@@ -599,8 +599,8 @@
       "route": "/solutions/online-store/",
       "status": 200,
       "file": "solutions/online-store/index.html",
-      "sha256": "eaecf1d593151ac826d8a9715e98d3222ecca88939752117abf88250a5b37383",
-      "bytes": 39109
+      "sha256": "2dd12e5c54762044231997b5742a692d31c004e24bd418741da327d29c3d35f1",
+      "bytes": 41102
     },
     {
       "route": "/solutions/prospecting/",
