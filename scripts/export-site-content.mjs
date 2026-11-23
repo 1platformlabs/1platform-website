@@ -46,6 +46,7 @@
 
 import { readFileSync, readdirSync, writeFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { runInNewContext } from 'node:vm'
 import { transformSync } from 'esbuild'
 
 const MESSAGES_DIR = 'src/i18n/messages'
@@ -133,6 +134,12 @@ function walk(dir, base = dir) {
  * committed and reviewed, so evaluating it is no more trusting than importing
  * it — which is what the site itself does on every request.
  */
+/** Plain code-unit order, the same order `Array#sort()` gives strings by default. */
+function byCodeUnit(a, b) {
+  if (a < b) return -1
+  return a > b ? 1 : 0
+}
+
 function readCatalogue(file) {
   const source = readFileSync(file, 'utf8')
   const withoutImport = source.replace(
@@ -141,8 +148,8 @@ function readCatalogue(file) {
   )
   const js = transformSync(withoutImport, { loader: 'ts', format: 'cjs' }).code
   const module = { exports: {} }
-  // eslint-disable-next-line no-new-func
-  new Function('module', 'exports', js)(module, module.exports)
+  // A fresh context with only `module`/`exports`: the catalogue sees no Node globals.
+  runInNewContext(js, { module, exports: module.exports }, { filename: file })
   const value = module.exports.default ?? module.exports
   if (!value || typeof value !== 'object' || !value.en || !value.es) {
     throw new Error(`${file}: expected a default export with 'en' and 'es' objects`)
@@ -163,8 +170,8 @@ function main() {
     process.exit(64)
   }
 
-  const onDisk = walk(MESSAGES_DIR).filter((f) => f.endsWith('.ts')).sort()
-  const mapped = Object.keys(ROUTE_OF).sort()
+  const onDisk = walk(MESSAGES_DIR).filter((f) => f.endsWith('.ts')).sort(byCodeUnit)
+  const mapped = Object.keys(ROUTE_OF).sort(byCodeUnit)
 
   // ── Cross-check 1: the map and the disk agree, in BOTH directions ──────
   // One direction alone is the classic half-check: "every mapped file exists"
@@ -265,7 +272,7 @@ function main() {
       '/changelog/',
       ...blogRoutes,
     ]),
-  ].sort()
+  ].sort(byCodeUnit)
 
   const fixture = {
     // Named so the seed cannot be pointed at the wrong tenant by accident.
