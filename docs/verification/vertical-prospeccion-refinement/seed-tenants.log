@@ -1,0 +1,32 @@
+2026-11-22 09:32:03,119 INFO fixture ok: 1 tenant(s), 2 host(s) — oneplatform
+2026-11-22 09:32:03,125 INFO site_seed_photographic_left_draft slug=oneplatform reason=root_not_stored
+2026-11-22 09:32:03,125 INFO == 2026-09-08_seed_site_tenants start (dry=False, db=e2e_vertical_prospeccion, collection=site_tenants) ==
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=brand_assets old=null new={"icon": "/brand/one-platform-symbol.png", "social_image": "/og/default.png"}
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=brand_mark old=null new="1"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=brand_name old=null new="One Platform"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=brand_wordmark old=null new="One Platform"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=default_locale old=null new="en"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=destinations old=null new={"app": "https://app.1platform.pro/app/", "docs": "https://developer.1platform.pro/", "status": null, "support": "https://wa.me/50253946564"}
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=domain old=null new="1platform.pro"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=domain_is_final old=null new=true
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=google_site_verification old=null new="google1dd96c2b1cc5f482"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=home_template old=null new="photographic-service"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=host_aliases old=null new=["www.1platform.pro"]
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=locales old=null new=["en", "es"]
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=slug old=null new="oneplatform"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=status old=null new="draft"
+2026-11-22 09:32:03,129 INFO site_seed_changed slug=oneplatform field=theme old=null new={"accent": "#2854a7", "accent_contrast": "#ffffff", "display_font": "manrope"}
+2026-11-22 09:32:03,140 INFO site_seed_refinement_applied slug=oneplatform fields=brand_assets,brand_mark,brand_name,brand_wordmark,default_locale,destinations,domain,domain_is_final,google_site_verification,home_template,host_aliases,locales,slug,status,theme
+2026-11-22 09:32:03,140 INFO stats: {'examined': 1, 'inserted': 1, 'updated': 0, 'unchanged': 0}
+2026-11-22 09:32:05,142 INFO fixture ok: 1 tenant(s), 2 host(s) — oneplatform
+2026-11-22 09:32:05,148 INFO == 2026-09-08_seed_site_tenants start (dry=False, db=e2e_vertical_prospeccion, collection=site_tenants) ==
+2026-11-22 09:32:05,151 WARNING site_seed_left_draft slug=oneplatform reason=home_content_missing locale=en missing=65
+2026-11-22 09:32:05,151 INFO stats: {'examined': 1, 'inserted': 0, 'updated': 0, 'unchanged': 1}
+2026-11-22 09:32:05,153 WARNING site_seed_left_draft slug=oneplatform reason=home_content_missing locale=en missing=65
+2026-11-22 09:32:05,153 INFO verify: 1 manifest(s) match the fixture
+2026-11-22 09:32:58,551 INFO fixture ok: 1 tenant(s), 2 host(s) — oneplatform
+2026-11-22 09:32:58,558 INFO == 2026-09-08_seed_site_tenants start (dry=False, db=e2e_vertical_prospeccion, collection=site_tenants) ==
+2026-11-22 09:32:58,561 INFO site_seed_changed slug=oneplatform field=status old="draft" new="published"
+2026-11-22 09:32:58,567 INFO site_seed_refinement_applied slug=oneplatform fields=status
+2026-11-22 09:32:58,567 INFO stats: {'examined': 1, 'inserted': 0, 'updated': 1, 'unchanged': 0}
+2026-11-22 09:32:58,568 INFO verify: 1 manifest(s) match the fixture

@@ -159,6 +159,19 @@ const sellAndGetPaid: Solution[] = [
         },
       ]
     : []),
+  // Same rule (vertical-prospeccion, PRS-13): the card exists only where the
+  // tenant publishes the landing, and its keys are asked only inside the branch.
+  ...(Astro.locals.tenant.pages.includes('/solutions/prospecting/')
+    ? [
+        {
+          icon: 'users' as const,
+          title: t('solutions.group.intelligence.item.prospecting.title'),
+          description: t('solutions.group.intelligence.item.prospecting.desc'),
+          replaces: t('solutions.group.intelligence.item.prospecting.replaces'),
+          href: l('/solutions/prospecting/'),
+        },
+      ]
+    : []),
 ];
 
 /* Build your site — everything a storefront or site is made of. */

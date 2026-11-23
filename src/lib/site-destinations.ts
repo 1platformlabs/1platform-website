@@ -123,3 +123,16 @@ export function plateOrderUrl(locals: DestinationLocals): string | null {
   url.searchParams.set('next', '/main/plates/orders?new=1')
   return environmentDestination(url.toString())
 }
+
+/**
+ * Where "set up prospecting" leads: the tenant's panel sign-in, carrying the
+ * prospecting section as `next` (epic vertical-prospeccion, PRS-13). `null`
+ * when the tenant has no panel; the caller renders no CTA, never a default.
+ */
+export function prospectingUrl(locals: DestinationLocals): string | null {
+  const base = locals.tenant.destinations.app
+  if (!base) return null
+  const url = new URL('/auth/login', base)
+  url.searchParams.set('next', '/main/prospecting')
+  return environmentDestination(url.toString())
+}
