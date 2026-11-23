@@ -79,7 +79,13 @@ ARG NODE_RUNTIME_MIN=22.23.4
 # encoder succeed while silently omitting the brand text. Keep a small,
 # deterministic sans face in the runtime image rather than relying on a build
 # dependency that `npm ci --omit=dev` removes.
-RUN apk add --no-cache --upgrade "nodejs>=${NODE_RUNTIME_MIN}" fontconfig font-dejavu \
+#
+# `icu-data-full`: Alpine's `nodejs` uses the system ICU, whose default data is
+# `icu-data-en` (English only). Without it `Intl.DateTimeFormat('es', …)` falls
+# back to English and every Spanish blog page showed «May 20, 2026» (#179). The
+# second `node -e` fails the build if Spanish still formats as English.
+RUN apk add --no-cache --upgrade "nodejs>=${NODE_RUNTIME_MIN}" icu-data-full fontconfig font-dejavu \
+ && node -e 'const m=new Intl.DateTimeFormat("es",{month:"long",timeZone:"UTC"}).format(new Date(Date.UTC(2026,4,20)));if(m!=="mayo"){console.error(`Intl sin datos de español (mes=${m}): falta icu-data-full`);process.exit(1)}' \
  && node -e 'const [m,c]=[process.argv[1],process.versions.node].map(v=>v.split(".").map(Number));if((c.map((x,i)=>x-m[i]).find(x=>x!==0)??0)<0){console.error(`Node ${process.version} está por debajo del piso de seguridad v${process.argv[1]}`);process.exit(1)}' "${NODE_RUNTIME_MIN}" \
  && echo "runtime: node $(node -v) (piso v${NODE_RUNTIME_MIN})"
 

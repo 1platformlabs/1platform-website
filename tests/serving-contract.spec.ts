@@ -323,6 +323,23 @@ test('the container carries a runtime for the application it now proxies to', ()
   expect(dockerfile, 'derived social cards need a deterministic runtime font').toMatch(/font-dejavu/)
 })
 
+test('the runtime formats dates in every locale, not only in English (#179)', () => {
+  // Alpine's `nodejs` links the system ICU, whose default data package is
+  // `icu-data-en`. Measured 2026-11-22 in nginx:1.27-alpine + nodejs (ICU 74.2):
+  // `Intl.DateTimeFormat('es', {month:'long'})` → "May 20, 2026"; after
+  // `apk add icu-data-full` → "20 de mayo de 2026". PROD served every Spanish
+  // blog page with English dates while a Mac (full ICU) rendered them right.
+  const dockerfile = readFileSync('Dockerfile', 'utf8')
+  const runtime = dockerfile.slice(dockerfile.indexOf('AS runtime'))
+  expect(runtime, 'the runtime stage must install the full ICU data').toMatch(/apk add --no-cache[^\n]*\bicu-data-full\b/)
+  // The package name alone could be dropped by a future rewrite of that line
+  // without anyone noticing, so the image build itself refuses to finish when
+  // Spanish still formats as English.
+  expect(runtime, 'the build must fail when Intl cannot format Spanish').toMatch(
+    /Intl\.DateTimeFormat\(\s*["']es["'][\s\S]*mayo[\s\S]*process\.exit\(1\)/,
+  )
+})
+
 test('the container has a channel for its configuration', () => {
   // Measured before this existed: the compose file declared no `environment:`
   // and no `env_file:`, and the deploy wrote an EMPTY `.env.prod`. The site
