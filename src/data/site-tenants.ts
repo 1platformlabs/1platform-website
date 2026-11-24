@@ -114,6 +114,7 @@ const ONEPLATFORM: SiteTenant = {
     '/solutions/',
     '/solutions/ads/',
     '/solutions/content/',
+    '/solutions/coupons/',
     '/solutions/deliveries/',
     '/solutions/online-store/',
     '/solutions/prospecting/',

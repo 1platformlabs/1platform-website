@@ -86,6 +86,11 @@ export default defineMessages({
       'Describe who you want to reach: Sofia finds companies that fit, researches their sites and prepares a message for each one. You approve every message before it is sent.',
     'solutions.group.intelligence.item.prospecting.replaces': 'A spreadsheet of leads and copy-pasted emails',
 
+    'solutions.group.intelligence.item.coupons.title': 'Coupons',
+    'solutions.group.intelligence.item.coupons.desc':
+      'Create discount coupons and batches of unique codes, set when they apply and how many times they can be used, and have your online store, in-person sales and your clients’ balance honor them.',
+    'solutions.group.intelligence.item.coupons.replaces': 'Codes kept in a spreadsheet and applied by hand',
+
     // — Group: build your site ———————————————————————————————————
     'solutions.group.content.eyebrow': 'Build your site',
     'solutions.group.content.title': 'Everything the storefront is made of',
@@ -283,6 +288,11 @@ export default defineMessages({
     'solutions.group.intelligence.item.prospecting.desc':
       'Describe a quién quieres llegar: Sofia encuentra empresas que encajan, investiga sus sitios y prepara un mensaje para cada una. Tú apruebas cada mensaje antes de que se envíe.',
     'solutions.group.intelligence.item.prospecting.replaces': 'Una hoja de cálculo de contactos y correos copiados a mano',
+
+    'solutions.group.intelligence.item.coupons.title': 'Cupones',
+    'solutions.group.intelligence.item.coupons.desc':
+      'Crea cupones de descuento y lotes de códigos únicos, define cuándo aplican y cuántas veces se pueden usar, y haz que tu tienda en línea, tus ventas en persona y el saldo de tus clientes los respeten.',
+    'solutions.group.intelligence.item.coupons.replaces': 'Códigos en una hoja de cálculo que se aplican a mano',
 
     // — Grupo: crea tu sitio —————————————————————————————————————
     'solutions.group.content.eyebrow': 'Crea tu sitio',

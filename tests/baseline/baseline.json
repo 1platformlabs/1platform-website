@@ -3,8 +3,8 @@
   "subject": "the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo",
   "host": "1platform.pro",
   "bodies": "tests/baseline/html",
-  "total_routes": 104,
-  "ok_routes": 55,
+  "total_routes": 106,
+  "ok_routes": 57,
   "redirect_routes": 48,
   "other_routes": 1,
   "entries": [
@@ -423,8 +423,15 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "4f02a0b81f3102457f8340dd554361835e5172ab60a9bcd047d126029c8a1323",
-      "bytes": 77925
+      "sha256": "3bf466bad79e96d4abf699188d38c012f11238417c596469a5599295c81ab194",
+      "bytes": 79021
+    },
+    {
+      "route": "/es/soluciones/cupones/",
+      "status": 200,
+      "file": "es/soluciones/cupones/index.html",
+      "sha256": "71839aa1a8ffdc3b7683b99c64e78c7f07058919878d623049477eeb2a49d569",
+      "bytes": 37808
     },
     {
       "route": "/es/soluciones/envios/",
@@ -571,8 +578,8 @@
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "4dd136473f454628e98c2d9eeded0435eb97de45aaf4bacf85dcd3b66fcf61b3",
-      "bytes": 75856
+      "sha256": "2eaf0971f2f48b9f92484aa9e45aed0d374ee56e8392bcb92bf8ebd43a0c20f6",
+      "bytes": 76929
     },
     {
       "route": "/solutions/ads/",
@@ -587,6 +594,13 @@
       "file": "solutions/content/index.html",
       "sha256": "62fe948ea0b2270193ff68896be1fc00df9bdf7eff53999caae1c790eec34448",
       "bytes": 44567
+    },
+    {
+      "route": "/solutions/coupons/",
+      "status": 200,
+      "file": "solutions/coupons/index.html",
+      "sha256": "5f9cc391fffaa4f3d6bad4ac57cdae8c77eff0208ee4609fe63d9add9b8f1399",
+      "bytes": 37515
     },
     {
       "route": "/solutions/deliveries/",

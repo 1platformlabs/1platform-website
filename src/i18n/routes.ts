@@ -60,6 +60,7 @@ export const ES_PATHS: Readonly<Record<string, string>> = {
   '/solutions/deliveries/': '/es/soluciones/envios/',
   '/solutions/review-plates/': '/es/soluciones/placas/',
   '/solutions/prospecting/': '/es/soluciones/prospeccion/',
+  '/solutions/coupons/': '/es/soluciones/cupones/',
   '/solutions/ads/': '/es/soluciones/publicidad/',
   '/solutions/whitelabel/': '/es/soluciones/marca-blanca/',
   '/solutions/content/': '/es/soluciones/sitio-web-y-contenido/',
