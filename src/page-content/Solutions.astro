@@ -172,6 +172,19 @@ const sellAndGetPaid: Solution[] = [
         },
       ]
     : []),
+  // Same rule (cupones-motor-core, MCU-09): the card exists only where the
+  // tenant publishes the landing, and its keys are asked only inside the branch.
+  ...(Astro.locals.tenant.pages.includes('/solutions/coupons/')
+    ? [
+        {
+          icon: 'tag' as const,
+          title: t('solutions.group.intelligence.item.coupons.title'),
+          description: t('solutions.group.intelligence.item.coupons.desc'),
+          replaces: t('solutions.group.intelligence.item.coupons.replaces'),
+          href: l('/solutions/coupons/'),
+        },
+      ]
+    : []),
 ];
 
 /* Build your site — everything a storefront or site is made of. */

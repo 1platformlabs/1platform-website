@@ -94,6 +94,7 @@ const ROUTE_OF = {
   'pages/solutions-deliveries.ts': '/solutions/deliveries/',
   'pages/solutions-review-plates.ts': '/solutions/review-plates/',
   'pages/solutions-prospecting.ts': '/solutions/prospecting/',
+  'pages/solutions-coupons.ts': '/solutions/coupons/',
   'pages/solutions-online-store.ts': '/solutions/online-store/',
   'pages/solutions-whitelabel.ts': '/solutions/whitelabel/',
   'pages/terms.ts': '/terms/',
