@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The Social media capability now names what can be published: posts, Reels and Stories (ES «Publicaciones, Reels e Historias»). Merge only after the Reels/Stories capability is on in production and its real-account test passed (epic `redes-sociales-reels-y-stories`, F5).
+
 - Keep the platform-address and custom-domain cards in two full-width columns on desktop, with aligned headings and a single column on mobile; long example addresses no longer split across lines at 1280 px.
 
 - Online Store solution page (es/en): new section «Start without your own domain» — a store opens on a platform address (`yourstore.1platform.pro`) and the domain is connected later, after which the platform address redirects to it keeping paths. The first step, the comparison row and the comment that denied a courtesy subdomain are rewritten in both catalogues (`solutions-online-store`, `photographic-interiors`) and in the activation overlay reference; frozen baseline of the two online-store routes re-frozen. Publish only once the capability is ON in PROD.
