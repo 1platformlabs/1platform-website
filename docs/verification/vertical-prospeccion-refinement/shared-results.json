@@ -1,0 +1,114 @@
+[
+  {
+    "port": 4921,
+    "reducedMotion": "reduce",
+    "status": 200,
+    "initial": "Skip to main content",
+    "after": {
+      "active": "BODY",
+      "id": "",
+      "text": "Skip to main contentOne PlatformSolutionsInfrastructureAIBlogDocumentationContac",
+      "hash": "#main-content",
+      "y": 0
+    },
+    "next": {
+      "active": "A",
+      "cls": "",
+      "text": "Home"
+    },
+    "buttons": [
+      {
+        "text": "Start Free",
+        "h": 44
+      },
+      {
+        "text": "View Solutions",
+        "h": 44
+      }
+    ]
+  },
+  {
+    "port": 4921,
+    "reducedMotion": "no-preference",
+    "status": 200,
+    "initial": "Skip to main content",
+    "after": {
+      "active": "A",
+      "id": "",
+      "text": "Skip to main content",
+      "hash": "",
+      "y": 0
+    },
+    "next": {
+      "active": "A",
+      "cls": "brand-lockup",
+      "text": "One Platform"
+    },
+    "buttons": [
+      {
+        "text": "Start Free",
+        "h": 44
+      },
+      {
+        "text": "View Solutions",
+        "h": 44
+      }
+    ]
+  },
+  {
+    "port": 5021,
+    "reducedMotion": "reduce",
+    "status": 200,
+    "initial": "Skip to main content",
+    "after": {
+      "active": "BODY",
+      "id": "",
+      "text": "Skip to main contentOne PlatformSolutionsInfrastructureAIBlogDocumentationContac",
+      "hash": "#main-content",
+      "y": 0
+    },
+    "next": {
+      "active": "A",
+      "cls": "",
+      "text": "Home"
+    },
+    "buttons": [
+      {
+        "text": "Start Free",
+        "h": 44
+      },
+      {
+        "text": "View Solutions",
+        "h": 44
+      }
+    ]
+  },
+  {
+    "port": 5021,
+    "reducedMotion": "no-preference",
+    "status": 200,
+    "initial": "Skip to main content",
+    "after": {
+      "active": "A",
+      "id": "",
+      "text": "Skip to main content",
+      "hash": "",
+      "y": 0
+    },
+    "next": {
+      "active": "A",
+      "cls": "brand-lockup",
+      "text": "One Platform"
+    },
+    "buttons": [
+      {
+        "text": "Start Free",
+        "h": 44
+      },
+      {
+        "text": "View Solutions",
+        "h": 44
+      }
+    ]
+  }
+]

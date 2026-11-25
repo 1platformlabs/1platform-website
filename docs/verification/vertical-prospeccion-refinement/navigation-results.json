@@ -1,0 +1,44 @@
+[
+  {
+    "locale": "en",
+    "width": 1360,
+    "menu": null,
+    "target": "/es/soluciones/prospeccion/",
+    "actual": "es",
+    "url": "http://1platform.pro:4921/es/soluciones/prospeccion/"
+  },
+  {
+    "locale": "en",
+    "width": 375,
+    "menu": {
+      "first": true,
+      "back": true,
+      "closed": true,
+      "returned": true
+    },
+    "target": "/es/soluciones/prospeccion/",
+    "actual": "es",
+    "url": "http://1platform.pro:4921/es/soluciones/prospeccion/"
+  },
+  {
+    "locale": "es",
+    "width": 1360,
+    "menu": null,
+    "target": "/solutions/prospecting/",
+    "actual": "en",
+    "url": "http://1platform.pro:4921/solutions/prospecting/"
+  },
+  {
+    "locale": "es",
+    "width": 375,
+    "menu": {
+      "first": true,
+      "back": true,
+      "closed": true,
+      "returned": true
+    },
+    "target": "/solutions/prospecting/",
+    "actual": "en",
+    "url": "http://1platform.pro:4921/solutions/prospecting/"
+  }
+]

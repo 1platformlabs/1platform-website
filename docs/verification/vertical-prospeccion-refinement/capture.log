@@ -1,0 +1,282 @@
+[
+  {
+    "key": "en-1360",
+    "status": 200,
+    "url": "http://1platform.pro:4921/solutions/prospecting/#how-it-works",
+    "overflow": 0,
+    "headings": [
+      {
+        "tag": "H1",
+        "text": "Find the right companies. You decide what gets sent."
+      },
+      {
+        "tag": "H2",
+        "text": "A pipeline that does the research and the first draft, and leaves the decisions to you."
+      },
+      {
+        "tag": "H3",
+        "text": "A reason to write, with its source"
+      },
+      {
+        "tag": "H3",
+        "text": "A message ready to review"
+      },
+      {
+        "tag": "H3",
+        "text": "You approve every message"
+      },
+      {
+        "tag": "H2",
+        "text": "Four steps, with you in charge of the last one."
+      },
+      {
+        "tag": "H2",
+        "text": "Control stays with your team"
+      },
+      {
+        "tag": "H2",
+        "text": "Try it in draft mode first"
+      },
+      {
+        "tag": "H2",
+        "text": "Set your first goal"
+      }
+    ],
+    "primary": [
+      {
+        "text": "Set up prospecting",
+        "href": "https://app.1platform.pro/auth/login?next=%2Fmain%2Fprospecting",
+        "height": 44
+      },
+      {
+        "text": "Set up prospecting",
+        "href": "https://app.1platform.pro/auth/login?next=%2Fmain%2Fprospecting",
+        "height": 44
+      }
+    ],
+    "body": "rgb(23, 38, 64)",
+    "errors": [],
+    "firstFocus": {
+      "text": "Skip to main content",
+      "outline": "rgb(40, 84, 167) solid 3px"
+    },
+    "skipTarget": "",
+    "anchor": {
+      "x": 0,
+      "y": 251.84375,
+      "width": 1360,
+      "height": 435.171875
+    },
+    "violations": []
+  },
+  {
+    "key": "en-375",
+    "status": 200,
+    "url": "http://1platform.pro:4921/solutions/prospecting/#how-it-works",
+    "overflow": 0,
+    "headings": [
+      {
+        "tag": "H1",
+        "text": "Find the right companies. You decide what gets sent."
+      },
+      {
+        "tag": "H2",
+        "text": "A pipeline that does the research and the first draft, and leaves the decisions to you."
+      },
+      {
+        "tag": "H3",
+        "text": "A reason to write, with its source"
+      },
+      {
+        "tag": "H3",
+        "text": "A message ready to review"
+      },
+      {
+        "tag": "H3",
+        "text": "You approve every message"
+      },
+      {
+        "tag": "H2",
+        "text": "Four steps, with you in charge of the last one."
+      },
+      {
+        "tag": "H2",
+        "text": "Control stays with your team"
+      },
+      {
+        "tag": "H2",
+        "text": "Try it in draft mode first"
+      },
+      {
+        "tag": "H2",
+        "text": "Set your first goal"
+      }
+    ],
+    "primary": [
+      {
+        "text": "Set up prospecting",
+        "href": "https://app.1platform.pro/auth/login?next=%2Fmain%2Fprospecting",
+        "height": 44
+      },
+      {
+        "text": "Set up prospecting",
+        "href": "https://app.1platform.pro/auth/login?next=%2Fmain%2Fprospecting",
+        "height": 44
+      }
+    ],
+    "body": "rgb(23, 38, 64)",
+    "errors": [],
+    "firstFocus": {
+      "text": "Skip to main content",
+      "outline": "rgb(40, 84, 167) solid 3px"
+    },
+    "skipTarget": "",
+    "anchor": {
+      "x": 0,
+      "y": 223.046875,
+      "width": 375,
+      "height": 525.640625
+    },
+    "violations": []
+  },
+  {
+    "key": "es-1360",
+    "status": 200,
+    "url": "http://1platform.pro:4921/es/soluciones/prospeccion/#how-it-works",
+    "overflow": 0,
+    "headings": [
+      {
+        "tag": "H1",
+        "text": "Encuentra a las empresas correctas. Tú decides qué se envía."
+      },
+      {
+        "tag": "H2",
+        "text": "Un embudo que hace la investigación y el primer borrador, y te deja las decisiones."
+      },
+      {
+        "tag": "H3",
+        "text": "Un motivo para escribir, con su fuente"
+      },
+      {
+        "tag": "H3",
+        "text": "Un mensaje listo para revisar"
+      },
+      {
+        "tag": "H3",
+        "text": "Tú apruebas cada mensaje"
+      },
+      {
+        "tag": "H2",
+        "text": "Cuatro pasos, y el último lo controlas tú."
+      },
+      {
+        "tag": "H2",
+        "text": "El control se queda en tu equipo"
+      },
+      {
+        "tag": "H2",
+        "text": "Pruébalo primero en modo borrador"
+      },
+      {
+        "tag": "H2",
+        "text": "Define tu primer objetivo"
+      }
+    ],
+    "primary": [
+      {
+        "text": "Configurar prospección",
+        "href": "https://app.1platform.pro/auth/login?next=%2Fmain%2Fprospecting",
+        "height": 44
+      },
+      {
+        "text": "Configurar prospección",
+        "href": "https://app.1platform.pro/auth/login?next=%2Fmain%2Fprospecting",
+        "height": 44
+      }
+    ],
+    "body": "rgb(23, 38, 64)",
+    "errors": [],
+    "firstFocus": {
+      "text": "Saltar al contenido principal",
+      "outline": "rgb(40, 84, 167) solid 3px"
+    },
+    "skipTarget": "",
+    "anchor": {
+      "x": 0,
+      "y": 252.4375,
+      "width": 1360,
+      "height": 435.171875
+    },
+    "violations": []
+  },
+  {
+    "key": "es-375",
+    "status": 200,
+    "url": "http://1platform.pro:4921/es/soluciones/prospeccion/#how-it-works",
+    "overflow": 0,
+    "headings": [
+      {
+        "tag": "H1",
+        "text": "Encuentra a las empresas correctas. Tú decides qué se envía."
+      },
+      {
+        "tag": "H2",
+        "text": "Un embudo que hace la investigación y el primer borrador, y te deja las decisiones."
+      },
+      {
+        "tag": "H3",
+        "text": "Un motivo para escribir, con su fuente"
+      },
+      {
+        "tag": "H3",
+        "text": "Un mensaje listo para revisar"
+      },
+      {
+        "tag": "H3",
+        "text": "Tú apruebas cada mensaje"
+      },
+      {
+        "tag": "H2",
+        "text": "Cuatro pasos, y el último lo controlas tú."
+      },
+      {
+        "tag": "H2",
+        "text": "El control se queda en tu equipo"
+      },
+      {
+        "tag": "H2",
+        "text": "Pruébalo primero en modo borrador"
+      },
+      {
+        "tag": "H2",
+        "text": "Define tu primer objetivo"
+      }
+    ],
+    "primary": [
+      {
+        "text": "Configurar prospección",
+        "href": "https://app.1platform.pro/auth/login?next=%2Fmain%2Fprospecting",
+        "height": 44
+      },
+      {
+        "text": "Configurar prospección",
+        "href": "https://app.1platform.pro/auth/login?next=%2Fmain%2Fprospecting",
+        "height": 44
+      }
+    ],
+    "body": "rgb(23, 38, 64)",
+    "errors": [],
+    "firstFocus": {
+      "text": "Saltar al contenido principal",
+      "outline": "rgb(40, 84, 167) solid 3px"
+    },
+    "skipTarget": "",
+    "anchor": {
+      "x": 0,
+      "y": 222.84375,
+      "width": 375,
+      "height": 525.640625
+    },
+    "violations": []
+  }
+]

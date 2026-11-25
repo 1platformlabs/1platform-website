@@ -1,0 +1,72 @@
+{
+  "tenants": [
+    {
+      "slug": "oneplatform",
+      "brand_name": "One Platform",
+      "brand_mark": "1",
+      "brand_wordmark": "One Platform",
+      "domain": "1platform.pro",
+      "locales": [
+        "en",
+        "es"
+      ],
+      "default_locale": "en",
+      "home_template": "photographic-service",
+      "theme": {
+        "accent": "#2854a7",
+        "accent_contrast": "#ffffff",
+        "display_font": "manrope"
+      },
+      "destinations": {
+        "docs": "https://developer.1platform.pro/",
+        "app": "https://app.1platform.pro/app/",
+        "support": "https://wa.me/50253946564",
+        "status": null
+      },
+      "brand_assets": {
+        "icon": "/brand/one-platform-symbol.png",
+        "social_image": "/og/default.png"
+      },
+      "google_site_verification": "google1dd96c2b1cc5f482",
+      "google_site_verifications": [
+        "google0e2e0extra0proof"
+      ],
+      "pages": [
+        "/",
+        "/about/",
+        "/blog/",
+        "/blog/1platform-vs-custom-toolchain/",
+        "/blog/ai-content-best-practices/",
+        "/blog/automate-seo-pipeline/",
+        "/blog/electronic-invoicing-online-business/",
+        "/blog/getting-started-5-minutes/",
+        "/blog/integrating-payments-into-your-saas/",
+        "/blog/launch-online-store-30-minutes/",
+        "/blog/programmatic-link-building/",
+        "/changelog/",
+        "/contact/",
+        "/cookies/",
+        "/for-agencies/",
+        "/for-developers/",
+        "/payments-invoicing/",
+        "/pricing/",
+        "/privacy/",
+        "/solutions/",
+        "/solutions/ads/",
+        "/solutions/content/",
+        "/solutions/deliveries/",
+        "/solutions/online-store/",
+        "/solutions/prospecting/",
+        "/solutions/review-plates/",
+        "/solutions/whitelabel/",
+        "/terms/"
+      ],
+      "indexable": true,
+      "status": "published",
+      "domain_is_final": true,
+      "host_aliases": [
+        "www.1platform.pro"
+      ]
+    }
+  ]
+}

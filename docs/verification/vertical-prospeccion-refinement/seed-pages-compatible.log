@@ -1,0 +1,4 @@
+2026-11-22 09:32:57,583 INFO fixture ok: slug=oneplatform documents=66 routes=28 locales=['en', 'es'] keys=1692/locale
+2026-11-22 09:32:57,584 INFO == 2026-09-08_seed_site_pages start (dry=False, db=e2e_vertical_prospeccion, collection=site_pages) ==
+2026-11-22 09:32:57,622 INFO stats: {'examined': 66, 'inserted': 2, 'updated': 0, 'unchanged': 64, 'pages_written': 0}
+2026-11-22 09:32:57,645 INFO verify: 66 document(s) match the fixture, 28 route(s) published

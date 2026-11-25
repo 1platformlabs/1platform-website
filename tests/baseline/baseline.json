@@ -3,8 +3,8 @@
   "subject": "the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo",
   "host": "1platform.pro",
   "bodies": "tests/baseline/html",
-  "total_routes": 102,
-  "ok_routes": 53,
+  "total_routes": 106,
+  "ok_routes": 57,
   "redirect_routes": 48,
   "other_routes": 1,
   "entries": [
@@ -423,8 +423,15 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "4311d1dd3b5ac1e2ec979c3931e9a49b088f45a8cb3e61771fb4337ed13a59cd",
-      "bytes": 76796
+      "sha256": "3bf466bad79e96d4abf699188d38c012f11238417c596469a5599295c81ab194",
+      "bytes": 79021
+    },
+    {
+      "route": "/es/soluciones/cupones/",
+      "status": 200,
+      "file": "es/soluciones/cupones/index.html",
+      "sha256": "71839aa1a8ffdc3b7683b99c64e78c7f07058919878d623049477eeb2a49d569",
+      "bytes": 37808
     },
     {
       "route": "/es/soluciones/envios/",
@@ -448,6 +455,13 @@
       "bytes": 37167
     },
     {
+      "route": "/es/soluciones/prospeccion/",
+      "status": 200,
+      "file": "es/soluciones/prospeccion/index.html",
+      "sha256": "e5c3ab7b69c66475f871d480fd82e8af7d9b907f28673a07a8f5807e4738a771",
+      "bytes": 37268
+    },
+    {
       "route": "/es/soluciones/publicidad/",
       "status": 200,
       "file": "es/soluciones/publicidad/index.html",
@@ -465,8 +479,8 @@
       "route": "/es/soluciones/tienda-online/",
       "status": 200,
       "file": "es/soluciones/tienda-online/index.html",
-      "sha256": "dfa0933640f261e47ee7395b6122bc38186b5522f1f32ae27bf3af66c0b66f49",
-      "bytes": 39527
+      "sha256": "273674356f8016d2f66b4c36103cf4847249fea0bd4cfcb7cbdcad669e7ec27d",
+      "bytes": 41575
     },
     {
       "route": "/es/solutions/",
@@ -564,8 +578,8 @@
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "93ffbd2e6d97748010b17bae4d1861dd967ea09ee165622402532ee2ed904b5d",
-      "bytes": 74757
+      "sha256": "2eaf0971f2f48b9f92484aa9e45aed0d374ee56e8392bcb92bf8ebd43a0c20f6",
+      "bytes": 76929
     },
     {
       "route": "/solutions/ads/",
@@ -582,6 +596,13 @@
       "bytes": 44567
     },
     {
+      "route": "/solutions/coupons/",
+      "status": 200,
+      "file": "solutions/coupons/index.html",
+      "sha256": "5f9cc391fffaa4f3d6bad4ac57cdae8c77eff0208ee4609fe63d9add9b8f1399",
+      "bytes": 37515
+    },
+    {
       "route": "/solutions/deliveries/",
       "status": 200,
       "file": "solutions/deliveries/index.html",
@@ -592,8 +613,15 @@
       "route": "/solutions/online-store/",
       "status": 200,
       "file": "solutions/online-store/index.html",
-      "sha256": "eaecf1d593151ac826d8a9715e98d3222ecca88939752117abf88250a5b37383",
-      "bytes": 39109
+      "sha256": "2dd12e5c54762044231997b5742a692d31c004e24bd418741da327d29c3d35f1",
+      "bytes": 41102
+    },
+    {
+      "route": "/solutions/prospecting/",
+      "status": 200,
+      "file": "solutions/prospecting/index.html",
+      "sha256": "26b023de7422e7b051586052b984a216c76bbc299a9511a228aed75a9709f080",
+      "bytes": 36843
     },
     {
       "route": "/solutions/review-plates/",
