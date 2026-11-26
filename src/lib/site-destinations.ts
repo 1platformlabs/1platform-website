@@ -138,12 +138,12 @@ export function prospectingUrl(locals: DestinationLocals): string | null {
 }
 
 /**
- * Where "create my first coupon" leads: the tenant's panel sign-in, carrying the
- * coupons module as `next` (epic cupones-motor-core, MCU-09). Relative to the
- * app base, like `plateOrderUrl`, so the panel's basename is kept. `null`
- * when the tenant has no panel; the caller renders no CTA, never a default.
+ * The tenant's panel sign-in carrying a panel route as `next`. Relative to the
+ * app base, like `plateOrderUrl`, so the panel's basename is kept, and a base
+ * that already is the sign-in is used as is. `null` when the tenant has no
+ * panel; the caller renders no CTA, never a default.
  */
-export function couponsUrl(locals: DestinationLocals): string | null {
+function panelSignInWithNext(locals: DestinationLocals, next: string): string | null {
   const base = locals.tenant.destinations.app
   if (!base) return null
   const root = new URL(base)
@@ -152,6 +152,22 @@ export function couponsUrl(locals: DestinationLocals): string | null {
   const url = alreadyLogin ? new URL(root.pathname.replace(/\/$/, ''), root) : new URL('auth/login', root)
   url.search = ''
   url.hash = ''
-  url.searchParams.set('next', '/main/coupons')
+  url.searchParams.set('next', next)
   return environmentDestination(url.toString())
+}
+
+/**
+ * Where "create my first coupon" leads: the tenant's panel sign-in, carrying the
+ * coupons module as `next` (epic cupones-motor-core, MCU-09).
+ */
+export function couponsUrl(locals: DestinationLocals): string | null {
+  return panelSignInWithNext(locals, '/main/coupons')
+}
+
+/**
+ * Where "place an order" leads: the tenant's panel sign-in, carrying the Growth
+ * section as `next` (epic vertical-crecimiento, VCR-10).
+ */
+export function growthUrl(locals: DestinationLocals): string | null {
+  return panelSignInWithNext(locals, '/main/growth')
 }

@@ -168,6 +168,11 @@ export default defineMessages({
       'Build a paid campaign, fund it from your workspace balance, and get back whatever was not spent once it settles.',
     'solutions.group.distribution.item.advertising.replaces': 'A second billing relationship to advertise',
 
+    'solutions.group.distribution.item.growth.title': 'Growth',
+    'solutions.group.distribution.item.growth.desc':
+      'Order followers, views and comments for your profiles, or links, press articles and voice-overs made by our team, paid from your balance and only for profiles and sites you have verified.',
+    'solutions.group.distribution.item.growth.replaces': 'A different seller for each network, each paid separately',
+
     // — Group: developer platform ———————————————————————————————
     'solutions.group.payments.eyebrow': 'Developer platform',
     'solutions.group.payments.title': 'The operational layer for builders',
@@ -365,6 +370,11 @@ export default defineMessages({
     'solutions.group.distribution.item.advertising.desc':
       'Arma una campaña pagada, fondéala con el saldo de tu espacio de trabajo y recupera lo que no se gastó cuando concilia.',
     'solutions.group.distribution.item.advertising.replaces': 'Una segunda relación de cobro para anunciarte',
+
+    'solutions.group.distribution.item.growth.title': 'Crecimiento',
+    'solutions.group.distribution.item.growth.desc':
+      'Pide seguidores, reproducciones y comentarios para tus perfiles, o enlaces, notas de prensa y locuciones hechos por nuestro equipo, pagados con tu saldo y sólo para perfiles y sitios que verificaste.',
+    'solutions.group.distribution.item.growth.replaces': 'Un vendedor distinto para cada red, cada uno con su propio pago',
 
     // — Grupo: plataforma para desarrolladores ————————————————————
     'solutions.group.payments.eyebrow': 'Plataforma para desarrolladores',
