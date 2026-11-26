@@ -283,7 +283,7 @@ test('neither RSS feed carries the other language', async () => {
 
 test('no provider name appears under /es/ outside the privacy policy', async () => {
   const banned =
-    /openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b/i;
+    /openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|pinecone|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b/i;
 
   const { es } = await publishedPagesByLocale();
   const scanned = es.filter((p) => !p.route.startsWith(PRIVACY_ES));
@@ -379,6 +379,7 @@ test('the English tree kept every address it had before the epic', async () => {
     '/solutions/review-plates/',
     '/solutions/prospecting/',
     '/solutions/coupons/',
+    '/solutions/knowledge-base/',
     '/solutions/ads/',
     '/payments-invoicing/',
     '/for-agencies/',

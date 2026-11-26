@@ -203,7 +203,7 @@ report "fonts are self-hosted and preloaded" \
 # out: an earlier version of this rule matched only `privacy.astro|privacy.ts`,
 # which silently excluded nothing that mattered and turned the legally-required
 # processor disclosure into a permanent red.
-m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b' $SRC $PROSE \
+m=$(grep -rniE 'openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|pinecone|\bmeta[ -](ads|business|platforms)\b|\bfacebook\b|\binstagram\b' $SRC $PROSE \
   | grep -viE '(^|/)privacy(\.(en|es))?\.(astro|ts):' | strip_comments)
 # Two exemptions by PLACE and by WORD. A line in one of these files is dropped
 # only if, with that file's words removed, it no longer matches -- so any other

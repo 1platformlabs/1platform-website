@@ -138,12 +138,13 @@ export function prospectingUrl(locals: DestinationLocals): string | null {
 }
 
 /**
- * Where "create my first coupon" leads: the tenant's panel sign-in, carrying the
- * coupons module as `next` (epic cupones-motor-core, MCU-09). Relative to the
- * app base, like `plateOrderUrl`, so the panel's basename is kept. `null`
- * when the tenant has no panel; the caller renders no CTA, never a default.
+ * The tenant's panel sign-in, carrying an in-panel route as `next` so a visitor
+ * lands on that module after signing in. Relative to the app base, like
+ * `plateOrderUrl`, so the panel's basename is kept, and a base that is already
+ * the sign-in is used as is. `null` when the tenant has no panel; the caller
+ * renders no CTA, never a default.
  */
-export function couponsUrl(locals: DestinationLocals): string | null {
+function panelSignInUrl(locals: DestinationLocals, next: string): string | null {
   const base = locals.tenant.destinations.app
   if (!base) return null
   const root = new URL(base)
@@ -152,6 +153,22 @@ export function couponsUrl(locals: DestinationLocals): string | null {
   const url = alreadyLogin ? new URL(root.pathname.replace(/\/$/, ''), root) : new URL('auth/login', root)
   url.search = ''
   url.hash = ''
-  url.searchParams.set('next', '/main/coupons')
+  url.searchParams.set('next', next)
   return environmentDestination(url.toString())
+}
+
+/**
+ * Where "create my first coupon" leads: the panel sign-in with the coupons
+ * module as `next` (epic cupones-motor-core, MCU-09).
+ */
+export function couponsUrl(locals: DestinationLocals): string | null {
+  return panelSignInUrl(locals, '/main/coupons')
+}
+
+/**
+ * Where "set up my knowledge base" leads: the panel sign-in with the knowledge
+ * base as `next` (epic rag-en-agentes, RAG-09).
+ */
+export function knowledgeBaseUrl(locals: DestinationLocals): string | null {
+  return panelSignInUrl(locals, '/main/knowledge')
 }

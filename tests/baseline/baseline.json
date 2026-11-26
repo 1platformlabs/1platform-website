@@ -3,8 +3,8 @@
   "subject": "the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo",
   "host": "1platform.pro",
   "bodies": "tests/baseline/html",
-  "total_routes": 106,
-  "ok_routes": 57,
+  "total_routes": 108,
+  "ok_routes": 59,
   "redirect_routes": 48,
   "other_routes": 1,
   "entries": [
@@ -411,8 +411,8 @@
       "route": "/es/privacidad/",
       "status": 200,
       "file": "es/privacidad/index.html",
-      "sha256": "fe7baa13465c32aec1d6ccd52695fa8b23168e2ad39d8517bf3e913844571329",
-      "bytes": 37651
+      "sha256": "e2c793df5eac34cfa838f0ca30d0bc27fdb60a0208dd9698ff0ca0a2a7cd1d01",
+      "bytes": 39004
     },
     {
       "route": "/es/privacy/",
@@ -423,8 +423,15 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "3bf466bad79e96d4abf699188d38c012f11238417c596469a5599295c81ab194",
-      "bytes": 79021
+      "sha256": "abfce145cee7865eff1da96ceabc429d9c83cc0a46c2465122495516a12d979e",
+      "bytes": 80217
+    },
+    {
+      "route": "/es/soluciones/base-de-conocimiento/",
+      "status": 200,
+      "file": "es/soluciones/base-de-conocimiento/index.html",
+      "sha256": "43e0080a6a614e4a8c92801730e08b63a897aca6962d52e1d4b2e814c0e95c7c",
+      "bytes": 36742
     },
     {
       "route": "/es/soluciones/cupones/",
@@ -571,15 +578,15 @@
       "route": "/privacy/",
       "status": 200,
       "file": "privacy/index.html",
-      "sha256": "e534935c5face0bf825fb12e70968f0df56a3ff8c87166fe08806c8f8d5981d6",
-      "bytes": 35219
+      "sha256": "5f8940439a4e5287c2b4253e7154acab34051db3ab3c90226517640371b3379e",
+      "bytes": 36371
     },
     {
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "2eaf0971f2f48b9f92484aa9e45aed0d374ee56e8392bcb92bf8ebd43a0c20f6",
-      "bytes": 76929
+      "sha256": "fccfcb1c676a9c1a067916465a3cebb740b88399e2174c82c952b51f7c70eb2d",
+      "bytes": 78076
     },
     {
       "route": "/solutions/ads/",
@@ -608,6 +615,13 @@
       "file": "solutions/deliveries/index.html",
       "sha256": "7a98f0b410017539bfc29152648d7f787d8b5cc970c65ed3a53116742d6e1ffd",
       "bytes": 49853
+    },
+    {
+      "route": "/solutions/knowledge-base/",
+      "status": 200,
+      "file": "solutions/knowledge-base/index.html",
+      "sha256": "5009fa45ecf6dcd32ce3b086172233caa231179799e318d17b81743d7e23b679",
+      "bytes": 36072
     },
     {
       "route": "/solutions/online-store/",
