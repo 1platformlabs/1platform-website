@@ -52,6 +52,11 @@ const VENDE_REVIEWS: Review[] = [
 
 // ── half 1: the module, no browser ────────────────────────────────────────
 
+function restoreEnv(name: string, value: string | undefined): void {
+  if (value === undefined) delete process.env[name];
+  else process.env[name] = value;
+}
+
 test.describe('site-reviews module', () => {
   const realFetch = globalThis.fetch;
   const realSource = process.env.SITE_MANIFEST_SOURCE;
@@ -71,8 +76,12 @@ test.describe('site-reviews module', () => {
   });
   test.afterEach(() => {
     globalThis.fetch = realFetch;
-    process.env.SITE_MANIFEST_SOURCE = realSource;
-    process.env.SITE_API_BASE_URL = realBase;
+    // `process.env.X = undefined` does not unset: Node stores the STRING
+    // "undefined". That string is a truthy SITE_API_BASE_URL, so every later
+    // spec in this worker built `undefined/api/v1/...` and failed on a URL it
+    // could not parse (1platform-website#202). Restore by deleting.
+    restoreEnv('SITE_MANIFEST_SOURCE', realSource);
+    restoreEnv('SITE_API_BASE_URL', realBase);
   });
 
   const json = (body: unknown, status = 200) => () => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
