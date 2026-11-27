@@ -138,13 +138,12 @@ export function prospectingUrl(locals: DestinationLocals): string | null {
 }
 
 /**
- * The tenant's panel sign-in, carrying an in-panel route as `next` so a visitor
- * lands on that module after signing in. Relative to the app base, like
- * `plateOrderUrl`, so the panel's basename is kept, and a base that is already
- * the sign-in is used as is. `null` when the tenant has no panel; the caller
- * renders no CTA, never a default.
+ * The tenant's panel sign-in carrying a panel route as `next`. Relative to the
+ * app base, like `plateOrderUrl`, so the panel's basename is kept, and a base
+ * that already is the sign-in is used as is. `null` when the tenant has no
+ * panel; the caller renders no CTA, never a default.
  */
-function panelSignInUrl(locals: DestinationLocals, next: string): string | null {
+function panelSignInWithNext(locals: DestinationLocals, next: string): string | null {
   const base = locals.tenant.destinations.app
   if (!base) return null
   const root = new URL(base)
@@ -158,17 +157,25 @@ function panelSignInUrl(locals: DestinationLocals, next: string): string | null 
 }
 
 /**
- * Where "create my first coupon" leads: the panel sign-in with the coupons
- * module as `next` (epic cupones-motor-core, MCU-09).
+ * Where "create my first coupon" leads: the tenant's panel sign-in, carrying the
+ * coupons module as `next` (epic cupones-motor-core, MCU-09).
  */
 export function couponsUrl(locals: DestinationLocals): string | null {
-  return panelSignInUrl(locals, '/main/coupons')
+  return panelSignInWithNext(locals, '/main/coupons')
 }
 
 /**
- * Where "set up my knowledge base" leads: the panel sign-in with the knowledge
- * base as `next` (epic rag-en-agentes, RAG-09).
+ * Where "place an order" leads: the tenant's panel sign-in, carrying the Growth
+ * section as `next` (epic vertical-crecimiento, VCR-10).
+ */
+export function growthUrl(locals: DestinationLocals): string | null {
+  return panelSignInWithNext(locals, '/main/growth')
+}
+
+/**
+ * Where "set up my knowledge base" leads: the tenant's panel sign-in, carrying the
+ * knowledge base as `next` (epic rag-en-agentes, RAG-09).
  */
 export function knowledgeBaseUrl(locals: DestinationLocals): string | null {
-  return panelSignInUrl(locals, '/main/knowledge')
+  return panelSignInWithNext(locals, '/main/knowledge')
 }

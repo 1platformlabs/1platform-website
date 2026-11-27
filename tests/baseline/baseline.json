@@ -3,8 +3,8 @@
   "subject": "the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo",
   "host": "1platform.pro",
   "bodies": "tests/baseline/html",
-  "total_routes": 108,
-  "ok_routes": 59,
+  "total_routes": 110,
+  "ok_routes": 61,
   "redirect_routes": 48,
   "other_routes": 1,
   "entries": [
@@ -423,8 +423,8 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "abfce145cee7865eff1da96ceabc429d9c83cc0a46c2465122495516a12d979e",
-      "bytes": 80217
+      "sha256": "27071e2e9bbffaabc54736e3757aa955b0ed2d29f3dc2664101ea03fad33aa48",
+      "bytes": 81291
     },
     {
       "route": "/es/soluciones/base-de-conocimiento/",
@@ -432,6 +432,13 @@
       "file": "es/soluciones/base-de-conocimiento/index.html",
       "sha256": "43e0080a6a614e4a8c92801730e08b63a897aca6962d52e1d4b2e814c0e95c7c",
       "bytes": 36742
+    },
+    {
+      "route": "/es/soluciones/crecimiento/",
+      "status": 200,
+      "file": "es/soluciones/crecimiento/index.html",
+      "sha256": "f8fbea1c16d2b68f86ee2348062bc44fb547a985cb55685ed0601a020279aee7",
+      "bytes": 36319
     },
     {
       "route": "/es/soluciones/cupones/",
@@ -585,8 +592,8 @@
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "fccfcb1c676a9c1a067916465a3cebb740b88399e2174c82c952b51f7c70eb2d",
-      "bytes": 78076
+      "sha256": "a28229a46013620d94623ba90b83817c8a9a0752d6fbfebbd88af95d2c36fa3a",
+      "bytes": 79116
     },
     {
       "route": "/solutions/ads/",
@@ -615,6 +622,13 @@
       "file": "solutions/deliveries/index.html",
       "sha256": "7a98f0b410017539bfc29152648d7f787d8b5cc970c65ed3a53116742d6e1ffd",
       "bytes": 49853
+    },
+    {
+      "route": "/solutions/growth/",
+      "status": 200,
+      "file": "solutions/growth/index.html",
+      "sha256": "e4a6c5c1f56e7d9c13a6cd5b0eafd67669ea495bfc79ddd028f5fbd5b0fb4471",
+      "bytes": 35959
     },
     {
       "route": "/solutions/knowledge-base/",

@@ -298,6 +298,20 @@ const growAndReach: Solution[] = [
     replaces: t('solutions.group.distribution.item.advertising.replaces'),
     href: l('/solutions/ads/'),
   },
+  // Same rule as Coupons (vertical-crecimiento, VCR-10): the card exists only
+  // where the tenant publishes the landing, and its keys are asked only inside
+  // the branch.
+  ...(Astro.locals.tenant.pages.includes('/solutions/growth/')
+    ? [
+        {
+          icon: 'trend' as const,
+          title: t('solutions.group.distribution.item.growth.title'),
+          description: t('solutions.group.distribution.item.growth.desc'),
+          replaces: t('solutions.group.distribution.item.growth.replaces'),
+          href: l('/solutions/growth/'),
+        },
+      ]
+    : []),
 ];
 
 /* Developer platform — the operational layer for builders. */
