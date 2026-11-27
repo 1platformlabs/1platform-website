@@ -24,7 +24,7 @@ const BASE = `http://localhost:${PORT}`;
 const PLATFORM_HOST = '1platform.pro';
 const ROUTE = '/solutions/review-plates/';
 const EXPECTED_QUERY = 'next=%2Fmain%2Fplates%2Forders%3Fnew%3D1';
-const PROVIDERS = /openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|facebook|instagram|whatsapp|google|\bmeta\b/i;
+const PROVIDERS = /openai|anthropic|\bmigo\b|tributax|pixabay|pexels|valueserp|publisuites|nicho\.ai|\bstripe\b|\bresend\b|pinecone|facebook|instagram|whatsapp|google|\bmeta\b/i;
 
 const visibleText = (html: string) =>
   html

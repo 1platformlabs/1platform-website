@@ -171,3 +171,11 @@ export function couponsUrl(locals: DestinationLocals): string | null {
 export function growthUrl(locals: DestinationLocals): string | null {
   return panelSignInWithNext(locals, '/main/growth')
 }
+
+/**
+ * Where "set up my knowledge base" leads: the tenant's panel sign-in, carrying the
+ * knowledge base as `next` (epic rag-en-agentes, RAG-09).
+ */
+export function knowledgeBaseUrl(locals: DestinationLocals): string | null {
+  return panelSignInWithNext(locals, '/main/knowledge')
+}

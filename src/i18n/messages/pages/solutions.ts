@@ -193,6 +193,10 @@ export default defineMessages({
     'solutions.group.payments.item.aiAgents.desc':
       'Create autonomous agents from templates or a guided wizard. Schedule runs and handle human approvals.',
     'solutions.group.payments.item.aiAgents.replaces': 'Custom automation scripts',
+    'solutions.group.payments.item.knowledgeBase.title': 'Knowledge base',
+    'solutions.group.payments.item.knowledgeBase.desc':
+      'Give your agents your documents, FAQs and site pages. They search them before answering, cite the source and never show internal files to customers.',
+    'solutions.group.payments.item.knowledgeBase.replaces': 'Answers pasted by hand into every agent’s instructions',
     'solutions.group.payments.item.inAppNotifications.title': 'In-App Notifications',
     'solutions.group.payments.item.inAppNotifications.desc':
       'Push notifications to a single user or broadcast to all. List the feed, mark read, and read unread count.',
@@ -396,6 +400,10 @@ export default defineMessages({
     'solutions.group.payments.item.aiAgents.desc':
       'Crea agentes autónomos a partir de plantillas o un asistente guiado. Programa ejecuciones y gestiona aprobaciones humanas.',
     'solutions.group.payments.item.aiAgents.replaces': 'Scripts de automatización hechos a medida',
+    'solutions.group.payments.item.knowledgeBase.title': 'Base de conocimiento',
+    'solutions.group.payments.item.knowledgeBase.desc':
+      'Dale a tus agentes tus documentos, preguntas frecuentes y páginas de tus sitios. Los consultan antes de responder, citan la fuente y nunca muestran lo interno a tus clientes.',
+    'solutions.group.payments.item.knowledgeBase.replaces': 'Respuestas pegadas a mano en las instrucciones de cada agente',
     'solutions.group.payments.item.inAppNotifications.title': 'Notificaciones en la app',
     'solutions.group.payments.item.inAppNotifications.desc':
       'Envía notificaciones a un solo usuario o a todos a la vez. Lista el feed, marca como leídas y consulta el conteo de no leídas.',

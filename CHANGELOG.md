@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Knowledge base solution page (EN `/solutions/knowledge-base/`, ES `/es/soluciones/base-de-conocimiento/`), its card in Solutions and its header/footer entries: documents, FAQs and site pages your agents search before answering, with the source cited and public/internal sources. The privacy policy declares the knowledge base's search processor and its retention; the design guard and the Spanish HTML scan now reject that processor's name anywhere else. The route is hidden until it is published in the tenant's pages (epic `rag-en-agentes`, RAG-09).
+
 - The Social media capability now names what can be published: posts, Reels and Stories (ES «Publicaciones, Reels e Historias»). Merge only after the Reels/Stories capability is on in production and its real-account test passed (epic `redes-sociales-reels-y-stories`, F5).
 
 - Keep the platform-address and custom-domain cards in two full-width columns on desktop, with aligned headings and a single column on mobile; long example addresses no longer split across lines at 1280 px.

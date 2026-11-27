@@ -137,6 +137,12 @@ assert_green "provider in privacy partial (en)" \
   "src/page-content/legal/privacy.en.astro" '<p>We use Stripe for payments.</p>'
 assert_green "provider in privacy catalogue" \
   "src/i18n/messages/pages/privacy.ts" "  'x.seeded': 'Usamos Stripe para los pagos.',"
+# The knowledge base's processor (rag-en-agentes, RAG-09): disclosed in the
+# privacy policy, red anywhere else -- the landing presents it as our own.
+assert_red "knowledge processor in an ordinary page" "external provider names" "$PAGE" \
+  '<p>Tu base de conocimiento vive en Pinecone.</p>'
+assert_green "knowledge processor in privacy partial (en)" \
+  "src/page-content/legal/privacy.en.astro" '<p>We use <strong>Pinecone</strong> for search.</p>'
 
 # The advertising family this epic brings to the site. The narrow spelling has
 # to be proved in BOTH directions or it is worth nothing: red on the brand as

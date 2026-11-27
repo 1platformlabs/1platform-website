@@ -3,8 +3,8 @@
   "subject": "the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo",
   "host": "1platform.pro",
   "bodies": "tests/baseline/html",
-  "total_routes": 108,
-  "ok_routes": 59,
+  "total_routes": 110,
+  "ok_routes": 61,
   "redirect_routes": 48,
   "other_routes": 1,
   "entries": [
@@ -411,8 +411,8 @@
       "route": "/es/privacidad/",
       "status": 200,
       "file": "es/privacidad/index.html",
-      "sha256": "fe7baa13465c32aec1d6ccd52695fa8b23168e2ad39d8517bf3e913844571329",
-      "bytes": 37651
+      "sha256": "e2c793df5eac34cfa838f0ca30d0bc27fdb60a0208dd9698ff0ca0a2a7cd1d01",
+      "bytes": 39004
     },
     {
       "route": "/es/privacy/",
@@ -423,8 +423,15 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "a4fe0dfbf8351147ab765454f3ad0683b76be53ec46d8a3fb6871ef8e51fd09c",
-      "bytes": 80095
+      "sha256": "27071e2e9bbffaabc54736e3757aa955b0ed2d29f3dc2664101ea03fad33aa48",
+      "bytes": 81291
+    },
+    {
+      "route": "/es/soluciones/base-de-conocimiento/",
+      "status": 200,
+      "file": "es/soluciones/base-de-conocimiento/index.html",
+      "sha256": "43e0080a6a614e4a8c92801730e08b63a897aca6962d52e1d4b2e814c0e95c7c",
+      "bytes": 36742
     },
     {
       "route": "/es/soluciones/crecimiento/",
@@ -578,15 +585,15 @@
       "route": "/privacy/",
       "status": 200,
       "file": "privacy/index.html",
-      "sha256": "e534935c5face0bf825fb12e70968f0df56a3ff8c87166fe08806c8f8d5981d6",
-      "bytes": 35219
+      "sha256": "5f8940439a4e5287c2b4253e7154acab34051db3ab3c90226517640371b3379e",
+      "bytes": 36371
     },
     {
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "70decb48bae39e541956f5f5b7d727c826c60fa8bd3ab180c2b6ff003bca8812",
-      "bytes": 77969
+      "sha256": "a28229a46013620d94623ba90b83817c8a9a0752d6fbfebbd88af95d2c36fa3a",
+      "bytes": 79116
     },
     {
       "route": "/solutions/ads/",
@@ -622,6 +629,13 @@
       "file": "solutions/growth/index.html",
       "sha256": "e4a6c5c1f56e7d9c13a6cd5b0eafd67669ea495bfc79ddd028f5fbd5b0fb4471",
       "bytes": 35959
+    },
+    {
+      "route": "/solutions/knowledge-base/",
+      "status": 200,
+      "file": "solutions/knowledge-base/index.html",
+      "sha256": "5009fa45ecf6dcd32ce3b086172233caa231179799e318d17b81743d7e23b679",
+      "bytes": 36072
     },
     {
       "route": "/solutions/online-store/",

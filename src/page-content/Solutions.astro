@@ -344,6 +344,20 @@ const developerPlatform: Solution[] = [
     replaces: t('solutions.group.payments.item.aiAgents.replaces'),
     href: l('/for-developers/'),
   },
+  // Same rule as the review-plates card (rag-en-agentes, RAG-09): the card
+  // exists only where the tenant publishes the landing, and its keys are asked
+  // only inside the branch.
+  ...(Astro.locals.tenant.pages.includes('/solutions/knowledge-base/')
+    ? [
+        {
+          icon: 'clipboard' as const,
+          title: t('solutions.group.payments.item.knowledgeBase.title'),
+          description: t('solutions.group.payments.item.knowledgeBase.desc'),
+          replaces: t('solutions.group.payments.item.knowledgeBase.replaces'),
+          href: l('/solutions/knowledge-base/'),
+        },
+      ]
+    : []),
   {
     icon: 'bell',
     title: t('solutions.group.payments.item.inAppNotifications.title'),
