@@ -294,7 +294,7 @@ test('canonicalRouteOf reads the tenant topology, not a hard-coded /es/', async 
   expect(routes.canonicalRouteOf('/en/contact/', bilingualSpanish)).toBe('/contact/')
 })
 
-test('publishedUrls enumerates 42 URLs for oneplatform, and every alternate is one of them', async () => {
+test('publishedUrls enumerates 44 URLs for oneplatform, and every alternate is one of them', async () => {
   const { routes, tenants } = await loaded()
   const { platform, clinic } = tenantsBySlug(tenants)
 
@@ -305,9 +305,9 @@ test('publishedUrls enumerates 42 URLs for oneplatform, and every alternate is o
   // alternates the Core pairs (tests/blog-from-api.spec.ts counts those: 16).
   // Before the blog moved: 27 routes x 2 = 54, i.e. 38 + 16 posts. Asserted
   // exactly, not as a floor.
-  expect(urls.length, 'the published URL set changed size — that is a regression or an intended change nobody wrote down').toBe(42)
-  expect(new Set(urls.map((u) => u.path)).size, 'a URL was enumerated twice').toBe(42)
-  expect(urls.filter((u) => u.path === '/es/' || u.path.startsWith('/es/')).length).toBe(21)
+  expect(urls.length, 'the published URL set changed size — that is a regression or an intended change nobody wrote down').toBe(44)
+  expect(new Set(urls.map((u) => u.path)).size, 'a URL was enumerated twice').toBe(44)
+  expect(urls.filter((u) => u.path === '/es/' || u.path.startsWith('/es/')).length).toBe(22)
   expect(urls.some((u) => /\/blog\/[^/]+\/$/.test(u.path)), 'a post leaked into the manifest enumeration').toBe(false)
 
   const published = new Set(urls.map((u) => u.path))
@@ -477,8 +477,8 @@ test('the repo page list is the exporter’s list, byte for byte', async () => {
   // The floor the task asks for, kept even though the comparison above subsumes
   // it: if the exporter ever stops emitting `published_routes`, the equality
   // would compare two empty-ish things and these named routes are what catches it.
-  expect(platform.pages.length).toBe(29)
-  expect(new Set(platform.pages).size, 'a route is listed twice in the repo manifest').toBe(29)
+  expect(platform.pages.length).toBe(30)
+  expect(new Set(platform.pages).size, 'a route is listed twice in the repo manifest').toBe(30)
   for (const route of ['/', '/pricing/', '/blog/', '/changelog/', '/for-developers/']) {
     expect(platform.pages, `the repo manifest dropped ${route}`).toContain(route)
   }

@@ -379,6 +379,7 @@ test('the English tree kept every address it had before the epic', async () => {
     '/solutions/review-plates/',
     '/solutions/prospecting/',
     '/solutions/coupons/',
+    '/solutions/growth/',
     '/solutions/ads/',
     '/payments-invoicing/',
     '/for-agencies/',
