@@ -1,0 +1,25 @@
+
+> 1platform-website@3.5.17 build
+> astro build
+
+09:34:48 [@astrojs/node] Enabling sessions with filesystem storage
+09:34:48 [vite] Re-optimizing dependencies because vite config has changed
+09:34:49 [content] Syncing content
+09:34:49 [content] Astro config changed
+09:34:49 [content] Clearing content store
+09:34:49 [content] Synced content
+09:34:49 [types] Generated 484ms
+09:34:49 [build] output: "server"
+09:34:49 [build] mode: "server"
+09:34:49 [build] directory: /Users/staimer/Documents/1platform-worktrees/vertical-prospeccion-website-control/dist/
+09:34:49 [build] adapter: @astrojs/node
+09:34:49 [build] Collecting build info...
+09:34:49 [build] ✓ Completed in 530ms.
+09:34:49 [build] Building server entrypoints...
+09:34:49 [vite] ✓ built in 238ms
+09:34:49 [vite] ✓ built in 378ms
+09:34:49 [vite] ✓ built in 35ms
+09:34:49 [build] Rearranging server assets...
+09:34:49 [build] ✓ Completed in 684ms.
+09:34:49 [build] Server built in 1.21s
+09:34:49 [build] Complete!

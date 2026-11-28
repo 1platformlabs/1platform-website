@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+- Knowledge base solution page (EN `/solutions/knowledge-base/`, ES `/es/soluciones/base-de-conocimiento/`), its card in Solutions and its header/footer entries: documents, FAQs and site pages your agents search before answering, with the source cited and public/internal sources. The privacy policy declares the knowledge base's search processor and its retention; the design guard and the Spanish HTML scan now reject that processor's name anywhere else. The route is hidden until it is published in the tenant's pages (epic `rag-en-agentes`, RAG-09).
+
+- The Social media capability now names what can be published: posts, Reels and Stories (ES «Publicaciones, Reels e Historias»). Merge only after the Reels/Stories capability is on in production and its real-account test passed (epic `redes-sociales-reels-y-stories`, F5).
+
+- Keep the platform-address and custom-domain cards in two full-width columns on desktop, with aligned headings and a single column on mobile; long example addresses no longer split across lines at 1280 px.
+
+- Online Store solution page (es/en): new section «Start without your own domain» — a store opens on a platform address (`yourstore.1platform.pro`) and the domain is connected later, after which the platform address redirects to it keeping paths. The first step, the comparison row and the comment that denied a courtesy subdomain are rewritten in both catalogues (`solutions-online-store`, `photographic-interiors`) and in the activation overlay reference; frozen baseline of the two online-store routes re-frozen. Publish only once the capability is ON in PROD.
+
 - Contacto: «Sign in at app.1platform.pro and use…» / «Inicia sesión en app.1platform.pro y…» con espacios alrededor del enlace (#188).
 - «Saltar al contenido» lleva el foco a `#main-content` también con movimiento normal (el desplazamiento suave cancelaba la navegación del navegador), y los anclajes internos siguen funcionando tras una navegación del lado del cliente (#197).
 - Las páginas en español del blog muestran las fechas en español en PROD: la imagen de runtime (nginx:alpine + `nodejs`) traía sólo los datos ICU en inglés; ahora instala `icu-data-full` y el build falla si `Intl` no formatea español (#179).
+
 - Rename the brand to One Platform across the site sources: every compiled catalogue, the Solutions JSON-LD and the legal title (now `tenant.brand_name`). Terms, Privacy and Cookies name the service One Platform; the operating entity stays 1Platform Labs. A new `check-tells` rule keeps `1Platform` (outside `1Platform Labs` and comments) out of catalogues, page content, layouts and components. `scripts/rename-brand-content.mjs` prepares the same rename offline for the stored `oneplatform` content (report with `remaining: 0`); applying it to production is a separate step (see `docs/infrastructure-branding-activation.md`).
 
 - Apply the approved One Platform refresh: configurable symbol/name chrome, API + MCP integration section, compact capabilities and alternating section backgrounds. Add a local WhatsApp-style lead-to-appointment demo with typing, internal scrolling, pause and reduced-motion support in ES/EN. The offline tenant-content preparer includes the brand patch; publication remains a separate step.

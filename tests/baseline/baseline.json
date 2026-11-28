@@ -3,8 +3,8 @@
   "subject": "the response of the standalone Node adapter, SITE_MANIFEST_SOURCE=repo",
   "host": "1platform.pro",
   "bodies": "tests/baseline/html",
-  "total_routes": 102,
-  "ok_routes": 53,
+  "total_routes": 110,
+  "ok_routes": 61,
   "redirect_routes": 48,
   "other_routes": 1,
   "entries": [
@@ -12,8 +12,8 @@
       "route": "/",
       "status": 200,
       "file": "index.html",
-      "sha256": "0e2ecd4cea3bcb70b91a6a7cebf9ae2bca13e67939b38504a25831521fcb1d10",
-      "bytes": 43442
+      "sha256": "f182847e4272414019173f2cc4bd53929b2afda53131622c9e8f2a8a58115b0e",
+      "bytes": 43450
     },
     {
       "route": "/404.html",
@@ -162,8 +162,8 @@
       "route": "/es/",
       "status": 200,
       "file": "es/index.html",
-      "sha256": "fef49ee4f53a8592592b2e21c87c2332fc522c194133c7a2a5fdf80ea5a9ba2b",
-      "bytes": 43963
+      "sha256": "05d80ee00a74ca69da30bdd22d6af7e1d06947e9f3f70e21958bc06cbfe70049",
+      "bytes": 43974
     },
     {
       "route": "/es/about/",
@@ -411,8 +411,8 @@
       "route": "/es/privacidad/",
       "status": 200,
       "file": "es/privacidad/index.html",
-      "sha256": "d4e2d4d2e756a6d129186c6aff9a30d47b167cb3f831032d9419a0a96ea08464",
-      "bytes": 37651
+      "sha256": "c1f15e4659b7c2472b3a17c32404232a7b060d1e2edcb52d1ec4ca84a7bea289",
+      "bytes": 39004
     },
     {
       "route": "/es/privacy/",
@@ -423,8 +423,29 @@
       "route": "/es/soluciones/",
       "status": 200,
       "file": "es/soluciones/index.html",
-      "sha256": "8740ba1588802e5bb3c70270093eb568e4e8cd1be52bf9af57b670d9d427a993",
-      "bytes": 76796
+      "sha256": "a1aa938b58dd942db8567362ecd61268ac591e657437c3782dc6fa5b0d6042e9",
+      "bytes": 81291
+    },
+    {
+      "route": "/es/soluciones/base-de-conocimiento/",
+      "status": 200,
+      "file": "es/soluciones/base-de-conocimiento/index.html",
+      "sha256": "6195cc2a98eb627d60eaab6aba236a8142ab9a5538fcf822eb1816d2c6ab6a8d",
+      "bytes": 36742
+    },
+    {
+      "route": "/es/soluciones/crecimiento/",
+      "status": 200,
+      "file": "es/soluciones/crecimiento/index.html",
+      "sha256": "7e5ad6ee02c1765233a5f9e0f0f0a4f0f50a82cb747bdfb1449b3a597bb24feb",
+      "bytes": 36319
+    },
+    {
+      "route": "/es/soluciones/cupones/",
+      "status": 200,
+      "file": "es/soluciones/cupones/index.html",
+      "sha256": "f51af4441eb482fe3a1889c0661c113e12d607392a35a711a43e3daddce6a707",
+      "bytes": 37808
     },
     {
       "route": "/es/soluciones/envios/",
@@ -448,6 +469,13 @@
       "bytes": 37167
     },
     {
+      "route": "/es/soluciones/prospeccion/",
+      "status": 200,
+      "file": "es/soluciones/prospeccion/index.html",
+      "sha256": "fe3fe1b1abbf9607876671d181ccaf684d2a7d777027d4b4e244e4ac577adb2c",
+      "bytes": 37268
+    },
+    {
       "route": "/es/soluciones/publicidad/",
       "status": 200,
       "file": "es/soluciones/publicidad/index.html",
@@ -465,8 +493,8 @@
       "route": "/es/soluciones/tienda-online/",
       "status": 200,
       "file": "es/soluciones/tienda-online/index.html",
-      "sha256": "b85b667afb1a2f2efef8fccc6aa73bc0e23acf0785776ed5ee4d2436385d6793",
-      "bytes": 39527
+      "sha256": "b3d4e607f9969596aa803b042e467e854ae4e1bbb7c86fd36f7e84860d983b90",
+      "bytes": 41575
     },
     {
       "route": "/es/solutions/",
@@ -557,15 +585,15 @@
       "route": "/privacy/",
       "status": 200,
       "file": "privacy/index.html",
-      "sha256": "0b1734ec75296a27f9b796af146c6d81d232f383fb604c3002b6b7d5ab731e81",
-      "bytes": 35219
+      "sha256": "8a8f1a414044600c21cc68c7649b5f6f501f0774a7277c6db80de69cc11f4791",
+      "bytes": 36371
     },
     {
       "route": "/solutions/",
       "status": 200,
       "file": "solutions/index.html",
-      "sha256": "1d96721fb0ec2e26a891eb03c5b457f13123c4e0bd09cea1f3258f527e7c2daf",
-      "bytes": 74757
+      "sha256": "b3f8266be6d2891476700f1e4a172bbe28377789677080a0b57e8db13bb9f662",
+      "bytes": 79116
     },
     {
       "route": "/solutions/ads/",
@@ -582,6 +610,13 @@
       "bytes": 44567
     },
     {
+      "route": "/solutions/coupons/",
+      "status": 200,
+      "file": "solutions/coupons/index.html",
+      "sha256": "0e30670f3d46e1f8b68ce47e150f0db25de06d4f5263d0b01fcd9afec8082e2f",
+      "bytes": 37515
+    },
+    {
       "route": "/solutions/deliveries/",
       "status": 200,
       "file": "solutions/deliveries/index.html",
@@ -589,11 +624,32 @@
       "bytes": 49853
     },
     {
+      "route": "/solutions/growth/",
+      "status": 200,
+      "file": "solutions/growth/index.html",
+      "sha256": "a5d059248b1a8963a9e3639f58acbb78ed608e3c6c260c271126ee1feeeb2f0c",
+      "bytes": 35959
+    },
+    {
+      "route": "/solutions/knowledge-base/",
+      "status": 200,
+      "file": "solutions/knowledge-base/index.html",
+      "sha256": "48e0b086a6be56cec810c0a2855835770273a39da1c8b8c3c24e78d000dfd8d3",
+      "bytes": 36072
+    },
+    {
       "route": "/solutions/online-store/",
       "status": 200,
       "file": "solutions/online-store/index.html",
-      "sha256": "6fc00ce9cb52e3a0bae84e1ed1a2dc5330abcc547ad9d9ab192a1401bddef82c",
-      "bytes": 39109
+      "sha256": "a0b55ba87d815a99ebfe39439201887273120a365a1d4fa58fafbd23da4a06f6",
+      "bytes": 41102
+    },
+    {
+      "route": "/solutions/prospecting/",
+      "status": 200,
+      "file": "solutions/prospecting/index.html",
+      "sha256": "76f76de4514b4261f295eb6a2a2495548a00aee2db797882179d9782cc50b35e",
+      "bytes": 36843
     },
     {
       "route": "/solutions/review-plates/",

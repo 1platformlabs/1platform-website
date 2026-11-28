@@ -81,6 +81,16 @@ export default defineMessages({
       'A counter plate with NFC and QR that takes your customer to your reviews, your profile or your chat, and that you can re-point at any time.',
     'solutions.group.intelligence.item.reviewPlates.replaces': 'A printed code that goes stale',
 
+    'solutions.group.intelligence.item.prospecting.title': 'Prospecting',
+    'solutions.group.intelligence.item.prospecting.desc':
+      'Describe who you want to reach: Sofia finds companies that fit, researches their sites and prepares a message for each one. You approve every message before it is sent.',
+    'solutions.group.intelligence.item.prospecting.replaces': 'A spreadsheet of leads and copy-pasted emails',
+
+    'solutions.group.intelligence.item.coupons.title': 'Coupons',
+    'solutions.group.intelligence.item.coupons.desc':
+      'Create discount coupons and batches of unique codes, set when they apply and how many times they can be used, and have your online store, in-person sales and your clients’ balance honor them.',
+    'solutions.group.intelligence.item.coupons.replaces': 'Codes kept in a spreadsheet and applied by hand',
+
     // — Group: build your site ———————————————————————————————————
     'solutions.group.content.eyebrow': 'Build your site',
     'solutions.group.content.title': 'Everything the storefront is made of',
@@ -158,6 +168,11 @@ export default defineMessages({
       'Build a paid campaign, fund it from your workspace balance, and get back whatever was not spent once it settles.',
     'solutions.group.distribution.item.advertising.replaces': 'A second billing relationship to advertise',
 
+    'solutions.group.distribution.item.growth.title': 'Growth',
+    'solutions.group.distribution.item.growth.desc':
+      'Order followers, views and comments for your profiles, or links, press articles and voice-overs made by our team, paid from your balance and only for profiles and sites you have verified.',
+    'solutions.group.distribution.item.growth.replaces': 'A different seller for each network, each paid separately',
+
     // — Group: developer platform ———————————————————————————————
     'solutions.group.payments.eyebrow': 'Developer platform',
     'solutions.group.payments.title': 'The operational layer for builders',
@@ -178,6 +193,10 @@ export default defineMessages({
     'solutions.group.payments.item.aiAgents.desc':
       'Create autonomous agents from templates or a guided wizard. Schedule runs and handle human approvals.',
     'solutions.group.payments.item.aiAgents.replaces': 'Custom automation scripts',
+    'solutions.group.payments.item.knowledgeBase.title': 'Knowledge base',
+    'solutions.group.payments.item.knowledgeBase.desc':
+      'Give your agents your documents, FAQs and site pages. They search them before answering, cite the source and never show internal files to customers.',
+    'solutions.group.payments.item.knowledgeBase.replaces': 'Answers pasted by hand into every agent’s instructions',
     'solutions.group.payments.item.inAppNotifications.title': 'In-App Notifications',
     'solutions.group.payments.item.inAppNotifications.desc':
       'Push notifications to a single user or broadcast to all. List the feed, mark read, and read unread count.',
@@ -274,6 +293,16 @@ export default defineMessages({
       'Una placa de mostrador con NFC y QR que lleva a tu cliente a tus reseñas, tu perfil o tu chat, y que puedes redirigir cuando quieras.',
     'solutions.group.intelligence.item.reviewPlates.replaces': 'Un código impreso que queda viejo',
 
+    'solutions.group.intelligence.item.prospecting.title': 'Prospección',
+    'solutions.group.intelligence.item.prospecting.desc':
+      'Describe a quién quieres llegar: Sofia encuentra empresas que encajan, investiga sus sitios y prepara un mensaje para cada una. Tú apruebas cada mensaje antes de que se envíe.',
+    'solutions.group.intelligence.item.prospecting.replaces': 'Una hoja de cálculo de contactos y correos copiados a mano',
+
+    'solutions.group.intelligence.item.coupons.title': 'Cupones',
+    'solutions.group.intelligence.item.coupons.desc':
+      'Crea cupones de descuento y lotes de códigos únicos, define cuándo aplican y cuántas veces se pueden usar, y haz que tu tienda en línea, tus ventas en persona y el saldo de tus clientes los respeten.',
+    'solutions.group.intelligence.item.coupons.replaces': 'Códigos en una hoja de cálculo que se aplican a mano',
+
     // — Grupo: crea tu sitio —————————————————————————————————————
     'solutions.group.content.eyebrow': 'Crea tu sitio',
     'solutions.group.content.title': 'Todo lo que forma la tienda',
@@ -346,6 +375,11 @@ export default defineMessages({
       'Arma una campaña pagada, fondéala con el saldo de tu espacio de trabajo y recupera lo que no se gastó cuando concilia.',
     'solutions.group.distribution.item.advertising.replaces': 'Una segunda relación de cobro para anunciarte',
 
+    'solutions.group.distribution.item.growth.title': 'Crecimiento',
+    'solutions.group.distribution.item.growth.desc':
+      'Pide seguidores, reproducciones y comentarios para tus perfiles, o enlaces, notas de prensa y locuciones hechos por nuestro equipo, pagados con tu saldo y sólo para perfiles y sitios que verificaste.',
+    'solutions.group.distribution.item.growth.replaces': 'Un vendedor distinto para cada red, cada uno con su propio pago',
+
     // — Grupo: plataforma para desarrolladores ————————————————————
     'solutions.group.payments.eyebrow': 'Plataforma para desarrolladores',
     'solutions.group.payments.title': 'La capa operativa para quienes construyen',
@@ -366,6 +400,10 @@ export default defineMessages({
     'solutions.group.payments.item.aiAgents.desc':
       'Crea agentes autónomos a partir de plantillas o un asistente guiado. Programa ejecuciones y gestiona aprobaciones humanas.',
     'solutions.group.payments.item.aiAgents.replaces': 'Scripts de automatización hechos a medida',
+    'solutions.group.payments.item.knowledgeBase.title': 'Base de conocimiento',
+    'solutions.group.payments.item.knowledgeBase.desc':
+      'Dale a tus agentes tus documentos, preguntas frecuentes y páginas de tus sitios. Los consultan antes de responder, citan la fuente y nunca muestran lo interno a tus clientes.',
+    'solutions.group.payments.item.knowledgeBase.replaces': 'Respuestas pegadas a mano en las instrucciones de cada agente',
     'solutions.group.payments.item.inAppNotifications.title': 'Notificaciones en la app',
     'solutions.group.payments.item.inAppNotifications.desc':
       'Envía notificaciones a un solo usuario o a todos a la vez. Lista el feed, marca como leídas y consulta el conteo de no leídas.',

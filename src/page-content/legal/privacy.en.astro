@@ -86,6 +86,9 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
 <h3>Video and image generation providers</h3>
 <p>We use <strong>Higgsfield</strong> (Higgsfield AI) to generate Creative Studio videos and images. When you choose an approved presenter for an order, its photo is sent to Higgsfield, where a copy is kept (the uploaded image and, for videos, an avatar created from it) used only to generate your pieces. Deleting that copy at the provider is not automatic: our team removes it by hand (see sections 5 and 7). Higgsfield's data use policies apply to that processing.</p>
 
+<h3>Knowledge base search providers</h3>
+<p>We use <strong>Pinecone</strong> (Pinecone Systems, Inc., United States) to store and search your workspace's knowledge base. When you upload a document or turn on the sync of your FAQs and site pages, we split its text into fragments and send them to Pinecone, which turns them into vector representations (embeddings) and stores the fragments, those vectors and the identifiers we attach to them (the source, its version and whether it is public or internal). When one of your agents, or you from the dashboard, searches the knowledge base, the question is sent to Pinecone to find and rank the most relevant fragments. The original file stays encrypted in our own storage. Pinecone's data processing terms apply to that processing.</p>
+
 <h3>Social networks</h3>
 <p>When you connect a Facebook Page or an Instagram professional account, we exchange data with <strong>Meta Platforms</strong> on your behalf: we send the posts you publish, the replies you write and the answers to the messages people send you, and we receive the data described in section 1. Meta's terms and data policy apply to that content on its platforms.</p>
 
@@ -126,6 +129,7 @@ const { l } = useI18n(Astro.url.pathname, Astro.locals);
   <li><strong>Messenger and Instagram conversations:</strong> Kept as part of your sales records while your account is active, and deleted when you or the person who wrote asks us to delete them, or when your account is deleted</li>
   <li><strong>Social network insights:</strong> Retained for up to 16 months to show period comparisons, and deleted earlier when you ask us to delete your account</li>
   <li><strong>Creative Studio face photos (presenters):</strong> Kept in our systems while the presenter exists in your account. If our team rejects the photo, we remove it from our systems. If you delete the presenter, it disappears from your list and your orders and we remove the photo from our systems. If the photo was already sent to Higgsfield, the copy there is only deleted when our team removes it by hand, after you delete the presenter or ask us to; this can take some time. We keep the consent record as proof. Pieces already delivered stay in your library</li>
+  <li><strong>Knowledge base content:</strong> Kept while the source exists in your knowledge base. When you delete a source, we delete its fragments and vectors at Pinecone and its file from our storage; when a published FAQ or page is unpublished, it leaves the knowledge base on the next sync; and when your workspace is closed, its whole knowledge base is deleted</li>
   <li><strong>Anonymized analytics:</strong> May be retained indefinitely in aggregate form</li>
 </ul>
 

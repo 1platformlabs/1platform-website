@@ -63,6 +63,11 @@ const approvedInteriors = infrastructureChrome(Astro.locals.messages);
       <div class="section-heading"><div><p class="eyebrow">{t('interiors.store.whatYouGet.eyebrow')}</p><h2 class="section-title">{t('interiors.store.whatYouGet.lead')}</h2></div><p>{t('interiors.benefit_lede')}</p></div>
       <div class="feature-grid">{features.map(({ key, icon }) => <article class="feature-card"><span class="feature-icon"><Icon name={icon} /></span><h3>{t(`interiors.store.feature.${key}.title`)}</h3><p>{t(`interiors.store.feature.${key}.desc`)}</p></article>)}</div>
     </div></section>
+    <section class="section section--wash" id="store-address"><div class="wrap">
+      <div class="section-heading"><div><p class="eyebrow">{t('interiors.store.noDomain.eyebrow')}</p><h2 class="section-title">{t('interiors.store.noDomain.title')}</h2></div><p>{t('interiors.store.noDomain.lead')}</p></div>
+      <div class="feature-grid store-address-grid">{['first', 'later'].map((key) => <article class="feature-card"><span class="feature-icon"><Icon name="globe-meridian" /></span><h3>{t(`interiors.store.noDomain.${key}.host`)}</h3><p>{t(`interiors.store.noDomain.${key}.desc`)}</p></article>)}</div>
+      <p class="section-lede">{t('interiors.store.noDomain.caution')}</p>
+    </div></section>
     <section class="story-section" id="incluido">
       <Image class="story-image" src={paymentsImage} alt="" widths={[640, 960, 1440]} sizes="(max-width: 760px) 100vw, 50vw" loading="lazy" />
       <div class="story-copy"><p class="eyebrow">{t('interiors.store.inTheBox.eyebrow')}</p><h2>{t('interiors.store.inTheBox.title')}</h2><p>{t('interiors.store.inTheBox.desc')}</p><a class="button button--white" href="#lista-incluida">{t('interiors.included_cta')}<Icon name="arrow-right-short" /></a></div>
@@ -73,3 +78,11 @@ const approvedInteriors = infrastructureChrome(Astro.locals.messages);
   </div>
 </BaseLayout>
 ) : (<LegacyOnlineStore />)}
+
+<style is:global>
+  .photographic-interior .feature-grid.store-address-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .photographic-interior .store-address-grid .feature-card .feature-icon { margin-bottom: 0; }
+  @media (max-width: 760px) {
+    .photographic-interior .feature-grid.store-address-grid { grid-template-columns: 1fr; }
+  }
+</style>

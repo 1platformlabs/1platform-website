@@ -166,6 +166,33 @@ const related: { title: string; description: string; href: string }[] = [
     </div>
   </section>
 
+  <!-- Starting without a domain: the platform address, and the domain later -->
+  <section class="section" id="store-address">
+    <div class="container">
+      <div class="statement reveal">
+        <p class="eyebrow">{t('solutions-online-store.noDomain.eyebrow')}</p>
+        <h2 class="statement__lead">{t('solutions-online-store.noDomain.title')}</h2>
+        <p>{t('solutions-online-store.noDomain.lead')}</p>
+      </div>
+
+      <div class="features">
+        <Card
+          icon="domain"
+          title={t('solutions-online-store.noDomain.first.host')}
+          description={t('solutions-online-store.noDomain.first.desc')}
+          class="reveal"
+        />
+        <Card
+          icon="domain"
+          title={t('solutions-online-store.noDomain.later.host')}
+          description={t('solutions-online-store.noDomain.later.desc')}
+          class="reveal"
+        />
+      </div>
+      <p class="reveal">{t('solutions-online-store.noDomain.caution')}</p>
+    </div>
+  </section>
+
   <!-- The concrete inventory, so "everything you need" is checkable -->
   <section class="section section--alt">
     <div class="container">
