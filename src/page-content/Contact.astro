@@ -132,11 +132,12 @@ const expectations: { icon: IconName; term: string; detail: string }[] = [
           </div>
 
           <p class="panel__hint">
-            {t('contact.panel.hint.pre')}
-            {appUrl(Astro.locals) && (
-              <a href={appUrl(Astro.locals)}>{new URL(appUrl(Astro.locals)!).host}</a>
-            )}
-            {t('contact.panel.hint.post')}
+            {/* Astro drops the whitespace between adjacent expressions and the
+                catalogue values carry none at their edges, so the separators are
+                explicit — one space on each side of the link, one alone without it (#188). */}
+            {t('contact.panel.hint.pre')}{appUrl(Astro.locals) ? (
+              <Fragment>{' '}<a href={appUrl(Astro.locals)}>{new URL(appUrl(Astro.locals)!).host}</a>{' '}</Fragment>
+            ) : ' '}{t('contact.panel.hint.post')}
           </p>
         </div>
       </div>

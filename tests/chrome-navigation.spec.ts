@@ -152,3 +152,37 @@ test('the home retains reciprocal SEO alternatives and focused project CTAs', as
   await expect(page.locator('#mcp')).toHaveCount(1);
   await expect(page.locator('#agente-redes')).toHaveCount(1);
 });
+
+// #197: Lenis cancelled the native fragment navigation, so with normal motion
+// the skip link kept focus and the next Tab landed on the header logo.
+for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+  test(`the skip link hands the keyboard to the main content (motion: ${reducedMotion})`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion });
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/about/');
+    await page.keyboard.press('Tab');
+    await expect(page.locator('.skip-link')).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/#main-content$/);
+    await page.keyboard.press('Tab');
+    const focusedInMain = () => page.evaluate(() => {
+      const main = document.getElementById('main-content');
+      return !!main && main.contains(document.activeElement) && document.activeElement !== main;
+    });
+    await expect.poll(focusedInMain).toBe(true);
+  });
+}
+
+test('the skip link still skips the navigation after a client-side navigation', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/about/');
+  await page.locator('.brand-nav a', { hasText: 'Blog' }).click();
+  await expect(page).toHaveURL(/\/blog\/$/);
+  await page.locator('.skip-link').focus();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab');
+  await expect.poll(() => page.evaluate(() => {
+    const main = document.getElementById('main-content');
+    return !!main && main.contains(document.activeElement) && document.activeElement !== main;
+  })).toBe(true);
+});
